@@ -27,6 +27,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
 
+from backend.ingestion.models import IngestedSample
+
 logger = logging.getLogger("ygb.bridge_worker")
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -67,6 +69,9 @@ class BridgeIngestionWorker:
         self._batch_sequence: int = 0
         self._batch_history: list[Dict[str, Any]] = []
         self._last_batch: Optional[Dict[str, Any]] = None
+        self._publish_published: int = 0
+        self._publish_failed: int = 0
+        self._publish_last_attempt: Optional[str] = None
         self._load_bridge()
         # Load persistent bridge state
         from backend.bridge.bridge_state import get_bridge_state
@@ -137,7 +142,16 @@ class BridgeIngestionWorker:
             "idempotency_keys_cached": len(self._ingested_keys),
             "batches_completed": len(self._batch_history),
             "last_batch": dict(self._last_batch) if self._last_batch else None,
+            "publish_stats": self.get_publish_stats(),
             **counts,
+        }
+
+    def get_publish_stats(self) -> Dict[str, Any]:
+        """Get cumulative bridge publish statistics for this worker process."""
+        return {
+            "published": self._publish_published,
+            "failed": self._publish_failed,
+            "last_attempt": self._publish_last_attempt,
         }
 
     def _restore_idempotency_keys(self):
@@ -184,6 +198,7 @@ class BridgeIngestionWorker:
         ingested: int,
         dropped: int,
         deduped: int,
+        failed: int = 0,
     ):
         """Finalize and retain a compact batch summary."""
         started_monotonic = float(batch.pop("started_monotonic", time.monotonic()))
@@ -194,6 +209,7 @@ class BridgeIngestionWorker:
             "ingested": ingested,
             "dropped": dropped,
             "deduped": deduped,
+            "failed": failed,
         }
         self._last_batch = batch_summary
         self._batch_history.append(batch_summary)
@@ -305,6 +321,41 @@ class BridgeIngestionWorker:
             "promotion_status": promotion_status,
         }
 
+    @staticmethod
+    def _map_ingested_sample_to_fields(sample: IngestedSample) -> Optional[Dict[str, Any]]:
+        """Map an ingestion sample to bridge fields without fabricating metadata."""
+        cve_id = str(getattr(sample, "cve_id", "") or "")
+        source = str(getattr(sample, "source", "") or "")
+        raw_text = str(getattr(sample, "raw_text", "") or "")
+        if not cve_id or not source or not raw_text:
+            return None
+
+        try:
+            parameters = json.dumps(
+                {
+                    "url": str(getattr(sample, "url", "") or ""),
+                    "tags": list(getattr(sample, "tags", ()) or ()),
+                },
+                separators=(",", ":"),
+            )[:511]
+        except (TypeError, ValueError) as exc:
+            logger.error(
+                "[BRIDGE] Failed to serialize ingestion sample metadata for %s: %s",
+                cve_id,
+                exc,
+            )
+            return None
+
+        return {
+            "endpoint": cve_id,
+            "parameters": parameters,
+            "exploit_vector": raw_text[:511],
+            "impact": str(getattr(sample, "severity", "UNKNOWN") or "UNKNOWN")[:511],
+            "source_tag": source[:511],
+            "sources": [source],
+            "promotion_status": "RESEARCH_PENDING",
+        }
+
     # =========================================================================
     # INGEST OPERATIONS
     # =========================================================================
@@ -327,29 +378,60 @@ class BridgeIngestionWorker:
             logger.error(f"[BRIDGE] ingest error: {e}")
             return -99
 
-    def stream_ingest_new(self, pipeline) -> int:
-        """
-        Stream-ingest new records from the pipeline into the bridge.
-        Called each scheduler cycle. Returns count of new samples ingested.
-        """
-        if not self._lib:
-            return 0
+    def _persist_sample(
+        self,
+        fields: Dict[str, Any],
+        reliability: float,
+        batch_id: str,
+        idempotency_key: str,
+    ) -> None:
+        persisted_sample = {
+            "endpoint": fields["endpoint"],
+            "parameters": fields["parameters"],
+            "exploit_vector": fields["exploit_vector"],
+            "impact": fields["impact"],
+            "source_tag": fields["source_tag"],
+            "reliability": reliability,
+            "ingested_at": datetime.now(timezone.utc).isoformat(),
+            "idempotency_key": idempotency_key,
+            "ingestion_batch_id": batch_id,
+        }
+        persisted_sample["sha256_hash"] = hashlib.sha256(
+            json.dumps(
+                {
+                    "endpoint": persisted_sample["endpoint"],
+                    "parameters": persisted_sample["parameters"],
+                    "exploit_vector": persisted_sample["exploit_vector"],
+                    "impact": persisted_sample["impact"],
+                    "source_tag": persisted_sample["source_tag"],
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        self._bridge_state.append_sample(persisted_sample)
 
+    def _publish_fields_batch(
+        self,
+        mapped_fields: list[Dict[str, Any]],
+        *,
+        mode: str,
+        total_candidates: int,
+        max_samples: int = 0,
+    ) -> Dict[str, int]:
+        """Publish mapped bridge fields while tracking publish statistics."""
+        batch = self._start_batch(mode, total_candidates)
+        self._publish_last_attempt = datetime.now(timezone.utc).isoformat()
         ingested = 0
         dropped = 0
         deduped = 0
-        records = getattr(pipeline, "_records", {})
-        if not records:
-            return 0
+        failed = 0
+        unavailable_failures = 0
 
-        batch = self._start_batch("stream", len(records))
+        for fields in mapped_fields:
+            if max_samples and ingested >= max_samples:
+                break
 
-        for cve_id, record in records.items():
-            fields = self._map_cve_to_sample(record)
-            if not fields:
-                continue
-
-            # Compute idempotency key
             ik = self._compute_idempotency_key(
                 fields["endpoint"], fields["exploit_vector"]
             )
@@ -358,7 +440,6 @@ class BridgeIngestionWorker:
                 deduped += 1
                 continue
 
-            # Compute reliability
             reliability = self._compute_reliability(
                 fields.get("sources", []),
                 fields.get("promotion_status", "RESEARCH_PENDING"),
@@ -368,46 +449,40 @@ class BridgeIngestionWorker:
                 dropped += 1
                 continue
 
-            # Ingest
+            if not self._lib:
+                failed += 1
+                unavailable_failures += 1
+                continue
+
             rc = self._ingest_one(fields, reliability)
             if rc == 0:
                 ingested += 1
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
-                # Persist sample
-                persisted_sample = {
-                    "endpoint": fields["endpoint"],
-                    "parameters": fields["parameters"],
-                    "exploit_vector": fields["exploit_vector"],
-                    "impact": fields["impact"],
-                    "source_tag": fields["source_tag"],
-                    "reliability": reliability,
-                    "ingested_at": datetime.now(timezone.utc).isoformat(),
-                    "idempotency_key": ik,
-                    "ingestion_batch_id": batch["batch_id"],
-                }
-                persisted_sample["sha256_hash"] = hashlib.sha256(
-                    json.dumps(
-                        {
-                            "endpoint": persisted_sample["endpoint"],
-                            "parameters": persisted_sample["parameters"],
-                            "exploit_vector": persisted_sample["exploit_vector"],
-                            "impact": persisted_sample["impact"],
-                            "source_tag": persisted_sample["source_tag"],
-                        },
-                        sort_keys=True,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ).hexdigest()
-                self._bridge_state.append_sample(persisted_sample)
+                self._persist_sample(fields, reliability, batch["batch_id"], ik)
             elif rc == -3:
                 self._total_deduped += 1
                 self._ingested_keys.add(ik)
                 deduped += 1
+            else:
+                failed += 1
+                logger.critical(
+                    "[BRIDGE] Failed to publish sample endpoint=%s rc=%s",
+                    fields["endpoint"],
+                    rc,
+                )
+
+        if unavailable_failures:
+            logger.critical(
+                "[BRIDGE] Bridge unavailable; failed to publish %s eligible samples",
+                unavailable_failures,
+            )
+
+        self._publish_published += ingested
+        self._publish_failed += failed
 
         if ingested > 0:
             self._last_ingest_at = datetime.now(timezone.utc).isoformat()
-            # Persist counters
             self._bridge_state.record_ingest_batch(ingested, ingested)
             self._bridge_state.flush_samples()
 
@@ -416,9 +491,66 @@ class BridgeIngestionWorker:
         if deduped > 0:
             self._bridge_state.record_dedup(deduped)
 
-        self._finish_batch(batch, ingested=ingested, dropped=dropped, deduped=deduped)
+        self._finish_batch(
+            batch,
+            ingested=ingested,
+            dropped=dropped,
+            deduped=deduped,
+            failed=failed,
+        )
+        return {
+            "ingested": ingested,
+            "dropped": dropped,
+            "deduped": deduped,
+            "failed": failed,
+        }
 
-        return ingested
+    def stream_ingest_new(self, pipeline) -> int:
+        """
+        Stream-ingest new records from the pipeline into the bridge.
+        Called each scheduler cycle. Returns count of new samples ingested.
+        """
+        records = getattr(pipeline, "_records", {})
+        if not records:
+            return 0
+
+        mapped_fields: list[Dict[str, Any]] = []
+        for cve_id, record in records.items():
+            fields = self._map_cve_to_sample(record)
+            if not fields:
+                continue
+            mapped_fields.append(fields)
+
+        stats = self._publish_fields_batch(
+            mapped_fields,
+            mode="stream",
+            total_candidates=len(records),
+        )
+        return stats["ingested"]
+
+    def publish_ingestion_samples(self, samples: list[IngestedSample]) -> int:
+        """Publish accepted ingestion samples into the bridge using real metadata only."""
+        if not samples:
+            return 0
+
+        mapped_fields: list[Dict[str, Any]] = []
+        for sample in samples:
+            fields = self._map_ingested_sample_to_fields(sample)
+            if fields is None:
+                logger.warning(
+                    "[BRIDGE] Skipping ingestion sample without required bridge fields: cve_id=%s source=%s",
+                    getattr(sample, "cve_id", ""),
+                    getattr(sample, "source", ""),
+                )
+                continue
+            mapped_fields.append(fields)
+
+        stats = self._publish_fields_batch(
+            mapped_fields,
+            mode="autograbber",
+            total_candidates=len(samples),
+        )
+        return stats["ingested"]
 
     def backfill(self, pipeline, max_samples: int = 0) -> Dict[str, Any]:
         """
@@ -433,79 +565,27 @@ class BridgeIngestionWorker:
             }
 
         t0 = time.time()
-        ingested = 0
-        dropped = 0
-        deduped = 0
-
         records = getattr(pipeline, "_records", {})
         total = len(records)
-        batch = self._start_batch("backfill", total)
 
+        mapped_fields: list[Dict[str, Any]] = []
         for cve_id, record in records.items():
-            if max_samples and ingested >= max_samples:
-                break
-
             fields = self._map_cve_to_sample(record)
             if not fields:
                 continue
+            mapped_fields.append(fields)
 
-            ik = self._compute_idempotency_key(
-                fields["endpoint"], fields["exploit_vector"]
-            )
-            if ik in self._ingested_keys:
-                deduped += 1
-                continue
-
-            reliability = self._compute_reliability(
-                fields.get("sources", []),
-                fields.get("promotion_status", "RESEARCH_PENDING"),
-            )
-            if reliability < RELIABILITY_DROP_THRESHOLD:
-                dropped += 1
-                self._total_dropped += 1
-                continue
-
-            rc = self._ingest_one(fields, reliability)
-            if rc == 0:
-                ingested += 1
-                self._ingested_keys.add(ik)
-                self._total_ingested += 1
-                # Persist sample
-                persisted_sample = {
-                    "endpoint": fields["endpoint"],
-                    "parameters": fields["parameters"],
-                    "exploit_vector": fields["exploit_vector"],
-                    "impact": fields["impact"],
-                    "source_tag": fields["source_tag"],
-                    "reliability": reliability,
-                    "ingested_at": datetime.now(timezone.utc).isoformat(),
-                    "idempotency_key": ik,
-                    "ingestion_batch_id": batch["batch_id"],
-                }
-                persisted_sample["sha256_hash"] = hashlib.sha256(
-                    json.dumps(
-                        {
-                            "endpoint": persisted_sample["endpoint"],
-                            "parameters": persisted_sample["parameters"],
-                            "exploit_vector": persisted_sample["exploit_vector"],
-                            "impact": persisted_sample["impact"],
-                            "source_tag": persisted_sample["source_tag"],
-                        },
-                        sort_keys=True,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ).hexdigest()
-                self._bridge_state.append_sample(persisted_sample)
-            elif rc == -3:
-                deduped += 1
-                self._ingested_keys.add(ik)
-                self._total_deduped += 1
+        stats = self._publish_fields_batch(
+            mapped_fields,
+            mode="backfill",
+            total_candidates=total,
+            max_samples=max_samples,
+        )
 
         elapsed = time.time() - t0
-        self._last_ingest_at = datetime.now(timezone.utc).isoformat()
+        if stats["ingested"] > 0:
+            self._last_ingest_at = datetime.now(timezone.utc).isoformat()
 
-        # Flush samples and persist counters
-        self._bridge_state.flush_samples()
         if self._lib:
             self._bridge_state.set_counts(
                 bridge_count=self._lib.bridge_get_count(),
@@ -517,16 +597,16 @@ class BridgeIngestionWorker:
 
         # Update manifest after backfill
         self.update_manifest()
-        self._finish_batch(batch, ingested=ingested, dropped=dropped, deduped=deduped)
 
         counts = self.get_bridge_counts()
         return {
             "success": True,
-            "batch_id": batch["batch_id"],
+            "batch_id": self._last_batch["batch_id"] if self._last_batch else "",
             "total_available": total,
-            "ingested": ingested,
-            "dropped": dropped,
-            "deduped": deduped,
+            "ingested": stats["ingested"],
+            "dropped": stats["dropped"],
+            "deduped": stats["deduped"],
+            "failed": stats["failed"],
             "elapsed_seconds": round(elapsed, 2),
             "bridge_count": counts.get("bridge_count", 0),
             "bridge_verified_count": counts.get("bridge_verified_count", 0),

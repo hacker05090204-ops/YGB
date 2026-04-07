@@ -13,6 +13,7 @@ import html
 import json
 import logging
 import re
+from collections import deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -47,11 +48,88 @@ class VoiceSession:
     last_error: Optional[str] = None
 
 
+_COMMAND_REQUEST_STATUSES = frozenset(
+    {"PENDING_APPROVAL", "APPROVED", "DENIED", "BLOCKED"}
+)
+
+
+@dataclass(frozen=True)
+class AssistantCommandRequest:
+    """Human-reviewable command request record for governance-blocked actions."""
+
+    request_id: str
+    command: str
+    requested_by: str
+    requested_at: str
+    approval_status: str
+
+    def __post_init__(self) -> None:
+        if not self.command.strip():
+            raise ValueError("Assistant command request rejected: command required")
+        if not self.requested_by.strip():
+            raise ValueError("Assistant command request rejected: requested_by required")
+        if self.approval_status not in _COMMAND_REQUEST_STATUSES:
+            raise ValueError(
+                "Assistant command request rejected: unsupported approval status "
+                f"{self.approval_status}"
+            )
+
+
+class CommandRequestLog:
+    """Append-only bounded request ledger for assistant command approval review."""
+
+    def __init__(self, *, max_entries: int = 1000):
+        if max_entries <= 0:
+            raise ValueError("Command request log rejected: max_entries must be positive")
+        self._entries: deque[AssistantCommandRequest] = deque(maxlen=max_entries)
+
+    def append(self, request: AssistantCommandRequest) -> AssistantCommandRequest:
+        self._entries.append(request)
+        return request
+
+    def entries(self) -> List[AssistantCommandRequest]:
+        return list(self._entries)
+
+    def pending(self) -> List[AssistantCommandRequest]:
+        return [
+            request
+            for request in self._entries
+            if request.approval_status == "PENDING_APPROVAL"
+        ]
+
+
 _active_sessions: Dict[str, VoiceSession] = {}
+_command_request_log = CommandRequestLog(max_entries=1000)
 
 
 def _utc_timestamp() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _normalize_requested_by(requested_by: Any) -> str:
+    normalized = str(requested_by or "").strip()
+    return normalized or "unknown"
+
+
+def _build_command_request(
+    command: str,
+    requested_by: str,
+    approval_status: str,
+) -> AssistantCommandRequest:
+    return AssistantCommandRequest(
+        request_id=f"ACR-{uuid4().hex[:12].upper()}",
+        command=command,
+        requested_by=_normalize_requested_by(requested_by),
+        requested_at=_utc_timestamp(),
+        approval_status=approval_status,
+    )
+
+
+def _latest_active_session() -> Optional[VoiceSession]:
+    if not _active_sessions:
+        return None
+    latest_session_id = next(reversed(_active_sessions))
+    return _active_sessions.get(latest_session_id)
 
 
 def _start_voice_session(turn_count: int = 1) -> VoiceSession:
@@ -79,6 +157,65 @@ def get_active_sessions() -> Dict[str, Dict[str, Any]]:
         session_id: asdict(session)
         for session_id, session in _active_sessions.items()
     }
+
+
+def get_pending_command_requests() -> List[AssistantCommandRequest]:
+    """Return governance-blocked requests awaiting human approval."""
+    return _command_request_log.pending()
+
+
+def request_command(command: str, requested_by: str) -> AssistantCommandRequest:
+    """Queue governance-blocked commands for review or execute approved commands in-session."""
+    normalized_command = str(command or "").strip().upper()
+    if not normalized_command:
+        raise ValueError("Assistant command request rejected: command required")
+
+    normalized_requested_by = _normalize_requested_by(requested_by)
+    if normalized_command in _GOVERNANCE_BLOCKED_COMMANDS:
+        request = _build_command_request(
+            normalized_command,
+            normalized_requested_by,
+            "PENDING_APPROVAL",
+        )
+        _command_request_log.append(request)
+        logger.warning(
+            "Assistant command queued for human approval: command=%s requested_by=%s reason=%s",
+            normalized_command,
+            normalized_requested_by,
+            _GOVERNANCE_BLOCKED_COMMANDS[normalized_command],
+        )
+        return request
+
+    active_session = _latest_active_session()
+    if active_session is None:
+        request = _build_command_request(
+            normalized_command,
+            normalized_requested_by,
+            "BLOCKED",
+        )
+        _command_request_log.append(request)
+        logger.warning(
+            "Assistant command request blocked because no active session exists: command=%s requested_by=%s",
+            normalized_command,
+            normalized_requested_by,
+        )
+        return request
+
+    active_session.turn_count += 1
+    result = dispatch_supported_command(
+        normalized_command,
+        {"requested_by": normalized_requested_by},
+        normalized_command,
+        voice_session=active_session,
+    )
+    approval_status = "APPROVED" if result.get("status") == "ok" else "BLOCKED"
+    request = _build_command_request(
+        normalized_command,
+        normalized_requested_by,
+        approval_status,
+    )
+    _command_request_log.append(request)
+    return request
 
 _SEARCH_ENGINE_DOMAINS = {
     "bing.com",
@@ -366,6 +503,7 @@ def run_research_analysis(query: str) -> Dict[str, Any]:
             "key_terms": list(result.key_terms),
             "word_count": result.word_count,
             "elapsed_ms": result.elapsed_ms,
+            "query_result": asdict(result.query_result) if result.query_result is not None else None,
         },
         "verification": {
             "confidence": verification_confidence,
@@ -616,10 +754,12 @@ def dispatch_supported_command(
             }
 
         if query in _GOVERNANCE_BLOCKED_COMMANDS:
+            approval_request = request_command(query, args.get("requested_by", "unknown"))
             return {
                 "status": "blocked",
                 "message": _GOVERNANCE_BLOCKED_COMMANDS[query],
                 "command_type": query,
+                "approval_request": asdict(approval_request),
             }
 
         return {

@@ -58,9 +58,23 @@ ROLE_VIEWER = 'VIEWER'
 VALID_ROLES = [ROLE_ADMIN, ROLE_WORKER, ROLE_VIEWER]
 _TRUTHY_VALUES = {'1', 'true', 'yes', 'on'}
 _TEMP_ADMIN_SESSION_TOKEN = 'temporary-admin-bypass'
+IS_PRODUCTION = os.getenv('YGB_ENV', 'development') == 'production'
+
+
+class AuthenticationError(RuntimeError):
+    """Raised when admin authentication cannot be completed safely."""
+
+
+def _runtime_is_production() -> bool:
+    configured_environment = os.environ.get('YGB_ENV')
+    if configured_environment is None:
+        return bool(IS_PRODUCTION)
+    return configured_environment.strip().lower() == 'production'
 
 
 def _temporary_auth_bypass_enabled() -> bool:
+    if _runtime_is_production():
+        return False
     return os.environ.get('YGB_TEMP_AUTH_BYPASS', 'false').strip().lower() in _TRUTHY_VALUES
 
 
@@ -522,7 +536,24 @@ def login(email: str, totp_code: str, ip: str = '0.0.0.0') -> dict:
     jwt_token = None
     try:
         jwt_token = create_jwt(user_id, role)
-    except RuntimeError as exc:
+    except Exception as exc:
+        if _runtime_is_production():
+            try:
+                destroy_session(session_token)
+            except OSError as cleanup_exc:
+                logger.critical(
+                    "Failed to destroy admin session after production JWT failure: %s",
+                    cleanup_exc,
+                    exc_info=True,
+                )
+            logger.critical(
+                "JWT creation failed in production; refusing session-only fallback: %s",
+                exc,
+                exc_info=True,
+            )
+            raise AuthenticationError(
+                'JWT creation failed in production; session-only fallback is disabled.'
+            ) from exc
         logger.warning("JWT creation unavailable; falling back to session-only mode: %s", exc)
 
     # Phase 5: Login notification

@@ -35,26 +35,84 @@ PEER_RECOVERY_NO_PEERS_REASON = "no_online_peers"
 PEER_RECOVERY_INCOMPLETE_REASON = "peer_recovery_incomplete"
 CLOUD_RECOVERY_UNAVAILABLE_REASON = "cloud_recovery_unavailable"
 CLOUD_RECOVERY_FAILED_REASON = "cloud_recovery_failed"
+RECOVERY_STATUS_PENDING = "PENDING"
+RECOVERY_STATUS_RESOLVED = "RESOLVED"
+RECOVERY_STATUS_FAILED = "FAILED"
+VALID_RECOVERY_STATUSES = {
+    RECOVERY_STATUS_PENDING,
+    RECOVERY_STATUS_RESOLVED,
+    RECOVERY_STATUS_FAILED,
+}
 
 
 @dataclass
 class RecoveryEvent:
+    event_id: str
     timestamp: str
     peer_id: str
     reason: str
-    resolved: bool
+    status: str = RECOVERY_STATUS_PENDING
+
+    def __post_init__(self) -> None:
+        normalized_status = str(self.status).upper()
+        if normalized_status not in VALID_RECOVERY_STATUSES:
+            raise ValueError(f"Invalid recovery event status: {self.status}")
+        self.status = normalized_status
+
+    @property
+    def resolved(self) -> bool:
+        return self.status == RECOVERY_STATUS_RESOLVED
+
+
+def _build_recovery_event_id(timestamp: str, peer_id: str, reason: str) -> str:
+    return f"{peer_id}:{reason}:{timestamp}"
+
+
+def _coerce_recovery_event(entry: dict) -> Optional[RecoveryEvent]:
+    timestamp = str(entry.get("timestamp", "")).strip()
+    peer_id = str(entry.get("peer_id", "")).strip()
+    reason = str(entry.get("reason", "")).strip()
+    if not timestamp or not peer_id or not reason:
+        return None
+
+    raw_status = entry.get("status")
+    if isinstance(raw_status, str) and raw_status.strip().upper() in VALID_RECOVERY_STATUSES:
+        status = raw_status.strip().upper()
+    else:
+        resolved_flag = entry.get("resolved")
+        if isinstance(resolved_flag, bool):
+            status = RECOVERY_STATUS_RESOLVED if resolved_flag else RECOVERY_STATUS_PENDING
+        else:
+            logger.warning("Skipping recovery log event with invalid status: %s", entry)
+            return None
+
+    event_id = str(entry.get("event_id", "")).strip()
+    if not event_id:
+        event_id = _build_recovery_event_id(timestamp, peer_id, reason)
+
+    try:
+        return RecoveryEvent(
+            event_id=event_id,
+            timestamp=timestamp,
+            peer_id=peer_id,
+            reason=reason,
+            status=status,
+        )
+    except ValueError as exc:
+        logger.warning("Skipping recovery log event: %s", exc)
+        return None
 
 
 def _rotate_recovery_events(events: list[RecoveryEvent]) -> list[RecoveryEvent]:
     if len(events) <= RECOVERY_LOG_ROTATE_AT:
         return events
 
-    unresolved = [event for event in events if event.resolved is False]
-    resolved = [event for event in events if event.resolved is True]
-    keep_unresolved = unresolved[-RECOVERY_LOG_RETAIN_EVENTS:]
-    remaining_slots = max(0, RECOVERY_LOG_RETAIN_EVENTS - len(keep_unresolved))
-    keep_resolved = resolved[-remaining_slots:] if remaining_slots else []
-    rotated = keep_resolved + keep_unresolved
+    active_events = [event for event in events if event.status != RECOVERY_STATUS_RESOLVED]
+    resolved_events = [event for event in events if event.status == RECOVERY_STATUS_RESOLVED]
+    keep_active = active_events[-RECOVERY_LOG_RETAIN_EVENTS:]
+    remaining_slots = max(0, RECOVERY_LOG_RETAIN_EVENTS - len(keep_active))
+    keep_resolved = resolved_events[-remaining_slots:] if remaining_slots else []
+    rotated = keep_resolved + keep_active
     rotated.sort(key=lambda event: event.timestamp)
     return rotated
 
@@ -73,10 +131,9 @@ def _load_recovery_log() -> list[RecoveryEvent]:
     for entry in payload:
         if not isinstance(entry, dict):
             continue
-        try:
-            events.append(RecoveryEvent(**entry))
-        except TypeError:
-            continue
+        event = _coerce_recovery_event(entry)
+        if event is not None:
+            events.append(event)
     return events
 
 
@@ -99,49 +156,82 @@ def _append_recovery_event(
     dedupe_open_events: bool = True,
 ) -> None:
     events = _load_recovery_log()
-    if dedupe_open_events and not resolved:
+    status = RECOVERY_STATUS_RESOLVED if resolved else RECOVERY_STATUS_PENDING
+    if dedupe_open_events and status == RECOVERY_STATUS_PENDING:
         for event in events:
-            if event.peer_id == peer_id and event.reason == reason and event.resolved is False:
+            if (
+                event.peer_id == peer_id
+                and event.reason == reason
+                and event.status == RECOVERY_STATUS_PENDING
+            ):
                 return
+    timestamp = datetime.now(timezone.utc).isoformat()
     events.append(
         RecoveryEvent(
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            event_id=_build_recovery_event_id(timestamp, peer_id, reason),
+            timestamp=timestamp,
             peer_id=peer_id,
             reason=reason,
-            resolved=resolved,
+            status=status,
         )
     )
     _persist_recovery_log(events)
+
+
+def mark_resolved(event_id: str) -> bool:
+    events = _load_recovery_log()
+    updated = False
+    for event in events:
+        if event.event_id != event_id:
+            continue
+        if event.status != RECOVERY_STATUS_RESOLVED:
+            event.status = RECOVERY_STATUS_RESOLVED
+            updated = True
+        break
+    if updated:
+        _persist_recovery_log(events)
+    return updated
 
 
 def mark_recovery_events_resolved(peer_id: str, reason: Optional[str] = None) -> int:
     events = _load_recovery_log()
     updated = 0
     for event in events:
-        if event.resolved:
+        if event.status == RECOVERY_STATUS_RESOLVED:
             continue
         if event.peer_id != peer_id:
             continue
         if reason is not None and event.reason != reason:
             continue
-        event.resolved = True
+        event.status = RECOVERY_STATUS_RESOLVED
         updated += 1
     if updated:
         _persist_recovery_log(events)
     return updated
 
 
-def get_unresolved_events(
+def get_pending_recovery_events(
     peer_id: Optional[str] = None,
     reason: Optional[str] = None,
 ) -> list[RecoveryEvent]:
-    events = [event for event in _load_recovery_log() if event.resolved is False]
+    events = [
+        event
+        for event in _load_recovery_log()
+        if event.status == RECOVERY_STATUS_PENDING
+    ]
     if peer_id is not None:
         events = [event for event in events if event.peer_id == peer_id]
     if reason is not None:
         events = [event for event in events if event.reason == reason]
     events.sort(key=lambda event: event.timestamp)
     return events
+
+
+def get_unresolved_events(
+    peer_id: Optional[str] = None,
+    reason: Optional[str] = None,
+) -> list[RecoveryEvent]:
+    return get_pending_recovery_events(peer_id=peer_id, reason=reason)
 
 
 # ── Priority Classification ──────────────────────────────────────────

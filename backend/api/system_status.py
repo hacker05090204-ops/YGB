@@ -44,6 +44,27 @@ def _safe_call(label: str, fn, *args, **kwargs) -> Dict[str, Any]:
         return {"status": "UNAVAILABLE", "error": str(exc)}
 
 
+def _sub_check_available(result: Any) -> bool:
+    if isinstance(result, dict) and result.get("status") == "UNAVAILABLE":
+        return False
+    return True
+
+
+def _derive_overall_health(sub_checks: Dict[str, Any]) -> str:
+    total_checks = len(sub_checks)
+    if total_checks == 0:
+        return "HEALTHY"
+
+    unavailable_checks = sum(
+        1 for result in sub_checks.values() if not _sub_check_available(result)
+    )
+    if unavailable_checks == 0:
+        return "HEALTHY"
+    if unavailable_checks / total_checks > 0.5:
+        return "CRITICAL"
+    return "DEGRADED"
+
+
 def _get_training_state() -> Dict[str, Any]:
     """Get real training state from the state manager."""
     from backend.training.state_manager import get_training_state_manager
@@ -96,6 +117,7 @@ async def aggregated_system_status(user=Depends(require_auth)):
     Intended for dashboard/monitoring consumption.
     """
     uptime_s = round(time.monotonic() - _BOOT_MONOTONIC, 1)
+    checked_at = datetime.now(UTC).isoformat()
 
     # Gather all subsystem statuses — each call is best-effort
     readiness = _safe_call("readiness", _get_readiness)
@@ -104,6 +126,14 @@ async def aggregated_system_status(user=Depends(require_auth)):
     voice = _safe_call("voice", _get_voice_status)
     storage = _safe_call("storage", _get_storage_health)
     canonical = _safe_call("canonical_status", read_or_refresh_system_status_file)
+    sub_checks = {
+        "readiness": readiness,
+        "metrics": metrics,
+        "training": training,
+        "voice": voice,
+        "storage": storage,
+        "canonical_status": canonical,
+    }
 
     # Determine overall status
     is_ready = readiness.get("ready", False) if isinstance(readiness, dict) else False
@@ -118,9 +148,13 @@ async def aggregated_system_status(user=Depends(require_auth)):
     else:
         overall = "UNHEALTHY"
 
+    overall_health = _derive_overall_health(sub_checks)
+
     return {
         "overall_status": overall,
-        "timestamp": datetime.now(UTC).isoformat(),
+        "overall_health": overall_health,
+        "timestamp": checked_at,
+        "last_checked": checked_at,
         "uptime_s": uptime_s,
         "boot_time": _BOOT_WALL,
         "subsystems": {

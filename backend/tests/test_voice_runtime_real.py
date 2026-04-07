@@ -129,6 +129,23 @@ def test_dispatch_supported_command_tracks_and_closes_voice_session(monkeypatch)
     assert vr.get_active_sessions() == {}
 
 
+def test_blocked_command_creates_pending_approval_request(monkeypatch):
+    monkeypatch.setattr(vr, "_command_request_log", vr.CommandRequestLog(max_entries=1000))
+
+    result = vr.dispatch_supported_command(
+        "START_SCAN",
+        {"requested_by": "user-1"},
+        "start scan now",
+    )
+
+    pending = vr.get_pending_command_requests()
+    assert result["status"] == "blocked"
+    assert result["approval_request"]["approval_status"] == "PENDING_APPROVAL"
+    assert pending
+    assert pending[-1].command == "START_SCAN"
+    assert pending[-1].requested_by == "user-1"
+
+
 def test_execute_orchestrated_intent_closes_voice_session_on_exception(monkeypatch):
     intent = _FakeIntent(command_type="QUERY_STATUS")
     orch = _FakeOrchestrator(intent)
@@ -231,6 +248,7 @@ def test_run_research_analysis_includes_verification(monkeypatch):
 
     assert result["status"] == "ok"
     assert result["research"]["summary"] == "Important update from two sources."
+    assert result["research"]["query_result"] is None
     assert result["verification"]["confidence"] in {"LIKELY", "UNVERIFIED"}
     assert len(result["verification"]["sources"]) >= 2
 

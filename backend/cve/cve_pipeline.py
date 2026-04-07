@@ -29,6 +29,13 @@ from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 
+from backend.ingestion.dedup import DedupIndex
+from backend.ingestion.normalizer import (
+    QualityRejectionLog,
+    SampleQualityScorer,
+    normalize_sample_with_quality,
+)
+
 logger = logging.getLogger("ygb.cve_pipeline")
 
 PARSER_VERSION = "2.0.0"
@@ -50,6 +57,7 @@ class IngestResult(Enum):
     UPDATED = "UPDATED"       # CVE existed, merged new data
     NO_DELTA = "NO_DELTA"     # Source had no new data
     DUPLICATE = "DUPLICATE"   # Exact duplicate, skipped
+    REJECTED = "REJECTED"     # Failed quality gate, skipped
     ERROR = "ERROR"           # Fetch/parse error
 
 
@@ -103,6 +111,8 @@ class CVERecord:
     promotion_status: str = "RESEARCH_PENDING"
     block_reason: str = ""
     merge_conflicts: List[str] = field(default_factory=list)
+    quality_score: float = 0.0
+    accepted: bool = True
 
 
 @dataclass
@@ -199,10 +209,15 @@ class StageResult:
     duplicates: int = 0
     rejected: int = 0
     rejection_reasons: Dict[str, int] = field(default_factory=dict)
+    quality_score: float = 0.0
+    accepted: bool = True
     message: str = ""
     timestamp: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
+
+
+PipelineStageResult = StageResult
 
 
 # =============================================================================
@@ -293,7 +308,7 @@ def compute_content_hash(cve_id: str, description: str, severity: str,
 class CVEPipeline:
     """Multi-source CVE feed with deterministic merge and truthful status."""
 
-    def __init__(self):
+    def __init__(self, quality_scorer: SampleQualityScorer | None = None):
         self._records: Dict[str, CVERecord] = {}
         self._freshness: Dict[str, FreshnessSLA] = {}
         self._source_status: Dict[str, SourceStatus] = {}
@@ -302,6 +317,13 @@ class CVEPipeline:
         self._merge_log: List[Dict[str, Any]] = []
         self._stage_results: List[Dict[str, Any]] = []
         self._rejection_log: List[Dict[str, Any]] = []
+        dedup_path = os.environ.get("YGB_CVE_DEDUP_STORE_PATH", "data/dedup_store.json")
+        self._quality_scorer = quality_scorer or SampleQualityScorer(
+            dedup_store=DedupIndex(dedup_path),
+            rejection_log=QualityRejectionLog(),
+        )
+        self._last_ingest_rejection_reason: str | None = None
+        self._last_ingest_quality_score: float = 0.0
         self._initialize_sources()
 
     def _initialize_sources(self):
@@ -403,6 +425,7 @@ class CVEPipeline:
                 "total": self._slo.rejected_records,
                 "recent": self.get_rejection_log(limit=10),
             },
+            "quality": self.get_pipeline_quality_stats(),
             "sources": self.get_source_status(),
             "checked_at": datetime.now(timezone.utc).isoformat(),
         }
@@ -421,6 +444,8 @@ class CVEPipeline:
         duplicates: int = 0,
         rejected: int = 0,
         rejection_reasons: Optional[Dict[str, int]] = None,
+        quality_score: float = 0.0,
+        accepted: bool = True,
         message: str = "",
     ):
         """Persist stage-level results for scheduler and operator visibility."""
@@ -434,6 +459,8 @@ class CVEPipeline:
                 duplicates=duplicates,
                 rejected=rejected,
                 rejection_reasons=dict(rejection_reasons or {}),
+                quality_score=float(quality_score),
+                accepted=bool(accepted),
                 message=message,
             )
         )
@@ -461,28 +488,31 @@ class CVEPipeline:
         source_id: str,
         reason: str,
         payload: Optional[Any] = None,
+        score: float | None = None,
     ):
         """Record a strict rejection with a compact payload preview."""
         preview = ""
         if payload is not None:
             try:
                 preview = json.dumps(payload, sort_keys=True, default=str)[:400]
-            except Exception:
-                preview = str(payload)[:400]
+            except Exception as exc:
+                preview = f"<unserializable:{type(exc).__name__}>"[:400]
 
         entry = {
             "source_id": source_id,
             "reason": reason,
             "payload_preview": preview,
+            "score": None if score is None else float(score),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self._rejection_log.append(entry)
         self._rejection_log = self._rejection_log[-100:]
         self._slo.rejected_records += 1
         logger.warning(
-            "[CVE_REJECTION] %s reason=%s payload=%s",
+            "[CVE_REJECTION] %s reason=%s score=%s payload=%s",
             source_id,
             reason,
+            "" if score is None else f"{float(score):.6f}",
             preview,
         )
 
@@ -491,6 +521,10 @@ class CVEPipeline:
         if limit <= 0:
             return []
         return list(self._rejection_log[-limit:])
+
+    def get_pipeline_quality_stats(self) -> Dict[str, Any]:
+        """Return pipeline quality gate counters based on real ingestion decisions."""
+        return self._quality_scorer.get_quality_stats()
 
     # ─── Circuit Breaker ─────────────────────────────────────────────
 
@@ -537,8 +571,48 @@ class CVEPipeline:
         source_id: str,
         raw_data: str = "",
         last_modified: str = "",
-    ) -> Tuple[CVERecord, IngestResult]:
+    ) -> Tuple[Optional[CVERecord], IngestResult]:
         """Ingest a CVE record with deterministic merge and dedup."""
+        normalized_payload, accepted, rejection_reason, quality_score = normalize_sample_with_quality(
+            {
+                "cve_id": cve_id,
+                "title": title,
+                "description": description,
+                "severity": severity,
+                "cvss_score": cvss_score,
+                "affected_products": list(affected_products),
+                "references": list(references),
+                "is_exploited": is_exploited,
+                "source": source_id,
+                "source_id": source_id,
+                "raw_data": raw_data,
+            },
+            scorer=self._quality_scorer,
+        )
+        self._last_ingest_rejection_reason = rejection_reason
+        self._last_ingest_quality_score = quality_score
+        if not accepted:
+            payload_preview = {
+                "cve_id": cve_id,
+                "severity": severity,
+                "source_id": source_id,
+                "description": str(description or "")[:200],
+            }
+            rejection_reason = rejection_reason or "quality_rejected"
+            self.record_rejection(
+                source_id,
+                rejection_reason,
+                payload_preview,
+                score=quality_score,
+            )
+            duplicate_reasons = {"duplicate_cve_id", "duplicate_text_hash"}
+            if rejection_reason in duplicate_reasons:
+                return None, IngestResult.DUPLICATE
+            return None, IngestResult.REJECTED
+
+        cve_id = str(normalized_payload.get("cve_id", cve_id) or "")
+        description = str(normalized_payload.get("description", description) or "")
+        severity = str(normalized_payload.get("severity", severity) or "UNKNOWN").upper()
         content_hash = compute_content_hash(
             cve_id, description, severity, cvss_score
         )
@@ -618,8 +692,11 @@ class CVEPipeline:
                 promotion_status=existing.promotion_status,
                 block_reason=existing.block_reason,
                 merge_conflicts=existing.merge_conflicts + conflicts,
+                quality_score=quality_score,
+                accepted=True,
             )
             self._records[cve_id] = merged
+            self._quality_scorer.record_seen(normalized_payload)
 
             if conflicts:
                 self._merge_log.append({
@@ -645,8 +722,11 @@ class CVEPipeline:
                 content_hash=content_hash,
                 severity_source=provenance.source,
                 promotion_status="RESEARCH_PENDING",
+                quality_score=quality_score,
+                accepted=True,
             )
             self._records[cve_id] = record
+            self._quality_scorer.record_seen(normalized_payload)
             return record, IngestResult.NEW
 
     # ─── Source Status ───────────────────────────────────────────────
@@ -758,6 +838,8 @@ class CVEPipeline:
                 "content_hash": r.content_hash[:16],
                 "promotion_status": r.promotion_status,
                 "block_reason": r.block_reason,
+                "quality_score": r.quality_score,
+                "accepted": r.accepted,
             }
             for r in records
         ]
@@ -809,6 +891,8 @@ class CVEPipeline:
                         "sources": [p.source for p in record.provenance],
                         "promotion_status": record.promotion_status,
                         "merged_at": record.merged_at,
+                        "quality_score": record.quality_score,
+                        "accepted": record.accepted,
                     },
                 ))
 

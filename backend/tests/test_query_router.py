@@ -269,6 +269,43 @@ class TestResearchSearchPipeline:
         summary, key_terms = self.pipeline._summarize("", "test")
         assert "No relevant" in summary
 
+    def test_search_labels_http_fallback_metadata_and_logs_warning(self, monkeypatch, caplog):
+        monkeypatch.setattr(self.pipeline, "_resolve_edge_binary", lambda: None)
+        monkeypatch.setattr(
+            self.pipeline,
+            "_fetch_html_over_http",
+            lambda url: "<html><body><p>DNS poisoning is a cache poisoning attack against DNS resolvers.</p></body></html>",
+        )
+
+        with caplog.at_level("WARNING", logger="backend.assistant.query_router"):
+            result = self.pipeline.search("What is DNS poisoning?")
+
+        assert result.status == ResearchStatus.SUCCESS
+        assert result.query_result is not None
+        assert result.query_result.source == "http_fallback"
+        assert result.query_result.confidence == 0.7
+        assert any(
+            "http fallback engaged" in record.message.lower()
+            and "unavailable" in record.message.lower()
+            for record in caplog.records
+        )
+
+    def test_search_returns_truthful_no_result_metadata(self, monkeypatch):
+        monkeypatch.setattr(self.pipeline, "_resolve_edge_binary", lambda: None)
+
+        def _raise_fetch(url):
+            raise RuntimeError("network unavailable")
+
+        monkeypatch.setattr(self.pipeline, "_fetch_html_over_http", _raise_fetch)
+
+        result = self.pipeline.search("What is DNS poisoning?")
+
+        assert result.status == ResearchStatus.NO_RESULTS
+        assert result.summary == "No result available"
+        assert result.query_result is not None
+        assert result.query_result.result == "No result available"
+        assert result.query_result.confidence == 0.0
+
     # ====================================================================
     # GUARDS
     # ====================================================================

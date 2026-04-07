@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import nullcontext
 import json
+import logging
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -17,6 +18,10 @@ from backend.training import feature_extractor
 from backend.training.data_watcher import DataWatcher
 from backend.training.feature_extractor import build_vocabulary, extract as extract_features, get_text_embedding, load_vocabulary
 from backend.training.incremental_trainer import (
+    AccuracyHistory,
+    AccuracySnapshot,
+    DatasetQualityError,
+    DatasetQualityGate,
     EpochResult,
     IncrementalTrainer,
     _StreamingFeatureDataset,
@@ -121,6 +126,45 @@ def _sample_with_time(index: int, *, hours_ago: int = 0, positive: bool = True) 
     )
 
 
+def _quality_gate_sample(
+    index: int,
+    *,
+    hours_ago: int = 0,
+    severity: str | None = None,
+) -> IngestedSample:
+    severities = ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO")
+    selected_severity = severity or severities[index % len(severities)]
+    description = (
+        f"Detailed vulnerability report {index} with reproducible exploit evidence, "
+        "affected service context, remediation guidance, analyst verification, and "
+        "public exploit telemetry preserved for backend hardening validation."
+    )
+    sample = make_sample(
+        "nvd",
+        description,
+        f"https://example.com/vuln/{index}",
+        f"CVE-2026-{index:05d}",
+        selected_severity,
+        ("exploit", "verified"),
+    )
+    return IngestedSample(
+        source=sample.source,
+        raw_text=sample.raw_text,
+        url=sample.url,
+        cve_id=sample.cve_id,
+        severity=sample.severity,
+        tags=sample.tags,
+        ingested_at=datetime.now(timezone.utc) - timedelta(hours=hours_ago),
+        sha256_hash=sample.sha256_hash,
+        token_count=sample.token_count,
+        lang=sample.lang,
+    )
+
+
+def _quality_gate_samples(count: int) -> list[IngestedSample]:
+    return [_quality_gate_sample(index) for index in range(count)]
+
+
 def _feature_vector(sample: IngestedSample) -> torch.Tensor:
     vector = torch.zeros(512, dtype=torch.float32)
     vector[0] = 1.0 if sample.cve_id else 0.0
@@ -221,11 +265,122 @@ def test_incremental_trainer_build_dataset_splits_90_10(monkeypatch, tmp_path):
     monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
-    samples = [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]
+    samples = _quality_gate_samples(100)
     train_loader, eval_loader = trainer.build_dataset(samples)
 
-    assert len(train_loader.dataset) == 45
-    assert len(eval_loader.dataset) == 5
+    assert len(train_loader.dataset) == 90
+    assert len(eval_loader.dataset) == 10
+
+
+def test_incremental_trainer_build_dataset_rejects_too_few_samples(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+
+    with pytest.raises(DatasetQualityError, match="sample_count_below_min"):
+        trainer.build_dataset(_quality_gate_samples(99))
+
+
+def test_incremental_trainer_build_dataset_rejects_imbalanced_severity(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+
+    with pytest.raises(DatasetQualityError, match="severity_distribution_below_min"):
+        trainer.build_dataset(
+            [_quality_gate_sample(index, severity="HIGH") for index in range(100)]
+        )
+
+
+def test_dataset_quality_report_fields_correct_for_known_inputs():
+    severities = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"] * 20
+    samples = [
+        {
+            "cve_id": f"CVE-2026-{index:05d}",
+            "severity": severities[index],
+            "quality_score": 0.5,
+            "raw_text": f"validated sample {index}",
+        }
+        for index in range(100)
+    ]
+
+    report = DatasetQualityGate().validate(samples)
+
+    assert report.passed is True
+    assert report.sample_count == 100
+    assert report.mean_quality_score == pytest.approx(0.5)
+    assert report.unique_cves == 100
+    assert report.severity_distribution == {
+        "CRITICAL": pytest.approx(0.2),
+        "HIGH": pytest.approx(0.2),
+        "MEDIUM": pytest.approx(0.2),
+        "LOW": pytest.approx(0.2),
+        "INFORMATIONAL": pytest.approx(0.2),
+    }
+    assert report.failed_reasons == []
+
+
+def test_accuracy_snapshot_fields_correct():
+    snapshot = AccuracySnapshot(
+        epoch=4,
+        accuracy=0.81,
+        precision=0.79,
+        recall=0.77,
+        f1=0.78,
+        auc_roc=0.88,
+        taken_at="2026-04-07T10:00:00+00:00",
+    )
+
+    assert snapshot.epoch == 4
+    assert snapshot.accuracy == pytest.approx(0.81)
+    assert snapshot.precision == pytest.approx(0.79)
+    assert snapshot.recall == pytest.approx(0.77)
+    assert snapshot.f1 == pytest.approx(0.78)
+    assert snapshot.auc_roc == pytest.approx(0.88)
+    assert snapshot.taken_at == "2026-04-07T10:00:00+00:00"
+
+
+def test_accuracy_history_get_best_returns_correct_snapshot():
+    history = AccuracyHistory()
+    first = AccuracySnapshot(
+        epoch=1,
+        accuracy=0.78,
+        precision=0.76,
+        recall=0.74,
+        f1=0.75,
+        auc_roc=0.82,
+        taken_at="2026-04-07T10:00:00+00:00",
+    )
+    second = AccuracySnapshot(
+        epoch=2,
+        accuracy=0.84,
+        precision=0.83,
+        recall=0.81,
+        f1=0.82,
+        auc_roc=0.89,
+        taken_at="2026-04-07T10:05:00+00:00",
+    )
+    history.add(first)
+    history.add(second)
+
+    assert history.get_best() == second
+    assert history.get_last() == second
 
 
 def test_incremental_trainer_raises_when_classifier_unavailable(monkeypatch, tmp_path):
@@ -392,6 +547,17 @@ def test_incremental_trainer_invalid_feature_counts_and_raises(monkeypatch, tmp_
     assert trainer._invalid_sample_count == 1
 
 
+def test_incremental_trainer_rejects_all_same_value_tensor(caplog):
+    with caplog.at_level(logging.WARNING):
+        is_valid, reason = IncrementalTrainer._validate_feature_tensor(
+            torch.ones(512, dtype=torch.float32)
+        )
+
+    assert is_valid is False
+    assert reason == "all_same_value"
+    assert "feature_tensor_all_same_value_rejected" in caplog.text
+
+
 def test_incremental_trainer_benchmark_returns_metric_dict(monkeypatch, tmp_path):
     fake_state = FakeStateManager()
     monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
@@ -456,12 +622,12 @@ def test_incremental_trainer_run_epoch_emits_metrics(monkeypatch, tmp_path):
     monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
-    trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
 
     result = trainer.run_incremental_epoch()
 
     assert isinstance(result, EpochResult)
-    assert result.samples_processed == 50
+    assert result.samples_processed == 100
     assert metrics_registry.get_gauge("model_precision") is not None
     assert metrics_registry.get_gauge("training_epoch_number") == 1.0
     assert fake_state.emit_calls
@@ -482,7 +648,7 @@ def test_incremental_trainer_persists_threshold_artifact(monkeypatch, tmp_path):
         raw_data_root=tmp_path / "raw",
         num_workers=0,
     )
-    trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
 
     result = trainer.run_incremental_epoch()
     payload = json.loads(baseline_path.read_text(encoding="utf-8"))
@@ -640,12 +806,121 @@ def test_incremental_trainer_circuit_breaker_rolls_back(monkeypatch, tmp_path):
     )
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
-    trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
 
     result = trainer.run_incremental_epoch()
 
     assert result.rollback is True
     assert metrics_registry.get_counter("training_rollback") == 1.0
+
+
+def test_incremental_trainer_rolls_back_when_f1_drops_more_than_threshold(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    model_path = tmp_path / "checkpoints" / "model.safetensors"
+    state_path = tmp_path / "checkpoints" / "training_state.json"
+    baseline_path = tmp_path / "checkpoints" / "baseline_accuracy.json"
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    metric_templates = [
+        {
+            "threshold": 0.5,
+            "accuracy": 0.80,
+            "precision": 0.80,
+            "recall": 0.80,
+            "f1": 0.80,
+            "strategy": "epoch_one",
+        },
+        {
+            "threshold": 0.5,
+            "accuracy": 0.79,
+            "precision": 0.78,
+            "recall": 0.64,
+            "f1": 0.70,
+            "strategy": "epoch_two",
+        },
+    ]
+
+    def _fake_calibrate(labels, probabilities, fallback_threshold=0.5):
+        template = metric_templates.pop(0)
+        return {
+            "threshold": float(template["threshold"]),
+            "predictions": [1 if index % 2 == 0 else 0 for index in range(len(labels))],
+            "accuracy": float(template["accuracy"]),
+            "precision": float(template["precision"]),
+            "recall": float(template["recall"]),
+            "f1": float(template["f1"]),
+            "strategy": str(template["strategy"]),
+        }
+
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.calibrate_positive_threshold",
+        _fake_calibrate,
+    )
+
+    trainer = IncrementalTrainer(
+        model_path=model_path,
+        state_path=state_path,
+        baseline_path=baseline_path,
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
+    rollback_calls: list[str] = []
+    trainer._load_best_checkpoint = lambda: rollback_calls.append("rollback")
+
+    first_result = trainer.run_incremental_epoch()
+    second_result = trainer.run_incremental_epoch()
+
+    assert first_result.rollback is False
+    assert second_result.rollback is True
+    assert rollback_calls == ["rollback"]
+    assert metrics_registry.get_counter("training_rollback") == 1.0
+    assert trainer.get_accuracy_history()[-1].f1 == pytest.approx(0.70)
+
+
+def test_incremental_trainer_blocks_promotion_when_f1_below_threshold(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    model_path = tmp_path / "checkpoints" / "model.safetensors"
+    state_path = tmp_path / "checkpoints" / "training_state.json"
+    baseline_path = tmp_path / "checkpoints" / "baseline_accuracy.json"
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.calibrate_positive_threshold",
+        lambda labels, probabilities, fallback_threshold=0.5: {
+            "threshold": float(fallback_threshold),
+            "predictions": [1 if index % 2 == 0 else 0 for index in range(len(labels))],
+            "accuracy": 0.80,
+            "precision": 0.76,
+            "recall": 0.72,
+            "f1": 0.74,
+            "strategy": "blocked_low_accuracy",
+        },
+    )
+
+    trainer = IncrementalTrainer(
+        model_path=model_path,
+        state_path=state_path,
+        baseline_path=baseline_path,
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
+
+    result = trainer.run_incremental_epoch()
+    payload = json.loads(baseline_path.read_text(encoding="utf-8"))
+
+    assert result.status == "BLOCKED_LOW_ACCURACY"
+    assert result.rollback is False
+    assert payload["checkpoint_f1"] == pytest.approx(0.0)
+    assert payload["baseline_accuracy"] == pytest.approx(0.0)
 
 
 def test_incremental_trainer_early_stopping(monkeypatch, tmp_path):
@@ -660,7 +935,7 @@ def test_incremental_trainer_early_stopping(monkeypatch, tmp_path):
     monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
-    trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
 
     result = trainer.run_incremental_epoch()
     assert result.early_stopped is True

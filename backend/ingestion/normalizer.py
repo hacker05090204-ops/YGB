@@ -3,19 +3,23 @@
 from __future__ import annotations
 
 import atexit
+import hashlib
 import json
 import logging
+import math
 import os
 import sys
 import unicodedata
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from os import cpu_count
 from pathlib import Path
 
 from backend.ingestion._integrity import log_module_sha256
+from backend.ingestion.dedup import DedupIndex
 from backend.ingestion.models import IngestedSample, detect_language
 from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
 
@@ -38,6 +42,313 @@ class NormalizationReport:
     pool_disabled: bool
     backpressure_applied: bool
     chunk_count: int
+
+
+@dataclass(frozen=True)
+class QualityRejectionEntry:
+    """Single append-only quality rejection event."""
+
+    cve_id: str
+    reason: str
+    score: float
+    timestamp: str
+
+
+class QualityRejectionLog:
+    """Bounded append-only quality rejection log."""
+
+    def __init__(self, max_entries: int = 10_000, rotate_to: int = 5_000) -> None:
+        self.max_entries = max_entries
+        self.rotate_to = rotate_to
+        self._entries: list[QualityRejectionEntry] = []
+
+    def append(self, cve_id: str, reason: str, score: float) -> None:
+        self._entries.append(
+            QualityRejectionEntry(
+                cve_id=str(cve_id or ""),
+                reason=str(reason),
+                score=float(score),
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+        )
+        if len(self._entries) > self.max_entries:
+            self._entries = self._entries[-self.rotate_to:]
+
+    def entries(self) -> tuple[QualityRejectionEntry, ...]:
+        return tuple(self._entries)
+
+
+class SampleQualityScorer:
+    """Deterministic quality scoring and acceptance rules for CVE samples."""
+
+    def __init__(
+        self,
+        dedup_store: DedupIndex | None = None,
+        rejection_log: QualityRejectionLog | None = None,
+    ) -> None:
+        self.dedup_store = dedup_store or DedupIndex("data/dedup_store.json")
+        self.dedup_store.load()
+        self.rejection_log = rejection_log or QualityRejectionLog()
+        self.accepted = 0
+        self.rejected = 0
+        self._score_total = 0.0
+        self._score_count = 0
+        self._rejection_reasons: dict[str, int] = {}
+        self.last_rejection_reason: str | None = None
+        self.last_score = 0.0
+        self.last_text_hash = ""
+
+    @staticmethod
+    def compute_text_hash(text: str) -> str:
+        return hashlib.sha256(str(text or "").encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _coerce_sample(sample: dict[str, object] | IngestedSample) -> dict[str, object]:
+        if isinstance(sample, IngestedSample):
+            return {
+                "source": sample.source,
+                "description": sample.raw_text,
+                "raw_text": sample.raw_text,
+                "url": sample.url,
+                "cve_id": sample.cve_id,
+                "severity": sample.severity,
+                "tags": list(sample.tags),
+                "token_count": sample.token_count,
+                "lang": sample.lang,
+                "sha256_hash": sample.sha256_hash,
+            }
+        return dict(sample)
+
+    @staticmethod
+    def _apply_annotations(
+        sample: dict[str, object] | IngestedSample,
+        payload: dict[str, object],
+    ) -> None:
+        if isinstance(sample, dict):
+            sample.update(payload)
+
+    @staticmethod
+    def _extract_text(payload: dict[str, object]) -> str:
+        return str(
+            payload.get("description")
+            or payload.get("raw_text")
+            or ""
+        )
+
+    @staticmethod
+    def _extract_source(payload: dict[str, object]) -> str:
+        return str(
+            payload.get("source")
+            or payload.get("source_id")
+            or payload.get("source_tag")
+            or ""
+        )
+
+    @staticmethod
+    def _clamp(value: float) -> float:
+        return max(0.0, min(1.0, value))
+
+    @classmethod
+    def _source_trust_score(cls, payload: dict[str, object]) -> float:
+        source = cls._extract_source(payload).strip().lower()
+        if "nvd" in source:
+            return 1.0
+        if "cisa" in source:
+            return 0.95
+        if "osv" in source:
+            return 0.85
+        if "github" in source:
+            return 0.75
+        return 0.5
+
+    @staticmethod
+    def _exploit_info_score(payload: dict[str, object]) -> float:
+        exploit_keys = (
+            "is_exploited",
+            "has_public_exploit",
+            "exploit_info",
+            "exploit_status",
+            "exploit_available",
+            "exploit_vector",
+        )
+        saw_unknown = False
+        for key in exploit_keys:
+            if key not in payload:
+                continue
+            value = payload.get(key)
+            if isinstance(value, bool):
+                return 1.0 if value else 0.0
+            if value is None:
+                saw_unknown = True
+                continue
+            if isinstance(value, (list, tuple, set, dict)):
+                return 1.0 if len(value) > 0 else 0.0
+            text = str(value).strip()
+            if not text:
+                saw_unknown = True
+                continue
+            lowered = text.lower()
+            if lowered in {"unknown", "unclear", "undetermined", "pending"}:
+                saw_unknown = True
+                continue
+            if lowered in {"none", "no", "false", "absent"}:
+                return 0.0
+            return 1.0
+        tags = payload.get("tags", ())
+        if isinstance(tags, (list, tuple, set)):
+            lowered_tags = {str(tag).strip().lower() for tag in tags}
+            if any("exploit" in tag for tag in lowered_tags):
+                return 1.0
+        return 0.5 if saw_unknown else 0.0
+
+    def score(self, sample: dict[str, object] | IngestedSample) -> float:
+        payload = self._coerce_sample(sample)
+        text = self._extract_text(payload)
+        text_length = len(text)
+        if text_length <= 1:
+            text_length_score = 0.0
+        else:
+            text_length_score = self._clamp(
+                math.log(text_length) / math.log(2000)
+            )
+        has_cvss_score = 1.0 if payload.get("cvss_score") not in (None, "") else 0.0
+        has_exploit_info = self._exploit_info_score(payload)
+        source_trust_score = self._source_trust_score(payload)
+        quality_score = (
+            text_length_score
+            + has_cvss_score
+            + has_exploit_info
+            + source_trust_score
+        ) / 4.0
+        payload["quality_score"] = quality_score
+        payload["text_hash"] = self.compute_text_hash(text)
+        self._apply_annotations(sample, payload)
+        return quality_score
+
+    def record_seen(self, sample: dict[str, object] | IngestedSample) -> None:
+        payload = self._coerce_sample(sample)
+        text_hash = str(
+            payload.get("text_hash")
+            or self.compute_text_hash(self._extract_text(payload))
+        )
+        cve_id = str(payload.get("cve_id", "") or "")
+        source = self._extract_source(payload)
+        self.dedup_store.record_seen(cve_id, text_hash, source=source)
+
+    def evaluate(
+        self,
+        sample: dict[str, object] | IngestedSample,
+        *,
+        ignore_duplicates: bool = False,
+    ) -> tuple[bool, str | None, float]:
+        payload = self._coerce_sample(sample)
+        quality_score = self.score(payload)
+        self._apply_annotations(sample, payload)
+        self.last_score = quality_score
+        self.last_text_hash = str(payload.get("text_hash", "") or "")
+        self._score_total += quality_score
+        self._score_count += 1
+
+        description = self._extract_text(payload).strip()
+        cve_id = str(payload.get("cve_id", "") or "").strip()
+        severity = str(payload.get("severity", "") or "").strip().upper()
+        duplicate = False
+        duplicate_reason = ""
+        if not ignore_duplicates and (cve_id or self.last_text_hash):
+            duplicate = self.dedup_store.is_duplicate(cve_id, self.last_text_hash)
+            if duplicate:
+                duplicate_reason = (
+                    "duplicate_cve_id"
+                    if self.dedup_store.has_cve_id(cve_id)
+                    else "duplicate_text_hash"
+                )
+
+        reason: str | None = None
+        if not description or len(description) < 50:
+            reason = "description_too_short"
+        elif not cve_id:
+            reason = "missing_cve_id"
+        elif not severity or severity == "UNKNOWN":
+            reason = "missing_severity"
+        elif quality_score < 0.4:
+            reason = "low_quality_score"
+        elif duplicate:
+            reason = duplicate_reason
+
+        if reason is not None:
+            self.rejected += 1
+            self._rejection_reasons[reason] = self._rejection_reasons.get(reason, 0) + 1
+            self.last_rejection_reason = reason
+            self.rejection_log.append(cve_id, reason, quality_score)
+            logger.warning(
+                "sample_quality_rejected cve_id=%s reason=%s score=%.6f",
+                cve_id or "",
+                reason,
+                quality_score,
+            )
+            return False, reason, quality_score
+
+        self.accepted += 1
+        self.last_rejection_reason = None
+        return True, None, quality_score
+
+    def is_acceptable(self, sample: dict[str, object] | IngestedSample) -> bool:
+        accepted, _, _ = self.evaluate(sample)
+        return accepted
+
+    def get_quality_stats(self) -> dict[str, object]:
+        mean_score = self._score_total / self._score_count if self._score_count else 0.0
+        return {
+            "accepted": self.accepted,
+            "rejected": self.rejected,
+            "mean_score": mean_score,
+            "rejection_reasons": dict(self._rejection_reasons),
+        }
+
+
+_QUALITY_REJECTION_LOG = QualityRejectionLog()
+_QUALITY_SCORER: SampleQualityScorer | None = None
+
+
+def get_quality_scorer() -> SampleQualityScorer:
+    global _QUALITY_SCORER
+    if _QUALITY_SCORER is None:
+        _QUALITY_SCORER = SampleQualityScorer(rejection_log=_QUALITY_REJECTION_LOG)
+    return _QUALITY_SCORER
+
+
+def normalize_sample_with_quality(
+    sample: dict[str, object],
+    scorer: SampleQualityScorer | None = None,
+    ignore_duplicates: bool = False,
+) -> tuple[dict[str, object], bool, str | None, float]:
+    normalized = dict(sample)
+    text = str(
+        normalized.get("description")
+        or normalized.get("raw_text")
+        or ""
+    )
+    normalized_text = normalize_text(text)
+    normalized["description"] = normalized_text
+    if "raw_text" in normalized or "description" not in sample:
+        normalized["raw_text"] = normalized_text
+    normalized["token_count"] = len(normalized_text.split())
+    normalized["lang"] = detect_language(normalized_text)
+    quality_scorer = scorer or get_quality_scorer()
+    accepted, reason, score = quality_scorer.evaluate(
+        normalized,
+        ignore_duplicates=ignore_duplicates,
+    )
+    return (
+        normalized,
+        accepted,
+        reason,
+        score,
+    )
+
+
+def get_quality_stats() -> dict[str, object]:
+    return get_quality_scorer().get_quality_stats()
 
 
 class _HTMLStripper(HTMLParser):
@@ -148,6 +459,7 @@ def _resolve_batch_limit(batch_limit: int) -> int:
 def normalize_batch_with_report(
     samples: list[IngestedSample],
     batch_limit: int = 0,
+    quality_scorer: SampleQualityScorer | None = None,
 ) -> tuple[list[IngestedSample], NormalizationReport]:
     """Normalize a batch with cache and back-pressure reporting."""
     if not samples:
@@ -200,6 +512,35 @@ def normalize_batch_with_report(
                 results[index] = updated
 
     normalized_samples = [sample for sample in results if sample is not None]
+    if quality_scorer is not None:
+        filtered_samples: list[IngestedSample] = []
+        for sample in normalized_samples:
+            normalized_payload, accepted, _, _ = normalize_sample_with_quality(
+                {
+                    "source": sample.source,
+                    "description": sample.raw_text,
+                    "raw_text": sample.raw_text,
+                    "url": sample.url,
+                    "cve_id": sample.cve_id,
+                    "severity": sample.severity,
+                    "tags": list(sample.tags),
+                    "token_count": sample.token_count,
+                    "lang": sample.lang,
+                    "sha256_hash": sample.sha256_hash,
+                },
+                scorer=quality_scorer,
+            )
+            if not accepted:
+                continue
+            filtered_samples.append(
+                replace(
+                    sample,
+                    raw_text=str(normalized_payload.get("raw_text", sample.raw_text)),
+                    token_count=int(normalized_payload.get("token_count", sample.token_count)),
+                    lang=str(normalized_payload.get("lang", sample.lang)),
+                )
+            )
+        normalized_samples = filtered_samples
     report = NormalizationReport(
         requested=len(samples),
         cache_hits=cache_hits,

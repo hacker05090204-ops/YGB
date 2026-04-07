@@ -12,12 +12,40 @@ Covers:
 
 import os
 import sys
+import tempfile
 import pytest
 from pathlib import Path
+
+from backend.ingestion.dedup import DedupIndex
+from backend.ingestion.normalizer import QualityRejectionLog, SampleQualityScorer
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _long_description(seed: str) -> str:
+    return (
+        f"{seed} "
+        "This description includes verified impact, affected components, exploitability notes, "
+        "and remediation context to satisfy the quality gate requirements for CVE ingestion."
+    )
+
+
+class _PermissiveQualityScorer(SampleQualityScorer):
+    def evaluate(self, sample, *, ignore_duplicates: bool = False):
+        return super().evaluate(sample, ignore_duplicates=True)
+
+    def record_seen(self, sample):
+        return None
+
+
+def _make_quality_scorer(path: Path, *, permissive: bool = False) -> SampleQualityScorer:
+    scorer_cls = _PermissiveQualityScorer if permissive else SampleQualityScorer
+    return scorer_cls(
+        dedup_store=DedupIndex(str(path)),
+        rejection_log=QualityRejectionLog(),
+    )
 
 
 class TestCVEPipeline:
@@ -26,8 +54,23 @@ class TestCVEPipeline:
     def setup_method(self):
         """Reset pipeline singleton for each test."""
         import backend.cve.cve_pipeline as mod
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self._previous_dedup_path = os.environ.get("YGB_CVE_DEDUP_STORE_PATH")
+        os.environ["YGB_CVE_DEDUP_STORE_PATH"] = str(
+            Path(self._tmpdir.name) / "dedup_store.json"
+        )
         mod._pipeline = None
         self.pipeline = mod.CVEPipeline()
+
+    def teardown_method(self):
+        import backend.cve.cve_pipeline as mod
+
+        mod._pipeline = None
+        if self._previous_dedup_path is None:
+            os.environ.pop("YGB_CVE_DEDUP_STORE_PATH", None)
+        else:
+            os.environ["YGB_CVE_DEDUP_STORE_PATH"] = self._previous_dedup_path
+        self._tmpdir.cleanup()
 
     def test_source_initialization(self):
         """All 6 sources should be initialized with proper status."""
@@ -50,7 +93,7 @@ class TestCVEPipeline:
         record, result = self.pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="Test CVE",
-            description="A test vulnerability",
+            description=_long_description("A test vulnerability."),
             severity="HIGH",
             cvss_score=8.5,
             affected_products=["product-a"],
@@ -64,6 +107,8 @@ class TestCVEPipeline:
         assert len(record.provenance) == 1
         assert record.provenance[0].source == "CVE Services / cve.org"
         assert record.promotion_status == "RESEARCH_PENDING"
+        assert record.accepted is True
+        assert record.quality_score >= 0.4
 
     def test_ingest_exact_duplicate(self):
         """Same CVE with same content hash should be DUPLICATE."""
@@ -71,7 +116,7 @@ class TestCVEPipeline:
         self.pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="Test",
-            description="Same description",
+            description=_long_description("Same description for the first accepted record."),
             severity="HIGH",
             cvss_score=8.5,
             affected_products=[],
@@ -82,7 +127,7 @@ class TestCVEPipeline:
         _, result = self.pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="Test",
-            description="Same description",
+            description=_long_description("Same description for the first accepted record."),
             severity="HIGH",
             cvss_score=8.5,
             affected_products=[],
@@ -92,13 +137,86 @@ class TestCVEPipeline:
         )
         assert result == IngestResult.DUPLICATE
 
-    def test_ingest_merge_update(self):
+    def test_duplicate_cve_id_rejected(self):
+        """Second accepted record with the same CVE ID should be rejected by quality dedup."""
+        from backend.cve.cve_pipeline import IngestResult
+
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-2000",
+            title="Original",
+            description=_long_description("Original accepted record for duplicate ID checks."),
+            severity="HIGH",
+            cvss_score=8.0,
+            affected_products=["product-a"],
+            references=[],
+            is_exploited=False,
+            source_id="nvd",
+        )
+
+        record, result = self.pipeline.ingest_record(
+            cve_id="CVE-2024-2000",
+            title="Duplicate",
+            description=_long_description("Second record should be rejected because the CVE ID is duplicated."),
+            severity="HIGH",
+            cvss_score=8.1,
+            affected_products=["product-b"],
+            references=[],
+            is_exploited=True,
+            source_id="cve_services",
+        )
+
+        assert record is None
+        assert result == IngestResult.DUPLICATE
+        assert self.pipeline.get_rejection_log(limit=1)[-1]["reason"] == "duplicate_cve_id"
+
+    def test_same_text_different_id_is_duplicate_via_text_hash(self):
+        """Normalized duplicate text should be rejected even with a different CVE ID."""
+        from backend.cve.cve_pipeline import IngestResult
+
+        description = _long_description("Shared normalized description for text-hash deduplication.")
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-3000",
+            title="First",
+            description=description,
+            severity="HIGH",
+            cvss_score=8.2,
+            affected_products=["product-a"],
+            references=[],
+            is_exploited=False,
+            source_id="nvd",
+        )
+
+        record, result = self.pipeline.ingest_record(
+            cve_id="CVE-2024-3001",
+            title="Second",
+            description=description,
+            severity="HIGH",
+            cvss_score=8.3,
+            affected_products=["product-b"],
+            references=[],
+            is_exploited=False,
+            source_id="cve_services",
+        )
+
+        assert record is None
+        assert result == IngestResult.DUPLICATE
+        assert self.pipeline.get_rejection_log(limit=1)[-1]["reason"] == "duplicate_text_hash"
+
+    def test_ingest_merge_update(self, tmp_path):
         """Same CVE with different content should merge (UPDATED)."""
         from backend.cve.cve_pipeline import IngestResult
-        self.pipeline.ingest_record(
+        import backend.cve.cve_pipeline as mod
+
+        pipeline = mod.CVEPipeline(
+            quality_scorer=_make_quality_scorer(
+                tmp_path / "merge_dedup_store.json",
+                permissive=True,
+            )
+        )
+        pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="Original",
-            description="Original desc",
+            description=_long_description("Original description before deterministic merge update."),
             severity="MEDIUM",
             cvss_score=5.0,
             affected_products=["prod-a"],
@@ -106,10 +224,10 @@ class TestCVEPipeline:
             is_exploited=False,
             source_id="cve_services",
         )
-        record, result = self.pipeline.ingest_record(
+        record, result = pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="Updated",
-            description="Updated desc — now with more detail",
+            description=_long_description("Updated description with more authoritative detail for merge coverage."),
             severity="HIGH",
             cvss_score=8.0,
             affected_products=["prod-b"],
@@ -161,7 +279,7 @@ class TestCVEPipeline:
         record, _ = self.pipeline.ingest_record(
             cve_id="CVE-2024-5678",
             title="Test",
-            description="Test desc",
+            description=_long_description("Provenance validation description."),
             severity="LOW",
             cvss_score=3.0,
             affected_products=[],
@@ -242,7 +360,7 @@ class TestCVEPipeline:
         self.pipeline.ingest_record(
             cve_id="CVE-2024-1234",
             title="OpenSSL issue",
-            description="TLS parsing bug in OpenSSL server path",
+            description=_long_description("TLS parsing bug in OpenSSL server path."),
             severity="HIGH",
             cvss_score=7.5,
             affected_products=["openssl"],
@@ -255,12 +373,20 @@ class TestCVEPipeline:
         assert results[0]["cve_id"] == "CVE-2024-1234"
         assert results[0]["severity_source"] == "NVD API v2"
 
-    def test_nvd_severity_is_authoritative(self):
+    def test_nvd_severity_is_authoritative(self, tmp_path):
         """NVD severity should override weaker source severity when they differ."""
-        self.pipeline.ingest_record(
+        import backend.cve.cve_pipeline as mod
+
+        pipeline = mod.CVEPipeline(
+            quality_scorer=_make_quality_scorer(
+                tmp_path / "authority_dedup_store.json",
+                permissive=True,
+            )
+        )
+        pipeline.ingest_record(
             cve_id="CVE-2024-5555",
             title="Canonical record",
-            description="Canonical description",
+            description=_long_description("Canonical description."),
             severity="CRITICAL",
             cvss_score=9.8,
             affected_products=[],
@@ -268,10 +394,10 @@ class TestCVEPipeline:
             is_exploited=False,
             source_id="cve_services",
         )
-        record, result = self.pipeline.ingest_record(
+        record, result = pipeline.ingest_record(
             cve_id="CVE-2024-5555",
             title="NVD record",
-            description="NVD normalized description",
+            description=_long_description("NVD normalized description."),
             severity="HIGH",
             cvss_score=8.1,
             affected_products=[],
@@ -283,12 +409,20 @@ class TestCVEPipeline:
         assert record.severity == "HIGH"
         assert record.severity_source == "NVD API v2"
 
-    def test_merge_conflict_logging(self):
+    def test_merge_conflict_logging(self, tmp_path):
         """Merge conflicts should be logged."""
-        self.pipeline.ingest_record(
+        import backend.cve.cve_pipeline as mod
+
+        pipeline = mod.CVEPipeline(
+            quality_scorer=_make_quality_scorer(
+                tmp_path / "conflict_dedup_store.json",
+                permissive=True,
+            )
+        )
+        pipeline.ingest_record(
             cve_id="CVE-2024-9999",
             title="Test",
-            description="V1",
+            description=_long_description("Version one description."),
             severity="LOW",
             cvss_score=2.0,
             affected_products=[],
@@ -296,10 +430,10 @@ class TestCVEPipeline:
             is_exploited=False,
             source_id="cve_services",
         )
-        record, _ = self.pipeline.ingest_record(
+        record, _ = pipeline.ingest_record(
             cve_id="CVE-2024-9999",
             title="Test",
-            description="V2",
+            description=_long_description("Version two description."),
             severity="CRITICAL",
             cvss_score=9.8,
             affected_products=[],
@@ -309,6 +443,36 @@ class TestCVEPipeline:
         )
         assert len(record.merge_conflicts) > 0
         assert "severity" in record.merge_conflicts[0].lower()
+
+    def test_pipeline_quality_stats_reflect_counts(self):
+        """Quality stats should expose accepted and rejected counts from real decisions."""
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-7000",
+            title="Accepted",
+            description=_long_description("Accepted pipeline quality stats sample."),
+            severity="HIGH",
+            cvss_score=8.4,
+            affected_products=["accepted-product"],
+            references=[],
+            is_exploited=True,
+            source_id="nvd",
+        )
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-7001",
+            title="Rejected",
+            description="short text",
+            severity="HIGH",
+            cvss_score=8.4,
+            affected_products=["rejected-product"],
+            references=[],
+            is_exploited=True,
+            source_id="nvd",
+        )
+
+        stats = self.pipeline.get_pipeline_quality_stats()
+        assert stats["accepted"] == 1
+        assert stats["rejected"] == 1
+        assert stats["rejection_reasons"]["description_too_short"] == 1
 
 
 class TestPromotionPolicy:
@@ -626,10 +790,16 @@ class TestScheduler:
         from backend.cve.cve_scheduler import get_scheduler
         assert get_scheduler().is_running is False
 
-    def test_scheduler_parse_and_rejection_stats(self):
+    def test_scheduler_parse_and_rejection_stats(self, tmp_path, monkeypatch):
         """Rejected CVEs and duplicates should be reflected in parse stats."""
         import backend.cve.cve_pipeline as pipeline_mod
         from backend.cve.cve_scheduler import get_scheduler
+
+        monkeypatch.setenv(
+            "YGB_CVE_DEDUP_STORE_PATH",
+            str(tmp_path / "scheduler_dedup_store.json"),
+        )
+        long_desc = _long_description("Alpha")
 
         scheduler = get_scheduler()
         pipeline = pipeline_mod.CVEPipeline()
@@ -641,7 +811,7 @@ class TestScheduler:
                     {
                         "cve": {
                             "id": "CVE-2024-1234",
-                            "descriptions": [{"lang": "en", "value": "Alpha"}],
+                            "descriptions": [{"lang": "en", "value": long_desc}],
                             "metrics": {
                                 "cvssMetricV31": [
                                     {"cvssData": {"baseScore": 8.0, "baseSeverity": "HIGH"}}
@@ -659,7 +829,7 @@ class TestScheduler:
                     {
                         "cve": {
                             "id": "CVE-2024-1234",
-                            "descriptions": [{"lang": "en", "value": "Alpha"}],
+                            "descriptions": [{"lang": "en", "value": long_desc}],
                             "metrics": {
                                 "cvssMetricV31": [
                                     {"cvssData": {"baseScore": 8.0, "baseSeverity": "HIGH"}}

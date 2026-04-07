@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-
-from backend.training.incremental_trainer import IncrementalTrainer
+from typing import TYPE_CHECKING
 
 DEFAULT_RUNTIME_STATUS_PATH = Path("data/runtime_status.json")
+IncrementalTrainer = None
+logger = logging.getLogger("ygb.training.runtime_status_validator")
+
+if TYPE_CHECKING:
+    from backend.training.incremental_trainer import AccuracySnapshot
 
 
 def _utc_now() -> str:
@@ -21,12 +26,39 @@ def _atomic_write_json(path: Path, payload: dict[str, object]) -> None:
     os.replace(temp_path, path)
 
 
+def validate_promotion_readiness(snapshot: "AccuracySnapshot") -> bool:
+    ready = True
+    if snapshot.f1 < 0.75:
+        logger.warning(
+            "promotion readiness failed: f1=%.4f < min_f1=0.7500",
+            snapshot.f1,
+        )
+        ready = False
+    if snapshot.precision < 0.70:
+        logger.warning(
+            "promotion readiness failed: precision=%.4f < min_precision=0.7000",
+            snapshot.precision,
+        )
+        ready = False
+    if snapshot.recall < 0.65:
+        logger.warning(
+            "promotion readiness failed: recall=%.4f < min_recall=0.6500",
+            snapshot.recall,
+        )
+        ready = False
+    return ready
+
+
 def validate_precision_breach_status(
     runtime_status_path: str | Path = DEFAULT_RUNTIME_STATUS_PATH,
     *,
     max_samples: int | None = None,
     precision_threshold: float | None = None,
 ) -> dict[str, object]:
+    trainer_cls = IncrementalTrainer
+    if trainer_cls is None:
+        from backend.training.incremental_trainer import IncrementalTrainer as trainer_cls
+
     status_path = Path(runtime_status_path)
     if not status_path.exists():
         return {"checked": False, "changed": False, "reason": "runtime_status_missing"}
@@ -42,7 +74,7 @@ def validate_precision_breach_status(
     )
     effective_samples = int(max_samples or os.environ.get("YGB_RUNTIME_VALIDATION_SAMPLES", "1500"))
 
-    trainer = IncrementalTrainer(num_workers=0)
+    trainer = trainer_cls(num_workers=0)
     benchmark = trainer.benchmark_current_model(max_samples=effective_samples)
     current_precision = float(benchmark["precision"])
 

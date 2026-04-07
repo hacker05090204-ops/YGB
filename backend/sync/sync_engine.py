@@ -21,6 +21,9 @@ import shutil
 import sys
 import threading
 import time
+from collections import deque
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -43,6 +46,38 @@ from backend.sync.chunker import (
 
 logger = logging.getLogger("ygb.sync")
 _SYNC_STOP_EVENT = threading.Event()
+
+
+@dataclass(frozen=True)
+class SyncCycleResult:
+    cycle_id: str
+    started_at: str
+    completed_at: str
+    files_scanned: int
+    files_changed: int
+    peers_attempted: int
+    peers_succeeded: int
+    errors: list[str]
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+class SyncHistory:
+    def __init__(self, limit: int = 50):
+        self._entries = deque(maxlen=max(1, limit))
+        self._lock = threading.Lock()
+
+    def add(self, result: SyncCycleResult) -> None:
+        with self._lock:
+            self._entries.append(result)
+
+    def get_entries(self) -> list[SyncCycleResult]:
+        with self._lock:
+            return list(self._entries)
+
+
+_SYNC_HISTORY = SyncHistory(limit=50)
 
 # ── Configuration ─────────────────────────────────────────────────────
 
@@ -88,6 +123,68 @@ def _init_dirs():
 def _is_critical(path: str) -> bool:
     """Check if path matches a critical backup pattern."""
     return any(pat in path for pat in CRITICAL_PATTERNS)
+
+
+def get_sync_history() -> list[SyncCycleResult]:
+    """Return the last 50 sync cycle results."""
+    return _SYNC_HISTORY.get_entries()
+
+
+def _build_manifest_payload(manifest: SyncManifest) -> dict[str, object]:
+    return {
+        "device_id": manifest.device_id,
+        "vector_clock": manifest.vector_clock,
+        "files": manifest.files,
+        "last_sync": manifest.last_sync,
+        "version": manifest.version,
+    }
+
+
+def _sync_manifest_to_peers(manifest: SyncManifest) -> tuple[int, int, list[str]]:
+    errors: list[str] = []
+    peers_attempted = 0
+    peers_succeeded = 0
+
+    try:
+        from backend.sync.peer_transport import get_peers, push_manifest_to_peer
+
+        peers = get_peers()
+    except Exception as exc:
+        detail = f"Peer discovery failed: {type(exc).__name__}: {exc}"
+        logger.warning(detail, exc_info=True)
+        return 0, 0, [detail]
+
+    payload = _build_manifest_payload(manifest)
+    for peer in peers:
+        peers_attempted += 1
+        peer_name = str(peer.get("name", "unknown"))
+        peer_url = str(peer.get("url", "")).strip()
+        peer_status = str(peer.get("status", "UNKNOWN")).upper()
+
+        if peer_status != "ONLINE":
+            detail = f"Peer {peer_name} unreachable ({peer_status})"
+            logger.warning(detail)
+            errors.append(detail)
+            continue
+
+        try:
+            pushed = push_manifest_to_peer(peer_url, payload)
+        except Exception as exc:
+            detail = f"Peer {peer_name} sync failed: {type(exc).__name__}: {exc}"
+            logger.warning(detail, exc_info=True)
+            errors.append(detail)
+            continue
+
+        if pushed:
+            peers_succeeded += 1
+            logger.info("Manifest synced to peer %s", peer_name)
+            continue
+
+        detail = f"Peer {peer_name} unreachable (manifest push failed)"
+        logger.warning(detail)
+        errors.append(detail)
+
+    return peers_attempted, peers_succeeded, errors
 
 
 # ── Scan ──────────────────────────────────────────────────────────────
@@ -204,81 +301,83 @@ def compress_cold_files() -> int:
 
 # ── Main Sync Cycle ───────────────────────────────────────────────────
 
-def sync_cycle() -> dict:
-    """
-    Execute one full sync cycle: scan → diff → chunk → retention → compress.
-
-    Returns a summary dict with stats.
-    """
+def sync_cycle() -> SyncCycleResult:
+    """Execute one full sync cycle and return the authoritative cycle result."""
     _init_dirs()
-    logger.info("═══ Sync cycle start [%s] ═══", DEVICE_ID)
+    started_dt = datetime.now(timezone.utc)
+    cycle_id = f"{DEVICE_ID}-{started_dt.strftime('%Y%m%dT%H%M%S%fZ')}"
+    logger.info("═══ Sync cycle start [%s] cycle_id=%s ═══", DEVICE_ID, cycle_id)
     t0 = time.monotonic()
 
     # 1. Load previous manifest
     manifest = load_manifest(MANIFEST_PATH)
     previous_files = dict(manifest.files)
 
-    # 2. Scan current files
+    # 2. Maintenance first, then scan the final on-disk state.
+    deleted = enforce_retention()
+    compressed = compress_cold_files()
     current_files = scan_local_files()
-    scan_ms = int((time.monotonic() - t0) * 1000)
-
-    # 3. Diff
     diff = diff_manifests(current_files, previous_files)
     n_changes = changes_count(diff)
 
     if n_changes == 0:
-        logger.info("No changes detected (%d files, scan=%dms)", len(current_files), scan_ms)
+        logger.info("No changes detected (%d files)", len(current_files))
     else:
         logger.info(
-            "Changes: +%d added, ~%d modified, -%d deleted (scan=%dms)",
-            len(diff["added"]), len(diff["modified"]), len(diff["deleted"]), scan_ms,
+            "Changes: +%d added, ~%d modified, -%d deleted",
+            len(diff["added"]),
+            len(diff["modified"]),
+            len(diff["deleted"]),
         )
 
-    # 4. Update manifest
+    # 3. Update manifest from the authoritative end-of-cycle file set.
     manifest.files = current_files
     if n_changes > 0:
         manifest.bump_clock()
     else:
         manifest.last_sync = time.strftime("%Y-%m-%dT%H:%M:%S%z")
-    save_manifest(manifest, MANIFEST_PATH)
-
-    # 5. Retention & compression
-    t1 = time.monotonic()
-    deleted = enforce_retention()
-    compressed = compress_cold_files()
     orphans = cleanup_orphan_chunks(manifest.files)
-    maint_ms = int((time.monotonic() - t1) * 1000)
 
-    # 6. Identify critical files for cloud backup
-    critical = [p for p in current_files if _is_critical(p)]
+    try:
+        save_manifest(manifest, MANIFEST_PATH)
+    except Exception as exc:
+        logger.critical("Manifest write failed for %s: %s", MANIFEST_PATH, exc, exc_info=True)
+        raise
 
+    # 4. Propagate the authoritative manifest to peers without crashing the cycle.
+    peers_attempted, peers_succeeded, errors = _sync_manifest_to_peers(manifest)
+
+    completed_dt = datetime.now(timezone.utc)
     total_ms = int((time.monotonic() - t0) * 1000)
-    summary = {
-        "device_id": DEVICE_ID,
-        "files_tracked": len(current_files),
-        "total_bytes": sum(e.get("size", 0) for e in current_files.values()),
-        "changes": n_changes,
-        "added": len(diff["added"]),
-        "modified": len(diff["modified"]),
-        "deleted_from_diff": len(diff["deleted"]),
-        "retention_deleted": deleted,
-        "compressed": compressed,
-        "orphan_chunks_removed": orphans,
-        "critical_files": len(critical),
-        "scan_ms": scan_ms,
-        "maintenance_ms": maint_ms,
-        "total_ms": total_ms,
-        "vector_clock": manifest.vector_clock,
-    }
+    result = SyncCycleResult(
+        cycle_id=cycle_id,
+        started_at=started_dt.isoformat(),
+        completed_at=completed_dt.isoformat(),
+        files_scanned=len(current_files),
+        files_changed=n_changes,
+        peers_attempted=peers_attempted,
+        peers_succeeded=peers_succeeded,
+        errors=errors,
+    )
+    _SYNC_HISTORY.add(result)
 
     logger.info(
-        "═══ Sync done: %d files (%.1f MB), %d changes, %dms ═══",
-        summary["files_tracked"],
-        summary["total_bytes"] / 1e6,
-        summary["changes"],
+        "Maintenance summary: retention_deleted=%d compressed=%d orphan_chunks_removed=%d critical_files=%d",
+        deleted,
+        compressed,
+        orphans,
+        len([path for path in current_files if _is_critical(path)]),
+    )
+    logger.info(
+        "═══ Sync done: %d files, %d changes, peers=%d/%d, errors=%d, %dms ═══",
+        result.files_scanned,
+        result.files_changed,
+        result.peers_succeeded,
+        result.peers_attempted,
+        len(result.errors),
         total_ms,
     )
-    return summary
+    return result
 
 
 # ── File Watcher ──────────────────────────────────────────────────────
@@ -441,7 +540,7 @@ def main():
     elif args.once:
         import json
         result = sync_cycle()
-        print(json.dumps(result, indent=2))
+        print(json.dumps(result.to_dict(), indent=2))
     elif args.restore:
         logger.info("Recovery mode — scanning and pulling from peers/cloud...")
         sync_cycle()

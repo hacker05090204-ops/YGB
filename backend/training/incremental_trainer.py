@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import hashlib
 import logging
+import math
 import os
 import re
 import time
@@ -12,17 +13,18 @@ from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Protocol
+from typing import Callable, Protocol
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader, Dataset
 
 from backend.ingestion._integrity import log_module_sha256
 from backend.bridge.bridge_state import get_bridge_state
+from backend.ingestion.normalizer import SampleQualityScorer
 from backend.ingestion.models import IngestedSample
 from backend.observability.metrics import metrics_registry
 from backend.training.feature_extractor import extract
@@ -53,6 +55,54 @@ _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
 _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
 
 
+class AccuracyThresholds:
+    MIN_F1 = 0.75
+    MIN_PRECISION = 0.70
+    MIN_RECALL = 0.65
+    MAX_DROP_FROM_BEST = 0.05
+
+
+@dataclass(frozen=True)
+class AccuracySnapshot:
+    epoch: int
+    accuracy: float
+    precision: float
+    recall: float
+    f1: float
+    auc_roc: float
+    taken_at: str
+
+
+class AccuracyHistory:
+    def __init__(self) -> None:
+        self._snapshots: list[AccuracySnapshot] = []
+
+    def add(self, snapshot: AccuracySnapshot) -> None:
+        self._snapshots.append(snapshot)
+
+    def get_best(self) -> AccuracySnapshot:
+        if not self._snapshots:
+            raise ValueError("accuracy history is empty")
+        return max(self._snapshots, key=lambda snapshot: snapshot.f1)
+
+    def get_last(self) -> AccuracySnapshot:
+        if not self._snapshots:
+            raise ValueError("accuracy history is empty")
+        return self._snapshots[-1]
+
+    def should_rollback(self) -> bool:
+        if len(self._snapshots) < 2:
+            return False
+        best_snapshot = self.get_best()
+        last_snapshot = self.get_last()
+        return (
+            best_snapshot.f1 - last_snapshot.f1
+        ) > AccuracyThresholds.MAX_DROP_FROM_BEST
+
+    def as_list(self) -> list[AccuracySnapshot]:
+        return list(self._snapshots)
+
+
 @dataclass(frozen=True)
 class EpochResult:
     accuracy: float
@@ -65,6 +115,180 @@ class EpochResult:
     rollback: bool
     early_stopped: bool
     prediction_hash: str = ""
+    status: str = "COMPLETED"
+
+
+TrainingResult = EpochResult
+
+
+@dataclass(frozen=True)
+class DatasetQualityReport:
+    passed: bool
+    sample_count: int
+    mean_quality_score: float
+    unique_cves: int
+    severity_distribution: dict[str, float]
+    failed_reasons: list[str]
+
+
+class DatasetQualityError(RuntimeError):
+    """Raised when dataset quality validation fails before training."""
+
+    def __init__(self, failed_reasons: list[str]) -> None:
+        self.failed_reasons = [str(reason) for reason in failed_reasons]
+        super().__init__(
+            "; ".join(self.failed_reasons)
+            if self.failed_reasons
+            else "dataset quality validation failed"
+        )
+
+
+class DatasetQualityGate:
+    MIN_SAMPLES = 100
+    MIN_QUALITY_SCORE = 0.4
+    MIN_UNIQUE_CVES = 50
+    MIN_SEVERITY_DISTRIBUTION = 0.1
+    _SEVERITY_CLASSES = (
+        "CRITICAL",
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "INFORMATIONAL",
+    )
+
+    def __init__(
+        self,
+        *,
+        feature_loader: Callable[[IngestedSample], torch.Tensor] | None = None,
+    ) -> None:
+        self._feature_loader = feature_loader
+
+    @staticmethod
+    def _coerce_payload(
+        sample: dict[str, object] | IngestedSample,
+    ) -> dict[str, object]:
+        if isinstance(sample, IngestedSample):
+            return SampleQualityScorer._coerce_sample(sample)
+        if isinstance(sample, dict):
+            return dict(sample)
+        raise TypeError(
+            "dataset quality validation requires dict or IngestedSample entries"
+        )
+
+    @staticmethod
+    def _canonical_severity(raw_severity: object) -> str:
+        severity = str(raw_severity or "").strip().upper()
+        if severity == "INFO":
+            return "INFORMATIONAL"
+        return severity
+
+    @classmethod
+    def _score_sample(cls, sample: dict[str, object] | IngestedSample) -> float:
+        payload = cls._coerce_payload(sample)
+        explicit_quality_score = payload.get("quality_score")
+        if explicit_quality_score not in (None, ""):
+            score = float(explicit_quality_score)
+            if not math.isfinite(score):
+                raise ValueError("quality_score is not finite")
+            return score
+
+        text = SampleQualityScorer._extract_text(payload)
+        text_length = len(text)
+        if text_length <= 1:
+            text_length_score = 0.0
+        else:
+            text_length_score = SampleQualityScorer._clamp(
+                math.log(text_length) / math.log(2000)
+            )
+        has_cvss_score = 1.0 if payload.get("cvss_score") not in (None, "") else 0.0
+        has_exploit_info = SampleQualityScorer._exploit_info_score(payload)
+        source_trust_score = SampleQualityScorer._source_trust_score(payload)
+        return (
+            text_length_score
+            + has_cvss_score
+            + has_exploit_info
+            + source_trust_score
+        ) / 4.0
+
+    def validate(
+        self, samples: list[dict[str, object] | IngestedSample]
+    ) -> DatasetQualityReport:
+        sample_count = len(samples)
+        failed_reasons: list[str] = []
+        quality_scores: list[float] = []
+        unique_cves: set[str] = set()
+        severity_counts = {severity: 0 for severity in self._SEVERITY_CLASSES}
+
+        for index, sample in enumerate(samples):
+            try:
+                payload = self._coerce_payload(sample)
+            except TypeError as exc:
+                failed_reasons.append(f"sample_payload_invalid[{index}]: {exc}")
+                continue
+
+            cve_id = str(payload.get("cve_id", "") or "").strip().upper()
+            if cve_id:
+                unique_cves.add(cve_id)
+
+            severity = self._canonical_severity(payload.get("severity", ""))
+            if severity in severity_counts:
+                severity_counts[severity] += 1
+
+            try:
+                quality_scores.append(self._score_sample(payload))
+            except (TypeError, ValueError) as exc:
+                failed_reasons.append(f"quality_score_invalid[{index}]: {exc}")
+
+            if self._feature_loader is not None and isinstance(sample, IngestedSample):
+                try:
+                    feature_tensor = self._feature_loader(sample)
+                except RuntimeError as exc:
+                    failed_reasons.append(f"feature_tensor_load_failed[{index}]: {exc}")
+                    continue
+                if torch.isnan(feature_tensor).any().item():
+                    failed_reasons.append(f"feature_tensor_nan[{index}]")
+                if torch.isinf(feature_tensor).any().item():
+                    failed_reasons.append(f"feature_tensor_inf[{index}]")
+
+        mean_quality_score = (
+            float(sum(quality_scores) / len(quality_scores)) if quality_scores else 0.0
+        )
+        unique_cve_count = len(unique_cves)
+        severity_distribution = {
+            severity: (
+                float(count) / float(sample_count) if sample_count > 0 else 0.0
+            )
+            for severity, count in severity_counts.items()
+        }
+
+        if sample_count < self.MIN_SAMPLES:
+            failed_reasons.append(
+                f"sample_count_below_min:{sample_count}<{self.MIN_SAMPLES}"
+            )
+        if mean_quality_score < self.MIN_QUALITY_SCORE:
+            failed_reasons.append(
+                "mean_quality_below_min:"
+                f"{mean_quality_score:.4f}<{self.MIN_QUALITY_SCORE:.4f}"
+            )
+        if unique_cve_count < self.MIN_UNIQUE_CVES:
+            failed_reasons.append(
+                f"unique_cves_below_min:{unique_cve_count}<{self.MIN_UNIQUE_CVES}"
+            )
+        for severity in self._SEVERITY_CLASSES:
+            if severity_distribution[severity] < self.MIN_SEVERITY_DISTRIBUTION:
+                failed_reasons.append(
+                    "severity_distribution_below_min:"
+                    f"{severity}={severity_distribution[severity]:.4f}"
+                )
+
+        return DatasetQualityReport(
+            passed=not failed_reasons,
+            sample_count=sample_count,
+            mean_quality_score=mean_quality_score,
+            unique_cves=unique_cve_count,
+            severity_distribution=severity_distribution,
+            failed_reasons=failed_reasons,
+        )
 
 
 class _StreamingFeatureDataset(Dataset):
@@ -178,6 +402,11 @@ class IncrementalTrainer:
         self.positive_threshold = float(self.baseline_state["positive_threshold"])
         self.state_manager = get_training_state_manager()
         self.model = self._load_or_initialize_model()
+        self.dataset_quality_gate = DatasetQualityGate(
+            feature_loader=self._load_or_compute_feature
+        )
+        self._last_dataset_quality_report: DatasetQualityReport | None = None
+        self._accuracy_history = AccuracyHistory()
 
     def _load_training_state(self) -> dict[str, object]:
         if not self.state_path.exists():
@@ -271,6 +500,28 @@ class IncrementalTrainer:
             return False, "inf_detected"
         if bool(torch.count_nonzero(feature).item()) is False:
             return False, "all_zero"
+        flattened = feature.detach().reshape(-1).cpu().to(dtype=torch.float32)
+        if flattened.numel() > 0 and torch.all(flattened == flattened[0]).item():
+            logger.warning(
+                "feature_tensor_all_same_value_rejected",
+                extra={
+                    "event": "feature_tensor_all_same_value_rejected",
+                    "value": float(flattened[0].item()),
+                    "numel": int(flattened.numel()),
+                },
+            )
+            return False, "all_same_value"
+        variance = float(flattened.var(unbiased=False).item()) if flattened.numel() else 0.0
+        if variance <= 0.0:
+            logger.warning(
+                "feature_tensor_zero_variance_rejected",
+                extra={
+                    "event": "feature_tensor_zero_variance_rejected",
+                    "variance": variance,
+                    "numel": int(flattened.numel()),
+                },
+            )
+            return False, "zero_variance"
         return True, "ok"
 
     def _record_invalid_sample(self, sample: IngestedSample, reason: str) -> None:
@@ -893,10 +1144,10 @@ class IncrementalTrainer:
     ) -> tuple[DataLoader, DataLoader]:
         if self.num_workers > 0 and can_ai_execute()[0]:
             raise RuntimeError("GUARD")
-        if len(samples) < 2:
-            raise RuntimeError(
-                "REAL_DATA_REQUIRED: At least two real samples are required"
-            )
+        quality_report = self.dataset_quality_gate.validate(samples)
+        self._last_dataset_quality_report = quality_report
+        if not quality_report.passed:
+            raise DatasetQualityError(quality_report.failed_reasons)
 
         indices = list(range(len(samples)))
         eval_count = min(len(indices) - 1, max(2, int(len(indices) * 0.1)))
@@ -952,6 +1203,36 @@ class IncrementalTrainer:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             optimizer.step()
         optimizer.zero_grad(set_to_none=True)
+
+    def get_accuracy_history(self) -> list[AccuracySnapshot]:
+        return self._accuracy_history.as_list()
+
+    @staticmethod
+    def _compute_auc_roc(
+        labels: list[int], positive_probabilities: list[float]
+    ) -> float:
+        try:
+            return float(roc_auc_score(labels, positive_probabilities))
+        except ValueError as exc:
+            logger.warning(
+                "auc_roc_unavailable_from_current_eval_set: %s",
+                exc,
+            )
+            return math.nan
+
+    def _load_best_checkpoint(self) -> None:
+        if not self.model_path.exists():
+            raise FileNotFoundError(
+                f"best checkpoint unavailable for rollback at {self.model_path}"
+            )
+        try:
+            reloaded_state = load_safetensors(
+                str(self.model_path), device=self.device.type
+            )
+            self.model.load_state_dict(reloaded_state, strict=False)
+        except Exception as exc:
+            logger.error("failed to load best checkpoint for rollback: %s", exc)
+            raise
 
     def benchmark_current_model(self, max_samples: int = 1500) -> dict[str, object]:
         samples, source = self.load_evaluation_samples(max_samples=max_samples)
@@ -1132,8 +1413,48 @@ class IncrementalTrainer:
         precision = float(threshold_metrics["precision"])
         recall = float(threshold_metrics["recall"])
         f1 = float(threshold_metrics["f1"])
+        auc_roc = self._compute_auc_roc(labels_out, positive_probabilities)
         eval_loss = float(sum(eval_losses) / max(len(eval_losses), 1))
         duration_ms = (time.perf_counter() - start_time) * 1000
+        snapshot = AccuracySnapshot(
+            epoch=epoch_number,
+            accuracy=accuracy,
+            precision=precision,
+            recall=recall,
+            f1=f1,
+            auc_roc=auc_roc,
+            taken_at=datetime.now(timezone.utc).isoformat(),
+        )
+        self._accuracy_history.add(snapshot)
+
+        from backend.training.runtime_status_validator import (
+            validate_promotion_readiness,
+        )
+
+        promotion_ready = validate_promotion_readiness(snapshot)
+        result_status = "COMPLETED"
+
+        if precision < AccuracyThresholds.MIN_PRECISION:
+            logger.critical(
+                "precision below minimum threshold: precision=%.4f min_precision=%.4f",
+                precision,
+                AccuracyThresholds.MIN_PRECISION,
+            )
+        if recall < AccuracyThresholds.MIN_RECALL:
+            logger.warning(
+                "recall below minimum threshold: recall=%.4f min_recall=%.4f",
+                recall,
+                AccuracyThresholds.MIN_RECALL,
+            )
+        if f1 < AccuracyThresholds.MIN_F1:
+            result_status = "BLOCKED_LOW_ACCURACY"
+            logger.critical(
+                "final f1 below minimum threshold, blocking promotion: f1=%.4f min_f1=%.4f",
+                f1,
+                AccuracyThresholds.MIN_F1,
+            )
+        elif not promotion_ready:
+            result_status = "PROMOTION_BLOCKED"
 
         logger.info(
             "incremental_threshold_calibrated",
@@ -1149,26 +1470,55 @@ class IncrementalTrainer:
             },
         )
 
+        if self._accuracy_history.should_rollback():
+            best_snapshot = self._accuracy_history.get_best()
+            last_snapshot = self._accuracy_history.get_last()
+            logger.warning(
+                "f1 rollback triggered, restoring best checkpoint: last_f1=%.4f best_f1=%.4f max_drop=%.4f",
+                last_snapshot.f1,
+                best_snapshot.f1,
+                AccuracyThresholds.MAX_DROP_FROM_BEST,
+            )
+            metrics_registry.increment("training_rollback", 1.0)
+            self._load_best_checkpoint()
+            return EpochResult(
+                accuracy=accuracy,
+                precision=precision,
+                recall=recall,
+                f1=f1,
+                eval_loss=eval_loss,
+                samples_processed=len(samples),
+                epoch_number=epoch_number,
+                rollback=True,
+                early_stopped=False,
+                prediction_hash=prediction_hash,
+                status=result_status,
+            )
+
         if accuracy < self.baseline_accuracy - 0.05:
             logger.critical("accuracy dropped > 5%, rolling back")
             metrics_registry.increment("training_rollback", 1.0)
             self._restore_previous_state(previous_state)
             return EpochResult(
-                accuracy,
-                precision,
-                recall,
-                f1,
-                eval_loss,
-                len(samples),
-                epoch_number,
-                True,
-                False,
+                accuracy=accuracy,
+                precision=precision,
+                recall=recall,
+                f1=f1,
+                eval_loss=eval_loss,
+                samples_processed=len(samples),
+                epoch_number=epoch_number,
+                rollback=True,
+                early_stopped=False,
+                prediction_hash=prediction_hash,
+                status=result_status,
             )
 
         early_stopped = False
         best_eval_loss = self.training_state.get("best_eval_loss")
         no_improve_count = int(self.training_state.get("no_improve_count", 0))
-        if best_eval_loss is None or eval_loss < float(best_eval_loss):
+        if promotion_ready and (
+            best_eval_loss is None or eval_loss < float(best_eval_loss)
+        ):
             best_eval_loss = eval_loss
             no_improve_count = 0
             self._save_model_state(self.model.state_dict(), epoch_number=epoch_number)
@@ -1180,6 +1530,14 @@ class IncrementalTrainer:
                 positive_threshold=positive_threshold,
             )
         else:
+            if not promotion_ready:
+                logger.warning(
+                    "model promotion blocked by readiness validation: status=%s f1=%.4f precision=%.4f recall=%.4f",
+                    result_status,
+                    f1,
+                    precision,
+                    recall,
+                )
             no_improve_count += 1
             if no_improve_count >= 3:
                 early_stopped = True
@@ -1231,6 +1589,7 @@ class IncrementalTrainer:
             rollback=False,
             early_stopped=early_stopped,
             prediction_hash=prediction_hash,
+            status=result_status,
         )
 
 

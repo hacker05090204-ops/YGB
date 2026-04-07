@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from backend.training.representation_bridge import (
+    DataShapeError,
     DataValueError,
     RealFeatureLoader,
     RepresentationExpander,
@@ -46,4 +47,23 @@ def test_real_feature_loader_rejects_nan_values(tmp_path):
     np.save(path, features)
 
     with pytest.raises(DataValueError, match="non-finite"):
+        RealFeatureLoader.load(path)
+
+
+def test_real_feature_loader_rejects_all_zero_row(tmp_path):
+    features = np.ones((2, 256), dtype=np.float32)
+    features[1, :] = 0.0
+    path = tmp_path / "features_zero_row.npy"
+    np.save(path, features)
+
+    with pytest.raises(DataValueError, match="all-zero row"):
+        RealFeatureLoader.load(path)
+
+
+def test_real_feature_loader_rejects_wrong_dtype(tmp_path):
+    features = np.ones((2, 256), dtype=np.float64)
+    path = tmp_path / "features_float64.npy"
+    np.save(path, features)
+
+    with pytest.raises(DataShapeError, match="dtype float32"):
         RealFeatureLoader.load(path)

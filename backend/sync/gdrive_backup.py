@@ -47,8 +47,20 @@ GDRIVE_SDK_CHUNK_BYTES = max(
     int(float(os.getenv("YGB_GDRIVE_SDK_CHUNK_MB", "8")) * 1024 * 1024),
 )
 ENCRYPTION_KEY = os.getenv("YGB_BACKUP_ENCRYPTION_KEY", "")
+ENCRYPTION_REQUIRED = os.getenv("YGB_REQUIRE_ENCRYPTION", "true") == "true"
 
 _upload_lock = threading.Lock()
+
+
+class EncryptionRequiredError(RuntimeError):
+    """Raised when backup encryption is mandatory but unavailable."""
+
+
+def _encryption_required() -> bool:
+    configured = os.getenv("YGB_REQUIRE_ENCRYPTION")
+    if configured is None:
+        return bool(ENCRYPTION_REQUIRED)
+    return configured.strip().lower() == "true"
 
 
 def _ensure_dirs():
@@ -129,17 +141,29 @@ def _call_with_retry(operation, *, label: str):
 def _encrypt_data(data: bytes) -> bytes:
     """Encrypt data with Fernet (AES-256-CBC). Returns encrypted bytes."""
     if not ENCRYPTION_KEY:
+        if _encryption_required():
+            raise EncryptionRequiredError(
+                "Cannot backup without encryption. Set YGB_BACKUP_ENCRYPTION_KEY."
+            )
         logger.warning("No encryption key set — uploading unencrypted")
         return data
     try:
         from cryptography.fernet import Fernet
         f = Fernet(ENCRYPTION_KEY.encode("utf-8"))
         return f.encrypt(data)
-    except ImportError:
+    except ImportError as exc:
+        if _encryption_required():
+            raise EncryptionRequiredError(
+                "Cannot backup without encryption. Install cryptography."
+            ) from exc
         logger.warning("cryptography not installed — uploading unencrypted")
         return data
-    except Exception as e:
-        logger.error("Encryption failed: %s", e)
+    except Exception as exc:
+        logger.error("Encryption failed: %s", exc)
+        if _encryption_required():
+            raise EncryptionRequiredError(
+                "Cannot backup without encryption. Encryption operation failed."
+            ) from exc
         return data
 
 
@@ -193,6 +217,10 @@ def stage_file_for_upload(
     """
     _ensure_dirs()
     try:
+        if _encryption_required() and not encrypt:
+            raise EncryptionRequiredError(
+                "Cannot backup without encryption. Encryption is required."
+            )
         data = file_path.read_bytes()
         if compress:
             data = _compress_data(data)
@@ -217,8 +245,10 @@ def stage_file_for_upload(
 
         logger.info("Staged for GDrive: %s (%.1f KB)", relative_path, len(data) / 1024)
         return staged
-    except Exception as e:
-        logger.error("Failed to stage %s: %s", relative_path, e)
+    except EncryptionRequiredError:
+        raise
+    except Exception as exc:
+        logger.error("Failed to stage %s: %s", relative_path, exc)
         return None
 
 

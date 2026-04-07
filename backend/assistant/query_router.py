@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, List, Dict, Tuple
 from datetime import datetime, timezone
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,18 @@ class RouteDecision:
 
 
 @dataclass(frozen=True)
+class QueryResult:
+    """Truthful query result metadata for primary/fallback research retrieval."""
+
+    query_id: str
+    query_text: str
+    source: str
+    result: str
+    confidence: float
+    retrieved_at: str
+
+
+@dataclass(frozen=True)
 class ResearchResult:
     """Result of a research query."""
     query: str
@@ -73,6 +86,7 @@ class ResearchResult:
     elapsed_ms: float
     mode: VoiceMode          # Always RESEARCH
     timestamp: str
+    query_result: Optional[QueryResult] = None
 
 
 # =========================================================================
@@ -326,6 +340,33 @@ class ResearchSearchPipeline:
         "cf-challenge",
     )
 
+    def __init__(self) -> None:
+        self._last_fetch_used_http_fallback = False
+        self._last_fetch_reason = ""
+
+    def _record_fetch_metadata(self, *, used_http_fallback: bool, reason: str) -> None:
+        self._last_fetch_used_http_fallback = used_http_fallback
+        self._last_fetch_reason = reason
+
+    def _build_query_result(
+        self,
+        *,
+        query_id: str,
+        query_text: str,
+        source: str,
+        result: str,
+        confidence: float,
+        retrieved_at: str,
+    ) -> QueryResult:
+        return QueryResult(
+            query_id=query_id,
+            query_text=query_text,
+            source=source,
+            result=result,
+            confidence=confidence,
+            retrieved_at=retrieved_at,
+        )
+
     def _resolve_edge_binary(self) -> Optional[str]:
         """Resolve Edge binary path from env/PATH/common install locations."""
         for candidate in self._EDGE_CANDIDATES:
@@ -368,6 +409,7 @@ class ResearchSearchPipeline:
         bing_url = f"https://www.bing.com/search?q={encoded_query}"
         ddg_url = f"https://duckduckgo.com/html/?q={encoded_query}"
 
+        fallback_reason = "Primary Edge search binary is unavailable"
         edge_binary = self._resolve_edge_binary()
         if edge_binary:
             result = subprocess.run(
@@ -394,31 +436,72 @@ class ResearchSearchPipeline:
                 "utf-8", errors="replace"
             )
             if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                self._record_fetch_metadata(
+                    used_http_fallback=False,
+                    reason="Primary Edge search succeeded",
+                )
                 return raw_html, "bing.com"
             if raw_html.strip():
-                logger.warning("Research Edge result looked like a bot challenge; falling back to HTTP")
+                fallback_reason = "Primary Edge search returned a bot challenge"
+            else:
+                fallback_reason = "Primary Edge search returned empty HTML"
 
         # Fallback chain: direct HTTPS fetch from allowlisted domains.
         try:
             raw_html = self._fetch_html_over_http(ddg_url)
             if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                logger.warning("Research HTTP fallback engaged: %s", fallback_reason)
+                self._record_fetch_metadata(
+                    used_http_fallback=True,
+                    reason=fallback_reason,
+                )
                 return raw_html, "duckduckgo.com"
-        except Exception as e:
-            logger.warning(f"Research HTTP fallback (duckduckgo) failed: {e}")
+            if raw_html.strip():
+                logger.warning(
+                    "Research HTTP fallback ignored DuckDuckGo bot challenge after %s",
+                    fallback_reason,
+                )
+        except Exception as exc:
+            logger.warning(
+                "Research HTTP fallback (duckduckgo) failed after %s: %s: %s",
+                fallback_reason,
+                type(exc).__name__,
+                exc,
+            )
 
         try:
             raw_html = self._fetch_html_over_http(bing_url)
             if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                logger.warning("Research HTTP fallback engaged: %s", fallback_reason)
+                self._record_fetch_metadata(
+                    used_http_fallback=True,
+                    reason=fallback_reason,
+                )
                 return raw_html, "bing.com"
-        except Exception as e:
-            logger.warning(f"Research HTTP fallback (bing) failed: {e}")
+            if raw_html.strip():
+                logger.warning(
+                    "Research HTTP fallback ignored Bing bot challenge after %s",
+                    fallback_reason,
+                )
+        except Exception as exc:
+            logger.warning(
+                "Research HTTP fallback (bing) failed after %s: %s: %s",
+                fallback_reason,
+                type(exc).__name__,
+                exc,
+            )
 
+        self._record_fetch_metadata(
+            used_http_fallback=True,
+            reason=fallback_reason,
+        )
         return "", ""
 
     def search(self, query: str) -> ResearchResult:
         """Execute a research search query."""
         timestamp = datetime.now(timezone.utc).isoformat()
         query = query.strip()
+        query_id = f"QRY-{uuid4().hex[:12].upper()}"
 
         # Block dangerous patterns
         for pattern in BLOCKED_RESEARCH_PATTERNS:
@@ -434,6 +517,14 @@ class ResearchSearchPipeline:
                     elapsed_ms=0,
                     mode=VoiceMode.RESEARCH,
                     timestamp=timestamp,
+                    query_result=self._build_query_result(
+                        query_id=query_id,
+                        query_text=query,
+                        source="blocked",
+                        result="Query blocked: contains forbidden pattern",
+                        confidence=0.0,
+                        retrieved_at=timestamp,
+                    ),
                 )
 
         import time
@@ -448,13 +539,21 @@ class ResearchSearchPipeline:
                     query=query,
                     status=ResearchStatus.NO_RESULTS,
                     title="",
-                    summary="I couldn't find results for that query. Could you rephrase your question?",
+                    summary="No result available",
                     source=source_domain or "",
                     key_terms=(),
                     word_count=0,
                     elapsed_ms=elapsed,
                     mode=VoiceMode.CLARIFICATION,
                     timestamp=timestamp,
+                    query_result=self._build_query_result(
+                        query_id=query_id,
+                        query_text=query,
+                        source="no_result",
+                        result="No result available",
+                        confidence=0.0,
+                        retrieved_at=timestamp,
+                    ),
                 )
 
             # Extract text from HTML (mirrors C++ content_extractor)
@@ -466,13 +565,21 @@ class ResearchSearchPipeline:
                     query=query,
                     status=ResearchStatus.NO_RESULTS,
                     title="",
-                    summary="I found the page but couldn't extract useful content. Could you try a different question?",
-                    source="bing.com",
+                    summary="No result available",
+                    source=source_domain or "",
                     key_terms=(),
                     word_count=0,
                     elapsed_ms=elapsed,
                     mode=VoiceMode.CLARIFICATION,
                     timestamp=timestamp,
+                    query_result=self._build_query_result(
+                        query_id=query_id,
+                        query_text=query,
+                        source="no_result",
+                        result="No result available",
+                        confidence=0.0,
+                        retrieved_at=timestamp,
+                    ),
                 )
 
             # Sanitize (mirrors C++ research_sanitizer)
@@ -492,6 +599,18 @@ class ResearchSearchPipeline:
                 elapsed_ms=elapsed,
                 mode=VoiceMode.RESEARCH,
                 timestamp=timestamp,
+                query_result=self._build_query_result(
+                    query_id=query_id,
+                    query_text=query,
+                    source=(
+                        "http_fallback"
+                        if self._last_fetch_used_http_fallback
+                        else "primary"
+                    ),
+                    result=summary,
+                    confidence=0.7 if self._last_fetch_used_http_fallback else 1.0,
+                    retrieved_at=timestamp,
+                ),
             )
 
         except subprocess.TimeoutExpired:
@@ -500,29 +619,45 @@ class ResearchSearchPipeline:
                 query=query,
                 status=ResearchStatus.TIMEOUT,
                 title="",
-                summary="The search took too long. Could you try a simpler question?",
+                summary="No result available",
                 source="",
                 key_terms=(),
                 word_count=0,
                 elapsed_ms=elapsed,
                 mode=VoiceMode.CLARIFICATION,
                 timestamp=timestamp,
+                query_result=self._build_query_result(
+                    query_id=query_id,
+                    query_text=query,
+                    source="timeout",
+                    result="No result available",
+                    confidence=0.0,
+                    retrieved_at=timestamp,
+                ),
             )
 
-        except Exception as e:
+        except Exception as exc:
             elapsed = (time.monotonic() - t_start) * 1000
-            logger.error(f"Research search failed: {e}")
+            logger.error("Research search failed: %s: %s", type(exc).__name__, exc)
             return ResearchResult(
                 query=query,
                 status=ResearchStatus.ERROR,
                 title="",
-                summary="I couldn't complete the search. Could you rephrase your question?",
+                summary="No result available",
                 source="",
                 key_terms=(),
                 word_count=0,
                 elapsed_ms=elapsed,
                 mode=VoiceMode.CLARIFICATION,
                 timestamp=timestamp,
+                query_result=self._build_query_result(
+                    query_id=query_id,
+                    query_text=query,
+                    source="error",
+                    result="No result available",
+                    confidence=0.0,
+                    retrieved_at=timestamp,
+                ),
             )
 
     # =====================================================================

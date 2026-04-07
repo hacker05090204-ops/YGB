@@ -16,6 +16,7 @@ import json
 import time
 import secrets
 import logging
+from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,6 +38,18 @@ REPORT_GENERATOR_VERSION = "1.0"
 class ValidationResult:
     valid: bool
     missing_fields: list[str]
+    errors: list[str]
+
+
+@dataclass(frozen=True)
+class ReportExportRecord:
+    report_id: str
+    exported_at: str
+    format: str
+    export_size_bytes: int
+
+
+ReportExportLog = deque(maxlen=1000)
 
 
 class ReportValidator:
@@ -45,7 +58,22 @@ class ReportValidator:
     @staticmethod
     def validate(report: dict) -> ValidationResult:
         missing_fields = [field for field in ReportValidator.REQUIRED if not report.get(field)]
-        return ValidationResult(valid=not missing_fields, missing_fields=missing_fields)
+        errors: list[str] = []
+        generated_at = report.get("generated_at")
+        generator_version = report.get("generator_version")
+
+        if generated_at and not _is_iso8601_timestamp(generated_at):
+            errors.append("Invalid generated_at: expected ISO8601 timestamp")
+        if generator_version and generator_version != REPORT_GENERATOR_VERSION:
+            errors.append(
+                f"Invalid generator_version: expected {REPORT_GENERATOR_VERSION}"
+            )
+
+        return ValidationResult(
+            valid=not missing_fields and not errors,
+            missing_fields=missing_fields,
+            errors=errors,
+        )
 
 
 def _get_db_path() -> str:
@@ -71,8 +99,8 @@ def _log_activity(user_id: str, action: str, detail: str):
     try:
         from backend.storage.storage_bridge import log_activity
         log_activity(user_id, action, detail)
-    except Exception:
-        logger.info("AUDIT [%s] %s: %s", user_id, action, detail)
+    except Exception as exc:
+        logger.info("AUDIT [%s] %s: %s (storage bridge unavailable: %s)", user_id, action, detail, exc)
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 
@@ -150,10 +178,67 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _db_unavailable_detail() -> Dict[str, Any]:
+    return {
+        "error": "SERVICE_UNAVAILABLE",
+        "detail": "Database unavailable",
+        "fallback_available": False,
+    }
+
+
+def _is_iso8601_timestamp(value: Any) -> bool:
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
+def _normalize_generated_at(value: Any, fallback: Optional[str] = None) -> str:
+    if _is_iso8601_timestamp(value):
+        return str(value)
+    if _is_iso8601_timestamp(fallback):
+        return str(fallback)
+    return _now_iso()
+
+
+def _validation_errors_for_report(report: Dict[str, Any]) -> List[str]:
+    validation = ReportValidator.validate(report)
+    validation_errors = [
+        f"Missing required field: {field}" for field in validation.missing_fields
+    ]
+    validation_errors.extend(validation.errors)
+    return validation_errors
+
+
+def _append_report_export_record(
+    report: Dict[str, Any], *, export_format: str = "json"
+) -> ReportExportRecord:
+    try:
+        export_bytes = len(
+            json.dumps(report, sort_keys=True, default=str).encode("utf-8")
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Report export payload could not be serialized") from exc
+
+    record = ReportExportRecord(
+        report_id=str(report.get("id", "")),
+        exported_at=_now_iso(),
+        format=export_format,
+        export_size_bytes=export_bytes,
+    )
+    ReportExportLog.append(record)
+    return record
+
+
 def _normalize_report_metadata(metadata: Any, *, generated_at: Optional[str] = None) -> dict:
     """Attach required generator metadata to report metadata payloads."""
     normalized = dict(metadata) if isinstance(metadata, dict) else {}
-    normalized.setdefault("generated_at", generated_at or _now_iso())
+    normalized["generated_at"] = _normalize_generated_at(
+        normalized.get("generated_at"), generated_at
+    )
     normalized["generator_version"] = REPORT_GENERATOR_VERSION
     return normalized
 
@@ -175,38 +260,32 @@ def _metadata_from_report(report: Dict[str, Any]) -> Dict[str, Any]:
 def _finalize_report_for_response(
     report: Dict[str, Any], *, ensure_metadata: bool = True
 ) -> Dict[str, Any]:
-    """Prepare report payloads for API responses with validation warnings."""
+    """Prepare report payloads for API responses with validation checks."""
     final_report = dict(report)
     metadata = _metadata_from_report(final_report)
 
     if ensure_metadata:
-        final_report["generated_at"] = (
-            final_report.get("generated_at")
-            or metadata.get("generated_at")
-            or final_report.get("created_at")
-            or _now_iso()
+        final_report["generated_at"] = _normalize_generated_at(
+            final_report.get("generated_at") or metadata.get("generated_at"),
+            final_report.get("created_at"),
         )
-        final_report["generator_version"] = (
-            final_report.get("generator_version")
-            or metadata.get("generator_version")
-            or REPORT_GENERATOR_VERSION
-        )
+        final_report["generator_version"] = REPORT_GENERATOR_VERSION
         merged_metadata = dict(metadata)
-        merged_metadata.setdefault("generated_at", final_report["generated_at"])
+        merged_metadata["generated_at"] = final_report["generated_at"]
         merged_metadata["generator_version"] = final_report["generator_version"]
         if "metadata_json" in final_report:
             final_report["metadata_json"] = json.dumps(merged_metadata)
 
-    validation = ReportValidator.validate(final_report)
-    if not validation.valid:
+    validation_errors = _validation_errors_for_report(final_report)
+    if validation_errors:
         logger.warning(
-            "Report validation failed for %s: missing_fields=%s",
+            "Report validation failed for %s: validation_errors=%s",
             final_report.get("id", "unknown"),
-            validation.missing_fields,
+            validation_errors,
         )
-        final_report["validation_warnings"] = [
-            f"Missing required field: {field}" for field in validation.missing_fields
-        ]
+        final_report["validation_warnings"] = validation_errors
+    else:
+        final_report.pop("validation_warnings", None)
 
     return final_report
 
@@ -247,11 +326,21 @@ async def create_report(request: Request, user=Depends(require_auth)):
         "generator_version": metadata["generator_version"],
     }
 
+    validation_errors = _validation_errors_for_report(report)
+    if validation_errors:
+        logger.error(
+            "Generated report %s failed validation before persistence: %s",
+            report_id,
+            validation_errors,
+        )
+        raise HTTPException(status_code=500, detail={
+            "error": "INTERNAL_ERROR",
+            "detail": "Generated report failed validation",
+        })
+
     conn = get_db_connection()
     if not conn:
-        raise HTTPException(status_code=503, detail={
-            "error": "SERVICE_UNAVAILABLE", "detail": "Database unavailable"
-        })
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
 
     try:
         cursor = conn.cursor()
@@ -291,6 +380,14 @@ async def create_report(request: Request, user=Depends(require_auth)):
     response_report = _finalize_report_for_response(
         {**report, "content": body.get("content", {})}
     )
+    try:
+        _append_report_export_record(response_report)
+    except ValueError as exc:
+        logger.error("Failed to append export record for %s: %s", report_id, exc)
+        raise HTTPException(status_code=500, detail={
+            "error": "INTERNAL_ERROR",
+            "detail": "Failed to record report export metadata",
+        })
     return {"success": True, "report": response_report}
 
 
@@ -338,9 +435,7 @@ async def get_report(report_id: str, user=Depends(require_auth)):
 
     conn = get_db_connection()
     if not conn:
-        raise HTTPException(status_code=503, detail={
-            "error": "SERVICE_UNAVAILABLE", "detail": "Database unavailable"
-        })
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
 
     try:
         cursor = conn.cursor()
@@ -393,9 +488,7 @@ async def get_report_content(report_id: str, user=Depends(require_auth)):
 
     conn = get_db_connection()
     if not conn:
-        raise HTTPException(status_code=503, detail={
-            "error": "SERVICE_UNAVAILABLE", "detail": "Database unavailable"
-        })
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
 
     try:
         cursor = conn.cursor()
@@ -481,9 +574,7 @@ async def start_video_recording(request: Request, user=Depends(require_auth)):
 
     conn = get_db_connection()
     if not conn:
-        raise HTTPException(status_code=503, detail={
-            "error": "SERVICE_UNAVAILABLE", "detail": "Database unavailable"
-        })
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
 
     try:
         cursor = conn.cursor()
@@ -518,9 +609,7 @@ async def stop_video_recording(video_id: str, request: Request, user=Depends(req
 
     conn = get_db_connection()
     if not conn:
-        raise HTTPException(status_code=503, detail={
-            "error": "SERVICE_UNAVAILABLE", "detail": "Database unavailable"
-        })
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
 
     try:
         cursor = conn.cursor()

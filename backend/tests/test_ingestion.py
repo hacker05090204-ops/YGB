@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 from collections import OrderedDict
 from urllib.robotparser import RobotFileParser
 from unittest.mock import AsyncMock, patch
@@ -96,6 +97,36 @@ class StubAdapter:
         return self._result
 
 
+def _make_quality_scorer(tmp_path):
+    return normalizer.SampleQualityScorer(
+        dedup_store=DedupIndex(str(tmp_path / "dedup_store.json")),
+        rejection_log=normalizer.QualityRejectionLog(),
+    )
+
+
+def _quality_payload(
+    description: str,
+    *,
+    cve_id: str = "CVE-2026-0001",
+    severity: str = "HIGH",
+    source: str = "nvd",
+    cvss_score: float | None = 8.1,
+    is_exploited: bool = True,
+    tags: tuple[str, ...] = (),
+) -> dict[str, object]:
+    return {
+        "source": source,
+        "description": description,
+        "raw_text": description,
+        "url": "https://example.com/advisory",
+        "cve_id": cve_id,
+        "severity": severity,
+        "cvss_score": cvss_score,
+        "is_exploited": is_exploited,
+        "tags": list(tags),
+    }
+
+
 @pytest.fixture(autouse=True)
 def reset_metrics_and_caches(monkeypatch, tmp_path):
     metrics_registry.reset()
@@ -123,27 +154,159 @@ def test_model_helpers_and_exports():
 def test_dedup_load_save_and_stats(tmp_path):
     index = DedupIndex(str(tmp_path / "dedup.json"))
     index.load()
-    index.mark_seen("abc")
-    assert index.is_duplicate("abc") is True
+    index.record_seen("CVE-2026-0001", "abc", source="nvd")
+    assert index.is_duplicate("CVE-2026-0001", "fresh") is True
+    assert index.is_duplicate("CVE-2026-9999", "abc") is True
     index.save()
 
     restored = DedupIndex(str(tmp_path / "dedup.json"))
     restored.load()
-    restored.mark_seen("def")
+    restored.record_seen("CVE-2026-0002", "def", source="nvd")
     stats = index.stats()
 
     assert restored.seen_hashes == {"abc", "def"}
+    assert restored.seen_cve_ids == {"CVE-2026-0001", "CVE-2026-0002"}
     assert stats["total_seen"] == 1.0
-    assert stats["dupes_found"] == 1.0
-    assert stats["duplicate_rate"] == 0.5
-    assert (tmp_path / "dedup.db").exists()
+    assert stats["dupes_found"] == 2.0
+    assert stats["duplicate_rate"] == pytest.approx(2 / 3)
+    assert (tmp_path / "dedup_store.json").exists()
 
-    list_payload = tmp_path / "dedup_list.json"
+    legacy_root = tmp_path / "legacy"
+    legacy_root.mkdir()
+    list_payload = legacy_root / "dedup_list.json"
     list_payload.write_text('["xyz"]', encoding="utf-8")
     from_list = DedupIndex(str(list_payload))
     from_list.load()
     assert from_list.seen_hashes == {"xyz"}
     assert list_payload.exists() is False
+
+
+def test_quality_score_computed_correctly(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    description = "A" * 200
+    sample = _quality_payload(description)
+
+    score = scorer.score(sample)
+
+    expected = (
+        min(math.log(len(description)) / math.log(2000), 1.0)
+        + 1.0
+        + 1.0
+        + 1.0
+    ) / 4.0
+    assert score == pytest.approx(expected)
+    assert float(sample["quality_score"]) == pytest.approx(expected)
+
+
+def test_quality_gate_rejects_short_description(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    accepted, reason, score = scorer.evaluate(_quality_payload("Too short for acceptance"))
+
+    assert accepted is False
+    assert reason == "description_too_short"
+    assert score < 1.0
+
+
+def test_quality_gate_rejects_missing_cve_id(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    description = "Detailed vulnerability context that exceeds the minimum description length by design."
+    accepted, reason, _ = scorer.evaluate(_quality_payload(description, cve_id=""))
+
+    assert accepted is False
+    assert reason == "missing_cve_id"
+
+
+def test_quality_gate_rejects_low_score(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    description = "This narrative is long enough to pass length checks but lacks trust and exploit detail."
+    accepted, reason, score = scorer.evaluate(
+        _quality_payload(
+            description,
+            source="other",
+            cvss_score=None,
+            is_exploited=False,
+        )
+    )
+
+    assert accepted is False
+    assert reason == "low_quality_score"
+    assert score < 0.4
+
+
+def test_quality_gate_accepts_high_quality_nvd_sample(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    description = (
+        "This NVD vulnerability description contains detailed impact analysis, affected scope, "
+        "exploitability context, and remediation guidance for downstream ingestion quality checks."
+    )
+    sample = _quality_payload(description, cve_id="CVE-2026-1001")
+
+    accepted, reason, score = scorer.evaluate(sample)
+    if accepted:
+        scorer.record_seen(sample)
+
+    stats = scorer.get_quality_stats()
+    assert accepted is True
+    assert reason is None
+    assert score >= 0.4
+    assert stats["accepted"] == 1
+    assert stats["rejected"] == 0
+
+
+def test_quality_gate_rejects_duplicate_cve_id(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    first = _quality_payload(
+        "A sufficiently detailed vulnerability description for the first accepted CVE sample.",
+        cve_id="CVE-2026-2222",
+    )
+    accepted, _, _ = scorer.evaluate(first)
+    assert accepted is True
+    scorer.record_seen(first)
+
+    second = _quality_payload(
+        "A different but equally detailed vulnerability narrative for the duplicate CVE identifier.",
+        cve_id="CVE-2026-2222",
+    )
+    accepted, reason, _ = scorer.evaluate(second)
+
+    assert accepted is False
+    assert reason == "duplicate_cve_id"
+
+
+def test_quality_gate_rejects_duplicate_text_hash(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    description = (
+        "This identical normalized vulnerability description is reused to trigger text hash deduplication."
+    )
+    first = _quality_payload(description, cve_id="CVE-2026-3001")
+    accepted, _, _ = scorer.evaluate(first)
+    assert accepted is True
+    scorer.record_seen(first)
+
+    second = _quality_payload(description, cve_id="CVE-2026-3002")
+    accepted, reason, _ = scorer.evaluate(second)
+
+    assert accepted is False
+    assert reason == "duplicate_text_hash"
+
+
+def test_quality_stats_reflect_counts(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    accepted_sample = _quality_payload(
+        "This accepted sample includes extensive detail about scope, impact, exploitability, and remediation.",
+        cve_id="CVE-2026-4001",
+    )
+    accepted, _, _ = scorer.evaluate(accepted_sample)
+    assert accepted is True
+    scorer.record_seen(accepted_sample)
+    scorer.evaluate(_quality_payload("short text", cve_id="CVE-2026-4002"))
+    scorer.evaluate(_quality_payload(accepted_sample["description"], cve_id="CVE-2026-4003"))
+
+    stats = scorer.get_quality_stats()
+    assert stats["accepted"] == 1
+    assert stats["rejected"] == 2
+    assert stats["rejection_reasons"]["description_too_short"] == 1
+    assert stats["rejection_reasons"]["duplicate_text_hash"] == 1
 
 
 def test_normalize_text_and_batch_cache(monkeypatch, tmp_path):
@@ -503,7 +666,7 @@ async def test_async_ingestor_full_cycle_and_helper(monkeypatch, tmp_path):
         adapters=adapters,
     )
 
-    def fake_normalize_with_report(samples, batch_limit=0):
+    def fake_normalize_with_report(samples, batch_limit=0, quality_scorer=None):
         return samples, normalizer.NormalizationReport(
             requested=len(samples),
             cache_hits=0,
@@ -554,7 +717,7 @@ async def test_async_ingestor_reports_backpressure(monkeypatch, tmp_path):
     ingestor.max_pending_samples = 1
     ingestor.max_normalize_batch = 1
 
-    def fake_normalize_with_report(samples, batch_limit=0):
+    def fake_normalize_with_report(samples, batch_limit=0, quality_scorer=None):
         return samples, normalizer.NormalizationReport(
             requested=len(samples),
             cache_hits=0,

@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 _DEFAULT_TTL = 86400  # 24 hours
 
 
+class RevocationUnavailableError(RuntimeError):
+    """Raised when no revocation backend can safely service a request."""
+
+
 # ---------------------------------------------------------------------------
 # Abstract store interface
 # ---------------------------------------------------------------------------
@@ -68,15 +72,26 @@ class _FileStore:
             Path(__file__).parent.parent.parent / "secure_data" / "revocations.json"
         )
         self._path = Path(path or os.getenv("REVOCATION_FILE_PATH", default_path))
-        self._path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self._path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            logger.error("[REVOCATION] File backend directory create failed: %s", exc)
+            raise RevocationUnavailableError(
+                f"Revocation file backend unavailable at {self._path}: {exc}"
+            ) from exc
         self._data = self._load()
 
     def _load(self) -> dict:
         if self._path.exists():
             try:
                 return json.loads(self._path.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError) as exc:
+            except json.JSONDecodeError as exc:
                 logger.warning("[REVOCATION] File load failed, starting empty: %s", exc)
+            except OSError as exc:
+                logger.error("[REVOCATION] File load failed: %s", exc)
+                raise RevocationUnavailableError(
+                    f"Revocation file backend unreadable at {self._path}: {exc}"
+                ) from exc
         return {"tokens": [], "sessions": []}
 
     def _save(self) -> None:
@@ -86,6 +101,9 @@ class _FileStore:
             )
         except OSError as exc:
             logger.error("[REVOCATION] File save failed: %s", exc)
+            raise RevocationUnavailableError(
+                f"Revocation file backend unavailable at {self._path}: {exc}"
+            ) from exc
 
     def revoke_token(self, token_hash: str, ttl: int = _DEFAULT_TTL) -> None:
         if token_hash not in self._data["tokens"]:
@@ -177,6 +195,181 @@ class _RedisStore:
                 self._client.delete(key)
 
 
+class _RedisFileFallbackStore:
+    """Redis-backed revocation with durable file fallback."""
+
+    def __init__(
+        self,
+        redis_store: _RedisStore,
+        file_store: Optional[_FileStore],
+        file_error: Optional[Exception] = None,
+    ) -> None:
+        self._redis_store = redis_store
+        self._file_store = file_store
+        self._file_error = file_error
+
+    def _redis_available(self) -> bool:
+        try:
+            return self._redis_store._is_available()
+        except Exception as exc:
+            logger.error("[REVOCATION] Redis availability check failed: %s", exc)
+            return False
+
+    def _raise_unavailable(self, action: str, cause: Optional[Exception] = None) -> None:
+        message = (
+            "Redis revocation backend is unavailable and file fallback is unavailable; "
+            f"cannot {action}."
+        )
+        if cause is not None:
+            raise RevocationUnavailableError(message) from cause
+        raise RevocationUnavailableError(message)
+
+    def _record_file_error(self, errors: list[Exception]) -> None:
+        if self._file_error is not None:
+            errors.append(self._file_error)
+
+    def revoke_token(self, token_hash: str, ttl: int = _DEFAULT_TTL) -> None:
+        redis_success = False
+        file_success = False
+        errors: list[Exception] = []
+
+        if self._redis_available():
+            try:
+                self._redis_store.revoke_token(token_hash, ttl)
+                redis_success = True
+            except Exception as exc:
+                logger.error("[REVOCATION] Redis token revoke failed: %s", exc)
+                errors.append(exc)
+        else:
+            logger.warning("[REVOCATION] Redis unavailable for token revoke — using file fallback")
+
+        if self._file_store is not None:
+            try:
+                self._file_store.revoke_token(token_hash, ttl)
+                file_success = True
+            except RevocationUnavailableError as exc:
+                logger.error("[REVOCATION] File fallback token revoke failed: %s", exc)
+                errors.append(exc)
+        else:
+            self._record_file_error(errors)
+
+        if redis_success or file_success:
+            return
+
+        self._raise_unavailable("revoke token", errors[0] if errors else None)
+
+    def revoke_session(self, session_id: str, ttl: int = _DEFAULT_TTL) -> None:
+        redis_success = False
+        file_success = False
+        errors: list[Exception] = []
+
+        if self._redis_available():
+            try:
+                self._redis_store.revoke_session(session_id, ttl)
+                redis_success = True
+            except Exception as exc:
+                logger.error("[REVOCATION] Redis session revoke failed: %s", exc)
+                errors.append(exc)
+        else:
+            logger.warning("[REVOCATION] Redis unavailable for session revoke — using file fallback")
+
+        if self._file_store is not None:
+            try:
+                self._file_store.revoke_session(session_id, ttl)
+                file_success = True
+            except RevocationUnavailableError as exc:
+                logger.error("[REVOCATION] File fallback session revoke failed: %s", exc)
+                errors.append(exc)
+        else:
+            self._record_file_error(errors)
+
+        if redis_success or file_success:
+            return
+
+        self._raise_unavailable("revoke session", errors[0] if errors else None)
+
+    def is_token_revoked(self, token_hash: str) -> bool:
+        results: list[bool] = []
+        errors: list[Exception] = []
+
+        if self._redis_available():
+            try:
+                results.append(self._redis_store.is_token_revoked(token_hash))
+            except Exception as exc:
+                logger.error("[REVOCATION] Redis token lookup failed: %s", exc)
+                errors.append(exc)
+        else:
+            logger.warning("[REVOCATION] Redis unavailable for token lookup — checking file fallback")
+
+        if self._file_store is not None:
+            try:
+                results.append(self._file_store.is_token_revoked(token_hash))
+            except RevocationUnavailableError as exc:
+                logger.error("[REVOCATION] File fallback token lookup failed: %s", exc)
+                errors.append(exc)
+        elif not results:
+            self._record_file_error(errors)
+
+        if results:
+            return any(results)
+
+        self._raise_unavailable("check token revocation", errors[0] if errors else None)
+
+    def is_session_revoked(self, session_id: str) -> bool:
+        results: list[bool] = []
+        errors: list[Exception] = []
+
+        if self._redis_available():
+            try:
+                results.append(self._redis_store.is_session_revoked(session_id))
+            except Exception as exc:
+                logger.error("[REVOCATION] Redis session lookup failed: %s", exc)
+                errors.append(exc)
+        else:
+            logger.warning("[REVOCATION] Redis unavailable for session lookup — checking file fallback")
+
+        if self._file_store is not None:
+            try:
+                results.append(self._file_store.is_session_revoked(session_id))
+            except RevocationUnavailableError as exc:
+                logger.error("[REVOCATION] File fallback session lookup failed: %s", exc)
+                errors.append(exc)
+        elif not results:
+            self._record_file_error(errors)
+
+        if results:
+            return any(results)
+
+        self._raise_unavailable("check session revocation", errors[0] if errors else None)
+
+    def clear(self) -> None:
+        cleared = False
+        errors: list[Exception] = []
+
+        if self._redis_available():
+            try:
+                self._redis_store.clear()
+                cleared = True
+            except Exception as exc:
+                logger.error("[REVOCATION] Redis clear failed: %s", exc)
+                errors.append(exc)
+
+        if self._file_store is not None:
+            try:
+                self._file_store.clear()
+                cleared = True
+            except RevocationUnavailableError as exc:
+                logger.error("[REVOCATION] File fallback clear failed: %s", exc)
+                errors.append(exc)
+        elif not cleared:
+            self._record_file_error(errors)
+
+        if cleared:
+            return
+
+        self._raise_unavailable("clear revocations", errors[0] if errors else None)
+
+
 # ---------------------------------------------------------------------------
 # Module-level singleton
 # ---------------------------------------------------------------------------
@@ -192,7 +385,15 @@ def _get_store():
     backend = os.getenv("REVOCATION_BACKEND", "file").lower()
     if backend == "redis":
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-        _store = _RedisStore(redis_url)
+        redis_store = _RedisStore(redis_url)
+        file_store = None
+        file_error = None
+        try:
+            file_store = _FileStore()
+        except RevocationUnavailableError as exc:
+            logger.error("[REVOCATION] File fallback initialization failed: %s", exc)
+            file_error = exc
+        _store = _RedisFileFallbackStore(redis_store, file_store=file_store, file_error=file_error)
     elif backend == "file":
         _store = _FileStore()
     else:
@@ -219,6 +420,15 @@ def get_backend_health() -> dict:
     if isinstance(store, _RedisStore):
         health["available"] = store._is_available()
         health["fail_mode"] = "closed"
+    elif isinstance(store, _RedisFileFallbackStore):
+        health["available"] = store._redis_available() or store._file_store is not None
+        health["fail_mode"] = "closed"
+        health["redis_available"] = store._redis_available()
+        health["file_fallback_available"] = store._file_store is not None
+        if store._file_store is not None:
+            health["file_path"] = str(store._file_store._path)
+        if store._file_error is not None:
+            health["file_error"] = str(store._file_error)
     elif isinstance(store, _FileStore):
         health["file_path"] = str(store._path)
         health["file_exists"] = store._path.exists()
@@ -253,4 +463,3 @@ def is_token_revoked(token: str) -> bool:
 def is_session_revoked(session_id: str) -> bool:
     """Check if a session has been revoked."""
     return _get_store().is_session_revoked(session_id)
-

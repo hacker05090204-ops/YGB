@@ -462,15 +462,27 @@ class RealFeatureLoader:
     @staticmethod
     def _validate(path: Path, array: np.ndarray) -> np.ndarray:
         features = np.asarray(array)
-        if features.ndim != 2 or features.shape[1] != 256:
-            raise DataShapeError(f"{path}: expected shape (N, 256), got {features.shape}")
+        if features.ndim != 2 or features.shape[0] < 1 or features.shape[1] != 256:
+            raise DataShapeError(
+                f"{path}: expected shape (N, 256) with N >= 1, got {features.shape}"
+            )
         if features.dtype != np.float32:
-            raise DataValueError(f"{path}: expected dtype float32, got {features.dtype}")
+            raise DataShapeError(f"{path}: expected dtype float32, got {features.dtype}")
         invalid_locations = np.argwhere(~np.isfinite(features))
         if invalid_locations.size:
             row, column = invalid_locations[0]
             raise DataValueError(
                 f"{path}: non-finite value at index ({int(row)}, {int(column)}): {features[row, column]!r}"
+            )
+        zero_rows = np.argwhere(np.all(features == 0.0, axis=1))
+        if zero_rows.size:
+            raise DataValueError(
+                f"{path}: all-zero row at index {int(zero_rows[0, 0])}"
+            )
+        zero_variance_rows = np.argwhere(np.var(features, axis=1) <= 0.0)
+        if zero_variance_rows.size:
+            raise DataValueError(
+                f"{path}: zero-variance row at index {int(zero_variance_rows[0, 0])}"
             )
         return features
 

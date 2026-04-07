@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import logging
 from types import SimpleNamespace
 
+import backend.cve.cve_pipeline as pipeline_mod
 import backend.cve.bridge_ingestion_worker as worker_module
 
 
@@ -80,6 +82,14 @@ def build_worker(monkeypatch, state: FakeBridgeState, lib: FakeBridgeLib):
     return worker_module.BridgeIngestionWorker()
 
 
+def _long_description(seed: str) -> str:
+    return (
+        f"{seed} "
+        "This description includes sufficient verified context, impact, and remediation detail "
+        "to satisfy pipeline quality validation before bridge ingestion occurs."
+    )
+
+
 def test_stream_ingest_restores_persisted_idempotency(monkeypatch):
     state = FakeBridgeState(
         samples=[
@@ -122,3 +132,101 @@ def test_stream_ingest_tracks_batch_metadata(monkeypatch):
     status = worker.get_status()
     assert status["last_batch"]["mode"] == "stream"
     assert status["last_batch"]["ingested"] == 1
+
+
+def test_low_quality_sample_does_not_reach_bridge(monkeypatch, tmp_path):
+    monkeypatch.setenv(
+        "YGB_CVE_DEDUP_STORE_PATH",
+        str(tmp_path / "bridge_quality_dedup_store.json"),
+    )
+    state = FakeBridgeState()
+    worker = build_worker(monkeypatch, state, FakeBridgeLib())
+    pipeline = pipeline_mod.CVEPipeline()
+
+    record, result = pipeline.ingest_record(
+        cve_id="CVE-2026-5001",
+        title="Rejected by quality gate",
+        description="short desc",
+        severity="HIGH",
+        cvss_score=8.0,
+        affected_products=["bridge-app"],
+        references=[],
+        is_exploited=False,
+        source_id="nvd",
+    )
+    ingested = worker.stream_ingest_new(pipeline)
+
+    assert record is None
+    assert result == pipeline_mod.IngestResult.REJECTED
+    assert ingested == 0
+    assert state.appended == []
+
+
+def test_high_quality_sample_reaches_bridge(monkeypatch, tmp_path):
+    monkeypatch.setenv(
+        "YGB_CVE_DEDUP_STORE_PATH",
+        str(tmp_path / "bridge_accept_dedup_store.json"),
+    )
+    state = FakeBridgeState()
+    worker = build_worker(monkeypatch, state, FakeBridgeLib())
+    pipeline = pipeline_mod.CVEPipeline()
+
+    record, result = pipeline.ingest_record(
+        cve_id="CVE-2026-5002",
+        title="Accepted by quality gate",
+        description=_long_description("Accepted bridge sample."),
+        severity="HIGH",
+        cvss_score=8.7,
+        affected_products=["bridge-app"],
+        references=["https://example.test/accepted"],
+        is_exploited=True,
+        source_id="nvd",
+    )
+    ingested = worker.stream_ingest_new(pipeline)
+
+    assert record is not None
+    assert result == pipeline_mod.IngestResult.NEW
+    assert ingested == 1
+    assert len(state.appended) == 1
+    assert state.appended[0]["endpoint"] == "CVE-2026-5002"
+
+
+def test_bridge_failure_logged_at_critical(monkeypatch, caplog):
+    state = FakeBridgeState()
+    worker = build_worker(monkeypatch, state, None)
+    pipeline = SimpleNamespace(
+        _records={"CVE-2024-9": make_record("CVE-2024-9", _long_description("Unavailable bridge."))}
+    )
+
+    with caplog.at_level(logging.CRITICAL):
+        ingested = worker.stream_ingest_new(pipeline)
+
+    assert ingested == 0
+    assert worker.get_publish_stats()["published"] == 0
+    assert worker.get_publish_stats()["failed"] == 1
+    assert any(record.levelno == logging.CRITICAL for record in caplog.records)
+
+
+def test_publish_stats_are_accurate(monkeypatch, caplog):
+    state = FakeBridgeState()
+    worker = build_worker(monkeypatch, state, FakeBridgeLib())
+    first_pipeline = SimpleNamespace(
+        _records={"CVE-2024-10": make_record("CVE-2024-10", _long_description("Published sample."))}
+    )
+
+    first_ingested = worker.stream_ingest_new(first_pipeline)
+    worker._lib = FakeBridgeLib(return_code=-7)
+    second_pipeline = SimpleNamespace(
+        _records={"CVE-2024-11": make_record("CVE-2024-11", _long_description("Failed sample."))}
+    )
+
+    with caplog.at_level(logging.CRITICAL):
+        second_ingested = worker.stream_ingest_new(second_pipeline)
+
+    stats = worker.get_publish_stats()
+    assert first_ingested == 1
+    assert second_ingested == 0
+    assert stats["published"] == 1
+    assert stats["failed"] == 1
+    assert stats["last_attempt"] is not None
+    assert any(record.levelno == logging.CRITICAL for record in caplog.records)

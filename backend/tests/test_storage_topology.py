@@ -6,6 +6,8 @@ import time
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
+
 
 def test_resolve_hdd_root_falls_back_to_c_drive(monkeypatch):
     from backend.storage import tiered_storage as ts
@@ -22,6 +24,46 @@ def test_resolve_hdd_root_falls_back_to_c_drive(monkeypatch):
     assert str(active) == str(ts.FALLBACK_HDD_ROOT)
     assert topology["fallback_active"] is True
     assert topology["primary_available"] is False
+
+
+def test_resolve_hdd_root_raises_when_all_tiers_unavailable(monkeypatch):
+    from backend.storage import tiered_storage as ts
+
+    monkeypatch.setattr(ts, "_path_is_usable", lambda path: (False, "Unavailable"))
+
+    with pytest.raises(ts.StorageCompletelyUnavailableError, match="No storage backend available\."):
+        ts.resolve_hdd_root()
+
+
+def test_init_dirs_logs_tier_availability(monkeypatch, caplog, tmp_path):
+    from backend.storage import tiered_storage as ts
+
+    ssd_root = tmp_path / "ssd"
+    primary_root = tmp_path / "primary"
+    fallback_root = tmp_path / "fallback"
+    monkeypatch.setattr(ts, "SSD_ROOT", ssd_root)
+    monkeypatch.setattr(ts, "PRIMARY_HDD_ROOT", primary_root)
+    monkeypatch.setattr(ts, "FALLBACK_HDD_ROOT", fallback_root)
+    monkeypatch.setattr(ts, "SSD_TRAINING_DIR", ssd_root / "training")
+    monkeypatch.setattr(ts, "SSD_CHECKPOINTS", ssd_root / "checkpoints")
+    monkeypatch.setattr(ts, "SSD_DATASETS", ssd_root / "datasets")
+    monkeypatch.setattr(ts, "SSD_DB", ssd_root / "ygb.db")
+    monkeypatch.setattr(ts, "STORAGE_WAL_PATH", ssd_root / ".wal.jsonl")
+
+    def _fake_usable(path):
+        if path == primary_root:
+            return False, "PrimaryOffline"
+        return True, "ok"
+
+    monkeypatch.setattr(ts, "_path_is_usable", _fake_usable)
+
+    with caplog.at_level(logging.INFO):
+        ts._init_dirs()
+
+    assert any(
+        record.levelno == logging.INFO and "Storage tier availability" in record.message
+        for record in caplog.records
+    )
 
 
 def test_storage_health_reports_fallback_truthfully(monkeypatch):

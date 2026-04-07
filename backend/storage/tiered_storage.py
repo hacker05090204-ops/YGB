@@ -28,6 +28,10 @@ from typing import Any, Optional
 
 logger = logging.getLogger("tiered_storage")
 
+
+class StorageCompletelyUnavailableError(RuntimeError):
+    """Raised when neither primary nor fallback storage can be used."""
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -304,7 +308,22 @@ def _path_is_usable(path: Path) -> tuple[bool, str]:
         return False, type(exc).__name__
 
 
-def resolve_hdd_root() -> tuple[Path, dict]:
+def _log_storage_tier_availability(
+    primary_ok: bool,
+    primary_reason: str,
+    fallback_ok: bool,
+    fallback_reason: str,
+) -> None:
+    logger.info(
+        "Storage tier availability: primary=%s (%s), fallback=%s (%s)",
+        "available" if primary_ok else "unavailable",
+        primary_reason,
+        "available" if fallback_ok else "unavailable",
+        fallback_reason,
+    )
+
+
+def resolve_hdd_root(*, log_availability: bool = False) -> tuple[Path, dict]:
     """
     Resolve the active HDD/NAS root.
 
@@ -314,6 +333,14 @@ def resolve_hdd_root() -> tuple[Path, dict]:
     """
     primary_ok, primary_reason = _path_is_usable(PRIMARY_HDD_ROOT)
     fallback_ok, fallback_reason = _path_is_usable(FALLBACK_HDD_ROOT)
+
+    if log_availability:
+        _log_storage_tier_availability(
+            primary_ok,
+            primary_reason,
+            fallback_ok,
+            fallback_reason,
+        )
 
     if primary_ok:
         return PRIMARY_HDD_ROOT, {
@@ -339,19 +366,7 @@ def resolve_hdd_root() -> tuple[Path, dict]:
             "reason": f"Primary root unavailable ({primary_reason}) — using local fallback",
         }
 
-    return PRIMARY_HDD_ROOT, {
-        "primary_root": str(PRIMARY_HDD_ROOT),
-        "fallback_root": str(FALLBACK_HDD_ROOT),
-        "active_root": str(PRIMARY_HDD_ROOT),
-        "primary_available": False,
-        "fallback_available": False,
-        "fallback_active": False,
-        "mode": "UNAVAILABLE",
-        "reason": (
-            f"Primary unavailable ({primary_reason}); "
-            f"fallback unavailable ({fallback_reason})"
-        ),
-    }
+    raise StorageCompletelyUnavailableError("No storage backend available.")
 
 
 def get_storage_topology(*, force_refresh: bool = False) -> dict:
@@ -676,7 +691,11 @@ def get_tier_health() -> list[StorageTierHealth]:
 
 def _init_dirs():
     _replay_incomplete_wal_entries()
-    hdd_root, topology = resolve_hdd_root()
+    try:
+        hdd_root, topology = resolve_hdd_root(log_availability=True)
+    except StorageCompletelyUnavailableError as exc:
+        logger.critical("Storage initialization failed: %s", exc)
+        raise
     hdd_dirs = [
         hdd_root / "videos",
         hdd_root / "logs",

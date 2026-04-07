@@ -61,6 +61,7 @@ _AUDIT_MAX_ENTRIES = 50000
 _AUDIT_ROTATE_ENTRIES = 25000
 _RATE_LIMIT_WINDOW_SECONDS = 60
 _RATE_LIMIT_MAX_CALLS = 100
+IS_PRODUCTION = os.getenv("YGB_ENV", "development") == "production"
 
 
 @dataclass(frozen=True)
@@ -175,8 +176,28 @@ def get_auth_audit_trail(subject: Optional[str] = None) -> list[AuthAuditEntry]:
     return _audit_trail.get(subject)
 
 
+def _runtime_is_production() -> bool:
+    configured_environment = os.getenv("YGB_ENV")
+    if configured_environment is None:
+        return bool(IS_PRODUCTION)
+    return configured_environment.strip().lower() == "production"
+
+
 def is_temporary_auth_bypass_enabled() -> bool:
+    if _runtime_is_production():
+        return False
     return os.getenv("YGB_TEMP_AUTH_BYPASS", "false").strip().lower() in _TRUTHY_VALUES
+
+
+def _log_temporary_auth_bypass_startup_warning() -> None:
+    if is_temporary_auth_bypass_enabled():
+        logger.warning(
+            "Temporary auth bypass is enabled in non-production. "
+            "Disable YGB_TEMP_AUTH_BYPASS before deployment."
+        )
+
+
+_log_temporary_auth_bypass_startup_warning()
 
 
 def build_temporary_auth_user(auth_via: str = "temporary") -> Dict:

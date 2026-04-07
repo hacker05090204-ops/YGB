@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import logging
 
 import backend.training.runtime_status_validator as validator
+from backend.training.incremental_trainer import AccuracySnapshot
 
 
 class _FakeTrainer:
@@ -28,6 +30,40 @@ class _LowPrecisionTrainer(_FakeTrainer):
         result = super().benchmark_current_model(max_samples=max_samples)
         result["precision"] = 0.71
         return result
+
+
+def test_validate_promotion_readiness_returns_false_and_logs_thresholds(caplog):
+    snapshot = AccuracySnapshot(
+        epoch=7,
+        accuracy=0.8,
+        precision=0.69,
+        recall=0.64,
+        f1=0.74,
+        auc_roc=0.86,
+        taken_at="2026-04-07T10:00:00+00:00",
+    )
+
+    with caplog.at_level(logging.WARNING):
+        ready = validator.validate_promotion_readiness(snapshot)
+
+    assert ready is False
+    assert "f1=0.7400" in caplog.text
+    assert "precision=0.6900" in caplog.text
+    assert "recall=0.6400" in caplog.text
+
+
+def test_validate_promotion_readiness_returns_true_when_thresholds_pass():
+    snapshot = AccuracySnapshot(
+        epoch=8,
+        accuracy=0.84,
+        precision=0.8,
+        recall=0.75,
+        f1=0.77,
+        auc_roc=0.9,
+        taken_at="2026-04-07T10:05:00+00:00",
+    )
+
+    assert validator.validate_promotion_readiness(snapshot) is True
 
 
 def test_precision_breach_validator_clears_stale_flag(tmp_path, monkeypatch):
