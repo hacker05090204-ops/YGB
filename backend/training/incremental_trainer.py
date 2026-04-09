@@ -13,13 +13,13 @@ from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+import inspect
 from typing import Callable, Protocol
 
 import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from torch.optim import AdamW
-from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader, Dataset
 
 from backend.ingestion._integrity import log_module_sha256
@@ -27,6 +27,7 @@ from backend.bridge.bridge_state import get_bridge_state
 from backend.ingestion.normalizer import SampleQualityScorer
 from backend.ingestion.models import IngestedSample
 from backend.observability.metrics import metrics_registry
+from backend.training.adaptive_learner import get_adaptive_learner
 from backend.training.feature_extractor import extract
 from backend.training.model_thresholds import (
     calibrate_positive_threshold,
@@ -36,6 +37,12 @@ from backend.training.model_thresholds import (
 )
 from backend.training.safetensors_store import SafetensorsFeatureStore
 from backend.training.state_manager import TrainingMetrics, get_training_state_manager
+from backend.training.training_optimizer import (
+    EarlyStopping,
+    HardNegativeMiner,
+    TrainingOptimiserConfig,
+    WarmupCosineScheduler,
+)
 from impl_v1.phase49.governors.g37_pytorch_backend import (
     BugClassifier,
     ModelConfig,
@@ -124,6 +131,25 @@ TrainingResult = EpochResult
 
 
 @dataclass(frozen=True)
+class TrainingLoopResult:
+    train_loss: float
+    eval_loss: float
+    accuracy: float
+    precision: float
+    recall: float
+    f1: float
+    auc_roc: float
+    positive_threshold: float
+    threshold_strategy: str
+    predictions: list[int]
+    labels: list[int]
+    probability_rows: list[list[float]]
+    hard_negative_indices: list[int]
+    epochs_completed: int
+    early_stopped: bool
+
+
+@dataclass(frozen=True)
 class DatasetQualityReport:
     passed: bool
     sample_count: int
@@ -149,7 +175,14 @@ class DatasetQualityGate:
     MIN_SAMPLES = 100
     MIN_QUALITY_SCORE = 0.4
     MIN_UNIQUE_CVES = 50
-    MIN_SEVERITY_DISTRIBUTION = 0.1
+    MIN_SEVERITY_DISTRIBUTION = {
+        "CRITICAL": 0.02,
+        "HIGH": 0.05,
+        "MEDIUM": 0.05,
+        "LOW": 0.01,
+        "INFORMATIONAL": 0.0,
+    }
+    QUORUM_UNKNOWN = "QUORUM_UNKNOWN"
     _SEVERITY_CLASSES = (
         "CRITICAL",
         "HIGH",
@@ -276,15 +309,26 @@ class DatasetQualityGate:
             failed_reasons.append(
                 f"unique_cves_below_min:{unique_cve_count}<{self.MIN_UNIQUE_CVES}"
             )
+        blocking_reasons = list(failed_reasons)
         for severity in self._SEVERITY_CLASSES:
-            if severity_distribution[severity] < self.MIN_SEVERITY_DISTRIBUTION:
+            minimum_distribution = float(
+                self.MIN_SEVERITY_DISTRIBUTION.get(severity, 0.0)
+            )
+            if severity_counts[severity] == 0 and sample_count < 20:
+                failed_reasons.append(f"{self.QUORUM_UNKNOWN}:{severity}=0")
+                continue
+            if severity_distribution[severity] < minimum_distribution:
                 failed_reasons.append(
+                    "severity_distribution_below_min:"
+                    f"{severity}={severity_distribution[severity]:.4f}"
+                )
+                blocking_reasons.append(
                     "severity_distribution_below_min:"
                     f"{severity}={severity_distribution[severity]:.4f}"
                 )
 
         return DatasetQualityReport(
-            passed=not failed_reasons,
+            passed=not blocking_reasons,
             sample_count=sample_count,
             mean_quality_score=mean_quality_score,
             unique_cves=unique_cve_count,
@@ -409,7 +453,10 @@ class DatasetQualityGate:
                 f"unique_cves_below_min:{unique_cve_count}<{self.MIN_UNIQUE_CVES}"
             )
         for label_name, distribution in severity_distribution.items():
-            if distribution < self.MIN_SEVERITY_DISTRIBUTION:
+            minimum_distribution = float(
+                self.MIN_SEVERITY_DISTRIBUTION.get(label_name, 0.1)
+            )
+            if distribution < minimum_distribution:
                 failed_reasons.append(
                     "severity_distribution_below_min:"
                     f"{label_name}={distribution:.4f}"
@@ -428,13 +475,25 @@ class DatasetQualityGate:
 class _StreamingFeatureDataset(Dataset):
     """Lazy real-data dataset backed by extracted or cached features."""
 
-    def __init__(self, trainer: "IncrementalTrainer", samples: list[IngestedSample], indices: list[int]) -> None:
+    def __init__(
+        self,
+        trainer: "IncrementalTrainer",
+        samples: list[IngestedSample],
+        indices: list[int],
+        *,
+        return_dataset_index: bool = False,
+    ) -> None:
         self._trainer = trainer
         self._samples = samples
         self._indices = tuple(indices)
+        self._return_dataset_index = bool(return_dataset_index)
 
     def __len__(self) -> int:
         return len(self._indices)
+
+    @property
+    def sample_indices(self) -> tuple[int, ...]:
+        return self._indices
 
     def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
         sample = self._samples[self._indices[item]]
@@ -446,6 +505,8 @@ class _StreamingFeatureDataset(Dataset):
                 f"REAL_DATA_REQUIRED: invalid feature tensor for {sample.sha256_hash} ({reason})"
             )
         label = torch.tensor(self._trainer._label_for_sample(sample), dtype=torch.long)
+        if self._return_dataset_index:
+            return features, label, torch.tensor(item, dtype=torch.long)
         return features, label
 
 
@@ -538,17 +599,29 @@ class IncrementalTrainer:
             epochs=1,
             seed=42,
         )
+        self.optimizer_config = TrainingOptimiserConfig(
+            learning_rate=float(self.model_config.learning_rate),
+            max_epochs=max(int(self.model_config.epochs), 5),
+            shuffle_seed=int(self.model_config.seed),
+        )
         self.training_state = self._load_training_state()
         self.baseline_state = self._load_baseline_state()
         self.baseline_accuracy = float(self.baseline_state["baseline_accuracy"])
         self.positive_threshold = float(self.baseline_state["positive_threshold"])
         self.state_manager = get_training_state_manager()
         self.model = self._load_or_initialize_model()
+        checkpoint_root = self.state_path.parent
+        self.adaptive_learner = get_adaptive_learner(
+            state_path=checkpoint_root / "adaptive_learning_state.json",
+            ewc_state_path=checkpoint_root / "adaptive_ewc_state.safetensors",
+        )
+        self.adaptive_learner.attach_model(self.model)
         self.dataset_quality_gate = DatasetQualityGate(
             feature_loader=self._load_or_compute_feature
         )
         self._last_dataset_quality_report: DatasetQualityReport | None = None
         self._accuracy_history = AccuracyHistory()
+        self._last_epoch_mean_ewc_loss = 0.0
 
     def _load_training_state(self) -> dict[str, object]:
         if not self.state_path.exists():
@@ -1327,7 +1400,10 @@ class IncrementalTrainer:
         return samples
 
     def build_dataset(
-        self, samples: list[IngestedSample]
+        self,
+        samples: list[IngestedSample],
+        *,
+        include_train_dataset_indices: bool = False,
     ) -> tuple[DataLoader, DataLoader]:
         if self.num_workers > 0 and can_ai_execute()[0]:
             raise RuntimeError("GUARD")
@@ -1337,21 +1413,44 @@ class IncrementalTrainer:
             raise DatasetQualityError(quality_report.failed_reasons)
 
         indices = list(range(len(samples)))
-        eval_count = min(len(indices) - 1, max(2, int(len(indices) * 0.1)))
-        eval_indices = self._deterministic_indices(len(indices), eval_count)
-        eval_index_set = set(eval_indices)
-        train_indices = [index for index in indices if index not in eval_index_set]
+        rng = np.random.default_rng(42)
+        shuffled_indices = list(indices)
+        rng.shuffle(shuffled_indices)
+        eval_count = min(
+            len(indices) - 1,
+            max(1, int(round(len(indices) * self.optimizer_config.validation_split))),
+        )
+        eval_indices = list(shuffled_indices[:eval_count])
+        train_indices = list(shuffled_indices[eval_count:])
         if not train_indices or not eval_indices:
             raise RuntimeError(
                 "REAL_DATA_REQUIRED: Deterministic train/validation split failed"
             )
 
-        train_dataset = _StreamingFeatureDataset(self, samples, train_indices)
+        val_class_distribution = {severity: 0 for severity in DatasetQualityGate._SEVERITY_CLASSES}
+        for eval_index in eval_indices:
+            severity = self.dataset_quality_gate._canonical_severity(
+                samples[eval_index].severity
+            )
+            if severity in val_class_distribution:
+                val_class_distribution[severity] += 1
+        logger.debug(
+            "incremental validation split size=%d class_distribution=%s",
+            len(eval_indices),
+            val_class_distribution,
+        )
+
+        train_dataset = _StreamingFeatureDataset(
+            self,
+            samples,
+            train_indices,
+            return_dataset_index=include_train_dataset_indices,
+        )
         eval_dataset = _StreamingFeatureDataset(self, samples, eval_indices)
         train_generator = torch.Generator().manual_seed(self.model_config.seed)
         train_loader = DataLoader(
             train_dataset,
-            batch_size=256,
+            batch_size=int(self.model_config.batch_size),
             shuffle=True,
             num_workers=self.num_workers,
             pin_memory=self.device.type == "cuda",
@@ -1380,19 +1479,472 @@ class IncrementalTrainer:
             return
         scaled_loss.backward()
 
-    def _step_optimizer(self, optimizer: torch.optim.Optimizer, scaler) -> None:
+    def _step_optimizer(
+        self,
+        optimizer: torch.optim.Optimizer,
+        scaler,
+        *,
+        gradient_clip_norm: float = 1.0,
+    ) -> None:
         if scaler is not None:
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(
+                self.model.parameters(), float(gradient_clip_norm)
+            )
             scaler.step(optimizer)
             scaler.update()
         else:
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(
+                self.model.parameters(), float(gradient_clip_norm)
+            )
             optimizer.step()
         optimizer.zero_grad(set_to_none=True)
 
+    @staticmethod
+    def _clone_model_state(
+        state_dict: dict[str, torch.Tensor],
+    ) -> dict[str, torch.Tensor]:
+        return {
+            name: tensor.detach().cpu().clone()
+            for name, tensor in state_dict.items()
+        }
+
+    @staticmethod
+    def _current_learning_rate(
+        optimizer: torch.optim.Optimizer,
+        scheduler,
+    ) -> float:
+        get_last_lr = getattr(scheduler, "get_last_lr", None)
+        if callable(get_last_lr):
+            last_learning_rates = list(get_last_lr())
+            if last_learning_rates:
+                return float(last_learning_rates[0])
+        return float(optimizer.param_groups[0]["lr"])
+
+    @staticmethod
+    def _merge_hard_negative_weights(
+        sample_weights: np.ndarray | None,
+        *,
+        dataset_length: int,
+        hard_negative_indices: list[int],
+        hard_negative_weight: float,
+    ) -> np.ndarray | None:
+        if not hard_negative_indices:
+            return sample_weights
+        effective_weights = (
+            sample_weights.copy()
+            if sample_weights is not None
+            else np.ones(dataset_length, dtype=np.float32)
+        )
+        for dataset_index in hard_negative_indices:
+            if 0 <= int(dataset_index) < dataset_length:
+                effective_weights[int(dataset_index)] *= float(hard_negative_weight)
+        return effective_weights
+
+    @staticmethod
+    def _loader_supports_dataset_indices(train_loader: DataLoader) -> bool:
+        dataset = getattr(train_loader, "dataset", None)
+        if dataset is None:
+            return False
+        dataset_flag = getattr(dataset, "_return_dataset_index", None)
+        if isinstance(dataset_flag, bool):
+            return dataset_flag
+        tensors = getattr(dataset, "tensors", None)
+        if isinstance(tensors, tuple):
+            return len(tensors) == 3
+        try:
+            first_item = dataset[0]
+        except (IndexError, KeyError, TypeError, RuntimeError, ValueError):
+            return False
+        return isinstance(first_item, (list, tuple)) and len(first_item) == 3
+
+    def _evaluate_loader(
+        self,
+        eval_loader: DataLoader,
+        criterion,
+    ) -> dict[str, object]:
+        self.model.eval()
+        eval_losses: list[float] = []
+        labels_out: list[int] = []
+        probability_rows: list[list[float]] = []
+        with torch.no_grad():
+            for batch in eval_loader:
+                features, labels, _ = self._unpack_batch(batch)
+                features = features.to(self.device)
+                labels = labels.to(self.device)
+                logits = self.model(features)
+                probabilities = torch.softmax(logits, dim=1)
+                eval_losses.append(float(criterion(logits, labels).item()))
+                labels_out.extend(labels.detach().cpu().tolist())
+                probability_rows.extend(probabilities.detach().cpu().tolist())
+        positive_probabilities = [float(row[1]) for row in probability_rows]
+        threshold_metrics = calibrate_positive_threshold(
+            labels_out,
+            positive_probabilities,
+            fallback_threshold=self.positive_threshold,
+        )
+        return {
+            "eval_loss": float(sum(eval_losses) / max(len(eval_losses), 1)),
+            "labels": labels_out,
+            "probability_rows": probability_rows,
+            "positive_threshold": float(threshold_metrics["threshold"]),
+            "threshold_strategy": str(threshold_metrics["strategy"]),
+            "predictions": list(threshold_metrics["predictions"]),
+            "accuracy": float(threshold_metrics["accuracy"]),
+            "precision": float(threshold_metrics["precision"]),
+            "recall": float(threshold_metrics["recall"]),
+            "f1": float(threshold_metrics["f1"]),
+            "auc_roc": self._compute_auc_roc(labels_out, positive_probabilities),
+        }
+
+    def _train_single_epoch(
+        self,
+        train_loader: DataLoader,
+        optimizer: torch.optim.Optimizer,
+        scheduler,
+        criterion,
+        scaler,
+        *,
+        sample_weights: list[float] | np.ndarray | None = None,
+        hard_negative_miner: HardNegativeMiner | None = None,
+        accumulation_steps: int = 4,
+        gradient_clip_norm: float = 1.0,
+        amp_enabled: bool = False,
+    ) -> float:
+        resolved_sample_weights = (
+            self._coerce_sample_weights(sample_weights, len(train_loader.dataset))
+            if sample_weights is not None
+            else None
+        )
+        self.adaptive_learner.attach_model(self.model)
+        self.model.train()
+        optimizer.zero_grad(set_to_none=True)
+        accum_steps = max(int(accumulation_steps), 1)
+        step_count = 0
+        epoch_losses: list[float] = []
+        epoch_ewc_losses: list[float] = []
+        if hard_negative_miner is not None:
+            hard_negative_miner.reset()
+        for step_count, batch in enumerate(train_loader, start=1):
+            features, labels, dataset_indices = self._unpack_batch(batch)
+            features = features.to(self.device)
+            labels = labels.to(self.device)
+            autocast_context = (
+                torch.cuda.amp.autocast(enabled=True)
+                if amp_enabled
+                else nullcontext()
+            )
+            with autocast_context:
+                outputs = self.model(features)
+                batch_losses = criterion(outputs, labels)
+                if not torch.is_tensor(batch_losses):
+                    raise TypeError("training criterion must return a tensor")
+                if resolved_sample_weights is None:
+                    loss = (
+                        batch_losses.mean()
+                        if batch_losses.ndim > 0
+                        else batch_losses
+                    )
+                else:
+                    if batch_losses.ndim == 0:
+                        raise ValueError(
+                            "sample_weights require a criterion with reduction='none'"
+                        )
+                    if dataset_indices is None:
+                        raise ValueError(
+                            "sample_weights require dataset indices in the training batches"
+                        )
+                    batch_index_array = np.asarray(
+                        dataset_indices.detach().cpu().tolist(),
+                        dtype=np.int64,
+                    )
+                    batch_weight_values = torch.as_tensor(
+                        resolved_sample_weights[batch_index_array],
+                        dtype=batch_losses.dtype,
+                        device=batch_losses.device,
+                    )
+                    if batch_weight_values.shape[0] != labels.shape[0]:
+                        raise ValueError(
+                            "sample weight batch length does not match label batch length"
+                        )
+                    loss = torch.sum(batch_losses * batch_weight_values) / torch.sum(
+                        batch_weight_values
+                    )
+                ewc_loss = self.adaptive_learner.get_ewc_loss()
+                if not torch.is_tensor(ewc_loss):
+                    ewc_loss = torch.as_tensor(
+                        float(ewc_loss),
+                        dtype=loss.dtype,
+                        device=loss.device,
+                    )
+                else:
+                    ewc_loss = ewc_loss.to(device=loss.device, dtype=loss.dtype)
+                total_loss = loss + ewc_loss
+                scaled_loss = total_loss / accum_steps
+            if hard_negative_miner is not None:
+                if batch_losses.ndim == 0:
+                    batch_loss_values = torch.full(
+                        (labels.shape[0],),
+                        float(batch_losses.detach().item()),
+                        dtype=torch.float32,
+                    )
+                else:
+                    batch_loss_values = batch_losses.detach().reshape(-1).to(
+                        dtype=torch.float32
+                    )
+                hard_negative_miner.update(
+                    losses=batch_loss_values.cpu().tolist(),
+                    labels=labels.detach().cpu().tolist(),
+                    positive_probabilities=torch.softmax(outputs.detach(), dim=1)[:, 1]
+                    .cpu()
+                    .tolist(),
+                    dataset_indices=(
+                        dataset_indices.detach().cpu().tolist()
+                        if dataset_indices is not None
+                        else None
+                    ),
+                )
+            self._backward_pass(scaled_loss, scaler)
+            epoch_losses.append(float(total_loss.detach().item()))
+            epoch_ewc_losses.append(float(ewc_loss.detach().item()))
+
+            if step_count % accum_steps == 0:
+                self._step_optimizer(
+                    optimizer,
+                    scaler,
+                    gradient_clip_norm=gradient_clip_norm,
+                )
+                scheduler.step()
+
+            if step_count % 50 == 0:
+                logger.info(
+                    "incremental_training_step",
+                    extra={
+                        "event": "incremental_training_step",
+                        "step": step_count,
+                        "loss": float(loss.item()),
+                    },
+                )
+
+        if step_count and step_count % accum_steps != 0:
+            self._step_optimizer(
+                optimizer,
+                scaler,
+                gradient_clip_norm=gradient_clip_norm,
+            )
+            scheduler.step()
+        self._last_epoch_mean_ewc_loss = float(
+            sum(epoch_ewc_losses) / max(len(epoch_ewc_losses), 1)
+        )
+        logger.debug(
+            "incremental training epoch mean_ewc_loss=%.8f batch_count=%d",
+            self._last_epoch_mean_ewc_loss,
+            len(epoch_ewc_losses),
+        )
+        return float(sum(epoch_losses) / max(len(epoch_losses), 1))
+
     def get_accuracy_history(self) -> list[AccuracySnapshot]:
         return self._accuracy_history.as_list()
+
+    @staticmethod
+    def _unpack_batch(
+        batch: object,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
+        if not isinstance(batch, (list, tuple)):
+            raise TypeError("training batch must be a tuple or list")
+        if len(batch) == 2:
+            features, labels = batch
+            return features, labels, None
+        if len(batch) == 3:
+            features, labels, dataset_indices = batch
+            return features, labels, dataset_indices
+        raise ValueError(f"training batch must contain 2 or 3 items, got {len(batch)}")
+
+    @staticmethod
+    def _coerce_sample_weights(
+        sample_weights: list[float] | np.ndarray,
+        expected_length: int,
+    ) -> np.ndarray:
+        weight_array = np.asarray(sample_weights, dtype=np.float32)
+        if weight_array.ndim != 1:
+            raise ValueError("sample_weights must be a 1D sequence of positive floats")
+        if weight_array.shape[0] != expected_length:
+            raise ValueError(
+                f"sample_weights length {weight_array.shape[0]} does not match expected {expected_length}"
+            )
+        if not np.isfinite(weight_array).all():
+            raise ValueError("sample_weights must be finite positive floats")
+        if np.any(weight_array <= 0.0):
+            raise ValueError("sample_weights must be strictly positive floats")
+        return weight_array
+
+    def _resolve_train_sample_weights(
+        self,
+        samples: list[IngestedSample],
+        train_loader: DataLoader,
+        sample_weights: dict[str, float] | list[float] | np.ndarray | None,
+    ) -> np.ndarray | None:
+        if sample_weights is None:
+            return None
+        dataset = getattr(train_loader, "dataset", None)
+        if dataset is None:
+            raise ValueError("train_loader must expose a dataset when sample_weights are provided")
+        expected_length = len(dataset)
+        if isinstance(sample_weights, dict):
+            if not isinstance(dataset, _StreamingFeatureDataset):
+                raise ValueError(
+                    "sample_weights dict requires the streaming training dataset for sample-id alignment"
+                )
+            aligned_weights = [
+                float(sample_weights.get(samples[index].sha256_hash, 1.0))
+                for index in dataset.sample_indices
+            ]
+            return self._coerce_sample_weights(aligned_weights, expected_length)
+        try:
+            raw_length = len(sample_weights)
+        except TypeError as exc:
+            raise ValueError("sample_weights must be a dict or 1D sequence") from exc
+        if isinstance(dataset, _StreamingFeatureDataset) and raw_length == len(samples):
+            aligned_weights = [float(sample_weights[index]) for index in dataset.sample_indices]
+            return self._coerce_sample_weights(aligned_weights, expected_length)
+        return self._coerce_sample_weights(sample_weights, expected_length)
+
+    def train(
+        self,
+        train_loader: DataLoader,
+        optimizer: torch.optim.Optimizer,
+        scheduler,
+        criterion,
+        scaler,
+        *,
+        sample_weights: list[float] | np.ndarray | None = None,
+        val_loader: DataLoader | None = None,
+        eval_criterion=None,
+        optimiser_config: TrainingOptimiserConfig | None = None,
+        return_history: bool = False,
+    ) -> float | TrainingLoopResult:
+        active_config = optimiser_config or self.optimizer_config
+        if val_loader is None and not return_history:
+            return self._train_single_epoch(
+                train_loader,
+                optimizer,
+                scheduler,
+                criterion,
+                scaler,
+                sample_weights=sample_weights,
+                accumulation_steps=active_config.accumulation_steps,
+                gradient_clip_norm=active_config.gradient_clip_norm,
+                amp_enabled=active_config.amp_enabled(self.device),
+            )
+        if val_loader is None or eval_criterion is None:
+            raise ValueError(
+                "val_loader and eval_criterion are required when return_history is enabled"
+            )
+
+        base_sample_weights = (
+            self._coerce_sample_weights(sample_weights, len(train_loader.dataset))
+            if sample_weights is not None
+            else None
+        )
+        hard_negative_target_count = active_config.resolved_hard_negative_count(
+            len(train_loader.dataset)
+        )
+        supports_dataset_indices = self._loader_supports_dataset_indices(train_loader)
+        hard_negative_miner = HardNegativeMiner(
+            max_hard_examples=max(hard_negative_target_count, 1)
+        )
+        early_stopper = EarlyStopping(
+            patience=active_config.patience,
+            min_delta=active_config.min_delta,
+            mode="min",
+        )
+        best_model_state = self._clone_model_state(self.model.state_dict())
+        best_result: TrainingLoopResult | None = None
+        current_hard_negative_indices: list[int] = []
+        epochs_completed = 0
+        for epoch_index in range(active_config.max_epochs):
+            effective_sample_weights = base_sample_weights
+            if supports_dataset_indices:
+                effective_sample_weights = self._merge_hard_negative_weights(
+                    base_sample_weights,
+                    dataset_length=len(train_loader.dataset),
+                    hard_negative_indices=current_hard_negative_indices,
+                    hard_negative_weight=active_config.hard_negative_weight,
+                )
+            train_loss = self._train_single_epoch(
+                train_loader,
+                optimizer,
+                scheduler,
+                criterion,
+                scaler,
+                sample_weights=effective_sample_weights,
+                hard_negative_miner=hard_negative_miner,
+                accumulation_steps=active_config.accumulation_steps,
+                gradient_clip_norm=active_config.gradient_clip_norm,
+                amp_enabled=active_config.amp_enabled(self.device),
+            )
+            evaluation = self._evaluate_loader(val_loader, eval_criterion)
+            current_hard_negative_indices = hard_negative_miner.get_hard_indices(
+                count=hard_negative_target_count
+            )
+            current_result = TrainingLoopResult(
+                train_loss=float(train_loss),
+                eval_loss=float(evaluation["eval_loss"]),
+                accuracy=float(evaluation["accuracy"]),
+                precision=float(evaluation["precision"]),
+                recall=float(evaluation["recall"]),
+                f1=float(evaluation["f1"]),
+                auc_roc=float(evaluation["auc_roc"]),
+                positive_threshold=float(evaluation["positive_threshold"]),
+                threshold_strategy=str(evaluation["threshold_strategy"]),
+                predictions=list(evaluation["predictions"]),
+                labels=list(evaluation["labels"]),
+                probability_rows=list(evaluation["probability_rows"]),
+                hard_negative_indices=list(current_hard_negative_indices),
+                epochs_completed=epoch_index + 1,
+                early_stopped=False,
+            )
+            epochs_completed = epoch_index + 1
+            learning_rate = self._current_learning_rate(optimizer, scheduler)
+            mean_ewc_loss = float(getattr(self, "_last_epoch_mean_ewc_loss", 0.0))
+            logger.info(
+                "epoch %d/%d | lr=%.2e | train_loss=%.3f | val_loss=%.3f | f1=%.2f | precision=%.2f | recall=%.2f | ewc_loss=%.3f",
+                epochs_completed,
+                active_config.max_epochs,
+                learning_rate,
+                current_result.train_loss,
+                current_result.eval_loss,
+                current_result.f1,
+                current_result.precision,
+                current_result.recall,
+                mean_ewc_loss,
+            )
+            improved = early_stopper.is_improvement(current_result.eval_loss)
+            if improved or best_result is None:
+                best_model_state = self._clone_model_state(self.model.state_dict())
+                best_result = current_result
+            if early_stopper.step(current_result.eval_loss):
+                break
+        self.model.load_state_dict(best_model_state, strict=False)
+        if best_result is None:
+            raise RuntimeError("training loop completed without validation results")
+        return TrainingLoopResult(
+            train_loss=best_result.train_loss,
+            eval_loss=best_result.eval_loss,
+            accuracy=best_result.accuracy,
+            precision=best_result.precision,
+            recall=best_result.recall,
+            f1=best_result.f1,
+            auc_roc=best_result.auc_roc,
+            positive_threshold=best_result.positive_threshold,
+            threshold_strategy=best_result.threshold_strategy,
+            predictions=list(best_result.predictions),
+            labels=list(best_result.labels),
+            probability_rows=list(best_result.probability_rows),
+            hard_negative_indices=list(best_result.hard_negative_indices),
+            epochs_completed=epochs_completed,
+            early_stopped=early_stopper.stopped,
+        )
 
     @staticmethod
     def _compute_auc_roc(
@@ -1421,6 +1973,16 @@ class IncrementalTrainer:
             logger.error("failed to load best checkpoint for rollback: %s", exc)
             raise
 
+    def _checkpoint_field_name(self) -> str:
+        return re.sub(r"[^A-Za-z0-9_]+", "_", self.model_path.stem).strip("_") or "model"
+
+    def _save_named_checkpoint(self, *, epoch_number: int, f1: float) -> Path:
+        checkpoint_path = self.model_path.parent / (
+            f"checkpoint_{self._checkpoint_field_name()}_{epoch_number}_{f1:.3f}.pt"
+        )
+        torch.save(self.model.state_dict(), checkpoint_path)
+        return checkpoint_path
+
     def benchmark_current_model(self, max_samples: int = 1500) -> dict[str, object]:
         samples, source = self.load_evaluation_samples(max_samples=max_samples)
         if not samples:
@@ -1448,7 +2010,8 @@ class IncrementalTrainer:
         eval_losses: list[float] = []
         criterion = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
-            for features, batch_labels in benchmark_loader:
+            for batch in benchmark_loader:
+                features, batch_labels, _ = self._unpack_batch(batch)
                 features = features.to(self.device)
                 batch_labels_device = batch_labels.to(self.device)
                 logits = self.model(features)
@@ -1510,7 +2073,10 @@ class IncrementalTrainer:
             "recommended_f1": float(calibrated_metrics["f1"]),
         }
 
-    def run_incremental_epoch(self) -> EpochResult:
+    def run_incremental_epoch(
+        self,
+        sample_weights: dict[str, float] | list[float] | np.ndarray | None = None,
+    ) -> EpochResult:
         samples = self.load_new_samples()
         epoch_number = int(self.training_state.get("epoch_number", 0)) + 1
         if len(samples) < 10:
@@ -1519,89 +2085,77 @@ class IncrementalTrainer:
                 0.0, 0.0, 0.0, 0.0, 0.0, len(samples), epoch_number, False, False
             )
 
-        train_loader, eval_loader = self.build_dataset(samples)
-        optimizer = AdamW(self.model.parameters(), lr=3e-4, weight_decay=0.01)
-        scheduler = OneCycleLR(
-            optimizer,
-            max_lr=3e-4,
-            steps_per_epoch=max(len(train_loader), 1),
-            epochs=1,
-            pct_start=0.3,
+        build_dataset_signature = inspect.signature(self.build_dataset)
+        if "include_train_dataset_indices" in build_dataset_signature.parameters:
+            train_loader, eval_loader = self.build_dataset(
+                samples,
+                include_train_dataset_indices=True,
+            )
+        else:
+            train_loader, eval_loader = self.build_dataset(samples)
+        resolved_train_sample_weights = self._resolve_train_sample_weights(
+            samples,
+            train_loader,
+            sample_weights,
         )
-        scaler = torch.amp.GradScaler("cuda") if self.device.type == "cuda" else None
-        criterion = torch.nn.CrossEntropyLoss()
-        previous_state = {
-            name: tensor.detach().cpu().clone()
-            for name, tensor in self.model.state_dict().items()
-        }
+        optimizer = AdamW(
+            self.model.parameters(),
+            lr=self.optimizer_config.learning_rate,
+            weight_decay=0.01,
+        )
+        optimizer_steps_per_epoch = max(
+            1,
+            math.ceil(
+                max(len(train_loader), 1) / self.optimizer_config.accumulation_steps
+            ),
+        )
+        total_scheduler_steps = max(
+            1,
+            optimizer_steps_per_epoch * self.optimizer_config.max_epochs,
+        )
+        scheduler = WarmupCosineScheduler(
+            optimizer,
+            total_steps=total_scheduler_steps,
+            warmup_steps=self.optimizer_config.resolved_warmup_steps(
+                total_scheduler_steps
+            ),
+            min_lr=self.optimizer_config.min_learning_rate,
+            warmup_start_factor=self.optimizer_config.warmup_start_factor,
+        )
+        scaler = (
+            torch.cuda.amp.GradScaler(enabled=True)
+            if self.optimizer_config.amp_enabled(self.device)
+            else None
+        )
+        train_criterion = torch.nn.CrossEntropyLoss(reduction="none")
+        eval_criterion = torch.nn.CrossEntropyLoss()
+        previous_state = self._clone_model_state(self.model.state_dict())
 
         start_time = time.perf_counter()
-        self.model.train()
-        optimizer.zero_grad(set_to_none=True)
-        accum_steps = 4
-        step_count = 0
-        for step_count, (features, labels) in enumerate(train_loader, start=1):
-            features = features.to(self.device)
-            labels = labels.to(self.device)
-            autocast_context = (
-                torch.amp.autocast("cuda")
-                if self.device.type == "cuda"
-                else nullcontext()
-            )
-            with autocast_context:
-                outputs = self.model(features)
-                loss = criterion(outputs, labels)
-                scaled_loss = loss / accum_steps
-            self._backward_pass(scaled_loss, scaler)
-
-            if step_count % accum_steps == 0:
-                self._step_optimizer(optimizer, scaler)
-                scheduler.step()
-
-            if step_count % 50 == 0:
-                logger.info(
-                    "incremental_training_step",
-                    extra={
-                        "event": "incremental_training_step",
-                        "step": step_count,
-                        "loss": float(loss.item()),
-                    },
-                )
-
-        if step_count and step_count % accum_steps != 0:
-            self._step_optimizer(optimizer, scaler)
-            scheduler.step()
-
-        self.model.eval()
-        eval_losses: list[float] = []
-        predictions: list[int] = []
-        labels_out: list[int] = []
-        probability_rows: list[list[float]] = []
-        with torch.no_grad():
-            for features, labels in eval_loader:
-                features = features.to(self.device)
-                labels = labels.to(self.device)
-                logits = self.model(features)
-                probs = torch.softmax(logits, dim=1)
-                eval_losses.append(float(criterion(logits, labels).item()))
-                labels_out.extend(labels.cpu().tolist())
-                probability_rows.extend(probs.cpu().tolist())
-
-        positive_probabilities = [float(row[1]) for row in probability_rows]
-        threshold_metrics = calibrate_positive_threshold(
-            labels_out,
-            positive_probabilities,
-            fallback_threshold=self.positive_threshold,
+        training_loop_result = self.train(
+            train_loader,
+            optimizer,
+            scheduler,
+            train_criterion,
+            scaler,
+            sample_weights=resolved_train_sample_weights,
+            val_loader=eval_loader,
+            eval_criterion=eval_criterion,
+            optimiser_config=self.optimizer_config,
+            return_history=True,
         )
-        positive_threshold = float(threshold_metrics["threshold"])
-        predictions = list(threshold_metrics["predictions"])
+
+        labels_out = list(training_loop_result.labels)
+        probability_rows = list(training_loop_result.probability_rows)
+        positive_threshold = float(training_loop_result.positive_threshold)
+        predictions = list(training_loop_result.predictions)
         prediction_hash = self._hash_predictions(predictions, probability_rows)
-        accuracy = float(threshold_metrics["accuracy"])
-        precision = float(threshold_metrics["precision"])
-        recall = float(threshold_metrics["recall"])
-        f1 = float(threshold_metrics["f1"])
-        auc_roc = self._compute_auc_roc(labels_out, positive_probabilities)
-        eval_loss = float(sum(eval_losses) / max(len(eval_losses), 1))
+        accuracy = float(training_loop_result.accuracy)
+        precision = float(training_loop_result.precision)
+        recall = float(training_loop_result.recall)
+        f1 = float(training_loop_result.f1)
+        auc_roc = float(training_loop_result.auc_roc)
+        eval_loss = float(training_loop_result.eval_loss)
         duration_ms = (time.perf_counter() - start_time) * 1000
         snapshot = AccuracySnapshot(
             epoch=epoch_number,
@@ -1648,7 +2202,7 @@ class IncrementalTrainer:
             extra={
                 "event": "incremental_threshold_calibrated",
                 "threshold": positive_threshold,
-                "strategy": str(threshold_metrics["strategy"]),
+                "strategy": training_loop_result.threshold_strategy,
                 "eval_samples": len(labels_out),
                 "precision": precision,
                 "recall": recall,
@@ -1700,7 +2254,7 @@ class IncrementalTrainer:
                 status=result_status,
             )
 
-        early_stopped = False
+        early_stopped = bool(training_loop_result.early_stopped)
         best_eval_loss = self.training_state.get("best_eval_loss")
         no_improve_count = int(self.training_state.get("no_improve_count", 0))
         if promotion_ready and (
@@ -1709,6 +2263,7 @@ class IncrementalTrainer:
             best_eval_loss = eval_loss
             no_improve_count = 0
             self._save_model_state(self.model.state_dict(), epoch_number=epoch_number)
+            self._save_named_checkpoint(epoch_number=epoch_number, f1=f1)
             self._persist_checkpoint_metrics(
                 accuracy=accuracy,
                 precision=precision,
@@ -1726,7 +2281,7 @@ class IncrementalTrainer:
                     recall,
                 )
             no_improve_count += 1
-            if no_improve_count >= 3:
+            if no_improve_count >= self.optimizer_config.patience:
                 early_stopped = True
                 logger.info("early stopping triggered")
                 reloaded_state = load_safetensors(

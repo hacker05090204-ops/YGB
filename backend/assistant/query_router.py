@@ -21,9 +21,11 @@ import urllib.request
 from urllib.parse import quote_plus
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, List, Dict, Tuple
+from typing import Any, Optional, List, Dict, Tuple
 from datetime import datetime, timezone
 from uuid import uuid4
+
+from backend.cve.anti_hallucination import get_anti_hallucination_validator
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +73,10 @@ class QueryResult:
     result: str
     confidence: float
     retrieved_at: str
+    grounded: bool = False
+    grounding_reason: str = ""
+    unverifiable_claim_rate: float = 0.0
+    production_ready: bool = False
 
 
 @dataclass(frozen=True)
@@ -296,6 +302,8 @@ BLOCKED_RESEARCH_PATTERNS = [
     r'\b(sudo|chmod|chown|passwd)\b',
 ]
 
+RESEARCH_PARSER_VERSION = "query_router.research.v1"
+
 
 class ResearchSearchPipeline:
     """
@@ -357,6 +365,10 @@ class ResearchSearchPipeline:
         result: str,
         confidence: float,
         retrieved_at: str,
+        grounded: bool = False,
+        grounding_reason: str = "",
+        unverifiable_claim_rate: float = 0.0,
+        production_ready: bool = False,
     ) -> QueryResult:
         return QueryResult(
             query_id=query_id,
@@ -365,6 +377,55 @@ class ResearchSearchPipeline:
             result=result,
             confidence=confidence,
             retrieved_at=retrieved_at,
+            grounded=grounded,
+            grounding_reason=grounding_reason,
+            unverifiable_claim_rate=unverifiable_claim_rate,
+            production_ready=production_ready,
+        )
+
+    @staticmethod
+    def _grounding_status() -> Dict[str, Any]:
+        return get_anti_hallucination_validator().get_status()
+
+    def _validate_query_grounding(
+        self,
+        *,
+        query_id: str,
+        query_text: str,
+        result: str,
+        source: str,
+        confidence: float,
+        retrieved_at: str,
+    ) -> tuple[bool, str, float, bool]:
+        validator = get_anti_hallucination_validator()
+        normalized_query = str(query_text or "").strip()
+        normalized_result = str(result or "").strip()
+        normalized_source = str(source or "").strip()
+        if not normalized_query:
+            status = validator.get_status()
+            return False, "query_text_missing", status["unverifiable_claim_rate"], status["production_ready"]
+        if not normalized_result or normalized_result.lower() == "no result available":
+            status = validator.get_status()
+            return False, "research_result_missing", status["unverifiable_claim_rate"], status["production_ready"]
+        if not normalized_source:
+            status = validator.get_status()
+            return False, "grounding_source_missing", status["unverifiable_claim_rate"], status["production_ready"]
+
+        check = validator.validate_provenance(
+            query_id,
+            {
+                "source": normalized_source,
+                "fetched_at": retrieved_at,
+                "parser_version": RESEARCH_PARSER_VERSION,
+                "confidence": confidence,
+            },
+        )
+        status = validator.get_status()
+        return (
+            check.passed,
+            check.detail,
+            float(status["unverifiable_claim_rate"]),
+            bool(status["production_ready"]),
         )
 
     def _resolve_edge_binary(self) -> Optional[str]:
@@ -524,6 +585,10 @@ class ResearchSearchPipeline:
                         result="Query blocked: contains forbidden pattern",
                         confidence=0.0,
                         retrieved_at=timestamp,
+                        grounded=False,
+                        grounding_reason="blocked_query",
+                        unverifiable_claim_rate=float(self._grounding_status()["unverifiable_claim_rate"]),
+                        production_ready=bool(self._grounding_status()["production_ready"]),
                     ),
                 )
 
@@ -553,6 +618,10 @@ class ResearchSearchPipeline:
                         result="No result available",
                         confidence=0.0,
                         retrieved_at=timestamp,
+                        grounded=False,
+                        grounding_reason="research_result_missing",
+                        unverifiable_claim_rate=float(self._grounding_status()["unverifiable_claim_rate"]),
+                        production_ready=bool(self._grounding_status()["production_ready"]),
                     ),
                 )
 
@@ -579,6 +648,10 @@ class ResearchSearchPipeline:
                         result="No result available",
                         confidence=0.0,
                         retrieved_at=timestamp,
+                        grounded=False,
+                        grounding_reason="research_result_missing",
+                        unverifiable_claim_rate=float(self._grounding_status()["unverifiable_claim_rate"]),
+                        production_ready=bool(self._grounding_status()["production_ready"]),
                     ),
                 )
 
@@ -587,6 +660,16 @@ class ResearchSearchPipeline:
 
             # Summarize (mirrors C++ result_summarizer)
             summary, key_terms = self._summarize(text, query)
+            grounded, grounding_reason, unverifiable_claim_rate, production_ready = (
+                self._validate_query_grounding(
+                    query_id=query_id,
+                    query_text=query,
+                    result=summary,
+                    source=source_domain or "",
+                    confidence=0.7 if self._last_fetch_used_http_fallback else 1.0,
+                    retrieved_at=timestamp,
+                )
+            )
 
             return ResearchResult(
                 query=query,
@@ -610,6 +693,10 @@ class ResearchSearchPipeline:
                     result=summary,
                     confidence=0.7 if self._last_fetch_used_http_fallback else 1.0,
                     retrieved_at=timestamp,
+                    grounded=grounded,
+                    grounding_reason=grounding_reason,
+                    unverifiable_claim_rate=unverifiable_claim_rate,
+                    production_ready=production_ready,
                 ),
             )
 
@@ -633,6 +720,10 @@ class ResearchSearchPipeline:
                     result="No result available",
                     confidence=0.0,
                     retrieved_at=timestamp,
+                    grounded=False,
+                    grounding_reason="research_timeout",
+                    unverifiable_claim_rate=float(self._grounding_status()["unverifiable_claim_rate"]),
+                    production_ready=bool(self._grounding_status()["production_ready"]),
                 ),
             )
 
@@ -657,6 +748,10 @@ class ResearchSearchPipeline:
                     result="No result available",
                     confidence=0.0,
                     retrieved_at=timestamp,
+                    grounded=False,
+                    grounding_reason="research_error",
+                    unverifiable_claim_rate=float(self._grounding_status()["unverifiable_claim_rate"]),
+                    production_ready=bool(self._grounding_status()["production_ready"]),
                 ),
             )
 

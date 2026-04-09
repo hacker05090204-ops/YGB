@@ -227,6 +227,11 @@ class CircuitBreaker:
         with self._lock:
             self._total_calls += 1
             self._total_failures += 1
+            if (
+                self._state == CircuitState.OPEN
+                and now - self._opened_at < self.recovery_timeout
+            ):
+                return
             state = self._current_state_unlocked()
             if state == CircuitState.HALF_OPEN:
                 # Probe failed — reopen

@@ -1,32 +1,11 @@
 {
-  "bytes_received": 0,
-  "bytes_sent": 0,
-  "device_id": "ygb-nas",
-  "errors": 1,
-  "files_received": 0,
-  "files_sent": 0,
-  "files_synced_last_cycle": 0,
-  "last_sync_time": "2026-03-22T10:42:53.282618+00:00",
-  "peer_results": [
-    {
-      "base_url": "http://100.70.206.107:8000",
-      "bytes_received": 0,
-      "bytes_sent": 0,
-      "device_id": "kinetic4",
-      "errors": 1,
-      "files_received": 0,
-      "files_sent": 0
-    }
-  ],
-  "peers_configured": [
-    {
-      "device_id": "kinetic4",
-      "host": "100.70.206.107",
-      "ip": "100.70.206.107",
-      "port": 8000,
-      "scheme": "http"
-    }
-  ],
+  "cycle_id": "laptop_a-20260409T043529790759Z",
+  "mode": "STANDALONE",
+  "local_files": 82685,
+  "local_bytes": 93577007,
+  "last_sync_time": "2026-04-09T04:35:29.790759+00:00",
   "peers_connected": 0,
-  "sync_root": "C:\\Users\\Unkno\\YGB"
+  "files_synced_last_cycle": 3,
+  "stale": false,
+  "message": "Single-device mode. Set YGB_SYNC_PEERS for mesh sync."
 }

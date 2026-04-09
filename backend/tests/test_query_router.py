@@ -13,6 +13,8 @@ import sys
 import os
 import pytest
 
+import backend.cve.anti_hallucination as anti_hallucination_module
+
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -167,7 +169,9 @@ class TestResearchSearchPipeline:
     """Test research search pipeline isolation and processing."""
 
     def setup_method(self):
+        anti_hallucination_module._validator = None
         self.pipeline = ResearchSearchPipeline()
+        self.validator = anti_hallucination_module.get_anti_hallucination_validator()
 
     # ====================================================================
     # BLOCKED PATTERNS
@@ -284,6 +288,11 @@ class TestResearchSearchPipeline:
         assert result.query_result is not None
         assert result.query_result.source == "http_fallback"
         assert result.query_result.confidence == 0.7
+        assert result.query_result.grounded is True
+        assert result.query_result.unverifiable_claim_rate == 0.0
+        assert result.query_result.production_ready is True
+        assert "All provenance fields present" in result.query_result.grounding_reason
+        assert self.validator.get_status()["total_checks"] == 1
         assert any(
             "http fallback engaged" in record.message.lower()
             and "unavailable" in record.message.lower()
@@ -305,6 +314,8 @@ class TestResearchSearchPipeline:
         assert result.query_result is not None
         assert result.query_result.result == "No result available"
         assert result.query_result.confidence == 0.0
+        assert result.query_result.grounded is False
+        assert result.query_result.production_ready is False
 
     # ====================================================================
     # GUARDS

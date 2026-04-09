@@ -27,6 +27,8 @@ import json
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from backend.evidence.video_recorder import get_video_recorder
+
 
 class EvidenceType(Enum):
     """CLOSED ENUM - Evidence types."""
@@ -225,6 +227,11 @@ _EVIDENCE_RECORD_PREFIXES = {
     "http_response": "HTR",
 }
 
+_VIDEO_RECORDING_CAPTURE_TYPES = frozenset({
+    "network_log",
+    "dom_snapshot",
+})
+
 
 @dataclass(frozen=True)
 class EvidenceRecord:
@@ -236,6 +243,7 @@ class EvidenceRecord:
     hash_sha256: str
     size_bytes: int
     status: str
+    video_recording_id: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.capture_type not in ALLOWED_CAPTURE_TYPES:
@@ -344,18 +352,59 @@ def _resolve_evidence_status(capture_type: str, captured_bytes: bytes) -> str:
 class EvidenceCapture:
     """Minimal evidence capture facade backed by real captured bytes."""
 
-    def __init__(self, store: Optional[EvidenceStore] = None):
+    def __init__(
+        self,
+        store: Optional[EvidenceStore] = None,
+        video_output_dir: Optional[str] = None,
+    ):
         self.store = store if store is not None else EvidenceStore()
+        self.video_output_dir = video_output_dir
 
-    def capture(self, source_url: str, capture_type: str) -> EvidenceRecord:
+    def _start_video_recording(self, capture_type: str) -> Optional[str]:
+        if capture_type not in _VIDEO_RECORDING_CAPTURE_TYPES:
+            return None
+
+        recording_result = get_video_recorder().start_recording(
+            session_id=generate_session_id(),
+            output_dir=self.video_output_dir,
+        )
+        if recording_result.status == "RECORDING":
+            return recording_result.recording_id
+        return None
+
+    def _stop_video_recording(self, recording_id: Optional[str]) -> Optional[str]:
+        if recording_id is None:
+            return None
+
+        recording_result = get_video_recorder().stop_recording(recording_id)
+        if recording_result.status == "COMPLETED":
+            return recording_result.recording_id
+        return None
+
+    def capture(
+        self,
+        source_url: str,
+        capture_type: str,
+        video_recording: bool = False,
+    ) -> EvidenceRecord:
         normalized_capture_type = capture_type.strip().lower()
         if normalized_capture_type not in ALLOWED_CAPTURE_TYPES:
             raise ValueError(f"Unsupported capture_type: {capture_type}")
 
-        if normalized_capture_type == "network_log":
-            captured_bytes = _capture_network_log_bytes(source_url)
-        else:
-            captured_bytes, _, _, _ = _read_capture_source_bytes(source_url)
+        active_video_recording_id: Optional[str] = None
+        completed_video_recording_id: Optional[str] = None
+
+        if video_recording and normalized_capture_type in _VIDEO_RECORDING_CAPTURE_TYPES:
+            active_video_recording_id = self._start_video_recording(normalized_capture_type)
+
+        try:
+            if normalized_capture_type == "network_log":
+                captured_bytes = _capture_network_log_bytes(source_url)
+            else:
+                captured_bytes, _, _, _ = _read_capture_source_bytes(source_url)
+        finally:
+            if active_video_recording_id is not None:
+                completed_video_recording_id = self._stop_video_recording(active_video_recording_id)
 
         record = EvidenceRecord(
             evidence_id=_generate_evidence_record_id(normalized_capture_type),
@@ -365,6 +414,7 @@ class EvidenceCapture:
             hash_sha256=compute_sha256(captured_bytes),
             size_bytes=len(captured_bytes),
             status=_resolve_evidence_status(normalized_capture_type, captured_bytes),
+            video_recording_id=completed_video_recording_id,
         )
         self.store.append(record)
         return record

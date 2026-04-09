@@ -1,0 +1,31 @@
+{
+  "events": [],
+  "monitor": {
+    "history_size": 5,
+    "severity_history": [
+      {
+        "NEGATIVE": 0.04318936877076412,
+        "POSITIVE": 0.9568106312292359
+      },
+      {
+        "NEGATIVE": 0.04318936877076412,
+        "POSITIVE": 0.9568106312292359
+      },
+      {
+        "NEGATIVE": 0.04318936877076412,
+        "POSITIVE": 0.9568106312292359
+      },
+      {
+        "NEGATIVE": 0.04318936877076412,
+        "POSITIVE": 0.9568106312292359
+      },
+      {
+        "NEGATIVE": 0.04318936877076412,
+        "POSITIVE": 0.9568106312292359
+      }
+    ],
+    "shift_threshold": 0.2
+  },
+  "schema_version": 1,
+  "updated_at": "2026-04-09T04:48:37.668217+00:00"
+}

@@ -12,6 +12,14 @@ from backend.sync.chunker import get_chunk, has_chunk, store_chunk
 from backend.sync.health import get_sync_health, should_alert
 from backend.sync.manifest import load_manifest
 from backend.sync.peer_transport import DEVICE_ID, MANIFEST_PATH, get_peers, save_peer_manifest
+from backend.sync.sync_engine import (
+    SyncMode,
+    get_last_sync_cycle,
+    get_local_sync_index,
+    get_sync_mode,
+    is_sync_stale,
+    sync_status_message,
+)
 from backend.sync.tailscale_sync import TailscaleSyncEngine
 
 logger = logging.getLogger("ygb.sync.routes")
@@ -85,6 +93,29 @@ async def receive_chunk(request: Request) -> dict:
 async def sync_status() -> dict:
     """Comprehensive sync status for the legacy dashboard."""
     health = get_sync_health()
+    mode = get_sync_mode()
+    index = get_local_sync_index()
+    last_cycle = get_last_sync_cycle()
+    local_files = index.get_file_count()
+    local_bytes = index.get_total_bytes()
+    last_completed_at = (
+        last_cycle.completed_at if last_cycle is not None else str(health.get("last_sync") or "")
+    )
+    stale = is_sync_stale(mode=mode, last_completed_at=last_completed_at)
+    message = sync_status_message(
+        mode,
+        peers_attempted=last_cycle.peers_attempted if last_cycle is not None else 0,
+        peers_succeeded=last_cycle.peers_succeeded if last_cycle is not None else 0,
+    )
+    if mode == SyncMode.STANDALONE:
+        health["status"] = "HEALTHY"
+    elif mode == SyncMode.DEGRADED:
+        health["status"] = "DEGRADED"
+    health["mode"] = mode.value
+    health["local_files"] = local_files
+    health["local_bytes"] = local_bytes
+    health["message"] = message
+    health["stale"] = stale
     health["alerts"] = should_alert(health)
     return health
 

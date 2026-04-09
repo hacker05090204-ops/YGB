@@ -13,8 +13,9 @@ import logging
 import os
 import time
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
+from urllib.parse import urlparse
 
 logger = logging.getLogger("ygb.cve_scheduler")
 
@@ -37,6 +38,10 @@ class SourceCycleStats:
     attempts: int = 1
     error: str = ""
     rejection_reasons: Dict[str, int] = field(default_factory=dict)
+    skipped: bool = False
+    non_retryable: bool = False
+    trip_circuit: bool = True
+    requires_format_fix: bool = False
 
 
 @dataclass(frozen=True)
@@ -50,6 +55,7 @@ class FeedSourceStatus:
     samples_fetched_total: int
     available: bool
     requires_credentials: bool
+    requires_format_fix: bool = False
 
 
 class CVEIngestScheduler:
@@ -88,6 +94,7 @@ class CVEIngestScheduler:
         self._feed_source_status: Dict[str, FeedSourceStatus] = (
             self._build_initial_feed_source_status()
         )
+        self._last_request_time_by_host: Dict[str, float] = {}
 
     @staticmethod
     def _source_display_name(
@@ -134,6 +141,7 @@ class CVEIngestScheduler:
                 samples_fetched_total=0,
                 available=(not requires_credentials) or credentials_present,
                 requires_credentials=requires_credentials,
+                requires_format_fix=False,
             )
         return statuses
 
@@ -158,6 +166,7 @@ class CVEIngestScheduler:
                 samples_fetched_total=0,
                 available=base_available,
                 requires_credentials=requires_credentials,
+                requires_format_fix=False,
             )
         else:
             current = replace(
@@ -165,9 +174,11 @@ class CVEIngestScheduler:
                 requires_credentials=requires_credentials,
                 available=(
                     False
-                    if current.consecutive_failures >= self._DEGRADED_THRESHOLD
+                    if current.requires_format_fix
+                    or current.consecutive_failures >= self._DEGRADED_THRESHOLD
                     else base_available
                 ),
+                requires_format_fix=current.requires_format_fix,
             )
 
         self._feed_source_status[source_name] = current
@@ -209,6 +220,7 @@ class CVEIngestScheduler:
             samples_fetched_total=current.samples_fetched_total + max(0, int(samples_fetched)),
             available=(not requires_credentials) or credentials_present,
             requires_credentials=requires_credentials,
+            requires_format_fix=False,
         )
         self._feed_source_status[updated.source_name] = updated
         return updated
@@ -234,6 +246,7 @@ class CVEIngestScheduler:
                 else (not requires_credentials) or credentials_present
             ),
             requires_credentials=requires_credentials,
+            requires_format_fix=False,
         )
         self._feed_source_status[updated.source_name] = updated
 
@@ -244,6 +257,25 @@ class CVEIngestScheduler:
                 next_failures,
             )
 
+        return updated
+
+    def _record_feed_format_fix(
+        self,
+        source_id: str,
+        cfg: Optional[Dict[str, Any]] = None,
+        attempted_at: Optional[str] = None,
+    ) -> FeedSourceStatus:
+        config = cfg or {}
+        current = self._ensure_feed_source_status(source_id, config)
+        requires_credentials = bool(config.get("requires_key", False))
+        updated = replace(
+            current,
+            last_attempt=attempted_at or datetime.now(timezone.utc).isoformat(),
+            available=False,
+            requires_credentials=requires_credentials,
+            requires_format_fix=True,
+        )
+        self._feed_source_status[updated.source_name] = updated
         return updated
 
     def _record_missing_credentials_skip(
@@ -259,6 +291,7 @@ class CVEIngestScheduler:
             last_attempt=datetime.now(timezone.utc).isoformat(),
             available=False,
             requires_credentials=True,
+            requires_format_fix=False,
         )
         self._feed_source_status[updated.source_name] = updated
 
@@ -405,6 +438,14 @@ class CVEIngestScheduler:
                 cycle_stats["sources_not_configured"] += 1
                 continue
 
+            feed_status = self._ensure_feed_source_status(source_id, cfg)
+            if feed_status.requires_format_fix:
+                logger.info(
+                    "[CVE_SCHEDULER] %s requires format fix — skipping",
+                    feed_status.source_name,
+                )
+                continue
+
             status = pipeline._source_status.get(source_id)
             if status == SourceStatus.NOT_CONFIGURED:
                 self._ensure_feed_source_status(source_id, cfg)
@@ -431,7 +472,7 @@ class CVEIngestScheduler:
             cycle_stats["rejected"] += source_stats.rejected
             if source_stats.no_delta:
                 cycle_stats["sources_no_delta"] += 1
-            if source_stats.success or source_stats.no_delta:
+            if source_stats.success or source_stats.no_delta or source_stats.skipped:
                 cycle_stats["sources_succeeded"] += 1
             else:
                 cycle_stats["sources_failed"] += 1
@@ -489,6 +530,198 @@ class CVEIngestScheduler:
         self._scheduler_stats["rejected"] += cycle_stats["rejected"]
         self._scheduler_stats["bridge_published"] += cycle_stats["bridge_published"]
 
+    @staticmethod
+    def _body_preview(body: str) -> str:
+        return " ".join(str(body or "").split())[:300]
+
+    @staticmethod
+    def _parse_iso_timestamp(raw_value: Optional[str]) -> Optional[datetime]:
+        if not raw_value:
+            return None
+        try:
+            return datetime.fromisoformat(str(raw_value).replace("Z", "+00:00"))
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _format_nvd_timestamp(value: datetime) -> str:
+        normalized = value.astimezone(timezone.utc).replace(microsecond=0)
+        return normalized.strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
+
+    @staticmethod
+    def _source_host(url: str) -> str:
+        return urlparse(url).netloc.lower()
+
+    @staticmethod
+    def _nvd_api_key() -> str:
+        return str(os.getenv("NVD_API_KEY", "") or "").strip()
+
+    def _is_nvd_v2_source(self, source_id: str, url: str) -> bool:
+        return (
+            source_id in {"nvd", "cve_services"}
+            or url.startswith("https://services.nvd.nist.gov/rest/json/cves/2.0")
+        )
+
+    def _minimum_delay_for_source(self, source_id: str, cfg: Dict[str, Any]) -> float:
+        if self._is_nvd_v2_source(source_id, str(cfg.get("url", "") or "")):
+            return 0.6 if self._nvd_api_key() else 6.0
+        return 0.0
+
+    async def _respect_source_rate_limit(
+        self,
+        source_id: str,
+        cfg: Dict[str, Any],
+    ) -> None:
+        minimum_delay = self._minimum_delay_for_source(source_id, cfg)
+        if minimum_delay <= 0:
+            return
+
+        host = self._source_host(str(cfg.get("url", "") or ""))
+        if not host:
+            return
+
+        last_request_time = self._last_request_time_by_host.get(host)
+        if last_request_time is not None:
+            wait_seconds = minimum_delay - (time.monotonic() - last_request_time)
+            if wait_seconds > 0:
+                await asyncio.sleep(wait_seconds)
+
+        self._last_request_time_by_host[host] = time.monotonic()
+
+    async def source_health_check(
+        self,
+        url: str,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> bool:
+        try:
+            import httpx
+        except ImportError:
+            return True
+
+        try:
+            async with httpx.AsyncClient(timeout=2.0) as client:
+                response = await client.head(
+                    url,
+                    headers=headers or {},
+                    follow_redirects=True,
+                )
+            if response.status_code >= 500:
+                logger.info("[CVE_SCHEDULER] source unreachable — skipping")
+                return False
+            return True
+        except Exception:
+            logger.info("[CVE_SCHEDULER] source unreachable — skipping")
+            return False
+
+    def _compute_nvd_window(self, pipeline, source_id: str) -> tuple[str, str]:
+        freshness = getattr(pipeline, "_freshness", {}).get(source_id)
+        end_at = datetime.now(timezone.utc).replace(microsecond=0)
+        start_at = end_at - timedelta(days=7)
+        if freshness is not None:
+            candidate = self._parse_iso_timestamp(
+                getattr(freshness, "last_seen_timestamp", None)
+                or getattr(freshness, "last_success_at", None)
+            )
+            if candidate is not None:
+                start_at = candidate.astimezone(timezone.utc).replace(microsecond=0)
+
+        if start_at >= end_at:
+            start_at = end_at - timedelta(minutes=5)
+
+        return self._format_nvd_timestamp(start_at), self._format_nvd_timestamp(end_at)
+
+    async def _fetch_nvd_v2(
+        self,
+        pipeline,
+        source_id: str,
+        cfg: Dict[str, Any],
+        headers: Dict[str, str],
+    ) -> SourceCycleStats:
+        import httpx
+
+        url = str(cfg["url"])
+        start_iso, end_iso = self._compute_nvd_window(pipeline, source_id)
+        params = {
+            "pubStartDate": start_iso,
+            "pubEndDate": end_iso,
+        }
+
+        await self._respect_source_rate_limit(source_id, cfg)
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                url,
+                headers=headers,
+                params=params,
+                follow_redirects=True,
+            )
+
+        if response.status_code == 304:
+            pipeline.mark_source_no_delta(source_id)
+            pipeline.record_stage_result(
+                source_id,
+                "FETCH",
+                "NO_DELTA",
+                message="HTTP 304",
+            )
+            logger.info(
+                "[CVE_SCHEDULER] %s source returned no delta — skipping cycle",
+                source_id,
+            )
+            return SourceCycleStats(
+                source_id=source_id,
+                success=True,
+                no_delta=True,
+            )
+
+        if response.status_code == 400:
+            logger.warning(
+                "[CVE_SCHEDULER] %s bad request url=%s body=%s",
+                source_id,
+                url,
+                self._body_preview(response.text),
+            )
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error="HTTP 400",
+                non_retryable=True,
+                trip_circuit=False,
+                requires_format_fix=True,
+            )
+
+        response.raise_for_status()
+        etag = response.headers.get("ETag", "")
+        last_mod = response.headers.get("Last-Modified", "")
+        data = response.json()
+        ingest_stats = self._parse_and_ingest(pipeline, source_id, data)
+
+        pipeline.mark_source_success(
+            source_id,
+            ingest_stats["records_ingested"],
+            etag=etag,
+            last_modified_header=last_mod,
+        )
+        pipeline.record_stage_result(
+            source_id,
+            "FETCH",
+            "SUCCESS",
+            records_seen=ingest_stats["records_seen"],
+            records_ingested=ingest_stats["records_ingested"],
+            duplicates=ingest_stats["duplicates"],
+            rejected=ingest_stats["rejected"],
+            rejection_reasons=ingest_stats["rejection_reasons"],
+            message=f"HTTP {response.status_code}",
+        )
+        return SourceCycleStats(
+            source_id=source_id,
+            success=True,
+            records_seen=ingest_stats["records_seen"],
+            records_ingested=ingest_stats["records_ingested"],
+            duplicates=ingest_stats["duplicates"],
+            rejected=ingest_stats["rejected"],
+            rejection_reasons=ingest_stats["rejection_reasons"],
+        )
+
     async def _fetch_source_with_retry(
         self, pipeline, source_id: str
     ) -> SourceCycleStats:
@@ -536,6 +769,13 @@ class CVEIngestScheduler:
                 )
                 return result
 
+            if result.skipped:
+                return result
+
+            if result.non_retryable:
+                last_result = result
+                break
+
             last_result = result
             if attempt < _MAX_RETRIES:
                 backoff = _BACKOFF_BASE * (2 ** (attempt - 1))
@@ -547,12 +787,27 @@ class CVEIngestScheduler:
                 await asyncio.sleep(backoff)
 
         failure_message = last_result.error or f"All {_MAX_RETRIES} retries exhausted"
-        self._record_feed_failure(
-            source_id,
-            cfg,
-            attempted_at=last_attempted_at,
-        )
-        pipeline.mark_source_error(source_id, failure_message)
+        if last_result.requires_format_fix:
+            self._record_feed_format_fix(
+                source_id,
+                cfg,
+                attempted_at=last_attempted_at,
+            )
+        else:
+            self._record_feed_failure(
+                source_id,
+                cfg,
+                attempted_at=last_attempted_at,
+            )
+
+        if last_result.trip_circuit:
+            pipeline.mark_source_error(source_id, failure_message)
+        else:
+            pipeline.mark_source_error(
+                source_id,
+                failure_message,
+                trip_circuit=False,
+            )
         pipeline.record_stage_result(
             source_id,
             "FETCH",
@@ -592,9 +847,44 @@ class CVEIngestScheduler:
             if key_val:
                 headers["apiKey"] = key_val
 
+        if not await self.source_health_check(url, headers=headers):
+            pipeline.record_stage_result(
+                source_id,
+                "FETCH",
+                "SKIPPED",
+                message="source unreachable",
+            )
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                skipped=True,
+                error="source_unreachable_skip",
+            )
+
+        if self._is_nvd_v2_source(source_id, url):
+            try:
+                return await self._fetch_nvd_v2(
+                    pipeline,
+                    source_id,
+                    cfg,
+                    headers,
+                )
+            except Exception as e:
+                logger.error("[CVE_SCHEDULER] %s fetch error: %s", source_id, e)
+                return SourceCycleStats(
+                    source_id=source_id,
+                    success=False,
+                    error=f"Fetch failed: {type(e).__name__}",
+                )
+
         try:
+            await self._respect_source_rate_limit(source_id, cfg)
             async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.get(url, headers=headers)
+                resp = await client.get(
+                    url,
+                    headers=headers,
+                    follow_redirects=True,
+                )
 
                 # 304 Not Modified → NO_DELTA
                 if resp.status_code == 304:
@@ -606,12 +896,29 @@ class CVEIngestScheduler:
                         message="HTTP 304",
                     )
                     logger.info(
-                        f"[CVE_SCHEDULER] {source_id}: NO_DELTA (304)"
+                        "[CVE_SCHEDULER] %s source returned no delta — skipping cycle",
+                        source_id,
                     )
                     return SourceCycleStats(
                         source_id=source_id,
                         success=True,
                         no_delta=True,
+                    )
+
+                if resp.status_code == 400:
+                    logger.warning(
+                        "[CVE_SCHEDULER] %s bad request url=%s body=%s",
+                        source_id,
+                        url,
+                        self._body_preview(resp.text),
+                    )
+                    return SourceCycleStats(
+                        source_id=source_id,
+                        success=False,
+                        error="HTTP 400",
+                        non_retryable=True,
+                        trip_circuit=False,
+                        requires_format_fix=True,
                     )
 
                 resp.raise_for_status()

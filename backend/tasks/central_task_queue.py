@@ -4,12 +4,29 @@ import asyncio
 import hashlib
 import json
 import os
+import sys
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from enum import Enum, IntEnum
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, Iterable, List, Optional, Sequence
+
+
+_TRUTHY_VALUES = frozenset({"1", "true", "yes", "on"})
+_TEST_ONLY_PATH_ENV = "YGB_ENABLE_TEST_ONLY_PATHS"
+
+
+def _test_only_paths_enabled() -> bool:
+    if "pytest" in sys.modules:
+        return True
+    return os.environ.get(_TEST_ONLY_PATH_ENV, "").strip().lower() in _TRUTHY_VALUES
+
+
+def _ensure_test_only_path_allowed(path_name: str) -> None:
+    if _test_only_paths_enabled():
+        return
+    raise RuntimeError(f"{path_name} is disabled outside test-only execution")
 
 
 def _normalize_json(value: Any) -> Any:
@@ -203,6 +220,9 @@ class FileBackedTaskQueue:
         dedup_key: Optional[str] = None,
     ) -> TaskRecord:
         async with self._lock:
+            normalized_kind = str(kind or "").strip().lower()
+            if normalized_kind.startswith("demo_"):
+                _ensure_test_only_path_allowed(f"task kind '{kind}'")
             dedup_key = dedup_key or self.build_dedup_key(kind, payload)
             existing_id = self._dedup.get(dedup_key)
             existing = self._tasks.get(existing_id or "")
@@ -332,10 +352,12 @@ class TaskAgent:
 
 
 async def _demo_handler(task: TaskRecord) -> None:
+    _ensure_test_only_path_allowed("central task queue demo handler")
     await asyncio.sleep(0.01)
 
 
 async def main() -> None:
+    _ensure_test_only_path_allowed("central_task_queue.main()")
     queue = FileBackedTaskQueue()
     await queue.enqueue(
         "demo_ingest",

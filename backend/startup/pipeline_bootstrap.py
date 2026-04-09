@@ -12,6 +12,7 @@ from backend.ingestion.autograbber import (
     AutoGrabberConfig,
     initialize_autograbber,
 )
+from backend.api.system_status import seed_system_status_cache
 from backend.training.auto_train_controller import (
     AutoTrainController,
     get_auto_train_controller,
@@ -41,6 +42,16 @@ class PipelineBootstrapResult:
 
 
 _bootstrap_lock = threading.Lock()
+
+
+def _refresh_sync_index_background() -> None:
+    try:
+        from backend.sync.sync_engine import get_local_sync_index
+
+        get_local_sync_index().refresh()
+        logger.info("[BOOT] Local sync index refreshed")
+    except Exception as exc:
+        logger.warning("[BOOT] Local sync index refresh failed: %s", exc)
 
 
 def _resolve_positive_int_env(var_names: tuple[str, ...], default: int) -> int:
@@ -100,6 +111,15 @@ def _controller_interval_seconds(controller: AutoTrainController) -> float | Non
         return None
 
 
+def initialize_workflow_orchestrator(*, autograbber, auto_train_controller):
+    from backend.tasks.industrial_agent import initialize_workflow_orchestrator as _init
+
+    return _init(
+        autograbber=autograbber,
+        auto_train_controller=auto_train_controller,
+    )
+
+
 def bootstrap_pipeline() -> PipelineBootstrapResult:
     """Initialize and start the automatic ingestion-to-training pipeline."""
     with _bootstrap_lock:
@@ -145,6 +165,25 @@ def bootstrap_pipeline() -> PipelineBootstrapResult:
                     controller_started_now,
                     controller_interval,
                 )
+            workflow_orchestrator = initialize_workflow_orchestrator(
+                autograbber=autograbber,
+                auto_train_controller=controller,
+            )
+            logger.info(
+                "[BOOT] Autonomous workflow orchestrator initialized history_size=%s",
+                workflow_orchestrator.get_status().get("history_size", 0),
+            )
+            seed_started = seed_system_status_cache()
+            logger.info(
+                "[BOOT] System status cache seed started=%s",
+                seed_started,
+            )
+            threading.Thread(
+                target=_refresh_sync_index_background,
+                name="ygb-sync-index-refresh",
+                daemon=True,
+            ).start()
+            logger.info("[BOOT] Local sync index refresh scheduled")
 
             return PipelineBootstrapResult(
                 autograbber=autograbber,

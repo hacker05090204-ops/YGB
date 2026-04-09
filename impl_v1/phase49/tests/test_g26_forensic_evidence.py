@@ -12,6 +12,7 @@ import inspect
 from pathlib import Path
 
 import impl_v1.phase49.governors.g26_forensic_evidence as forensic_evidence
+from backend.evidence.video_recorder import VideoRecordingResult
 
 from impl_v1.phase49.governors.g26_forensic_evidence import (
     EvidenceType,
@@ -684,4 +685,74 @@ class TestBatch5GroupAForensicEvidence:
         module_source = inspect.getsource(forensic_evidence).lower()
         assert "mock_metadata" not in module_source
         assert "mock metadata" not in module_source
+
+    def test_evidence_record_defaults_video_recording_id_to_none(self):
+        """Evidence records include an optional video identifier."""
+        record = EvidenceRecord(
+            evidence_id="ER-NET-ABC123DEF456",
+            capture_type="network_log",
+            source_url="https://example.com",
+            captured_at="2026-01-28T00:00:00+00:00",
+            hash_sha256=compute_sha256(b"network"),
+            size_bytes=len(b"network"),
+            status="CAPTURED",
+        )
+
+        assert record.video_recording_id is None
+
+    def test_capture_can_attach_completed_video_recording_id(self, monkeypatch):
+        """Evidence capture can attach a completed video recording id."""
+
+        class RecorderDouble:
+            def __init__(self):
+                self.started = 0
+                self.stopped: list[str] = []
+
+            def start_recording(self, session_id=None, output_dir=None, fps=10):
+                self.started += 1
+                return VideoRecordingResult(
+                    recording_id="VIDREC-INTEGRATION",
+                    status="RECORDING",
+                    started_at="2026-01-28T00:00:00+00:00",
+                    stopped_at=None,
+                    output_path=str(Path("integration-video.mp4")),
+                    sha256_hash=None,
+                    size_bytes=0,
+                    duration_seconds=0.0,
+                    frame_count=1,
+                    error_message=None,
+                )
+
+            def stop_recording(self, recording_id):
+                self.stopped.append(recording_id)
+                return VideoRecordingResult(
+                    recording_id=recording_id,
+                    status="COMPLETED",
+                    started_at="2026-01-28T00:00:00+00:00",
+                    stopped_at="2026-01-28T00:00:01+00:00",
+                    output_path=str(Path("integration-video.mp4")),
+                    sha256_hash=compute_sha256(b"integration-video"),
+                    size_bytes=len(b"integration-video"),
+                    duration_seconds=1.0,
+                    frame_count=2,
+                    error_message=None,
+                )
+
+        recorder = RecorderDouble()
+        monkeypatch.setattr(forensic_evidence, "get_video_recorder", lambda: recorder)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source_path = Path(tmpdir) / "response.bin"
+            source_path.write_bytes(b"network-response-bytes")
+
+            capture = EvidenceCapture(EvidenceStore())
+            record = capture.capture(
+                source_path.as_uri(),
+                "network_log",
+                video_recording=True,
+            )
+
+        assert recorder.started == 1
+        assert recorder.stopped == ["VIDREC-INTEGRATION"]
+        assert record.video_recording_id == "VIDREC-INTEGRATION"
 

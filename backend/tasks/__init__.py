@@ -5,13 +5,23 @@ from backend.tasks.central_task_queue import (
     TaskRecord,
     TaskState,
 )
-from backend.tasks.industrial_agent import IndustrialAgentRuntime
+from backend.tasks.industrial_agent import (
+    AutonomousWorkflowOrchestrator,
+    IndustrialAgentRuntime,
+    WorkflowCycleResult,
+    get_workflow_orchestrator,
+    initialize_workflow_orchestrator,
+)
 
 __all__ = [
+    "AutonomousWorkflowOrchestrator",
     "FileBackedTaskQueue",
     "IndustrialAgentRuntime",
     "TaskAgent",
     "TaskPriority",
     "TaskRecord",
     "TaskState",
+    "WorkflowCycleResult",
+    "get_workflow_orchestrator",
+    "initialize_workflow_orchestrator",
 ]

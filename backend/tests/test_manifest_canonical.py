@@ -237,6 +237,8 @@ class TestValidateManifestCompatibility(unittest.TestCase):
             payload["dataset_hash"] = hashlib.sha256(
                 json.dumps(payload, sort_keys=True).encode("utf-8")
             ).hexdigest()
+        payload.pop("signed_by", None)
+        payload.pop("signature_hash", None)
         canonicalize_manifest(payload, authority_key=os.environ["YGB_AUTHORITY_KEY"])
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as handle:

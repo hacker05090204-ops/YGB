@@ -30,9 +30,9 @@ import uuid
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Response, status as http_status
+from fastapi import APIRouter, Depends, Query, Response, status as http_status
 
-from backend.auth.auth_guard import require_auth
+from backend.auth.auth_guard import require_admin, require_auth
 from backend.training.auto_train_controller import get_auto_train_controller
 
 logger = logging.getLogger(__name__)
@@ -689,6 +689,51 @@ def get_auto_training_status() -> dict[str, object]:
     }
 
 
+def get_workflow_orchestrator():
+    from backend.tasks.industrial_agent import get_workflow_orchestrator as _get
+
+    return _get()
+
+
+def get_workflow_status() -> dict[str, object]:
+    orchestrator = get_workflow_orchestrator()
+    return {
+        "status": "ok",
+        **orchestrator.get_status(),
+    }
+
+
+def get_workflow_history(*, limit: int = 10) -> dict[str, object]:
+    orchestrator = get_workflow_orchestrator()
+    return {
+        "status": "ok",
+        "history": orchestrator.get_history(limit=limit),
+    }
+
+
+def trigger_workflow_cycle(*, trigger: str = "api") -> dict[str, str]:
+    orchestrator = get_workflow_orchestrator()
+    return orchestrator.trigger_cycle(trigger=trigger)
+
+
+def get_auth_status() -> dict[str, object]:
+    from backend.auth.auth_guard import get_auth_runtime_status
+
+    return {
+        "status": "ok",
+        **get_auth_runtime_status(),
+    }
+
+
+def get_governance_key_status() -> dict[str, object]:
+    from backend.governance.approval_ledger import get_key_manager_status
+
+    return {
+        "status": "ok",
+        **get_key_manager_status(run_integrity=True),
+    }
+
+
 def trigger_auto_training_check() -> dict[str, str]:
     controller = get_auto_train_controller()
     return controller.trigger_check()
@@ -710,6 +755,42 @@ async def auto_training_trigger(
     else:
         response.status_code = http_status.HTTP_200_OK
     return payload
+
+
+@router.get("/api/v1/workflow/status")
+async def workflow_status(user=Depends(require_auth)) -> dict[str, object]:
+    return get_workflow_status()
+
+
+@router.get("/api/v1/workflow/history")
+async def workflow_history(
+    limit: int = Query(10, ge=1, le=100),
+    user=Depends(require_auth),
+) -> dict[str, object]:
+    return get_workflow_history(limit=limit)
+
+
+@router.post("/api/v1/workflow/trigger")
+async def workflow_trigger(
+    response: Response,
+    user=Depends(require_auth),
+) -> dict[str, str]:
+    payload = trigger_workflow_cycle(trigger="api")
+    if payload["status"] == "triggered":
+        response.status_code = http_status.HTTP_202_ACCEPTED
+    else:
+        response.status_code = http_status.HTTP_200_OK
+    return payload
+
+
+@router.get("/api/v1/auth/status")
+async def auth_status(user=Depends(require_auth)) -> dict[str, object]:
+    return get_auth_status()
+
+
+@router.get("/api/v1/governance/key-status")
+async def governance_key_status(user=Depends(require_admin)) -> dict[str, object]:
+    return get_governance_key_status()
 
 
 # =========================================================================

@@ -9,6 +9,7 @@ Rules:
 """
 
 import logging
+import math
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
@@ -40,6 +41,12 @@ class AntiHallucinationValidator:
         self._passed_checks: int = 0
         self._failed_checks: int = 0
 
+    @staticmethod
+    def _read_provenance_value(provenance: Dict[str, Any], field_name: str) -> Any:
+        if hasattr(provenance, field_name):
+            return getattr(provenance, field_name, None)
+        return provenance.get(field_name)
+
     def validate_provenance(
         self,
         cve_id: str,
@@ -53,18 +60,25 @@ class AntiHallucinationValidator:
 
         missing = []
         for field_name in REQUIRED_PROVENANCE_FIELDS:
-            val = getattr(provenance, field_name, None) if hasattr(
-                provenance, field_name
-            ) else provenance.get(field_name)
+            val = self._read_provenance_value(provenance, field_name)
+            if field_name == "confidence":
+                try:
+                    numeric_confidence = float(val)
+                except (TypeError, ValueError):
+                    missing.append(field_name)
+                    continue
+                if not math.isfinite(numeric_confidence) or numeric_confidence <= 0.0:
+                    missing.append(field_name)
+                continue
             if val is None or (isinstance(val, str) and not val.strip()):
                 missing.append(field_name)
 
-        confidence = getattr(provenance, "confidence", 0.0) if hasattr(
-            provenance, "confidence"
-        ) else provenance.get("confidence", 0.0)
-        source = getattr(provenance, "source", "") if hasattr(
-            provenance, "source"
-        ) else provenance.get("source", "")
+        raw_confidence = self._read_provenance_value(provenance, "confidence")
+        try:
+            confidence = float(raw_confidence)
+        except (TypeError, ValueError):
+            confidence = 0.0
+        source = self._read_provenance_value(provenance, "source") or ""
 
         passed = len(missing) == 0
         if passed:
@@ -141,6 +155,7 @@ class AntiHallucinationValidator:
             "total_checks": self._total_checks,
             "passed": self._passed_checks,
             "failed": self._failed_checks,
+            "audit_entries": len(self._audit_log),
             "unverifiable_claim_rate": self.compute_unverifiable_claim_rate(),
             "production_ready": self.is_production_ready()[0],
         }

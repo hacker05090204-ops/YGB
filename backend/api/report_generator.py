@@ -14,6 +14,7 @@ import os
 import sys
 import json
 import time
+import hashlib
 import secrets
 import logging
 from collections import deque
@@ -23,12 +24,14 @@ from pathlib import Path
 from typing import Any, Optional, Dict, List
 
 from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from backend.auth.auth_guard import require_auth
+from backend.reporting.report_engine import get_report_engine
 
 logger = logging.getLogger("ygb.report_generator")
 REPORT_GENERATOR_VERSION = "1.0"
@@ -102,7 +105,9 @@ def _log_activity(user_id: str, action: str, detail: str):
     except Exception as exc:
         logger.info("AUDIT [%s] %s: %s (storage bridge unavailable: %s)", user_id, action, detail, exc)
 
-router = APIRouter(prefix="/api/reports", tags=["reports"])
+legacy_router = APIRouter(prefix="/api/reports", tags=["reports"])
+v1_router = APIRouter(prefix="/api/v1/reports", tags=["reports"])
+router = APIRouter(tags=["reports"])
 
 # =============================================================================
 # DATABASE INITIALIZATION
@@ -214,12 +219,16 @@ def _validation_errors_for_report(report: Dict[str, Any]) -> List[str]:
 
 
 def _append_report_export_record(
-    report: Dict[str, Any], *, export_format: str = "json"
+    report: Dict[str, Any], *, export_format: str = "json", export_payload: Any | None = None
 ) -> ReportExportRecord:
+    payload_to_measure = report if export_payload is None else export_payload
     try:
-        export_bytes = len(
-            json.dumps(report, sort_keys=True, default=str).encode("utf-8")
-        )
+        if isinstance(payload_to_measure, str):
+            export_bytes = len(payload_to_measure.encode("utf-8"))
+        else:
+            export_bytes = len(
+                json.dumps(payload_to_measure, sort_keys=True, default=str).encode("utf-8")
+            )
     except (TypeError, ValueError) as exc:
         raise ValueError("Report export payload could not be serialized") from exc
 
@@ -241,6 +250,40 @@ def _normalize_report_metadata(metadata: Any, *, generated_at: Optional[str] = N
     )
     normalized["generator_version"] = REPORT_GENERATOR_VERSION
     return normalized
+
+
+def _serialize_report_content(content: Any) -> str:
+    try:
+        return json.dumps(content)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Report content could not be serialized") from exc
+
+
+def _deserialize_report_content(content: Any) -> Dict[str, Any]:
+    if isinstance(content, dict):
+        return dict(content)
+    if not isinstance(content, str):
+        raise ValueError("Stored report content must be a JSON object")
+    try:
+        parsed = json.loads(content or "{}")
+    except json.JSONDecodeError as exc:
+        raise ValueError("Stored report content is not valid JSON") from exc
+    if not isinstance(parsed, dict):
+        raise ValueError("Stored report content must decode to an object")
+    return parsed
+
+
+def _sha256_for_content_payload(content: Any) -> str:
+    try:
+        canonical_content = json.dumps(
+            content,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Report content could not be serialized for sha256") from exc
+    return hashlib.sha256(canonical_content.encode("utf-8")).hexdigest()
 
 
 def _metadata_from_report(report: Dict[str, Any]) -> Dict[str, Any]:
@@ -270,11 +313,18 @@ def _finalize_report_for_response(
             final_report.get("created_at"),
         )
         final_report["generator_version"] = REPORT_GENERATOR_VERSION
+        final_report["sha256"] = str(
+            final_report.get("sha256") or metadata.get("sha256") or ""
+        )
         merged_metadata = dict(metadata)
         merged_metadata["generated_at"] = final_report["generated_at"]
         merged_metadata["generator_version"] = final_report["generator_version"]
+        if final_report["sha256"]:
+            merged_metadata["sha256"] = final_report["sha256"]
         if "metadata_json" in final_report:
             final_report["metadata_json"] = json.dumps(merged_metadata)
+    elif "sha256" not in final_report:
+        final_report["sha256"] = str(metadata.get("sha256") or "")
 
     validation_errors = _validation_errors_for_report(final_report)
     if validation_errors:
@@ -294,7 +344,7 @@ def _finalize_report_for_response(
 # REPORT ENDPOINTS
 # =============================================================================
 
-@router.post("")
+@legacy_router.post("")
 async def create_report(request: Request, user=Depends(require_auth)):
     """Create a new report."""
     _ensure_tables()
@@ -310,20 +360,68 @@ async def create_report(request: Request, user=Depends(require_auth)):
 
     report_id = _generate_id("rpt")
     now = _now_iso()
-    metadata = _normalize_report_metadata(body.get("metadata", {}), generated_at=now)
+    raw_content = body.get("content", {})
+    if raw_content is None:
+        raw_content = {}
+
+    generated_content = raw_content
+    generated_at = now
+    generated_metadata: Dict[str, Any] = {}
+    if isinstance(raw_content, dict) and "findings" in raw_content:
+        try:
+            generated_report = get_report_engine().build_report(
+                report_id=report_id,
+                title=title,
+                description=body.get("description", ""),
+                report_type=body.get("report_type", "general"),
+                findings=raw_content.get("findings", []),
+                source_context={
+                    key: value for key, value in raw_content.items() if key != "findings"
+                },
+                generated_at=now,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail={
+                "error": "VALIDATION_ERROR", "detail": str(exc)
+            }) from exc
+        generated_content = generated_report.to_content_dict()
+        generated_at = generated_report.generated_at
+        report_sha256 = generated_report.sha256
+        generated_metadata["report_storage_path"] = generated_report.storage_path
+        generated_metadata["report_engine_version"] = generated_report.generator_version
+    else:
+        try:
+            report_sha256 = _sha256_for_content_payload(raw_content)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail={
+                "error": "VALIDATION_ERROR", "detail": str(exc)
+            }) from exc
+
+    metadata = _normalize_report_metadata(body.get("metadata", {}), generated_at=generated_at)
+    metadata["sha256"] = report_sha256
+    metadata.update(generated_metadata)
+
+    try:
+        serialized_content = _serialize_report_content(generated_content)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail={
+            "error": "VALIDATION_ERROR", "detail": str(exc)
+        }) from exc
+
     report = {
         "id": report_id,
         "title": title,
         "description": body.get("description", ""),
         "report_type": body.get("report_type", "general"),
         "status": "draft",
-        "content": json.dumps(body.get("content", {})),
+        "content": serialized_content,
         "created_by": user_id,
         "created_at": now,
         "updated_at": now,
         "metadata_json": json.dumps(metadata),
         "generated_at": metadata["generated_at"],
         "generator_version": metadata["generator_version"],
+        "sha256": report_sha256,
     }
 
     validation_errors = _validation_errors_for_report(report)
@@ -378,7 +476,7 @@ async def create_report(request: Request, user=Depends(require_auth)):
     logger.info("Report created: %s by %s", report_id, user_id)
 
     response_report = _finalize_report_for_response(
-        {**report, "content": body.get("content", {})}
+        {**report, "content": generated_content}
     )
     try:
         _append_report_export_record(response_report)
@@ -391,7 +489,7 @@ async def create_report(request: Request, user=Depends(require_auth)):
     return {"success": True, "report": response_report}
 
 
-@router.get("")
+@legacy_router.get("")
 async def list_reports(request: Request, user=Depends(require_auth)):
     """List all reports for the authenticated user."""
     _ensure_tables()
@@ -427,7 +525,7 @@ async def list_reports(request: Request, user=Depends(require_auth)):
     return {"success": True, "reports": reports}
 
 
-@router.get("/{report_id}")
+@legacy_router.get("/{report_id}")
 async def get_report(report_id: str, user=Depends(require_auth)):
     """Get a specific report."""
     _ensure_tables()
@@ -480,7 +578,7 @@ async def get_report(report_id: str, user=Depends(require_auth)):
 # REPORT CONTENT ENDPOINT (frontend contract: GET /api/reports/{id}/content)
 # =============================================================================
 
-@router.get("/{report_id}/content")
+@legacy_router.get("/{report_id}/content")
 async def get_report_content(report_id: str, user=Depends(require_auth)):
     """Get the content of a specific report (frontend contract match)."""
     _ensure_tables()
@@ -536,15 +634,81 @@ async def get_report_content(report_id: str, user=Depends(require_auth)):
         "status": report.get("status", "unknown"),
         "generated_at": validated_report.get("generated_at"),
         "generator_version": validated_report.get("generator_version"),
+        "sha256": validated_report.get("sha256", ""),
         "validation_warnings": validated_report.get("validation_warnings", []),
     }
+
+
+@legacy_router.get("/{report_id}/export/markdown")
+@v1_router.get("/{report_id}/export/markdown")
+async def export_report_markdown(report_id: str, user=Depends(require_auth)):
+    """Export a saved vulnerability report as Markdown."""
+    _ensure_tables()
+    user_id = user.get("sub", "")
+
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=503, detail=_db_unavailable_detail())
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM reports WHERE id = ?", (report_id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail={
+                "error": "NOT_FOUND", "detail": "Report not found"
+            })
+
+        columns = [desc[0] for desc in cursor.description]
+        report = dict(zip(columns, row))
+
+        if user.get("role") != "admin" and report["created_by"] != user_id:
+            raise HTTPException(status_code=403, detail={
+                "error": "FORBIDDEN", "detail": "Access denied"
+            })
+
+        validated_report = _finalize_report_for_response(report)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Failed to export markdown for report %s: %s", report_id, exc)
+        raise HTTPException(status_code=500, detail={
+            "error": "INTERNAL_ERROR", "detail": "Failed to export report markdown"
+        }) from exc
+    finally:
+        conn.close()
+
+    try:
+        content = _deserialize_report_content(validated_report.get("content", "{}"))
+        markdown = get_report_engine().export_markdown(
+            {**validated_report, "content": content}
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail={
+            "error": "VALIDATION_ERROR", "detail": str(exc)
+        }) from exc
+
+    try:
+        _append_report_export_record(
+            {**validated_report, "content": content},
+            export_format="markdown",
+            export_payload=markdown,
+        )
+    except ValueError as exc:
+        logger.error("Failed to append markdown export record for %s: %s", report_id, exc)
+        raise HTTPException(status_code=500, detail={
+            "error": "INTERNAL_ERROR",
+            "detail": "Failed to record markdown export metadata",
+        }) from exc
+
+    return PlainTextResponse(markdown, media_type="text/markdown")
 
 
 # =============================================================================
 # VIDEO RECORDING ENDPOINTS
 # =============================================================================
 
-@router.post("/videos/start")
+@legacy_router.post("/videos/start")
 async def start_video_recording(request: Request, user=Depends(require_auth)):
     """Start a new video recording session."""
     _ensure_tables()
@@ -599,7 +763,7 @@ async def start_video_recording(request: Request, user=Depends(require_auth)):
     return {"success": True, "recording": recording}
 
 
-@router.post("/videos/{video_id}/stop")
+@legacy_router.post("/videos/{video_id}/stop")
 async def stop_video_recording(video_id: str, request: Request, user=Depends(require_auth)):
     """Stop a video recording and save metadata."""
     _ensure_tables()
@@ -662,7 +826,7 @@ async def stop_video_recording(video_id: str, request: Request, user=Depends(req
     }
 
 
-@router.get("/videos")
+@legacy_router.get("/videos")
 async def list_videos(request: Request, user=Depends(require_auth)):
     """List video recordings for the authenticated user."""
     _ensure_tables()
@@ -705,3 +869,7 @@ async def list_videos(request: Request, user=Depends(require_auth)):
         conn.close()
 
     return {"success": True, "videos": videos}
+
+
+router.include_router(legacy_router)
+router.include_router(v1_router)

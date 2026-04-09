@@ -1,21 +1,33 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from safetensors.numpy import save_file as save_safetensors_file
 
 import backend.api.runtime_api as runtime_api
+import backend.training.auto_train_controller as auto_train_controller_module
+from backend.training.adaptive_learner import AdaptationEvent
 from backend.training.auto_train_controller import (
     AutoTrainConfig,
     AutoTrainController,
 )
 from backend.training.incremental_trainer import AccuracySnapshot
-from backend.training.safetensors_store import SafetensorsFeatureStore
+from backend.training.rl_feedback import OutcomeSignal, RLFeedbackCollector, RewardBuffer
+from backend.training.safetensors_store import (
+    FEATURE_DIM_METADATA_KEY,
+    FEATURE_TENSOR_KEY,
+    LABEL_TENSOR_KEY,
+    METADATA_JSON_KEY,
+    SafetensorsFeatureStore,
+)
 
 
 def _write_feature_shards(root: Path, sample_count: int, *, positive_ratio: float = 0.5) -> None:
@@ -32,6 +44,28 @@ def _write_feature_shards(root: Path, sample_count: int, *, positive_ratio: floa
             np.asarray([label], dtype=np.int64),
             metadata={"sample_index": index, "label": label},
         )
+
+
+def _write_invalid_feature_shard(
+    root: Path,
+    shard_name: str,
+    features: np.ndarray,
+    labels: np.ndarray,
+    *,
+    metadata: dict[str, object] | None = None,
+) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    save_safetensors_file(
+        {
+            FEATURE_TENSOR_KEY: np.asarray(features, dtype=np.float32),
+            LABEL_TENSOR_KEY: np.asarray(labels, dtype=np.int64),
+        },
+        str(root / f"{shard_name}.safetensors"),
+        metadata={
+            METADATA_JSON_KEY: json.dumps(metadata or {}, sort_keys=True),
+            FEATURE_DIM_METADATA_KEY: "256",
+        },
+    )
 
 
 class _FakeTrainer:
@@ -99,7 +133,7 @@ def _blocked_snapshot() -> AccuracySnapshot:
 
 def test_controller_skips_when_not_enough_new_samples(tmp_path):
     feature_root = tmp_path / "training" / "features_safetensors"
-    _write_feature_shards(feature_root, 50, positive_ratio=0.5)
+    _write_feature_shards(feature_root, 49, positive_ratio=0.5)
     trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot())
     controller = AutoTrainController(
         AutoTrainConfig(
@@ -113,8 +147,41 @@ def test_controller_skips_when_not_enough_new_samples(tmp_path):
     run = controller.check_and_train()
 
     assert run.status == "SKIPPED"
-    assert run.new_samples == 50
+    assert run.new_samples == 49
     assert trainer.calls == 0
+
+
+def test_controller_uses_adaptive_threshold_for_small_dataset(tmp_path):
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_feature_shards(feature_root, 100, positive_ratio=0.5)
+    trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=200,
+        ),
+        trainer=trainer,
+    )
+
+    run = controller.check_and_train()
+
+    assert run.status == "COMPLETED"
+    assert trainer.calls == 1
+
+
+def test_compute_trigger_threshold_mid_sized_dataset(tmp_path):
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_feature_shards(feature_root, 5000, positive_ratio=0.5)
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+        ),
+        trainer=_FakeTrainer(tmp_path, snapshot=_passing_snapshot()),
+    )
+
+    assert controller._compute_trigger_threshold() == 200
 
 
 def test_controller_trains_when_enough_new_samples_exist(tmp_path):
@@ -155,6 +222,71 @@ def test_controller_failed_quality_gate_returns_failed(tmp_path):
     assert run.status == "FAILED"
     assert run.error == "dataset_quality_failed"
     assert trainer.calls == 0
+
+
+def test_controller_fails_when_purity_rejects_all_rows(tmp_path, caplog):
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_invalid_feature_shard(
+        feature_root,
+        "invalid_zero_row",
+        np.zeros((1, 256), dtype=np.float32),
+        np.asarray([1], dtype=np.int64),
+        metadata={"sample_sha256": "invalid-zero-row"},
+    )
+    trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=1,
+        ),
+        trainer=trainer,
+    )
+
+    with caplog.at_level(logging.CRITICAL, logger="ygb.training.auto_train_controller"):
+        run = controller.check_and_train()
+
+    assert run.status == "FAILED"
+    assert run.error == "data purity rejected all feature rows"
+    assert trainer.calls == 0
+    assert any(
+        record.levelno == logging.CRITICAL and "data purity failed" in record.getMessage()
+        for record in caplog.records
+    )
+
+
+def test_load_all_shards_filters_invalid_rows_before_returning(tmp_path):
+    feature_root = tmp_path / "training" / "features_safetensors"
+    store = SafetensorsFeatureStore(feature_root)
+    store.write(
+        "valid_row",
+        np.linspace(0.01, 1.01, 256, dtype=np.float32).reshape(1, 256),
+        np.asarray([1], dtype=np.int64),
+        metadata={"sample_sha256": "valid-row"},
+    )
+    _write_invalid_feature_shard(
+        feature_root,
+        "constant_row",
+        np.full((1, 256), 0.5, dtype=np.float32),
+        np.asarray([0], dtype=np.int64),
+        metadata={"sample_sha256": "constant-row"},
+    )
+    trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=1,
+        ),
+        trainer=trainer,
+    )
+
+    features, labels, row_ids, shard_count = controller._load_all_shards()
+
+    assert shard_count == 2
+    assert features.shape == (1, 256)
+    assert labels.tolist() == [1]
+    assert row_ids == ["valid-row"]
 
 
 def test_controller_only_promotes_when_readiness_thresholds_are_met(tmp_path):
@@ -221,6 +353,150 @@ def test_get_last_run_returns_latest_entry(tmp_path):
 
     assert controller.get_last_run() == second_run
     assert first_run.run_id != second_run.run_id
+
+
+def test_controller_passes_reward_weight_lookup_to_trainer(tmp_path, monkeypatch):
+    class _WeightCapturingTrainer(_FakeTrainer):
+        def __init__(self, root: Path, *, snapshot: AccuracySnapshot) -> None:
+            super().__init__(root, snapshot=snapshot)
+            self.sample_weights = None
+
+        def run_incremental_epoch(self, sample_weights=None):
+            self.sample_weights = sample_weights
+            return super().run_incremental_epoch()
+
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_feature_shards(feature_root, 120, positive_ratio=0.5)
+    reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
+    reward_buffer.add(
+        OutcomeSignal(
+            sample_id="sample_0000",
+            cve_id="CVE-2026-9000",
+            predicted_severity="HIGH",
+            outcome="kev_exploit_confirmed",
+            reward=1.0,
+            source="cisa_kev",
+        )
+    )
+    collector = RLFeedbackCollector(reward_buffer=reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_reward_buffer", lambda: reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_rl_collector", lambda: collector)
+    trainer = _WeightCapturingTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=100,
+        ),
+        trainer=trainer,
+    )
+
+    run = controller.check_and_train()
+
+    assert run.status == "COMPLETED"
+    assert trainer.sample_weights is not None
+    assert trainer.sample_weights["sample_0000"] == pytest.approx(2.0)
+
+
+def test_controller_get_rl_stats_returns_correct_counts(tmp_path, monkeypatch):
+    reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
+    reward_buffer.add(
+        OutcomeSignal(
+            sample_id="sample-1",
+            cve_id="CVE-2026-9101",
+            predicted_severity="HIGH",
+            outcome="kev_exploit_confirmed",
+            reward=1.0,
+            source="cisa_kev",
+        )
+    )
+    reward_buffer.add(
+        OutcomeSignal(
+            sample_id="sample-2",
+            cve_id="CVE-2026-9102",
+            predicted_severity="LOW",
+            outcome="kev_exploit_confirmed",
+            reward=-0.5,
+            source="cisa_kev",
+        )
+    )
+    collector = RLFeedbackCollector(reward_buffer=reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_reward_buffer", lambda: reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_rl_collector", lambda: collector)
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=tmp_path / "training" / "features_safetensors",
+            checkpoints_root=tmp_path / "checkpoints",
+        ),
+        trainer=_FakeTrainer(tmp_path, snapshot=_passing_snapshot()),
+    )
+
+    assert controller.get_rl_stats() == {
+        "total_signals": 2,
+        "mean_reward": pytest.approx(0.25),
+        "positive_signals": 1,
+        "negative_signals": 1,
+    }
+
+
+def test_controller_records_and_exposes_adaptation_events(tmp_path, monkeypatch):
+    class _FakeAdaptiveLearner:
+        def __init__(self) -> None:
+            self.calls: list[dict[str, object]] = []
+            self.event = AdaptationEvent(
+                event_id="event-1",
+                observed_at="2026-04-08T00:00:00+00:00",
+                severity_counts={"NEGATIVE": 60, "POSITIVE": 60},
+                baseline_distribution={"NEGATIVE": 0.5, "POSITIVE": 0.5},
+                current_distribution={"NEGATIVE": 0.5, "POSITIVE": 0.5},
+                js_distance=0.25,
+                threshold=0.2,
+                history_depth=2,
+                fisher_sample_count=120,
+            )
+
+        def on_new_grab_cycle(self, severity_counts, model=None, prev_dataloader=None):
+            self.calls.append(
+                {
+                    "severity_counts": dict(severity_counts),
+                    "model": model,
+                    "has_prev_dataloader": prev_dataloader is not None,
+                }
+            )
+            return self.event
+
+        def get_events(self):
+            return [self.event]
+
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_feature_shards(feature_root, 120, positive_ratio=0.5)
+    fake_learner = _FakeAdaptiveLearner()
+    monkeypatch.setattr(
+        auto_train_controller_module,
+        "get_adaptive_learner",
+        lambda **kwargs: fake_learner,
+    )
+    trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=100,
+        ),
+        trainer=trainer,
+    )
+
+    run = controller.check_and_train()
+
+    assert run.status == "COMPLETED"
+    assert fake_learner.calls == [
+        {
+            "severity_counts": {"NEGATIVE": 60, "POSITIVE": 60},
+            "model": None,
+            "has_prev_dataloader": True,
+        }
+    ]
+    assert controller.get_adaptation_events() == [fake_learner.event]
 
 
 def test_status_endpoint_returns_requested_shape(monkeypatch):

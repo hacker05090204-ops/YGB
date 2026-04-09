@@ -33,6 +33,16 @@ class TestReportGeneratorModule(unittest.TestCase):
         self.assertIn("/api/reports/videos", routes, "GET /api/reports/videos")
         self.assertIn("/api/reports/{report_id}", routes, "GET /api/reports/{id}")
         self.assertIn("/api/reports/{report_id}/content", routes, "GET /api/reports/{id}/content")
+        self.assertIn(
+            "/api/reports/{report_id}/export/markdown",
+            routes,
+            "GET /api/reports/{id}/export/markdown should be registered",
+        )
+        self.assertIn(
+            "/api/v1/reports/{report_id}/export/markdown",
+            routes,
+            "GET /api/v1/reports/{id}/export/markdown should be registered",
+        )
 
     def test_generate_id_format(self):
         """Generated IDs should have the correct prefix format."""
@@ -121,6 +131,18 @@ class TestReportValidation(unittest.TestCase):
         self.assertEqual(report["generator_version"], "1.0")
         parsed = datetime.fromisoformat(report["generated_at"].replace("Z", "+00:00"))
         self.assertIsNotNone(parsed)
+
+    def test_finalize_report_surfaces_sha256_from_metadata(self):
+        from backend.api.report_generator import _finalize_report_for_response
+
+        report = _finalize_report_for_response({
+            "id": "rpt-sha",
+            "title": "Generated Report",
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "metadata_json": json.dumps({"sha256": "a" * 64}),
+        })
+
+        self.assertEqual(report["sha256"], "a" * 64)
 
 
 class TestVideoRecordingMetadata(unittest.TestCase):

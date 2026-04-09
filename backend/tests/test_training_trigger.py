@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+from dataclasses import replace
 import json
 import logging
 from datetime import datetime, timedelta, timezone
@@ -27,6 +28,11 @@ from backend.training.incremental_trainer import (
     _StreamingFeatureDataset,
 )
 from backend.training.state_manager import TrainingMetrics, TrainingPausedException, TrainingStateManager
+from backend.training.training_optimizer import (
+    EarlyStopping,
+    HardNegativeMiner,
+    WarmupCosineScheduler,
+)
 
 
 class FakeStateManager:
@@ -333,6 +339,30 @@ def test_dataset_quality_report_fields_correct_for_known_inputs():
         "LOW": pytest.approx(0.2),
         "INFORMATIONAL": pytest.approx(0.2),
     }
+    assert report.failed_reasons == []
+
+
+def test_dataset_quality_gate_passes_realistic_cve_distribution():
+    severities = (
+        ["HIGH"] * 40
+        + ["MEDIUM"] * 35
+        + ["CRITICAL"] * 15
+        + ["LOW"] * 8
+        + ["INFORMATIONAL"] * 2
+    )
+    samples = [
+        {
+            "cve_id": f"CVE-2026-{index:05d}",
+            "severity": severity,
+            "quality_score": 0.6,
+            "raw_text": f"realistic sample {index}",
+        }
+        for index, severity in enumerate(severities)
+    ]
+
+    report = DatasetQualityGate().validate(samples)
+
+    assert report.passed is True
     assert report.failed_reasons == []
 
 
@@ -712,8 +742,8 @@ def test_incremental_trainer_run_epoch_cuda_scaler_branch(monkeypatch, tmp_path)
     monkeypatch.setattr("backend.training.incremental_trainer.precision_score", lambda *args, **kwargs: 0.85)
     monkeypatch.setattr("backend.training.incremental_trainer.recall_score", lambda *args, **kwargs: 0.85)
     monkeypatch.setattr("backend.training.incremental_trainer.f1_score", lambda *args, **kwargs: 0.85)
-    monkeypatch.setattr("backend.training.incremental_trainer.torch.amp.GradScaler", lambda *args, **kwargs: FakeScaler())
-    monkeypatch.setattr("backend.training.incremental_trainer.torch.amp.autocast", lambda *args, **kwargs: nullcontext())
+    monkeypatch.setattr("backend.training.incremental_trainer.torch.cuda.amp.GradScaler", lambda *args, **kwargs: FakeScaler())
+    monkeypatch.setattr("backend.training.incremental_trainer.torch.cuda.amp.autocast", lambda *args, **kwargs: nullcontext())
     monkeypatch.setattr(torch.Tensor, "to", lambda self, *args, **kwargs: self, raising=False)
 
     trainer = IncrementalTrainer(
@@ -785,6 +815,139 @@ def test_incremental_trainer_optimizer_helpers_cover_cpu_and_scaler(monkeypatch,
     assert scaler.unscaled is True
     assert scaler.stepped is True
     assert scaler.updated is True
+
+
+def test_incremental_trainer_train_uses_sample_weights_in_loss(monkeypatch, tmp_path):
+    class FixedLogitModel(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.bias = torch.nn.Parameter(torch.zeros(2, dtype=torch.float32))
+
+        def forward(self, features: torch.Tensor) -> torch.Tensor:
+            return features + self.bias
+
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.model = FixedLogitModel()
+    trainer.device = torch.device("cpu")
+
+    features = torch.tensor([[2.0, 0.0], [0.0, 2.0]], dtype=torch.float32)
+    labels = torch.tensor([0, 0], dtype=torch.long)
+    dataset_indices = torch.tensor([0, 1], dtype=torch.long)
+    train_loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(features, labels, dataset_indices),
+        batch_size=2,
+        shuffle=False,
+    )
+    criterion = torch.nn.CrossEntropyLoss(reduction="none")
+    base_losses = criterion(features, labels)
+
+    weighted_loss = trainer.train(
+        train_loader,
+        torch.optim.SGD(trainer.model.parameters(), lr=0.0),
+        torch.optim.lr_scheduler.LambdaLR(
+            torch.optim.SGD(trainer.model.parameters(), lr=0.0),
+            lr_lambda=lambda _: 1.0,
+        ),
+        criterion,
+        None,
+        sample_weights=[1.0, 3.0],
+    )
+    unweighted_loss = trainer.train(
+        train_loader,
+        torch.optim.SGD(trainer.model.parameters(), lr=0.0),
+        torch.optim.lr_scheduler.LambdaLR(
+            torch.optim.SGD(trainer.model.parameters(), lr=0.0),
+            lr_lambda=lambda _: 1.0,
+        ),
+        criterion,
+        None,
+        sample_weights=None,
+    )
+
+    expected_weighted_loss = float(
+        ((base_losses * torch.tensor([1.0, 3.0])).sum() / 4.0).item()
+    )
+    expected_unweighted_loss = float(base_losses.mean().item())
+
+    assert weighted_loss == pytest.approx(expected_weighted_loss)
+    assert unweighted_loss == pytest.approx(expected_unweighted_loss)
+    assert weighted_loss > unweighted_loss
+
+
+def test_incremental_trainer_train_adds_ewc_loss(monkeypatch, tmp_path, caplog):
+    class FixedLogitModel(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.bias = torch.nn.Parameter(torch.zeros(2, dtype=torch.float32))
+
+        def forward(self, features: torch.Tensor) -> torch.Tensor:
+            return features + self.bias
+
+    class _StubAdaptiveLearner:
+        def __init__(self) -> None:
+            self.attached_model = None
+
+        def attach_model(self, model: torch.nn.Module) -> None:
+            self.attached_model = model
+
+        def get_ewc_loss(self) -> torch.Tensor:
+            return torch.tensor(0.25, dtype=torch.float32)
+
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.model = FixedLogitModel()
+    trainer.device = torch.device("cpu")
+    trainer.adaptive_learner = _StubAdaptiveLearner()
+
+    features = torch.tensor([[2.0, 0.0], [0.0, 2.0]], dtype=torch.float32)
+    labels = torch.tensor([0, 0], dtype=torch.long)
+    train_loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(features, labels),
+        batch_size=2,
+        shuffle=False,
+    )
+    criterion = torch.nn.CrossEntropyLoss(reduction="none")
+    optimizer = torch.optim.SGD(trainer.model.parameters(), lr=0.0)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer,
+        lr_lambda=lambda _: 1.0,
+    )
+    base_losses = criterion(features, labels)
+
+    with caplog.at_level(logging.DEBUG, logger="ygb.training.incremental_trainer"):
+        total_loss = trainer.train(
+            train_loader,
+            optimizer,
+            scheduler,
+            criterion,
+            None,
+            sample_weights=None,
+        )
+
+    assert total_loss == pytest.approx(float(base_losses.mean().item() + 0.25))
+    assert trainer.adaptive_learner.attached_model is trainer.model
+    assert any("mean_ewc_loss" in record.getMessage() for record in caplog.records)
 
 
 def test_incremental_trainer_circuit_breaker_rolls_back(monkeypatch, tmp_path):
@@ -872,6 +1035,7 @@ def test_incremental_trainer_rolls_back_when_f1_drops_more_than_threshold(monkey
         raw_data_root=tmp_path / "raw",
         num_workers=0,
     )
+    trainer.optimizer_config = replace(trainer.optimizer_config, max_epochs=1)
     trainer.load_new_samples = lambda: _quality_gate_samples(100)
     rollback_calls: list[str] = []
     trainer._load_best_checkpoint = lambda: rollback_calls.append("rollback")
@@ -959,6 +1123,288 @@ def test_incremental_trainer_insufficient_samples(monkeypatch, tmp_path):
     result = trainer.run_incremental_epoch()
     assert result.samples_processed == 5
     assert result.rollback is False
+
+
+def test_warmup_cosine_scheduler_warmup_then_decay():
+    parameter = torch.nn.Parameter(torch.tensor([1.0], dtype=torch.float32))
+    optimizer = torch.optim.SGD([parameter], lr=0.1)
+    scheduler = WarmupCosineScheduler(
+        optimizer,
+        total_steps=6,
+        warmup_steps=2,
+        min_lr=0.001,
+        warmup_start_factor=0.1,
+    )
+
+    learning_rates = [optimizer.param_groups[0]["lr"]]
+    for _ in range(6):
+        optimizer.step()
+        scheduler.step()
+        learning_rates.append(optimizer.param_groups[0]["lr"])
+
+    assert learning_rates[0] < learning_rates[1] < learning_rates[2]
+    assert learning_rates[2] > learning_rates[3] > learning_rates[4]
+    assert learning_rates[-1] >= 0.001
+
+
+def test_early_stopping_triggers_after_patience_exhaustion():
+    early_stopper = EarlyStopping(patience=2, min_delta=0.0)
+
+    assert early_stopper.step(1.0) is False
+    assert early_stopper.step(1.0) is False
+    assert early_stopper.step(1.0) is True
+
+
+def test_hard_negative_miner_returns_expected_hard_indices():
+    miner = HardNegativeMiner(max_hard_examples=2)
+
+    hard_indices = miner.mine(
+        losses=[0.10, 1.10, 0.25, 0.90],
+        labels=[0, 0, 1, 0],
+        positive_probabilities=[0.05, 0.95, 0.80, 0.70],
+        dataset_indices=[10, 11, 12, 13],
+    )
+
+    assert hard_indices == [11, 13]
+
+
+def test_incremental_trainer_train_logs_val_loss_and_uses_validation_split(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    samples = _quality_gate_samples(100)
+    train_loader, val_loader = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+    )
+    config = replace(
+        trainer.optimizer_config,
+        max_epochs=1,
+        use_amp=False,
+    )
+    optimizer = torch.optim.AdamW(
+        trainer.model.parameters(),
+        lr=config.learning_rate,
+        weight_decay=0.01,
+    )
+    scheduler = WarmupCosineScheduler(
+        optimizer,
+        total_steps=1,
+        warmup_steps=1,
+        min_lr=config.min_learning_rate,
+        warmup_start_factor=config.warmup_start_factor,
+    )
+
+    with caplog.at_level(logging.INFO, logger="ygb.training.incremental_trainer"):
+        summary = trainer.train(
+            train_loader,
+            optimizer,
+            scheduler,
+            torch.nn.CrossEntropyLoss(reduction="none"),
+            None,
+            sample_weights=None,
+            val_loader=val_loader,
+            eval_criterion=torch.nn.CrossEntropyLoss(),
+            optimiser_config=config,
+            return_history=True,
+        )
+
+    assert len(train_loader.dataset) == 90
+    assert len(val_loader.dataset) == 10
+    assert summary.eval_loss >= 0.0
+    assert "val_loss=" in caplog.text
+
+
+def test_incremental_trainer_validation_split_is_deterministic(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    samples = _quality_gate_samples(100)
+
+    train_loader_a, val_loader_a = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+    )
+    train_loader_b, val_loader_b = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+    )
+
+    assert list(train_loader_a.dataset.sample_indices) == list(train_loader_b.dataset.sample_indices)
+    assert list(val_loader_a.dataset.sample_indices) == list(val_loader_b.dataset.sample_indices)
+
+
+def test_incremental_trainer_epoch_log_contains_all_required_fields(monkeypatch, tmp_path, caplog):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    samples = _quality_gate_samples(100)
+    train_loader, val_loader = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+    )
+    config = replace(
+        trainer.optimizer_config,
+        max_epochs=1,
+        use_amp=False,
+    )
+    optimizer = torch.optim.AdamW(
+        trainer.model.parameters(),
+        lr=config.learning_rate,
+        weight_decay=0.01,
+    )
+    scheduler = WarmupCosineScheduler(
+        optimizer,
+        total_steps=1,
+        warmup_steps=1,
+        min_lr=config.min_learning_rate,
+        warmup_start_factor=config.warmup_start_factor,
+    )
+
+    with caplog.at_level(logging.INFO, logger="ygb.training.incremental_trainer"):
+        trainer.train(
+            train_loader,
+            optimizer,
+            scheduler,
+            torch.nn.CrossEntropyLoss(reduction="none"),
+            None,
+            sample_weights=None,
+            val_loader=val_loader,
+            eval_criterion=torch.nn.CrossEntropyLoss(),
+            optimiser_config=config,
+            return_history=True,
+        )
+
+    epoch_logs = [
+        record.getMessage()
+        for record in caplog.records
+        if "epoch 1/1 | lr=" in record.getMessage()
+    ]
+    assert epoch_logs
+    log_line = epoch_logs[-1]
+    for token in ("train_loss=", "val_loss=", "f1=", "precision=", "recall=", "ewc_loss="):
+        assert token in log_line
+
+
+def test_incremental_trainer_saves_deterministic_checkpoint_name(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
+
+    result = trainer.run_incremental_epoch()
+
+    expected = trainer.model_path.parent / f"checkpoint_{trainer.model_path.stem}_{result.epoch_number}_{result.f1:.3f}.pt"
+    assert expected.exists()
+
+
+def test_incremental_trainer_train_early_stops_before_max_epochs_when_val_loss_is_flat(
+    monkeypatch,
+    tmp_path,
+):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    samples = _quality_gate_samples(100)
+    train_loader, val_loader = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+    )
+    config = replace(
+        trainer.optimizer_config,
+        learning_rate=0.0,
+        min_learning_rate=0.0,
+        max_epochs=5,
+        patience=1,
+        use_amp=False,
+    )
+    optimizer = torch.optim.AdamW(
+        trainer.model.parameters(),
+        lr=config.learning_rate,
+        weight_decay=0.01,
+    )
+    scheduler = WarmupCosineScheduler(
+        optimizer,
+        total_steps=config.max_epochs,
+        warmup_steps=1,
+        min_lr=config.min_learning_rate,
+        warmup_start_factor=1.0,
+    )
+
+    summary = trainer.train(
+        train_loader,
+        optimizer,
+        scheduler,
+        torch.nn.CrossEntropyLoss(reduction="none"),
+        None,
+        sample_weights=None,
+        val_loader=val_loader,
+        eval_criterion=torch.nn.CrossEntropyLoss(),
+        optimiser_config=config,
+        return_history=True,
+    )
+
+    assert summary.early_stopped is True
+    assert summary.epochs_completed < config.max_epochs
 
 
 def test_data_watcher_triggers_on_file_count_and_time(monkeypatch, tmp_path):

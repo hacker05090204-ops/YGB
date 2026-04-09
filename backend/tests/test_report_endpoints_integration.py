@@ -30,6 +30,7 @@ class TestReportEndpointsRealDB(unittest.TestCase):
             "DATABASE_URL": f"sqlite:///{cls.db_path}",
             "YGB_TEMP_AUTH_BYPASS": "true",
             "YGB_HDD_ROOT": cls.tmp_dir,
+            "YGB_REPORT_OUTPUT_DIR": os.path.join(cls.tmp_dir, "generated_reports"),
         }
         cls.patcher = patch.dict(os.environ, cls.env_patches)
         cls.patcher.start()
@@ -70,6 +71,7 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         self.assertEqual(data["report"]["title"], "SQL Injection in Login")
         self.assertEqual(data["report"]["status"], "draft")
         self.assertEqual(data["report"]["generator_version"], "1.0")
+        self.assertEqual(len(data["report"]["sha256"]), 64)
         self.assertIsNotNone(
             datetime.fromisoformat(data["report"]["generated_at"].replace("Z", "+00:00"))
         )
@@ -134,8 +136,19 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         """GET /api/reports/{id}/content — get report content."""
         create_resp = self.client.post("/api/reports", json={
             "title": "Content Test Report",
-            "content": {"findings": [{"id": 1, "title": "XSS"}]},
+            "content": {
+                "findings": [
+                    {
+                        "finding_id": "FND-CONTENT-1",
+                        "title": "Cross-site scripting",
+                        "description": "Reflected cross-site scripting in the search endpoint allows arbitrary JavaScript execution in victim browsers.",
+                        "severity": "HIGH",
+                        "cvss_score": 8.1,
+                    }
+                ]
+            },
         })
+        self.assertEqual(create_resp.status_code, 200)
         report_id = create_resp.json()["report"]["id"]
 
         resp = self.client.get(f"/api/reports/{report_id}/content")
@@ -146,6 +159,108 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         self.assertIn("findings", data["content"])
         self.assertIn("generated_at", data)
         self.assertEqual(data["generator_version"], "1.0")
+        self.assertEqual(len(data["sha256"]), 64)
+
+    def test_create_report_with_findings_uses_report_engine(self):
+        """POST /api/reports — findings payloads should use the report engine."""
+        resp = self.client.post("/api/reports", json={
+            "title": "Engine-backed report",
+            "description": "Engine-backed vulnerability report",
+            "content": {
+                "scan_target": "api.example.com",
+                "findings": [
+                    {
+                        "finding_id": "FND-200",
+                        "title": "SQL injection in login",
+                        "description": "Union-based SQL injection in the login workflow allows authentication bypass across multiple application roles.",
+                        "severity": "HIGH",
+                        "cvss_score": 8.8,
+                        "model_confidence": 0.91,
+                        "cve_id": "CVE-2026-2200",
+                    }
+                ],
+            },
+        })
+
+        self.assertEqual(resp.status_code, 200)
+        payload = resp.json()["report"]
+        self.assertEqual(len(payload["sha256"]), 64)
+        self.assertIn("executive_summary", payload["content"])
+        self.assertIn("sections", payload["content"])
+        self.assertEqual(payload["content"]["findings"][0]["finding_id"], "FND-200")
+
+        metadata = json.loads(payload["metadata_json"])
+        self.assertTrue(os.path.exists(metadata["report_storage_path"]))
+
+    def test_create_report_with_empty_findings_returns_validation_error(self):
+        """POST /api/reports — empty findings should be rejected."""
+        resp = self.client.post("/api/reports", json={
+            "title": "Invalid findings report",
+            "content": {"findings": []},
+        })
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()["detail"]["error"], "VALIDATION_ERROR")
+
+    def test_export_markdown_endpoint_returns_saved_report_markdown(self):
+        """GET /api/reports/{id}/export/markdown — export saved report markdown."""
+        create_resp = self.client.post("/api/reports", json={
+            "title": "Markdown report",
+            "description": "Markdown export coverage",
+            "content": {
+                "findings": [
+                    {
+                        "finding_id": "FND-300",
+                        "title": "Cross-site scripting",
+                        "description": "Reflected cross-site scripting in the search endpoint allows arbitrary JavaScript execution in victim browsers.",
+                        "severity": "HIGH",
+                        "cvss_score": 8.0,
+                    },
+                    {
+                        "finding_id": "FND-301",
+                        "title": "Missing CSRF protection",
+                        "description": "The account settings workflow accepts state-changing POST requests without an anti-CSRF token or same-site validation.",
+                        "severity": "MEDIUM",
+                        "cvss_score": 6.4,
+                    },
+                ]
+            },
+        })
+        report_id = create_resp.json()["report"]["id"]
+
+        resp = self.client.get(f"/api/reports/{report_id}/export/markdown")
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.headers["content-type"].startswith("text/markdown"))
+        self.assertIn("FND-300", resp.text)
+        self.assertIn("FND-301", resp.text)
+        self.assertIn("## Executive Summary", resp.text)
+
+    def test_export_markdown_v1_endpoint_returns_saved_report_markdown(self):
+        """GET /api/v1/reports/{id}/export/markdown — export saved report markdown."""
+        create_resp = self.client.post("/api/reports", json={
+            "title": "Markdown v1 report",
+            "description": "Markdown export v1 coverage",
+            "content": {
+                "findings": [
+                    {
+                        "finding_id": "FND-400",
+                        "title": "Privilege escalation",
+                        "description": "A privilege escalation path in the administrative API allows low-privilege users to invoke actions reserved for tenant administrators.",
+                        "severity": "HIGH",
+                        "cvss_score": 8.4,
+                    }
+                ]
+            },
+        })
+        report_id = create_resp.json()["report"]["id"]
+
+        resp = self.client.get(f"/api/v1/reports/{report_id}/export/markdown")
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.headers["content-type"].startswith("text/markdown"))
+        self.assertIn("FND-400", resp.text)
+        self.assertIn("## Executive Summary", resp.text)
 
     def test_get_report_content_not_found(self):
         """GET /api/reports/{id}/content — 404 for non-existent."""

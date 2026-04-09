@@ -201,6 +201,34 @@ class SampleQualityScorer:
                 return 1.0
         return 0.5 if saw_unknown else 0.0
 
+    @staticmethod
+    def _coerce_cvss_score(payload: dict[str, object]) -> float | None:
+        raw_score = payload.get("cvss_score")
+        if raw_score in (None, ""):
+            return None
+        try:
+            return float(raw_score)
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def _normalize_severity(cls, payload: dict[str, object]) -> str:
+        severity = str(payload.get("severity", "") or "").strip().upper()
+        if severity and severity != "UNKNOWN":
+            return severity
+
+        cvss_score = cls._coerce_cvss_score(payload)
+        if cvss_score is not None:
+            if cvss_score >= 9.0:
+                return "CRITICAL"
+            if cvss_score >= 7.0:
+                return "HIGH"
+            if cvss_score >= 4.0:
+                return "MEDIUM"
+            return "LOW"
+
+        return "INFORMATIONAL"
+
     def score(self, sample: dict[str, object] | IngestedSample) -> float:
         payload = self._coerce_sample(sample)
         text = self._extract_text(payload)
@@ -243,6 +271,7 @@ class SampleQualityScorer:
     ) -> tuple[bool, str | None, float]:
         payload = self._coerce_sample(sample)
         quality_score = self.score(payload)
+        payload["severity"] = self._normalize_severity(payload)
         self._apply_annotations(sample, payload)
         self.last_score = quality_score
         self.last_text_hash = str(payload.get("text_hash", "") or "")
@@ -251,7 +280,6 @@ class SampleQualityScorer:
 
         description = self._extract_text(payload).strip()
         cve_id = str(payload.get("cve_id", "") or "").strip()
-        severity = str(payload.get("severity", "") or "").strip().upper()
         duplicate = False
         duplicate_reason = ""
         if not ignore_duplicates and (cve_id or self.last_text_hash):
@@ -268,8 +296,6 @@ class SampleQualityScorer:
             reason = "description_too_short"
         elif not cve_id:
             reason = "missing_cve_id"
-        elif not severity or severity == "UNKNOWN":
-            reason = "missing_severity"
         elif quality_score < 0.4:
             reason = "low_quality_score"
         elif duplicate:

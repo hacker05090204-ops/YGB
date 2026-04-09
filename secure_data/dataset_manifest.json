@@ -1,19 +1,29 @@
 {
-  "version": "2.0",
-  "generated_at": "2026-04-04T05:58:00Z",
-  "source": "NVD_API_v2_bulk_ingest",
-  "sample_count": 126000,
-  "verified_count": 126000,
-  "field_schema": [
-    "endpoint",
-    "parameters",
-    "exploit_vector",
-    "impact",
-    "source_tag",
-    "reliability"
-  ],
+  "schema_version": 1,
+  "dataset_source": "INGESTION_PIPELINE",
+  "total_samples": 127347,
+  "verified_samples": 127347,
+  "per_field_counts": {
+    "endpoint": 0,
+    "parameters": 0,
+    "exploit_vector": 0,
+    "impact": 0,
+    "source_tag": 0,
+    "reliability": 0
+  },
+  "source_mix": {},
   "strict_real_mode": true,
-  "threshold": 125000,
-  "deficit": 0,
-  "go_no_go": "GO"
+  "updated_at": "2026-04-08T20:03:51.439568+00:00",
+  "ingestion_manifest_hash": "d4c35b218e38c3f2",
+  "worker_stats": {
+    "total_ingested": 0,
+    "total_dropped": 4,
+    "total_deduped": 0
+  },
+  "sample_count": 127347,
+  "dataset_hash": "d4c35b218e38c3f2",
+  "signed_by": "3e1a64c5cb00d8cbdbea8095936731bc9eb5290716b2a393249c7e9b1634ca69",
+  "version": "1.0",
+  "created_at": "2026-04-08T20:03:51.439568+00:00",
+  "signature_hash": "8d46307ea13e62044bd24640cdb7129108aaf19d8d7c92bc3391d6ac74a31282"
 }

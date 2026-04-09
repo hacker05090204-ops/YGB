@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 import threading
 import time
@@ -12,7 +13,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
+from backend.training.adaptive_learner import AdaptationEvent, get_adaptive_learner
+from backend.training.data_purity import AllRowsRejectedError, DataPurityEnforcer
 from backend.training.incremental_trainer import (
     DEFAULT_BASELINE_PATH,
     DEFAULT_FEATURE_STORE_ROOT,
@@ -21,6 +26,7 @@ from backend.training.incremental_trainer import (
     DatasetQualityGate,
     IncrementalTrainer,
 )
+from backend.training.rl_feedback import get_reward_buffer, get_rl_collector
 from backend.training.runtime_status_validator import validate_promotion_readiness
 from backend.training.safetensors_store import FEATURE_DIM, SafetensorsFeatureStore
 
@@ -71,11 +77,18 @@ class AutoTrainController:
         self.config = config or AutoTrainConfig()
         self.feature_store = SafetensorsFeatureStore(self.config.feature_store_root)
         self.dataset_quality_gate = DatasetQualityGate()
+        self._purity_enforcer = DataPurityEnforcer()
+        self._rl_collector = get_rl_collector()
+        self._reward_buffer = get_reward_buffer()
         self.trainer = trainer or IncrementalTrainer(
             model_path=self.config.checkpoints_root / DEFAULT_MODEL_PATH.name,
             state_path=self.config.checkpoints_root / DEFAULT_STATE_PATH.name,
             baseline_path=self.config.checkpoints_root / DEFAULT_BASELINE_PATH.name,
             feature_store_root=self.config.feature_store_root,
+        )
+        self.adaptive_learner = get_adaptive_learner(
+            state_path=self.config.checkpoints_root / "adaptive_learning_state.json",
+            ewc_state_path=self.config.checkpoints_root / "adaptive_ewc_state.safetensors",
         )
         self._state_lock = threading.Lock()
         self._stop_event = threading.Event()
@@ -224,6 +237,18 @@ class AutoTrainController:
             "last_run": asdict(last_run) if last_run is not None else None,
         }
 
+    def get_rl_stats(self) -> dict[str, float | int]:
+        stats = self._reward_buffer.stats()
+        return {
+            "total_signals": int(stats["total_signals"]),
+            "mean_reward": float(stats["mean_reward"]),
+            "positive_signals": int(stats["positive_signals"]),
+            "negative_signals": int(stats["negative_signals"]),
+        }
+
+    def get_adaptation_events(self) -> list[AdaptationEvent]:
+        return self.adaptive_learner.get_events()
+
     def _run_loop(self) -> None:
         logger.info("auto train scheduler thread entered")
         try:
@@ -298,14 +323,36 @@ class AutoTrainController:
             self._append_or_replace_run_locked(run)
         return run
 
-    def _load_store_snapshot(self) -> tuple[np.ndarray, np.ndarray, int]:
+    @staticmethod
+    def _shard_row_ids(shard_name: str, metadata: dict[str, Any], row_count: int) -> list[str]:
+        raw_row_ids = metadata.get("row_ids")
+        if isinstance(raw_row_ids, (list, tuple)):
+            coerced_row_ids = [str(value) for value in raw_row_ids]
+            if len(coerced_row_ids) == row_count:
+                return coerced_row_ids
+        sample_sha256 = str(metadata.get("sample_sha256") or metadata.get("sample_id") or "").strip()
+        if row_count == 1:
+            return [sample_sha256 or shard_name]
+        return [f"{shard_name}:{index}" for index in range(row_count)]
+
+    def _load_all_shards(self) -> tuple[np.ndarray, np.ndarray, list[str], int]:
         shard_names = self.feature_store.list_shards()
         feature_batches: list[np.ndarray] = []
         label_batches: list[np.ndarray] = []
+        row_ids: list[str] = []
         for shard_name in shard_names:
             shard = self.feature_store.read(shard_name)
-            feature_batches.append(np.asarray(shard.features, dtype=np.float32))
-            label_batches.append(np.asarray(shard.labels, dtype=np.int64))
+            shard_features = np.asarray(shard.features, dtype=np.float32)
+            shard_labels = np.asarray(shard.labels, dtype=np.int64)
+            feature_batches.append(shard_features)
+            label_batches.append(shard_labels)
+            row_ids.extend(
+                self._shard_row_ids(
+                    shard_name,
+                    shard.metadata,
+                    int(shard_labels.shape[0]),
+                )
+            )
 
         if feature_batches:
             features = np.concatenate(feature_batches, axis=0)
@@ -317,11 +364,141 @@ class AutoTrainController:
             labels = np.empty((0,), dtype=np.int64)
 
         shard_count = len(shard_names)
+        try:
+            features, labels, row_ids, purity_result = self._purity_enforcer.enforce_feature_tensor(
+                features,
+                labels,
+                row_ids,
+            )
+        except AllRowsRejectedError:
+            with self._state_lock:
+                self._last_observed_shard_count = shard_count
+                self._last_observed_total_samples = 0
+            raise
         total_samples = int(labels.shape[0])
+        if purity_result.rejected_count:
+            logger.warning(
+                "auto train data purity filtered rows shard_count=%d rejected=%d reasons=%s",
+                shard_count,
+                purity_result.rejected_count,
+                purity_result.rejection_reasons,
+            )
         with self._state_lock:
             self._last_observed_shard_count = shard_count
             self._last_observed_total_samples = total_samples
-        return features, labels, shard_count
+        return features, labels, row_ids, shard_count
+
+    def _load_store_snapshot(self) -> tuple[np.ndarray, np.ndarray, list[str], int]:
+        return self._load_all_shards()
+
+    def _compute_trigger_threshold(self) -> int:
+        total = int(self.feature_store.total_samples())
+        if total < 500:
+            return 50
+        if total < 2000:
+            return 100
+        if total < 10000:
+            return 200
+        return 500
+
+    @staticmethod
+    def _log_run_summary(run: AutoTrainRun, *, threshold: int) -> None:
+        logger.info(
+            "auto train summary run_id=%s status=%s new_samples=%d threshold=%d total_samples=%d",
+            run.run_id,
+            run.status,
+            run.new_samples,
+            threshold,
+            run.total_samples,
+        )
+
+    def _build_reward_weight_lookup(self, row_ids: list[str]) -> dict[str, float] | None:
+        weighted_rewards = self._reward_buffer.get_weighted_signals()
+        if not weighted_rewards:
+            return None
+        sample_weights: dict[str, float] = {}
+        for row_id in row_ids:
+            if row_id not in weighted_rewards:
+                continue
+            sample_weights[row_id] = float(max(0.1, 1.0 + weighted_rewards[row_id]))
+        return sample_weights or None
+
+    @staticmethod
+    def _severity_counts_from_labels(labels: np.ndarray) -> dict[str, int]:
+        label_aliases = {0: "NEGATIVE", 1: "POSITIVE"}
+        severity_counts: dict[str, int] = {}
+        for raw_label in np.asarray(labels, dtype=np.int64).tolist():
+            label_value = int(raw_label)
+            label_name = label_aliases.get(label_value, f"LABEL_{label_value}")
+            severity_counts[label_name] = severity_counts.get(label_name, 0) + 1
+        return severity_counts
+
+    @staticmethod
+    def _expand_adaptation_features(features: np.ndarray) -> np.ndarray:
+        feature_array = np.asarray(features, dtype=np.float32)
+        if feature_array.ndim != 2:
+            raise ValueError(
+                f"adaptation features must have shape (N, D), got {feature_array.shape}"
+            )
+        if feature_array.shape[1] == 512:
+            return feature_array
+        if feature_array.shape[1] == FEATURE_DIM:
+            return np.repeat(feature_array, 2, axis=1).astype(np.float32, copy=False)
+        raise ValueError(
+            f"adaptation features must have width {FEATURE_DIM} or 512, got {feature_array.shape[1]}"
+        )
+
+    def _build_adaptation_dataloader(
+        self,
+        features: np.ndarray,
+        labels: np.ndarray,
+    ) -> DataLoader | None:
+        feature_array = np.asarray(features, dtype=np.float32)
+        label_array = np.asarray(labels, dtype=np.int64)
+        if feature_array.ndim != 2 or label_array.ndim != 1:
+            logger.warning(
+                "adaptive learning dataloader skipped because feature or label array shape is invalid features=%s labels=%s",
+                feature_array.shape,
+                label_array.shape,
+            )
+            return None
+        if feature_array.shape[0] == 0 or label_array.shape[0] == 0:
+            return None
+        if feature_array.shape[0] != label_array.shape[0]:
+            logger.warning(
+                "adaptive learning dataloader skipped because feature and label counts differ features=%d labels=%d",
+                feature_array.shape[0],
+                label_array.shape[0],
+            )
+            return None
+        try:
+            expanded_features = self._expand_adaptation_features(feature_array)
+        except ValueError as exc:
+            logger.warning("adaptive learning dataloader skipped: %s", exc)
+            return None
+        dataset = TensorDataset(
+            torch.from_numpy(np.ascontiguousarray(expanded_features)),
+            torch.from_numpy(np.ascontiguousarray(label_array)),
+        )
+        return DataLoader(
+            dataset,
+            batch_size=min(256, max(len(dataset), 1)),
+            shuffle=False,
+        )
+
+    def _run_incremental_epoch(
+        self,
+        *,
+        sample_weights: dict[str, float] | None,
+    ):
+        run_incremental_epoch = getattr(self.trainer, "run_incremental_epoch")
+        try:
+            signature = inspect.signature(run_incremental_epoch)
+        except (TypeError, ValueError):
+            signature = None
+        if signature is not None and "sample_weights" in signature.parameters:
+            return run_incremental_epoch(sample_weights=sample_weights)
+        return run_incremental_epoch()
 
     def _artifact_signature(self) -> tuple[tuple[str, int, int], ...]:
         model_path = Path(getattr(self.trainer, "model_path", self.config.checkpoints_root / DEFAULT_MODEL_PATH.name))
@@ -357,14 +534,22 @@ class AutoTrainController:
     def _execute_run(self, placeholder: AutoTrainRun) -> AutoTrainRun:
         features: np.ndarray | None = None
         labels: np.ndarray | None = None
+        row_ids: list[str] = []
         shard_count = placeholder.shard_count
         total_samples = placeholder.total_samples
         new_samples = placeholder.new_samples
         processed_total_samples: int | None = None
+        trigger_threshold = self._compute_trigger_threshold()
         try:
-            features, labels, shard_count = self._load_store_snapshot()
+            features, labels, row_ids, shard_count = self._load_store_snapshot()
             total_samples = int(labels.shape[0])
             new_samples = max(0, total_samples - self._last_processed_total_samples)
+            severity_counts = self._severity_counts_from_labels(labels)
+            adaptation_event = self.adaptive_learner.on_new_grab_cycle(
+                severity_counts=severity_counts,
+                model=getattr(self.trainer, "model", None),
+                prev_dataloader=self._build_adaptation_dataloader(features, labels),
+            )
             logger.info(
                 "auto train scan run_id=%s shard_count=%d total_samples=%d new_samples=%d",
                 placeholder.run_id,
@@ -372,8 +557,23 @@ class AutoTrainController:
                 total_samples,
                 new_samples,
             )
+            trigger_threshold = self._compute_trigger_threshold()
+            logger.info(
+                "auto train threshold run_id=%s threshold=%d total_samples=%d new_samples=%d",
+                placeholder.run_id,
+                trigger_threshold,
+                total_samples,
+                new_samples,
+            )
+            if adaptation_event is not None:
+                logger.info(
+                    "adaptive learning event recorded run_id=%s js_distance=%.6f fisher_samples=%d",
+                    placeholder.run_id,
+                    adaptation_event.js_distance,
+                    adaptation_event.fisher_sample_count,
+                )
 
-            if new_samples < int(self.config.min_new_samples):
+            if new_samples < trigger_threshold:
                 final_run = replace(
                     placeholder,
                     status="SKIPPED",
@@ -383,11 +583,14 @@ class AutoTrainController:
                     new_samples=new_samples,
                 )
                 logger.info(
-                    "auto train skipped run_id=%s insufficient_new_samples=%d min_required=%d",
+                    "auto train skipped run_id=%s insufficient_new_samples=%d min_required=%d threshold=%d total_samples=%d",
                     placeholder.run_id,
                     new_samples,
-                    int(self.config.min_new_samples),
+                    trigger_threshold,
+                    trigger_threshold,
+                    total_samples,
                 )
+                self._log_run_summary(final_run, threshold=trigger_threshold)
                 return self._finalize_run(
                     final_run,
                     processed_total_samples=None,
@@ -416,13 +619,16 @@ class AutoTrainController:
                     quality_report.failed_reasons,
                 )
                 processed_total_samples = total_samples
+                self._log_run_summary(final_run, threshold=trigger_threshold)
                 return self._finalize_run(
                     final_run,
                     processed_total_samples=processed_total_samples,
                 )
 
             artifact_signature_before = self._artifact_signature()
-            trainer_result = self.trainer.run_incremental_epoch()
+            trainer_result = self._run_incremental_epoch(
+                sample_weights=self._build_reward_weight_lookup(row_ids),
+            )
             artifact_signature_after = self._artifact_signature()
             checkpoint_updated = artifact_signature_before != artifact_signature_after
             trainer_status = str(getattr(trainer_result, "status", "COMPLETED"))
@@ -455,15 +661,47 @@ class AutoTrainController:
                 epoch_number=int(getattr(trainer_result, "epoch_number", 0) or 0),
             )
             logger.info(
-                "auto train completed run_id=%s trainer_status=%s promoted=%s checkpoint_updated=%s",
+                "auto train completed run_id=%s trainer_status=%s promoted=%s checkpoint_updated=%s new_samples=%d threshold=%d total_samples=%d",
                 placeholder.run_id,
                 trainer_status,
                 promoted,
                 checkpoint_updated,
+                new_samples,
+                trigger_threshold,
+                total_samples,
             )
+            logger.info(
+                "auto train rl mean_reward=%.6f total_signals=%d",
+                self._reward_buffer.mean_reward(),
+                int(self.get_rl_stats()["total_signals"]),
+            )
+            self._log_run_summary(final_run, threshold=trigger_threshold)
             return self._finalize_run(
                 final_run,
                 processed_total_samples=processed_total_samples,
+            )
+        except AllRowsRejectedError as exc:
+            with self._state_lock:
+                shard_count = self._last_observed_shard_count
+            logger.critical(
+                "auto train data purity failed run_id=%s trigger=%s reasons=%s",
+                placeholder.run_id,
+                placeholder.trigger,
+                exc.result.rejection_reasons,
+            )
+            failed_run = replace(
+                placeholder,
+                status="FAILED",
+                finished_at=_utc_now(),
+                shard_count=shard_count,
+                total_samples=0,
+                new_samples=0,
+                error=str(exc),
+            )
+            self._log_run_summary(failed_run, threshold=trigger_threshold)
+            return self._finalize_run(
+                failed_run,
+                processed_total_samples=None,
             )
         except Exception as exc:
             logger.exception(
@@ -481,6 +719,7 @@ class AutoTrainController:
                 new_samples=new_samples,
                 error=str(exc),
             )
+            self._log_run_summary(failed_run, threshold=trigger_threshold)
             return self._finalize_run(
                 failed_run,
                 processed_total_samples=processed_total_samples,

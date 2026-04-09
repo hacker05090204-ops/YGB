@@ -227,8 +227,9 @@ PipelineStageResult = StageResult
 _SOURCE_CONFIGS = {
     "cve_services": {
         "name": "CVE Services / cve.org",
-        "url": "https://cveawg.mitre.org/api/cve",
+        "url": "https://services.nvd.nist.gov/rest/json/cves/2.0",
         "requires_key": False,
+        "key_env": "NVD_API_KEY",
         "staleness_hours": 6,
         "confidence": 0.98,
         "priority": 1,
@@ -634,7 +635,7 @@ class CVEPipeline:
             # Severity: highest wins
             sev_order = {
                 "CRITICAL": 4, "HIGH": 3, "MEDIUM": 2,
-                "LOW": 1, "UNKNOWN": 0,
+                "LOW": 1, "INFORMATIONAL": 0, "UNKNOWN": 0,
             }
             existing_rank = self._severity_rank(
                 existing.severity_source or existing.provenance[-1].source
@@ -777,7 +778,13 @@ class CVEPipeline:
             )
         self._slo.no_delta_ingests += 1
 
-    def mark_source_error(self, source_id: str, error: str):
+    def mark_source_error(
+        self,
+        source_id: str,
+        error: str,
+        *,
+        trip_circuit: bool = True,
+    ):
         """Mark a source as failed."""
         now = datetime.now(timezone.utc).isoformat()
         prev = self._source_status.get(source_id, SourceStatus.DISCONNECTED)
@@ -788,7 +795,13 @@ class CVEPipeline:
 
         cb = self._circuit_breakers.get(source_id)
         if cb:
-            cb.record_failure()
+            if trip_circuit:
+                cb.record_failure()
+            else:
+                cb.state = CircuitState.CLOSED
+                cb.failure_count = 0
+                cb.last_failure_at = None
+                cb.half_open_attempts = 0
 
         if source_id in self._freshness:
             f = self._freshness[source_id]

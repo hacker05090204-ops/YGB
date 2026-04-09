@@ -253,6 +253,38 @@ def test_quality_gate_accepts_high_quality_nvd_sample(tmp_path):
     assert stats["rejected"] == 0
 
 
+def test_quality_gate_derives_critical_severity_from_cvss(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    sample = _quality_payload(
+        "This record includes enough detail to stay above the quality threshold while testing severity derivation.",
+        cve_id="CVE-2026-1002",
+        severity="",
+        cvss_score=9.5,
+    )
+
+    accepted, reason, _ = scorer.evaluate(sample)
+
+    assert accepted is True
+    assert reason is None
+    assert sample["severity"] == "CRITICAL"
+
+
+def test_quality_gate_defaults_missing_severity_to_informational(tmp_path):
+    scorer = _make_quality_scorer(tmp_path)
+    sample = _quality_payload(
+        "This record intentionally omits both severity and CVSS while still providing enough context for acceptance.",
+        cve_id="CVE-2026-1003",
+        severity="",
+        cvss_score=None,
+    )
+
+    accepted, reason, _ = scorer.evaluate(sample)
+
+    assert accepted is True
+    assert reason is None
+    assert sample["severity"] == "INFORMATIONAL"
+
+
 def test_quality_gate_rejects_duplicate_cve_id(tmp_path):
     scorer = _make_quality_scorer(tmp_path)
     first = _quality_payload(

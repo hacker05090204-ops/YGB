@@ -62,6 +62,7 @@ _AUDIT_ROTATE_ENTRIES = 25000
 _RATE_LIMIT_WINDOW_SECONDS = 60
 _RATE_LIMIT_MAX_CALLS = 100
 IS_PRODUCTION = os.getenv("YGB_ENV", "development") == "production"
+_TEST_ONLY_PATH_ENV = "YGB_ENABLE_TEST_ONLY_PATHS"
 
 
 @dataclass(frozen=True)
@@ -183,10 +184,22 @@ def _runtime_is_production() -> bool:
     return configured_environment.strip().lower() == "production"
 
 
+def _test_only_paths_enabled() -> bool:
+    if "pytest" in sys.modules:
+        return True
+    return os.getenv(_TEST_ONLY_PATH_ENV, "").strip().lower() in _TRUTHY_VALUES
+
+
+def _temporary_auth_bypass_requested() -> bool:
+    return os.getenv("YGB_TEMP_AUTH_BYPASS", "false").strip().lower() in _TRUTHY_VALUES
+
+
 def is_temporary_auth_bypass_enabled() -> bool:
     if _runtime_is_production():
         return False
-    return os.getenv("YGB_TEMP_AUTH_BYPASS", "false").strip().lower() in _TRUTHY_VALUES
+    if not _temporary_auth_bypass_requested():
+        return False
+    return _test_only_paths_enabled()
 
 
 def _log_temporary_auth_bypass_startup_warning() -> None:
@@ -194,6 +207,10 @@ def _log_temporary_auth_bypass_startup_warning() -> None:
         logger.warning(
             "Temporary auth bypass is enabled in non-production. "
             "Disable YGB_TEMP_AUTH_BYPASS before deployment."
+        )
+    elif _temporary_auth_bypass_requested():
+        logger.warning(
+            "Temporary auth bypass was requested but is ignored outside test-only execution."
         )
 
 
@@ -691,7 +708,7 @@ def preflight_check_secrets() -> None:
     _check_secret("JWT_SECRET", 32)
     _check_secret("YGB_HMAC_SECRET", 32)
     _check_secret("YGB_VIDEO_JWT_SECRET", 32)
-    if is_temporary_auth_bypass_enabled():
+    if _temporary_auth_bypass_requested():
         errors.append(
             "YGB_TEMP_AUTH_BYPASS=true is not allowed in hardened mode. "
             "Set YGB_TEMP_AUTH_BYPASS=false before startup."
@@ -717,6 +734,59 @@ def preflight_check_secrets() -> None:
         _warnings.append("API_HOST=0.0.0.0 — server is binding to all interfaces (use 127.0.0.1 for local-only)")
     for w in _warnings:
         print(f"[PREFLIGHT] WARN: {w}")
+
+
+def _secret_meets_runtime_requirements(env_name: str, min_length: int = 32) -> bool:
+    value = os.getenv(env_name, "").strip()
+    if value.lower() in _PLACEHOLDER_SECRETS:
+        return False
+    if any(pattern in value for pattern in _PLACEHOLDER_PATTERNS):
+        return False
+    return len(value) >= min_length
+
+
+def get_auth_runtime_status() -> Dict:
+    """Return non-secret authentication hardening status for operator visibility."""
+    from backend.auth.revocation_store import get_backend_health
+
+    secret_health = {
+        "JWT_SECRET": _secret_meets_runtime_requirements("JWT_SECRET", 32),
+        "YGB_HMAC_SECRET": _secret_meets_runtime_requirements("YGB_HMAC_SECRET", 32),
+        "YGB_VIDEO_JWT_SECRET": _secret_meets_runtime_requirements("YGB_VIDEO_JWT_SECRET", 32),
+    }
+    bypass_requested = _temporary_auth_bypass_requested()
+    bypass_enabled = is_temporary_auth_bypass_enabled()
+    production_mode = _runtime_is_production()
+    backend_health = get_backend_health()
+    audit_entries = len(get_auth_audit_trail())
+    active_rate_limited_subjects = sum(
+        1 for attempts in _subject_rate_limit_windows.values() if attempts
+    )
+
+    status = "HEALTHY"
+    if not all(secret_health.values()):
+        status = "ERROR" if production_mode else "DEGRADED"
+    elif bypass_requested:
+        status = "DEGRADED"
+
+    backend_status = ""
+    if isinstance(backend_health, dict):
+        backend_status = str(backend_health.get("status", "") or "").upper()
+    if backend_status in {"ERROR", "DOWN", "UNAVAILABLE"} and status == "HEALTHY":
+        status = "DEGRADED"
+
+    return {
+        "status": status,
+        "available": status != "ERROR",
+        "production_mode": production_mode,
+        "temporary_bypass_requested": bypass_requested,
+        "temporary_bypass_enabled": bypass_enabled,
+        "required_secrets": secret_health,
+        "all_required_secrets_present": all(secret_health.values()),
+        "audit_entries": audit_entries,
+        "active_rate_limited_subjects": active_rate_limited_subjects,
+        "revocation_backend": backend_health,
+    }
 
 
 # =============================================================================

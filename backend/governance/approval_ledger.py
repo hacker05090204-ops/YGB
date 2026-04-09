@@ -22,7 +22,7 @@ import os
 import stat
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -117,8 +117,7 @@ class KeyManager:
 
     Keys are loaded from:
       1. YGB_KEY_DIR env var (directory of key files) — PREFERRED
-      2. YGB_APPROVAL_SECRET env var (fallback single key)
-      3. Hardcoded default (dev only, rejected in strict mode)
+      2. YGB_APPROVAL_SECRET env var (fallback single key in non-strict mode)
 
     Security:
       - Key files must not be world-readable (mode 600 on POSIX)
@@ -134,6 +133,8 @@ class KeyManager:
         self._revoked: set[str] = set()
         self._active_key_id: str = self.DEFAULT_KEY_ID
         self._audit_log: list[dict] = []
+        self._source: str = "unconfigured"
+        self._key_dir: str = ""
         # Default to strict=True in production environments
         if strict is None:
             env = os.environ.get("YGB_ENV", "").lower()
@@ -176,8 +177,10 @@ class KeyManager:
     def _load_keys(self) -> None:
         """Load keys from filesystem or environment with security checks."""
         key_dir = os.environ.get("YGB_KEY_DIR", "")
+        self._key_dir = key_dir
 
         if key_dir and os.path.isdir(key_dir):
+            self._source = "key_dir"
             loaded = 0
             # Load all .key files with permission checks
             for fname in sorted(os.listdir(key_dir)):
@@ -235,6 +238,7 @@ class KeyManager:
                     "For production, use YGB_KEY_DIR with key files instead."
                 )
             self._keys[self.DEFAULT_KEY_ID] = secret_str.encode()
+            self._source = "env"
             self._log_audit("KEY_FALLBACK", self.DEFAULT_KEY_ID,
                             "using env var — NOT FOR PRODUCTION")
 
@@ -246,6 +250,18 @@ class KeyManager:
     def audit_log(self) -> list[dict]:
         """Return the key rotation/revocation audit log."""
         return list(self._audit_log)
+
+    @property
+    def strict_mode(self) -> bool:
+        return bool(self._strict)
+
+    @property
+    def source(self) -> str:
+        return self._source
+
+    @property
+    def key_dir(self) -> str:
+        return self._key_dir
 
     def get_signing_key(self) -> tuple[str, bytes]:
         """Get the active signing key. Returns (key_id, secret)."""
@@ -282,6 +298,80 @@ class KeyManager:
     @property
     def available_key_ids(self) -> list:
         return list(self._keys.keys())
+
+
+def get_key_manager_status(
+    *,
+    key_manager: Optional[KeyManager] = None,
+    run_integrity: bool = False,
+    strict: bool | None = None,
+) -> dict:
+    """Return non-secret governance key status for runtime inspection."""
+    try:
+        manager = key_manager or KeyManager(strict=strict)
+    except Exception as exc:
+        return {
+            "available": False,
+            "status": "ERROR",
+            "strict_mode": None if strict is None else bool(strict),
+            "source": "unavailable",
+            "key_dir": os.environ.get("YGB_KEY_DIR", "") or None,
+            "active_key_id": None,
+            "available_key_ids": [],
+            "revoked_keys": [],
+            "using_env_fallback": False,
+            "authority_key_configured": bool(os.environ.get("YGB_AUTHORITY_KEY", "").strip()),
+            "integrity": asdict(last_integrity_report) if last_integrity_report is not None else None,
+            "audit_events": [],
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    active_key_id = manager.active_key_id or None
+    available = False
+    error = None
+    try:
+        active_key_id, _ = manager.get_signing_key()
+        available = True
+    except Exception as exc:
+        error = f"{type(exc).__name__}: {exc}"
+
+    integrity_payload = asdict(last_integrity_report) if last_integrity_report is not None else None
+    if run_integrity:
+        try:
+            integrity_payload = asdict(run_integrity_check())
+        except Exception as exc:
+            integrity_payload = {
+                "entries_checked": 0,
+                "hash_chain_valid": False,
+                "first_broken_entry_id": None,
+                "checked_at": _integrity_timestamp(),
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+            error = error or f"integrity_check_failed: {type(exc).__name__}: {exc}"
+
+    using_env_fallback = manager.source == "env"
+    revoked_keys = sorted(str(key_id) for key_id in manager.revoked_keys)
+    status = "HEALTHY"
+    if not available:
+        status = "ERROR"
+    elif using_env_fallback or revoked_keys:
+        status = "DEGRADED"
+
+    return {
+        "available": available,
+        "status": status,
+        "strict_mode": manager.strict_mode,
+        "source": manager.source,
+        "key_dir": manager.key_dir or None,
+        "active_key_id": active_key_id,
+        "available_key_ids": sorted(str(key_id) for key_id in manager.available_key_ids),
+        "revoked_keys": revoked_keys,
+        "using_env_fallback": using_env_fallback,
+        "authority_key_configured": bool(os.environ.get("YGB_AUTHORITY_KEY", "").strip()),
+        "integrity": integrity_payload,
+        "audit_events": manager.audit_log[-10:],
+        "error": error,
+    }
 
 
 # ===========================================================
