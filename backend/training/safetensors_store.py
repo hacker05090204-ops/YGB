@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -19,6 +21,20 @@ LABEL_TENSOR_KEY = "labels"
 METADATA_JSON_KEY = "json_metadata"
 FEATURE_DIM_METADATA_KEY = "ygb_feature_dim"
 FEATURE_DIM = 256
+CHECKPOINT_METADATA_JSON_KEY = "ygb_checkpoint_metadata"
+CHECKPOINT_SCHEMA_VERSION = 1
+DEFAULT_TOP_K_CHECKPOINTS = 3
+
+
+def _atomic_write_json_file(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = Path(f"{path}.tmp")
+    with open(temp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(str(temp_path), str(path))
 
 
 @dataclass(frozen=True)
@@ -285,3 +301,591 @@ class SafetensorsFeatureStore:
             raise ValueError(
                 f"{path}: label length {labels.shape[0]} does not match feature rows {features.shape[0]}"
             )
+
+
+class CheckpointManager:
+    """Safetensors-backed expert checkpoint manager with top-k retention."""
+
+    def __init__(
+        self,
+        root: Path | str = "checkpoints",
+        *,
+        keep_top_k: int = DEFAULT_TOP_K_CHECKPOINTS,
+        expert_fields: Iterable[str] | None = None,
+    ) -> None:
+        self.root = Path(root)
+        self.experts_root = self.root / "experts"
+        self.registry_path = self.root / "expert_checkpoint_registry.json"
+        self.keep_top_k = self._coerce_keep_top_k(keep_top_k)
+        if expert_fields is None:
+            from impl_v1.phase49.moe import EXPERT_FIELDS
+
+            expert_fields = EXPERT_FIELDS
+        self.expert_fields = tuple(str(field_name) for field_name in expert_fields)
+
+    def save(
+        self,
+        *,
+        expert_id: int,
+        field_name: str,
+        state_dict: dict[str, Any],
+        val_f1: float,
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        expert_id_value, field_name_value = self._validate_expert_identity(
+            expert_id,
+            field_name,
+        )
+        val_f1_value = self._coerce_float(val_f1, field_name="val_f1")
+
+        registry = self._load_registry()
+        registry_key = self._registry_key(expert_id_value, field_name_value)
+        existing_entry = registry["experts"].get(registry_key)
+        existing_records = self._collect_checkpoint_records(
+            expert_id_value,
+            field_name_value,
+            existing_entry,
+        )
+
+        if len(existing_records) >= self.keep_top_k:
+            worst_retained = existing_records[-1]
+            if val_f1_value <= float(worst_retained["val_f1"]):
+                normalized_entry = self._entry_from_records(
+                    expert_id_value,
+                    field_name_value,
+                    existing_records,
+                )
+                if existing_entry != normalized_entry:
+                    registry["experts"][registry_key] = normalized_entry
+                    self._save_registry(registry)
+                status = self._status_from_records(
+                    expert_id_value,
+                    field_name_value,
+                    existing_records,
+                )
+                return {
+                    "saved": False,
+                    "retained": False,
+                    "checkpoint_path": "",
+                    "is_best": False,
+                    **status,
+                }
+
+        checkpoint_path = self._next_checkpoint_path(
+            expert_id_value,
+            field_name_value,
+            val_f1_value,
+        )
+        checkpoint_metadata = {
+            "expert_id": expert_id_value,
+            "field_name": field_name_value,
+            "val_f1": val_f1_value,
+            "created_at": self._timestamp_now(),
+            **(metadata or {}),
+        }
+        self._write_checkpoint(
+            checkpoint_path,
+            state_dict,
+            metadata=checkpoint_metadata,
+        )
+
+        new_record = {
+            "checkpoint_path": self._serialize_path(checkpoint_path),
+            "val_f1": val_f1_value,
+            "created_at": str(checkpoint_metadata["created_at"]),
+            "metadata": checkpoint_metadata,
+        }
+        retained_records, removed_records = self._prune_records(existing_records + [new_record])
+        self._delete_removed_records(removed_records)
+
+        normalized_entry = self._entry_from_records(
+            expert_id_value,
+            field_name_value,
+            retained_records,
+        )
+        registry["experts"][registry_key] = normalized_entry
+        self._save_registry(registry)
+
+        status = self._status_from_records(
+            expert_id_value,
+            field_name_value,
+            retained_records,
+        )
+        retained_path = self._serialize_path(checkpoint_path)
+        return {
+            "saved": True,
+            "retained": any(
+                item["checkpoint_path"] == retained_path for item in retained_records
+            ),
+            "checkpoint_path": retained_path,
+            "is_best": normalized_entry["best_checkpoint_path"] == retained_path,
+            **status,
+        }
+
+    def load(
+        self,
+        *,
+        expert_id: int,
+        field_name: str,
+        checkpoint_path: str | Path | None = None,
+        device: str = "cpu",
+    ) -> dict[str, Any]:
+        expert_id_value, field_name_value = self._validate_expert_identity(
+            expert_id,
+            field_name,
+        )
+        if checkpoint_path is None:
+            status = self.status(expert_id_value, field_name_value)
+            resolved_path_text = str(status.get("best_checkpoint_path", "") or "")
+            if not resolved_path_text:
+                raise FileNotFoundError(
+                    f"No retained checkpoint for expert_id={expert_id_value} field_name={field_name_value}"
+                )
+            resolved_path = Path(resolved_path_text)
+        else:
+            resolved_path = Path(checkpoint_path)
+
+        if not resolved_path.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {resolved_path}")
+
+        from safetensors.torch import load_file as load_torch_safetensors_file
+
+        return load_torch_safetensors_file(str(resolved_path), device=device)
+
+    def status(self, expert_id: int, field_name: str) -> dict[str, Any]:
+        expert_id_value, field_name_value = self._validate_expert_identity(
+            expert_id,
+            field_name,
+        )
+        registry = self._load_registry()
+        registry_key = self._registry_key(expert_id_value, field_name_value)
+        existing_entry = registry["experts"].get(registry_key)
+        retained_records = self._collect_checkpoint_records(
+            expert_id_value,
+            field_name_value,
+            existing_entry,
+        )
+        normalized_entry = self._entry_from_records(
+            expert_id_value,
+            field_name_value,
+            retained_records,
+        )
+        if existing_entry != normalized_entry:
+            registry["experts"][registry_key] = normalized_entry
+            self._save_registry(registry)
+        return self._status_from_records(
+            expert_id_value,
+            field_name_value,
+            retained_records,
+        )
+
+    def get_all_expert_status(self) -> list[dict[str, Any]]:
+        registry = self._load_registry()
+        statuses: list[dict[str, Any]] = []
+        changed = False
+        for expert_id, field_name in enumerate(self.expert_fields):
+            registry_key = self._registry_key(expert_id, field_name)
+            existing_entry = registry["experts"].get(registry_key)
+            retained_records = self._collect_checkpoint_records(
+                expert_id,
+                field_name,
+                existing_entry,
+            )
+            normalized_entry = self._entry_from_records(
+                expert_id,
+                field_name,
+                retained_records,
+            )
+            if existing_entry != normalized_entry:
+                registry["experts"][registry_key] = normalized_entry
+                changed = True
+            statuses.append(
+                self._status_from_records(
+                    expert_id,
+                    field_name,
+                    retained_records,
+                )
+            )
+        if changed:
+            self._save_registry(registry)
+        return statuses
+
+    @staticmethod
+    def _coerce_keep_top_k(keep_top_k: int) -> int:
+        parsed = int(keep_top_k)
+        if parsed <= 0:
+            raise ValueError(f"keep_top_k must be >= 1, got {parsed}")
+        return parsed
+
+    @staticmethod
+    def _registry_key(expert_id: int, field_name: str) -> str:
+        return f"{int(expert_id)}:{str(field_name)}"
+
+    @staticmethod
+    def _serialize_path(path: Path) -> str:
+        return path.as_posix()
+
+    @staticmethod
+    def _timestamp_now() -> str:
+        return datetime.now(timezone.utc).isoformat()
+
+    @staticmethod
+    def _coerce_float(value: Any, *, field_name: str) -> float:
+        try:
+            parsed = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{field_name} must be a finite float, got {value!r}") from exc
+        if not np.isfinite(parsed):
+            raise ValueError(f"{field_name} must be a finite float, got {parsed!r}")
+        return parsed
+
+    def _validate_expert_identity(
+        self,
+        expert_id: int,
+        field_name: str,
+    ) -> tuple[int, str]:
+        expert_id_value = int(expert_id)
+        field_name_value = str(field_name or "").strip()
+        if not field_name_value:
+            raise ValueError("field_name is required")
+        if not 0 <= expert_id_value < len(self.expert_fields):
+            raise ValueError(f"Invalid expert_id={expert_id_value}")
+        expected_field_name = self.expert_fields[expert_id_value]
+        if field_name_value != expected_field_name:
+            raise ValueError(
+                f"Expert-field mismatch: expert_id={expert_id_value} expects {expected_field_name}, got {field_name_value}"
+            )
+        return expert_id_value, field_name_value
+
+    def _load_registry(self) -> dict[str, Any]:
+        if not self.registry_path.exists():
+            return {
+                "schema_version": CHECKPOINT_SCHEMA_VERSION,
+                "experts": {},
+            }
+
+        with open(self.registry_path, "r", encoding="utf-8") as handle:
+            raw_registry = json.load(handle)
+        if not isinstance(raw_registry, dict):
+            raise ValueError(
+                f"Checkpoint registry must be a JSON object, got {type(raw_registry).__name__}"
+            )
+
+        raw_entries = raw_registry.get("experts")
+        if not isinstance(raw_entries, dict):
+            raw_entries = {
+                key: value
+                for key, value in raw_registry.items()
+                if key != "schema_version"
+            }
+
+        normalized_entries: dict[str, Any] = {}
+        for key, value in raw_entries.items():
+            normalized = self._normalize_registry_entry(str(key), value)
+            normalized_entries[self._registry_key(normalized["expert_id"], normalized["field_name"])] = normalized
+        return {
+            "schema_version": CHECKPOINT_SCHEMA_VERSION,
+            "experts": normalized_entries,
+        }
+
+    def _save_registry(self, registry: dict[str, Any]) -> None:
+        normalized_payload = {
+            "schema_version": CHECKPOINT_SCHEMA_VERSION,
+            "experts": dict(sorted(registry.get("experts", {}).items())),
+        }
+        _atomic_write_json_file(self.registry_path, normalized_payload)
+
+    def _normalize_registry_entry(self, registry_key: str, value: Any) -> dict[str, Any]:
+        raw_value = value if isinstance(value, dict) else {}
+        parsed_expert_id, parsed_field_name = self._parse_registry_key(registry_key)
+        expert_id_value = int(raw_value.get("expert_id", parsed_expert_id))
+        field_name_value = str(raw_value.get("field_name", parsed_field_name) or "").strip()
+        if not field_name_value and 0 <= expert_id_value < len(self.expert_fields):
+            field_name_value = self.expert_fields[expert_id_value]
+        expert_id_value, field_name_value = self._validate_expert_identity(
+            expert_id_value,
+            field_name_value,
+        )
+
+        raw_records = raw_value.get("checkpoints")
+        if not isinstance(raw_records, list):
+            raw_records = []
+            legacy_path = str(
+                raw_value.get("best_checkpoint_path")
+                or raw_value.get("checkpoint_path")
+                or ""
+            ).strip()
+            legacy_f1 = raw_value.get("best_val_f1")
+            if legacy_f1 is None:
+                legacy_f1 = raw_value.get("val_f1")
+            if legacy_path:
+                raw_records.append(
+                    {
+                        "checkpoint_path": legacy_path,
+                        "val_f1": legacy_f1,
+                        "created_at": str(raw_value.get("updated_at", "") or ""),
+                        "metadata": {
+                            "expert_id": expert_id_value,
+                            "field_name": field_name_value,
+                        },
+                    }
+                )
+
+        normalized_records = [
+            normalized
+            for normalized in (
+                self._normalize_checkpoint_record(record) for record in raw_records
+            )
+            if normalized is not None
+        ]
+        retained_records = self._sort_checkpoint_records(normalized_records)[: self.keep_top_k]
+        return self._entry_from_records(
+            expert_id_value,
+            field_name_value,
+            retained_records,
+        )
+
+    @staticmethod
+    def _parse_registry_key(registry_key: str) -> tuple[int, str]:
+        raw_expert_id, _, raw_field_name = str(registry_key).partition(":")
+        if not raw_expert_id or not raw_field_name:
+            raise ValueError(f"Invalid checkpoint registry key: {registry_key!r}")
+        return int(raw_expert_id), raw_field_name
+
+    def _normalize_checkpoint_record(
+        self,
+        record: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        checkpoint_path_text = str(record.get("checkpoint_path", "") or "").strip()
+        if not checkpoint_path_text:
+            return None
+        checkpoint_path = Path(checkpoint_path_text)
+        if not checkpoint_path.exists():
+            return None
+
+        raw_val_f1 = record.get("val_f1")
+        if raw_val_f1 in (None, ""):
+            raw_val_f1 = self._extract_f1(checkpoint_path.name)
+        if raw_val_f1 in (None, ""):
+            return None
+        val_f1_value = self._coerce_float(raw_val_f1, field_name="val_f1")
+
+        metadata = record.get("metadata")
+        if not isinstance(metadata, dict):
+            metadata = self._read_checkpoint_metadata(checkpoint_path)
+
+        created_at = str(record.get("created_at", "") or "").strip()
+        if not created_at:
+            created_at = str(metadata.get("created_at", "") or "").strip()
+        if not created_at:
+            created_at = datetime.fromtimestamp(
+                checkpoint_path.stat().st_mtime,
+                tz=timezone.utc,
+            ).isoformat()
+
+        return {
+            "checkpoint_path": self._serialize_path(checkpoint_path),
+            "val_f1": val_f1_value,
+            "created_at": created_at,
+            "metadata": metadata,
+        }
+
+    def _read_checkpoint_metadata(self, checkpoint_path: Path) -> dict[str, Any]:
+        with safe_open(str(checkpoint_path), framework="np") as handle:
+            metadata = handle.metadata() or {}
+        raw_metadata = metadata.get(CHECKPOINT_METADATA_JSON_KEY, "{}")
+        parsed_metadata = json.loads(raw_metadata)
+        if not isinstance(parsed_metadata, dict):
+            raise ValueError(
+                f"{checkpoint_path}: checkpoint metadata must decode to an object"
+            )
+        return parsed_metadata
+
+    def _collect_checkpoint_records(
+        self,
+        expert_id: int,
+        field_name: str,
+        existing_entry: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        if isinstance(existing_entry, dict):
+            for record in existing_entry.get("checkpoints", []):
+                normalized = self._normalize_checkpoint_record(record)
+                if normalized is not None:
+                    records.append(normalized)
+
+        for checkpoint_path in self._discover_checkpoint_paths(expert_id, field_name):
+            normalized = self._normalize_checkpoint_record(
+                {
+                    "checkpoint_path": self._serialize_path(checkpoint_path),
+                }
+            )
+            if normalized is not None:
+                records.append(normalized)
+
+        return self._sort_checkpoint_records(records)[: self.keep_top_k]
+
+    def _discover_checkpoint_paths(
+        self,
+        expert_id: int,
+        field_name: str,
+    ) -> list[Path]:
+        legacy_pattern = f"expert_{expert_id}_{field_name}_*.safetensors"
+        discovered = list(self.root.glob(legacy_pattern))
+        expert_dir = self.experts_root / f"{expert_id:02d}_{field_name}"
+        if expert_dir.exists():
+            discovered.extend(sorted(expert_dir.glob("*.safetensors")))
+        unique_paths: list[Path] = []
+        seen: set[str] = set()
+        for checkpoint_path in discovered:
+            serialized_path = self._serialize_path(checkpoint_path)
+            if serialized_path in seen:
+                continue
+            seen.add(serialized_path)
+            unique_paths.append(checkpoint_path)
+        return unique_paths
+
+    def _sort_checkpoint_records(
+        self,
+        records: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        deduplicated: dict[str, dict[str, Any]] = {}
+        for record in records:
+            checkpoint_path = str(record["checkpoint_path"])
+            previous = deduplicated.get(checkpoint_path)
+            if previous is None:
+                deduplicated[checkpoint_path] = dict(record)
+                continue
+            candidate = [previous, dict(record)]
+            candidate.sort(
+                key=lambda item: (
+                    float(item["val_f1"]),
+                    str(item["created_at"]),
+                    str(item["checkpoint_path"]),
+                ),
+                reverse=True,
+            )
+            deduplicated[checkpoint_path] = candidate[0]
+        return sorted(
+            deduplicated.values(),
+            key=lambda item: (
+                float(item["val_f1"]),
+                str(item["created_at"]),
+                str(item["checkpoint_path"]),
+            ),
+            reverse=True,
+        )
+
+    def _entry_from_records(
+        self,
+        expert_id: int,
+        field_name: str,
+        records: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        retained_records = self._sort_checkpoint_records(list(records))[: self.keep_top_k]
+        best_record = retained_records[0] if retained_records else None
+        return {
+            "expert_id": int(expert_id),
+            "field_name": str(field_name),
+            "best_val_f1": (
+                float(best_record["val_f1"]) if best_record is not None else None
+            ),
+            "best_checkpoint_path": (
+                str(best_record["checkpoint_path"]) if best_record is not None else ""
+            ),
+            "checkpoints": retained_records,
+            "updated_at": self._timestamp_now(),
+        }
+
+    def _status_from_records(
+        self,
+        expert_id: int,
+        field_name: str,
+        records: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        retained_records = self._sort_checkpoint_records(list(records))[: self.keep_top_k]
+        best_record = retained_records[0] if retained_records else None
+        return {
+            "expert_id": int(expert_id),
+            "field_name": str(field_name),
+            "has_checkpoint": best_record is not None,
+            "best_val_f1": (
+                float(best_record["val_f1"]) if best_record is not None else None
+            ),
+            "best_checkpoint_path": (
+                str(best_record["checkpoint_path"]) if best_record is not None else ""
+            ),
+            "checkpoints": retained_records,
+        }
+
+    def _next_checkpoint_path(
+        self,
+        expert_id: int,
+        field_name: str,
+        val_f1: float,
+    ) -> Path:
+        expert_dir = self.experts_root / f"{expert_id:02d}_{field_name}"
+        expert_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        return expert_dir / (
+            f"expert_{expert_id}_{field_name}_f1_{val_f1:.6f}_{timestamp}.safetensors"
+        )
+
+    def _write_checkpoint(
+        self,
+        checkpoint_path: Path,
+        state_dict: dict[str, Any],
+        *,
+        metadata: dict[str, Any],
+    ) -> None:
+        from safetensors.torch import save_file as save_torch_safetensors_file
+
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = Path(f"{checkpoint_path}.tmp")
+        metadata_payload = {
+            CHECKPOINT_METADATA_JSON_KEY: json.dumps(metadata, sort_keys=True),
+        }
+        try:
+            save_torch_safetensors_file(
+                state_dict,
+                str(temp_path),
+                metadata=metadata_payload,
+            )
+            os.replace(str(temp_path), str(checkpoint_path))
+        except (OSError, RuntimeError, TypeError, ValueError):
+            if temp_path.exists():
+                temp_path.unlink()
+            raise
+
+    def _prune_records(
+        self,
+        records: list[dict[str, Any]],
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        sorted_records = self._sort_checkpoint_records(records)
+        retained_records = sorted_records[: self.keep_top_k]
+        removed_records = sorted_records[self.keep_top_k :]
+        return retained_records, removed_records
+
+    @staticmethod
+    def _delete_removed_records(records: list[dict[str, Any]]) -> None:
+        for record in records:
+            checkpoint_path = Path(str(record["checkpoint_path"]))
+            if checkpoint_path.exists():
+                checkpoint_path.unlink()
+
+    @staticmethod
+    def _extract_f1(path_or_name: str | Path) -> float | None:
+        filename = Path(path_or_name).name
+        legacy_match = re.search(
+            r"_(?P<f1>\d+(?:\.\d+)?)(?=\.safetensors$)",
+            filename,
+        )
+        if legacy_match is not None:
+            return float(legacy_match.group("f1"))
+        named_match = re.search(
+            r"(?:^|_)f1_(?P<f1>\d+(?:\.\d+)?)(?=(_|\.safetensors$))",
+            filename,
+        )
+        if named_match is not None:
+            return float(named_match.group("f1"))
+        return None

@@ -112,7 +112,7 @@ def safe_grad_norm(torch_module, parameters, norm_type: float = 2.0) -> float:
 
 
 def build_optimizer(optim_module, parameters, lr: float, device) -> Any:
-    kwargs = {"lr": lr, "betas": (0.9, 0.95), "weight_decay": 0.01}
+    kwargs = {"lr": lr, "betas": (0.9, 0.95), "weight_decay": 1e-4}
     if getattr(device, "type", "") == "cuda":
         try:
             return optim_module.AdamW(parameters, fused=True, **kwargs)

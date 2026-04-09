@@ -303,6 +303,34 @@ class TestChainVerifier:
         assert any(v.violation_type == IntegrityViolation.HASH_MISMATCH
                    for v in result.violations)
 
+    def test_verify_timestamp_anomaly(self):
+        """Detect non-monotonic timestamps in the evidence chain."""
+        builder = IntegrityChainBuilder("SES-123")
+        link1 = builder.add_evidence("EV-001", b"data1")
+        link2 = builder.add_evidence("EV-002", b"data2")
+
+        tampered = ChainLink(
+            link_id=link2.link_id,
+            evidence_id=link2.evidence_id,
+            content_hash=link2.content_hash,
+            prev_hash=link2.prev_hash,
+            link_hash=link2.link_hash,
+            timestamp="2025-01-01T00:00:00+00:00",
+            session_id=link2.session_id,
+            sequence=link2.sequence,
+        )
+
+        chain = (link1, tampered)
+
+        verifier = IntegrityChainVerifier()
+        result = verifier.verify_chain(chain, "SES-123")
+
+        assert result.is_valid is False
+        assert any(
+            violation.violation_type == IntegrityViolation.TIMESTAMP_ANOMALY
+            for violation in result.violations
+        )
+
 
 class TestReportIntegrity:
     """Test report integrity functions."""

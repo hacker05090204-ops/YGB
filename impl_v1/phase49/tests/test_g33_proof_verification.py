@@ -126,6 +126,24 @@ class TestVerifyBugProof:
         assert result.status == ProofStatus.REAL
         assert result.impact == ImpactCategory.ACCOUNT_TAKEOVER
         assert result.confidence >= 75
+
+    def test_duplicate_finding_marked_duplicate(self):
+        result = verify_bug_proof(
+            finding_text="Account takeover via IDOR",
+            finding_data={
+                "duplicate_report_id": "RPT-1001",
+            },
+        )
+        assert result.status == ProofStatus.DUPLICATE
+
+    def test_scanner_output_without_controllable_input_is_rejected(self):
+        result = verify_bug_proof(
+            finding_text="Scanner reported SQL injection",
+            finding_data={},
+            scanner_output=True,
+        )
+        assert result.status == ProofStatus.NOT_REAL
+        assert result.rejection_reason == RejectionReason.SCANNER_OUTPUT_ONLY
     
     def test_has_result_id(self):
         result = verify_bug_proof("test", {})
@@ -173,6 +191,17 @@ class TestProofVerifier:
         )
 
         assert result.status == ProofStatus.NOT_REAL
+        assert verifier.get_rejected() == (result,)
+
+    def test_verify_tracks_duplicates_as_rejected(self):
+        verifier = ProofVerifier()
+
+        result = verifier.verify(
+            "Duplicate IDOR",
+            {"duplicate_report_id": "RPT-1001"},
+        )
+
+        assert result.status == ProofStatus.DUPLICATE
         assert verifier.get_rejected() == (result,)
 
     def test_module_singleton_exists(self):

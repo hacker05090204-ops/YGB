@@ -53,7 +53,7 @@ try:
     lib.bridge_init.restype = ctypes.c_int
     lib.bridge_init()
     print("[BRIDGE] bridge_init() called")
-except:
+except AttributeError:
     pass
 
 # Initialize persistent bridge state

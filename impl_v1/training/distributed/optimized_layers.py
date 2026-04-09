@@ -77,6 +77,7 @@ class OptimizedTrainingModel(nn.Module):
         token_dim: int = 32,
         use_flash_attention: bool = True,
         gradient_checkpointing: bool = False,
+        dropout: float = 0.3,
     ):
         super().__init__()
         self.gradient_checkpointing = bool(gradient_checkpointing)
@@ -85,11 +86,16 @@ class OptimizedTrainingModel(nn.Module):
         self.padded_input_dim = self.num_tokens * self.token_dim
 
         self.token_proj = nn.Linear(self.token_dim, hidden_dim)
+        self.token_dropout = nn.Dropout(dropout)
         self.attn_norm = RMSNorm(hidden_dim)
         self.attn = FlashAttentionMixer(hidden_dim, num_heads=attention_heads, use_flash_attention=use_flash_attention)
+        self.attn_dropout = nn.Dropout(dropout)
         self.ffn_norm = RMSNorm(hidden_dim)
         self.ffn = SwiGLUFeedForward(hidden_dim, hidden_dim * 2)
+        self.ffn_dropout = nn.Dropout(dropout)
         self.output_norm = RMSNorm(hidden_dim)
+        self.output_dropout = nn.Dropout(dropout)
+        self.classifier_dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(hidden_dim, num_classes)
 
     @staticmethod
@@ -108,9 +114,9 @@ class OptimizedTrainingModel(nn.Module):
         self.gradient_checkpointing = bool(enabled)
 
     def _mix_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        tokens = tokens + self.attn(self.attn_norm(tokens))
-        tokens = tokens + self.ffn(self.ffn_norm(tokens))
-        return self.output_norm(tokens)
+        tokens = tokens + self.attn_dropout(self.attn(self.attn_norm(tokens)))
+        tokens = tokens + self.ffn_dropout(self.ffn(self.ffn_norm(tokens)))
+        return self.output_dropout(self.output_norm(tokens))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.size(-1) < self.padded_input_dim:
@@ -119,10 +125,10 @@ class OptimizedTrainingModel(nn.Module):
             x = x[..., : self.padded_input_dim]
 
         tokens = x.view(x.size(0), self.num_tokens, self.token_dim)
-        tokens = self.token_proj(tokens)
+        tokens = self.token_dropout(self.token_proj(tokens))
         if self.gradient_checkpointing and self.training and tokens.requires_grad:
             tokens = checkpoint(self._mix_tokens, tokens, use_reentrant=False)
         else:
             tokens = self._mix_tokens(tokens)
-        pooled = tokens.mean(dim=1)
+        pooled = self.classifier_dropout(tokens.mean(dim=1))
         return self.classifier(pooled)

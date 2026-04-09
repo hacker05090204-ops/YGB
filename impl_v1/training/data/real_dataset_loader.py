@@ -2653,3 +2653,7 @@ def generate_dataset_manifest() -> dict:
             "success": False,
             "error": f"manifest_generation_failed: {type(e).__name__}",
         }
+
+
+class RealDatasetLoader(IngestionPipelineDataset):
+    """Backward-compatible alias for the ingestion-backed real dataset loader."""

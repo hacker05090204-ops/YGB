@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+import logging
 from pathlib import Path
 import sys
 from typing import Any, Sequence
@@ -17,15 +19,19 @@ if str(PROJECT_ROOT) not in sys.path:
 from backend.training.safetensors_store import SafetensorsFeatureStore
 
 
+logger = logging.getLogger(__name__)
+
 SOURCE_ROOTS = (
-    Path("reports/g38_training"),
-    Path("training/learned_features"),
+    (PROJECT_ROOT / "reports" / "g38_training").resolve(),
+    (PROJECT_ROOT / "training" / "learned_features").resolve(),
 )
-OUTPUT_ROOT = Path("training/features_safetensors")
+OUTPUT_ROOT = (PROJECT_ROOT / "training" / "features_safetensors").resolve()
 FEATURE_DIM = 256
 
 
 def _read_json_payload(source_path: Path) -> dict[str, Any]:
+    if not source_path.exists():
+        raise FileNotFoundError(f"JSON feature file not found: {source_path}")
     raw_text = source_path.read_text(encoding="utf-8").strip()
     try:
         payload = json.loads(raw_text)
@@ -100,9 +106,10 @@ def extract_legacy_feature_payload(
 def iter_json_feature_files(source_roots: Sequence[Path] = SOURCE_ROOTS) -> list[Path]:
     candidates: set[Path] = set()
     for source_root in source_roots:
-        if not source_root.exists():
+        resolved_root = Path(source_root)
+        if not resolved_root.exists():
             continue
-        candidates.update(source_root.glob("learned_features_*.json"))
+        candidates.update(resolved_root.glob("learned_features_*.json"))
     return sorted(candidates)
 
 
@@ -116,16 +123,26 @@ def shard_name_for_path(source_path: Path) -> str:
 
 
 def migrate_paths(
-    paths: Sequence[Path],
+    paths: Sequence[Path | str],
     *,
-    output_root: Path = OUTPUT_ROOT,
+    output_root: Path | str = OUTPUT_ROOT,
 ) -> dict[str, int]:
-    store = SafetensorsFeatureStore(output_root)
+    store = SafetensorsFeatureStore(Path(output_root))
     migrated = 0
     skipped = 0
     total_samples = 0
 
-    for source_path in paths:
+    for raw_source_path in paths:
+        source_path = Path(raw_source_path)
+        if not source_path.exists():
+            logger.warning("Skipping missing JSON feature file: %s", source_path)
+            skipped += 1
+            continue
+        if not source_path.is_file():
+            logger.warning("Skipping non-file JSON feature path: %s", source_path)
+            skipped += 1
+            continue
+
         payload = _read_json_payload(source_path)
 
         legacy_payload = extract_legacy_feature_payload(source_path, payload)
@@ -157,20 +174,52 @@ def migrate_paths(
 
 
 def migrate_json_feature_files(
-    source_roots: Sequence[Path] = SOURCE_ROOTS,
+    source_roots: Sequence[Path | str] = SOURCE_ROOTS,
     *,
-    output_root: Path = OUTPUT_ROOT,
+    output_root: Path | str = OUTPUT_ROOT,
 ) -> dict[str, int]:
     return migrate_paths(iter_json_feature_files(source_roots), output_root=output_root)
 
 
-def main() -> int:
-    result = migrate_json_feature_files()
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Migrate learned-feature JSON reports into .safetensors feature shards.",
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help="Optional explicit JSON feature files to migrate. Defaults to scanning known source roots.",
+    )
+    parser.add_argument(
+        "--source-root",
+        action="append",
+        default=[],
+        help="Directory to scan for learned_features_*.json. Can be supplied multiple times.",
+    )
+    parser.add_argument(
+        "--output-root",
+        default=str(OUTPUT_ROOT),
+        help="Destination directory for generated .safetensors feature shards.",
+    )
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    args = build_parser().parse_args(argv)
+    output_root = Path(args.output_root)
+
+    if args.paths:
+        result = migrate_paths(args.paths, output_root=output_root)
+    else:
+        source_roots = args.source_root or [str(path) for path in SOURCE_ROOTS]
+        result = migrate_json_feature_files(source_roots=source_roots, output_root=output_root)
+
     print(
         "Migrated",
         result["migrated"],
         "JSON learned-feature file(s) into",
-        OUTPUT_ROOT.as_posix(),
+        output_root.as_posix(),
         "and skipped",
         result["skipped"],
         "unsupported file(s)",

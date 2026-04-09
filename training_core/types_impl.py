@@ -96,6 +96,21 @@ class TrainingResult:
     start_epoch: int = 0
     latest_checkpoint_meta_path: str = ""
     best_checkpoint_meta_path: str = ""
+    val_accuracy: float = 0.0
+    val_f1: float = 0.0
+    val_precision: float = 0.0
+    val_recall: float = 0.0
+    best_val_loss: float = float("inf")
+    train_samples: int = 0
+    val_samples: int = 0
+    test_samples: int = 0
+    effective_hidden_dim: int = 0
+    split_seed: int = 42
+    optimizer_lr: float = 0.0
+    optimizer_weight_decay: float = 0.0
+    label_smoothing: float = 0.0
+    checkpoint_path: str = ""
+    status: str = "UNKNOWN"
 
 
 @dataclass

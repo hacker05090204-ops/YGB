@@ -12,7 +12,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple
 import hashlib
+import hmac
 import logging
+import os
 import uuid
 from datetime import datetime, UTC
 
@@ -21,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 class SealVerificationError(RuntimeError):
+    pass
+
+
+class SealProvisioningError(SealVerificationError):
     pass
 
 
@@ -162,9 +168,19 @@ def can_execute(seal: ExecutionSealResult) -> bool:
     return seal.sealed and seal.all_passed
 
 
+def _seal_secret() -> bytes:
+    for env_name in ("YGB_AUTHORITY_KEY", "YGB_HMAC_SECRET"):
+        value = os.environ.get(env_name, "").strip()
+        if value:
+            return value.encode("utf-8")
+    raise SealProvisioningError(
+        "Execution seal requires YGB_AUTHORITY_KEY or YGB_HMAC_SECRET to be configured"
+    )
+
+
 def compute_seal(execution_id: str, timestamp_iso: str, payload_hash: str) -> str:
     payload = f"{execution_id}:{timestamp_iso}:{payload_hash}".encode()
-    return hashlib.sha256(payload).hexdigest()
+    return hmac.new(_seal_secret(), payload, hashlib.sha256).hexdigest()
 
 
 def verify_seal(
@@ -174,7 +190,7 @@ def verify_seal(
     claimed_seal: str,
 ) -> bool:
     expected = compute_seal(execution_id, timestamp_iso, payload_hash)
-    if claimed_seal != expected:
+    if not hmac.compare_digest(claimed_seal, expected):
         logger.critical(
             "Execution seal mismatch for execution_id=%s timestamp=%s payload_hash=%s",
             execution_id,

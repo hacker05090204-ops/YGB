@@ -46,6 +46,16 @@ class CaptureStatus(Enum):
     FAILED = "FAILED"
 
 
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when a required real backend is not provisioned."""
+
+
+POC_VIDEO_BACKEND_MESSAGE = (
+    "PoC video rendering requires a provisioned native video compositor backend. "
+    "Configure the real PoC/video renderer and evidence export pipeline before enabling PoC video output."
+)
+
+
 @dataclass(frozen=True)
 class EvidenceMetadata:
     """Metadata for a single evidence item."""
@@ -865,60 +875,17 @@ def generate_poc_video_output(
 ) -> PoCVideoOutput:
     """
     Generate PoC video output structure.
-    
-    NOTE: This generates the OUTPUT STRUCTURE only.
-    Actual video rendering is deferred to C++ backend.
     """
     if can_modify_browser_state_for_poc():  # pragma: no cover
         raise RuntimeError("SECURITY: PoC is POST-processing only")
-    
-    output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
-    
-    output_id = _generate_poc_id("VID")
-    video_path = str(output_path / f"{output_id}.{format.lower()}")
-    
-    # Compute integrity hash
-    integrity_content = f"{timeline.timeline_id}|{timeline.bundle_hash}|{format}"
-    integrity_hash = compute_sha256(integrity_content.encode())
-    
-    return PoCVideoOutput(
-        output_id=output_id,
-        video_path=video_path,
-        timeline=timeline,
-        format=format,
-        width=width,
-        height=height,
-        integrity_hash=integrity_hash,
-        is_rendered=False,  # Pending — real rendering deferred to C++
-    )
+    raise RealBackendNotConfiguredError(POC_VIDEO_BACKEND_MESSAGE)
 
 
 def export_poc_video(output: PoCVideoOutput) -> bytes:
     """
     Export PoC video as bytes.
-    
-    PENDING: Real rendering deferred to C++.
-    Returns JSON export metadata as bytes.
     """
-    export_data = {
-        "output_id": output.output_id,
-        "video_path": output.video_path,
-        "format": output.format,
-        "width": output.width,
-        "height": output.height,
-        "duration_ms": output.timeline.total_duration_ms,
-        "step_count": output.timeline.step_count,
-        "integrity_hash": output.integrity_hash,
-        "is_rendered": output.is_rendered,
-        "status": "PENDING_RENDER_BY_CPP",
-    }
-    
-    # Write export metadata sidecar file
-    with open(output.video_path + ".meta.json", "w") as f:
-        json.dump(export_data, f, indent=2)
-    
-    return json.dumps(export_data, indent=2).encode("utf-8")
+    raise RealBackendNotConfiguredError(POC_VIDEO_BACKEND_MESSAGE)
 
 
 # =============================================================================

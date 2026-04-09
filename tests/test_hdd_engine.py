@@ -1,140 +1,102 @@
 """
-HDD Engine — Full Test Suite
-Tests all CRUD operations, caching, lifecycle, and performance on D:\ygb_hdd
+Pytest coverage for the HDD engine.
+
+This test uses a real writable temporary directory instead of a hard-coded
+drive letter so collection and execution remain portable when a specific HDD
+volume is unavailable in the current workspace.
 """
 
-import sys
-import uuid
 import time
-
-sys.path.insert(0, "c:/Users/Unkno/YGB")
+import uuid
 
 from native.hdd_engine.hdd_engine import HDDEngine, LifecycleState
 
-passed = 0
-failed = 0
 
-def check(name, condition, detail=""):
-    global passed, failed
-    if condition:
-        passed += 1
-        print("[PASS] " + name + ("  (" + detail + ")" if detail else ""))
-    else:
-        failed += 1
-        print("[FAIL] " + name + ("  (" + detail + ")" if detail else ""))
+def test_hdd_engine_crud_and_cache(tmp_path):
+    engine_root = tmp_path / "ygb_hdd"
+    engine = HDDEngine(str(engine_root))
 
-print("=" * 60)
-print("HDD ENGINE FULL TEST SUITE")
-print("=" * 60)
-print()
+    assert engine.initialize() is True, f"root={engine.root}"
 
-# 1. Initialize
-e = HDDEngine("E:/ygb_hdd")
-ok = e.initialize()
-check("Initialize", ok, "root=" + str(e.root))
+    stats = engine.get_stats()
+    assert stats["initialized"] is True
+    assert stats["hdd_root"] == str(engine_root)
+    assert stats["disk_usage"]["total_bytes"] > 0
 
-# 2. Get stats
-stats = e.get_stats()
-check("Get stats", stats["initialized"], "disk_used=" + str(stats["disk_usage"]["percent_used"]) + "%")
+    uid = uuid.uuid4().hex[:8]
+    user_id = f"test-{uid}"
+    user = engine.create_entity(
+        "users",
+        user_id,
+        {
+            "name": "Full Test",
+            "email": f"{uid}@ygb.dev",
+            "role": "hunter",
+        },
+    )
+    assert user["entity_id"] == user_id
 
-# 3. Create user
-uid = str(uuid.uuid4())[:8]
-user_id = "test-" + uid
-try:
-    user = e.create_entity("users", user_id, {"name": "Full Test", "email": uid + "@ygb.dev", "role": "hunter"})
-    check("Create user", user is not None, "id=" + user_id)
-except Exception as ex:
-    check("Create user", False, str(ex))
-    user = None
+    entity = engine.read_entity("users", user_id)
+    assert entity is not None
+    assert entity["latest"]["name"] == "Full Test"
+    assert len(entity["records"]) == 1
 
-# 4. Read entity
-entity = e.read_entity("users", user_id)
-check("Read entity", entity is not None and entity["latest"]["name"] == "Full Test",
-      "records=" + str(len(entity["records"])) if entity else "None")
+    started = time.perf_counter()
+    cached_entity = engine.read_entity("users", user_id)
+    cache_ms = (time.perf_counter() - started) * 1000
+    assert cached_entity == entity
+    assert cache_ms < 5.0, f"cache_read_ms={cache_ms:.2f}"
 
-# 5. Cache read (should be fast)
-t0 = time.perf_counter()
-entity2 = e.read_entity("users", user_id)
-t1 = time.perf_counter()
-cache_ms = (t1 - t0) * 1000
-check("Cache read", cache_ms < 5, "%.2fms" % cache_ms)
+    record = engine.append_record(
+        "users",
+        user_id,
+        {"action": "login", "ip": "127.0.0.1"},
+    )
+    assert record["op"] == "UPDATE"
 
-# 6. Append record
-try:
-    rec = e.append_record("users", user_id, {"action": "login", "ip": "127.0.0.1"})
-    check("Append record", rec["op"] == "UPDATE", "op=" + rec["op"])
-except Exception as ex:
-    check("Append record", False, str(ex))
+    updated_entity = engine.read_entity("users", user_id)
+    assert updated_entity is not None
+    assert len(updated_entity["records"]) == 2
+    assert updated_entity["latest"]["action"] == "login"
 
-# 7. Read after append
-entity3 = e.read_entity("users", user_id)
-check("Read after append", entity3 is not None and len(entity3["records"]) == 2,
-      "records=" + str(len(entity3["records"])) if entity3 else "None")
+    listed = engine.list_entities("users")
+    assert any(meta["entity_id"] == user_id for meta in listed)
 
-# 8. List entities
-listed = e.list_entities("users")
-check("List entities", len(listed) >= 1, "count=" + str(len(listed)))
+    assert engine.count_entities("users") >= 1
 
-# 9. Count entities (cached)
-t0 = time.perf_counter()
-count = e.count_entities("users")
-t1 = time.perf_counter()
-check("Count entities", count >= 1, "count=%d, %.2fms" % (count, (t1 - t0) * 1000))
+    assert engine.update_lifecycle("users", user_id, LifecycleState.ACTIVE) is True
+    assert engine.update_lifecycle("users", user_id, LifecycleState.COMPLETED) is True
 
-# 10. Lifecycle: ACTIVE
-ok = e.update_lifecycle("users", user_id, LifecycleState.ACTIVE)
-check("Lifecycle -> ACTIVE", ok)
+    metadata = engine.read_metadata("users", user_id)
+    assert metadata is not None
+    assert metadata["lifecycle_state"] == LifecycleState.COMPLETED.value
 
-# 11. Lifecycle: COMPLETED
-ok = e.update_lifecycle("users", user_id, LifecycleState.COMPLETED)
-check("Lifecycle -> COMPLETED", ok)
+    engine.invalidate_cache()
+    refreshed_metadata = engine.read_metadata("users", user_id)
+    assert refreshed_metadata is not None
+    assert refreshed_metadata["lifecycle_state"] == LifecycleState.COMPLETED.value
 
-# 12. Read metadata (from cache)
-meta = e.read_metadata("users", user_id)
-check("Read metadata", meta is not None and meta["lifecycle_state"] == "COMPLETED",
-      "state=" + meta["lifecycle_state"] if meta else "None")
+    target_id = f"tgt-{uuid.uuid4().hex[:8]}"
+    target = engine.create_entity(
+        "targets",
+        target_id,
+        {
+            "program_name": "TestCorp",
+            "scope": "*.testcorp.com",
+            "payout_tier": "high",
+        },
+    )
+    assert target["entity_id"] == target_id
 
-# 13. Cache invalidation + re-read
-e.invalidate_cache()
-meta2 = e.read_metadata("users", user_id)
-check("Post-invalidation read", meta2 is not None and meta2["lifecycle_state"] == "COMPLETED")
+    assert engine.count_entities("users") >= 1
+    assert engine.count_entities("targets") >= 1
 
-# 14. Create target
-tid = str(uuid.uuid4())[:8]
-target_id = "tgt-" + tid
-try:
-    target = e.create_entity("targets", target_id, {"program_name": "TestCorp", "scope": "*.testcorp.com", "payout_tier": "high"})
-    check("Create target", target is not None, "id=" + target_id)
-except Exception as ex:
-    check("Create target", False, str(ex))
+    disk = engine._get_disk_usage()
+    assert disk["total_bytes"] > 0
 
-# 15. Cross-entity counts
-user_count = e.count_entities("users")
-target_count = e.count_entities("targets")
-check("Cross-entity counts", user_count >= 1 and target_count >= 1,
-      "users=%d, targets=%d" % (user_count, target_count))
-
-# 16. Disk usage
-disk = e._get_disk_usage()
-total_gb = disk["total_bytes"] // (1024**3)
-free_gb = disk["free_bytes"] // (1024**3)
-check("Disk usage", disk["total_bytes"] > 0,
-      "total=%dGB, free=%dGB, used=%.1f%%" % (total_gb, free_gb, disk["percent_used"]))
-
-# Final
-final_stats = e.get_stats()
-print()
-print("=" * 60)
-print("FINAL STATS")
-print("  Writes : %d" % final_stats["total_writes"])
-print("  Reads  : %d" % final_stats["total_reads"])
-print("  Entities: %d" % final_stats["total_entities"])
-print("  Bytes  : %d" % final_stats["total_bytes_written"])
-print("=" * 60)
-print()
-print("RESULTS: %d passed, %d failed" % (passed, failed))
-if failed == 0:
-    print("ALL TESTS PASSED")
-else:
-    print("SOME TESTS FAILED")
-    sys.exit(1)
+    final_stats = engine.get_stats()
+    assert final_stats["initialized"] is True
+    assert final_stats["entity_counts"]["users"] >= 1
+    assert final_stats["entity_counts"]["targets"] >= 1
+    assert final_stats["total_entities"] >= 2
+    assert final_stats["disk_usage"]["total_bytes"] > 0

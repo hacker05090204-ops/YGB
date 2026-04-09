@@ -39,6 +39,8 @@ from impl_v1.phase49.governors.g26_forensic_evidence import (
     EvidenceCaptureEngine,
     create_evidence_session,
     verify_evidence_integrity,
+    RealBackendNotConfiguredError,
+    POC_VIDEO_BACKEND_MESSAGE,
 )
 
 
@@ -539,70 +541,72 @@ class TestPoCTimeline:
 class TestPoCVideoOutput:
     """Tests for PoCVideoOutput generation."""
     
-    def test_generate_poc_video_output(self):
-        """Generate video output structure."""
+    def test_generate_poc_video_output_requires_real_backend(self):
+        """PoC video generation must fail closed without the native renderer."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
             engine.capture_screenshot("https://example.com", data=b"VID_OUTPUT_PNG")
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(bundle, ("Navigate", "Execute"))
-            output = generate_poc_video_output(timeline, tmpdir)
-            
-            assert output.output_id.startswith("POC-VID-")
-            assert output.format == "WEBM"
-            assert output.is_rendered == False  # Mock
+            with pytest.raises(RealBackendNotConfiguredError, match="PoC video rendering requires"):
+                generate_poc_video_output(timeline, tmpdir)
     
-    def test_generate_poc_video_mp4(self):
-        """Generate MP4 video output."""
+    def test_generate_poc_video_mp4_requires_real_backend(self):
+        """MP4 output must also fail closed without the native renderer."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(bundle, tuple())
-            output = generate_poc_video_output(timeline, tmpdir, format="MP4")
-            
-            assert output.format == "MP4"
-            assert output.video_path.endswith(".mp4")
-    
-    def test_video_output_has_integrity_hash(self):
-        """Video output has integrity hash."""
+            with pytest.raises(RealBackendNotConfiguredError, match="PoC video rendering requires"):
+                generate_poc_video_output(timeline, tmpdir, format="MP4")
+
+    def test_video_output_error_message_is_actionable(self):
+        """Provisioning error must explain the missing backend clearly."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(bundle, tuple())
-            output = generate_poc_video_output(timeline, tmpdir)
-            
-            assert len(output.integrity_hash) == 64
+            with pytest.raises(RealBackendNotConfiguredError) as exc_info:
+                generate_poc_video_output(timeline, tmpdir)
+
+            assert POC_VIDEO_BACKEND_MESSAGE in str(exc_info.value)
 
 
 class TestExportPoCVideo:
     """Tests for export_poc_video function."""
     
-    def test_export_returns_bytes(self):
-        """Export returns bytes."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            session_id, engine = create_evidence_session(tmpdir)
-            bundle = engine.finalize_bundle()
-            
-            timeline = build_poc_timeline(bundle, ("Step 1",))
-            output = generate_poc_video_output(timeline, tmpdir)
-            
-            exported = export_poc_video(output)
-            assert isinstance(exported, bytes)
-    
-    def test_export_creates_meta_file(self):
-        """Export creates metadata file."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            session_id, engine = create_evidence_session(tmpdir)
-            bundle = engine.finalize_bundle()
-            
-            timeline = build_poc_timeline(bundle, tuple())
-            output = generate_poc_video_output(timeline, tmpdir)
-            
+    def test_export_requires_real_backend(self):
+        """Export must fail closed when the video renderer is unavailable."""
+        timeline = build_poc_timeline(
+            EvidenceBundle(
+                bundle_id="BND-TEST",
+                session_id="SES-TEST",
+                created_at="2026-01-28T00:00:00Z",
+                screenshots=tuple(),
+                videos=tuple(),
+                dom_snapshots=tuple(),
+                network_metadata=tuple(),
+                bundle_hash="bundle-hash",
+                is_complete=True,
+            ),
+            tuple(),
+        )
+        output = PoCVideoOutput(
+            output_id="POC-VID-TEST",
+            video_path="forbidden.mp4",
+            timeline=timeline,
+            format="MP4",
+            width=1920,
+            height=1080,
+            integrity_hash="a" * 64,
+            is_rendered=False,
+        )
+
+        with pytest.raises(RealBackendNotConfiguredError, match="PoC video rendering requires"):
             export_poc_video(output)
-            assert Path(output.video_path + ".meta.json").exists()
 
 
 class TestPoCVideoGuards:

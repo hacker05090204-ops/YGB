@@ -8,6 +8,7 @@ from impl_v1.phase49.governors.g11_execution_seal import (
     SealCheckResult,
     SealCheckEntry,
     ExecutionSealResult,
+    SealProvisioningError,
     SealVerificationError,
     compute_seal,
     create_check,
@@ -224,7 +225,8 @@ class TestDataclassFrozen:
 class TestVerifySeal:
     """Test seal hashing and verification."""
 
-    def test_valid_seal_passes(self):
+    def test_valid_seal_passes(self, monkeypatch):
+        monkeypatch.setenv("YGB_HMAC_SECRET", "seal-secret-for-tests-0123456789abcdef")
         execution_id = "exec-123"
         timestamp_iso = "2026-04-05T16:00:00Z"
         payload_hash = "payload-hash"
@@ -232,11 +234,13 @@ class TestVerifySeal:
 
         assert verify_seal(execution_id, timestamp_iso, payload_hash, claimed) is True
 
-    def test_wrong_seal_raises_error(self):
+    def test_wrong_seal_raises_error(self, monkeypatch):
+        monkeypatch.setenv("YGB_HMAC_SECRET", "seal-secret-for-tests-0123456789abcdef")
         with pytest.raises(SealVerificationError, match="seal mismatch"):
             verify_seal("exec-123", "2026-04-05T16:00:00Z", "payload-hash", "wrong-seal")
 
-    def test_wrong_seal_logs_critical(self, caplog):
+    def test_wrong_seal_logs_critical(self, monkeypatch, caplog):
+        monkeypatch.setenv("YGB_HMAC_SECRET", "seal-secret-for-tests-0123456789abcdef")
         with caplog.at_level(logging.CRITICAL):
             with pytest.raises(SealVerificationError):
                 verify_seal("exec-123", "2026-04-05T16:00:00Z", "payload-hash", "wrong-seal")
@@ -245,3 +249,10 @@ class TestVerifySeal:
             record.levelno == logging.CRITICAL and "mismatch" in record.message.lower()
             for record in caplog.records
         )
+
+    def test_missing_seal_secret_raises_provisioning_error(self, monkeypatch):
+        monkeypatch.delenv("YGB_HMAC_SECRET", raising=False)
+        monkeypatch.delenv("YGB_AUTHORITY_KEY", raising=False)
+
+        with pytest.raises(SealProvisioningError, match="requires YGB_AUTHORITY_KEY or YGB_HMAC_SECRET"):
+            compute_seal("exec-123", "2026-04-05T16:00:00Z", "payload-hash")

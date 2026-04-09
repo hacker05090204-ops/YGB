@@ -45,15 +45,15 @@ class TestAIAcceleratorTruthfulness:
 
 
 class TestForensicVideoTruthfulness:
-    """Forensic video must report PENDING_RENDER when C++ unavailable."""
+    """Forensic video must fail closed when the real renderer is unavailable."""
 
     def test_poc_video_not_rendered(self, tmp_path):
-        """POC video output must set is_rendered=False."""
+        """POC video generation must raise a clear provisioning error."""
         from impl_v1.phase49.governors.g26_forensic_evidence import (
+            RealBackendNotConfiguredError,
             create_evidence_session,
             build_poc_timeline,
             generate_poc_video_output,
-            compute_sha256,
         )
         session_id, engine = create_evidence_session(str(tmp_path / "evidence"))
         # Create a minimal screenshot for the bundle
@@ -62,17 +62,16 @@ class TestForensicVideoTruthfulness:
         bundle = engine.finalize_bundle()
 
         timeline = build_poc_timeline(bundle, ("Step 1: Navigate",))
-        output = generate_poc_video_output(timeline, str(tmp_path / "poc"))
-        assert output.is_rendered is False, "POC video should NOT be rendered (C++ required)"
+        with pytest.raises(RealBackendNotConfiguredError, match="requires a provisioned native video compositor backend"):
+            generate_poc_video_output(timeline, str(tmp_path / "poc"))
 
     def test_poc_video_status_pending_render(self, tmp_path):
-        """export_poc_video status dict must include PENDING_RENDER_BY_CPP."""
-        import json
+        """POC video export must also fail closed without the renderer."""
         from impl_v1.phase49.governors.g26_forensic_evidence import (
+            RealBackendNotConfiguredError,
             create_evidence_session,
             build_poc_timeline,
             generate_poc_video_output,
-            export_poc_video,
         )
         session_id, engine = create_evidence_session(str(tmp_path / "evidence2"))
         data = b"PNG_TEST_DATA_2"
@@ -80,13 +79,8 @@ class TestForensicVideoTruthfulness:
         bundle = engine.finalize_bundle()
 
         timeline = build_poc_timeline(bundle, ("Step 1",))
-        output = generate_poc_video_output(timeline, str(tmp_path / "poc2"))
-        export_bytes = export_poc_video(output)
-        status = json.loads(export_bytes)
-        assert status["status"] == "PENDING_RENDER_BY_CPP", (
-            f"Expected PENDING_RENDER_BY_CPP, got: {status['status']}"
-        )
-        assert status["is_rendered"] is False
+        with pytest.raises(RealBackendNotConfiguredError, match="requires a provisioned native video compositor backend"):
+            generate_poc_video_output(timeline, str(tmp_path / "poc2"))
 
 
 class TestCVEApiTruthfulness:
@@ -128,6 +122,21 @@ class TestGmailAlertsTruthfulness:
                 device_id="test-device-abc",
                 ip_address="192.168.1.1",
             )
+
+
+class TestVoiceReportingTruthfulness:
+    """Voice reporting must fail closed without a real TTS backend."""
+
+    def test_voice_reporting_requires_real_tts_backend(self):
+        from impl_v1.phase49.governors.g17_voice_reporting import (
+            RealBackendNotConfiguredError,
+            VoiceReporter,
+        )
+
+        reporter = VoiceReporter()
+
+        with pytest.raises(RealBackendNotConfiguredError):
+            reporter.generate_report("Voice narration requires real backend")
 
 
 class TestScreenInspectionTruthfulness:

@@ -25,7 +25,9 @@ import hmac
 import hashlib
 import struct
 import logging
+import tempfile
 import time
+import threading
 import uuid
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
@@ -49,6 +51,8 @@ EXPECTED_HMAC_VERSION = 4  # Emergency rotation: previous key exposed in git
 
 # Runtime state file (used by get_runtime_status for non-telemetry state)
 RUNTIME_STATE_PATH = os.path.join(PROJECT_ROOT, 'reports', 'runtime_state.json')
+EXPERT_STATUS_PATH = os.path.join(PROJECT_ROOT, 'experts_status.json')
+EXPERT_CHECKPOINT_ROOT = os.path.join(PROJECT_ROOT, 'checkpoints')
 
 # Required fields for valid runtime state
 REQUIRED_FIELDS = [
@@ -62,6 +66,7 @@ REQUIRED_FIELDS = [
 
 STALE_THRESHOLD_MS = 30_000  # 30 seconds
 _TRUTHY_VALUES = {"1", "true", "yes", "on"}
+_LAST_SEEN_LOCK = threading.RLock()
 
 
 def _validate_structure(data: dict) -> list:
@@ -309,28 +314,38 @@ def validate_hmac(payload: dict) -> bool:
 
 def load_last_seen_timestamp() -> int:
     """Load last seen monotonic timestamp from persistence."""
-    try:
-        with open(LAST_SEEN_PATH, 'r') as f:
-            data = json.load(f)
-        return int(data.get('last_seen', 0))
-    except (FileNotFoundError, json.JSONDecodeError, ValueError):
-        return 0
+    with _LAST_SEEN_LOCK:
+        try:
+            with open(LAST_SEEN_PATH, 'r') as f:
+                data = json.load(f)
+            return int(data.get('last_seen', 0))
+        except (FileNotFoundError, json.JSONDecodeError, ValueError):
+            return 0
 
 
 def save_last_seen_timestamp(ts: int) -> None:
     """Persist last seen monotonic timestamp atomically."""
-    tmp_path = LAST_SEEN_PATH + '.tmp'
-    try:
-        with open(tmp_path, 'w') as f:
-            json.dump({"last_seen": ts}, f)
-            f.flush()
-            os.fsync(f.fileno())
-        # Atomic replace
-        if os.path.exists(LAST_SEEN_PATH):
-            os.remove(LAST_SEEN_PATH)
-        os.rename(tmp_path, LAST_SEEN_PATH)
-    except Exception as e:
-        logger.error("Failed to save last_seen_timestamp: %s", e)
+    with _LAST_SEEN_LOCK:
+        directory = os.path.dirname(LAST_SEEN_PATH)
+        os.makedirs(directory, exist_ok=True)
+        fd, tmp_path = tempfile.mkstemp(
+            prefix='last_seen_timestamp.',
+            suffix='.tmp',
+            dir=directory,
+        )
+        try:
+            with os.fdopen(fd, 'w') as f:
+                json.dump({"last_seen": ts}, f)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, LAST_SEEN_PATH)
+        except Exception as e:
+            logger.error("Failed to save last_seen_timestamp: %s", e)
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except OSError:
+                logger.warning("Failed to clean temporary last_seen file: %s", tmp_path)
 
 
 # =========================================================================
@@ -412,79 +427,80 @@ def validate_telemetry() -> dict:
 
     # Step 6: Validate monotonic_timestamp > last_seen (replay protection)
     monotonic_ts = data.get('monotonic_timestamp', 0)
-    last_seen = load_last_seen_timestamp()
-    if last_seen > 0 and monotonic_ts <= last_seen:
-        logger.error(
-            "REPLAY DETECTED: monotonic_timestamp=%d <= last_seen=%d",
-            monotonic_ts, last_seen
-        )
-        return {
-            "status": "corrupted",
-            "reason": "replay_detected",
-            "detail": f"Replay detected: monotonic_timestamp={monotonic_ts} <= last_seen={last_seen}"
-        }
+    with _LAST_SEEN_LOCK:
+        last_seen = load_last_seen_timestamp()
+        if last_seen > 0 and monotonic_ts <= last_seen:
+            logger.error(
+                "REPLAY DETECTED: monotonic_timestamp=%d <= last_seen=%d",
+                monotonic_ts, last_seen
+            )
+            return {
+                "status": "corrupted",
+                "reason": "replay_detected",
+                "detail": f"Replay detected: monotonic_timestamp={monotonic_ts} <= last_seen={last_seen}"
+            }
 
-    # Step 7: Validate schema version
-    if data['schema_version'] != EXPECTED_SCHEMA_VERSION:
-        logger.error(
-            "Schema version mismatch: got %s, expected %s",
-            data['schema_version'], EXPECTED_SCHEMA_VERSION
-        )
-        return {
-            "status": "corrupted",
-            "reason": "schema_mismatch",
-            "detail": f"Schema version mismatch: {data['schema_version']}"
-        }
+        # Step 7: Validate schema version
+        if data['schema_version'] != EXPECTED_SCHEMA_VERSION:
+            logger.error(
+                "Schema version mismatch: got %s, expected %s",
+                data['schema_version'], EXPECTED_SCHEMA_VERSION
+            )
+            return {
+                "status": "corrupted",
+                "reason": "schema_mismatch",
+                "detail": f"Schema version mismatch: {data['schema_version']}"
+            }
 
-    # Step 8: Validate determinism_status
-    if data['determinism_status'] is not True:
-        logger.error("determinism_status is not true")
-        return {
-            "status": "corrupted",
-            "reason": "determinism_failed",
-            "detail": "determinism_status is false"
-        }
+        # Step 8: Validate determinism_status
+        if data['determinism_status'] is not True:
+            logger.error("determinism_status is not true")
+            return {
+                "status": "corrupted",
+                "reason": "determinism_failed",
+                "detail": "determinism_status is false"
+            }
 
-    # Step 9: THERMAL HALT — reject if GPU temperature > 88°C
-    gpu_temp = data.get('gpu_temperature', 0.0)
-    if isinstance(gpu_temp, (int, float)) and gpu_temp > 88.0:
-        logger.error("THERMAL HALT: gpu_temperature=%.1f > 88.0°C", gpu_temp)
-        return {
-            "status": "corrupted",
-            "reason": "thermal_limit",
-            "detail": f"GPU temperature {gpu_temp:.1f}°C exceeds 88°C safety limit"
-        }
+        # Step 9: THERMAL HALT — reject if GPU temperature > 88°C
+        gpu_temp = data.get('gpu_temperature', 0.0)
+        if isinstance(gpu_temp, (int, float)) and gpu_temp > 88.0:
+            logger.error("THERMAL HALT: gpu_temperature=%.1f > 88.0°C", gpu_temp)
+            return {
+                "status": "corrupted",
+                "reason": "thermal_limit",
+                "detail": f"GPU temperature {gpu_temp:.1f}°C exceeds 88°C safety limit"
+            }
 
-    # Step 10: GOVERNANCE LOCK — reject if freeze_status is active
-    if data.get('freeze_status') is True:
-        logger.error("GOVERNANCE LOCK ACTIVE: freeze_status=true — training blocked")
-        return {
-            "status": "corrupted",
-            "reason": "governance_lock",
-            "detail": "Governance freeze is active — training halted"
-        }
+        # Step 10: GOVERNANCE LOCK — reject if freeze_status is active
+        if data.get('freeze_status') is True:
+            logger.error("GOVERNANCE LOCK ACTIVE: freeze_status=true — training blocked")
+            return {
+                "status": "corrupted",
+                "reason": "governance_lock",
+                "detail": "Governance freeze is active — training halted"
+            }
 
-    # Step 11: STRICT HMAC VERSION CHECK — no backward compatibility
-    hmac_ver = data.get('hmac_version')
-    if hmac_ver is None:
-        logger.error("HMAC version MISSING from telemetry — strict rejection")
-        return {
-            "status": "corrupted",
-            "reason": "hmac_version_missing",
-            "detail": f"hmac_version field required, expected {EXPECTED_HMAC_VERSION}"
-        }
-    if hmac_ver != EXPECTED_HMAC_VERSION:
-        logger.error("HMAC version mismatch: got %s, expected %s",
-                     hmac_ver, EXPECTED_HMAC_VERSION)
-        return {
-            "status": "corrupted",
-            "reason": "hmac_version_mismatch",
-            "detail": f"HMAC version {hmac_ver} != expected {EXPECTED_HMAC_VERSION}"
-        }
+        # Step 11: STRICT HMAC VERSION CHECK — no backward compatibility
+        hmac_ver = data.get('hmac_version')
+        if hmac_ver is None:
+            logger.error("HMAC version MISSING from telemetry — strict rejection")
+            return {
+                "status": "corrupted",
+                "reason": "hmac_version_missing",
+                "detail": f"hmac_version field required, expected {EXPECTED_HMAC_VERSION}"
+            }
+        if hmac_ver != EXPECTED_HMAC_VERSION:
+            logger.error("HMAC version mismatch: got %s, expected %s",
+                         hmac_ver, EXPECTED_HMAC_VERSION)
+            return {
+                "status": "corrupted",
+                "reason": "hmac_version_mismatch",
+                "detail": f"HMAC version {hmac_ver} != expected {EXPECTED_HMAC_VERSION}"
+            }
 
-    # All checks passed — update last_seen atomically
-    if monotonic_ts > last_seen:
-        save_last_seen_timestamp(monotonic_ts)
+        # All checks passed — update last_seen atomically
+        if monotonic_ts > last_seen:
+            save_last_seen_timestamp(monotonic_ts)
 
     return {
         "status": "ok",
@@ -689,6 +705,51 @@ def get_auto_training_status() -> dict[str, object]:
     }
 
 
+def get_training_expert_status() -> dict[str, object]:
+    from backend.training.safetensors_store import CheckpointManager
+    from scripts.expert_task_queue import load_status
+
+    queue_state = load_status(EXPERT_STATUS_PATH)
+    checkpoint_manager = CheckpointManager(EXPERT_CHECKPOINT_ROOT)
+    checkpoint_status_by_expert = {
+        (int(item["expert_id"]), str(item["field_name"])): item
+        for item in checkpoint_manager.get_all_expert_status()
+    }
+
+    combined_status = []
+    for record in queue_state.get("experts", []):
+        expert_id = int(record.get("expert_id", 0))
+        field_name = str(record.get("field_name", "") or "")
+        checkpoint_status = checkpoint_status_by_expert.get(
+            (expert_id, field_name),
+            {
+                "has_checkpoint": False,
+                "best_val_f1": None,
+            },
+        )
+        queue_best_val_f1 = record.get("best_val_f1")
+        combined_status.append(
+            {
+                "expert_id": expert_id,
+                "field_name": field_name,
+                "queue_status": str(record.get("status", "") or ""),
+                "has_checkpoint": bool(checkpoint_status.get("has_checkpoint", False)),
+                "best_val_f1": (
+                    checkpoint_status.get("best_val_f1")
+                    if checkpoint_status.get("best_val_f1") is not None
+                    else queue_best_val_f1
+                ),
+                "claimed_by": record.get("claimed_by"),
+            }
+        )
+
+    return {
+        "status": "ok",
+        "updated_at": queue_state.get("updated_at", ""),
+        "experts": combined_status,
+    }
+
+
 def get_workflow_orchestrator():
     from backend.tasks.industrial_agent import get_workflow_orchestrator as _get
 
@@ -742,6 +803,11 @@ def trigger_auto_training_check() -> dict[str, str]:
 @router.get("/api/v1/training/auto/status")
 async def auto_training_status(user=Depends(require_auth)) -> dict[str, object]:
     return get_auto_training_status()
+
+
+@router.get("/api/v1/training/experts/status")
+async def training_expert_status(user=Depends(require_auth)) -> dict[str, object]:
+    return get_training_expert_status()
 
 
 @router.post("/api/v1/training/auto/trigger")
@@ -811,7 +877,15 @@ def register_routes(app):
         status_code = 500 if result.get('status') == 'error' else 200
         return json.dumps(result), status_code, {'Content-Type': 'application/json'}
 
-    logger.info("Registered runtime API routes: /runtime/status, /api/v1/status/detailed")
+    @app.route('/api/v1/training/experts/status', methods=['GET'])
+    def training_expert_status_route():
+        result = get_training_expert_status()
+        status_code = 500 if result.get('status') == 'error' else 200
+        return json.dumps(result), status_code, {'Content-Type': 'application/json'}
+
+    logger.info(
+        "Registered runtime API routes: /runtime/status, /api/v1/status/detailed, /api/v1/training/experts/status"
+    )
 
 
 # =========================================================================

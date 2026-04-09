@@ -199,6 +199,19 @@ def _has_auth_violation(finding_data: Dict) -> bool:
     )
 
 
+def _is_duplicate_finding(finding_data: Dict) -> bool:
+    duplicate_keys = ("duplicate_of", "duplicate_report_id", "duplicate_finding_id")
+    if any(str(finding_data.get(key, "") or "").strip() for key in duplicate_keys):
+        return True
+    if bool(finding_data.get("is_duplicate", False)):
+        return True
+    duplicate_probability = finding_data.get("duplicate_probability")
+    try:
+        return float(duplicate_probability) >= 0.95
+    except (TypeError, ValueError):
+        return False
+
+
 def _determine_impact(finding_data: Dict) -> ImpactCategory:
     """Determine impact category from finding data."""
     impact_map = {
@@ -247,6 +260,32 @@ def verify_bug_proof(
             rejection_reason=noise_reason,
             evidence=None,
             determinism_hash=_hash_content(finding_text),
+        ))
+
+    if _is_duplicate_finding(finding_data):
+        return _finalize_result(ProofVerificationResult(
+            result_id=_generate_id("PRF"),
+            status=ProofStatus.DUPLICATE,
+            confidence=99,
+            impact=ImpactCategory.NONE,
+            proof="",
+            reason="Duplicate finding matches an existing verified report",
+            rejection_reason=RejectionReason.NONE,
+            evidence=None,
+            determinism_hash=_hash_content(finding_text + str(finding_data)),
+        ))
+
+    if scanner_output and not _has_controllable_input(finding_data):
+        return _finalize_result(ProofVerificationResult(
+            result_id=_generate_id("PRF"),
+            status=ProofStatus.NOT_REAL,
+            confidence=90,
+            impact=ImpactCategory.NONE,
+            proof="",
+            reason="Rejected scanner-only output without controllable proof",
+            rejection_reason=RejectionReason.SCANNER_OUTPUT_ONLY,
+            evidence=None,
+            determinism_hash=_hash_content(finding_text + str(finding_data)),
         ))
     
     # Step 2: Check for controllable input

@@ -142,6 +142,13 @@ def compute_chain_root_hash(chain: List[ChainLink]) -> Optional[str]:
     return hashlib.sha256(combined.encode("utf-8")).hexdigest()
 
 
+def _parse_chain_timestamp(value: str) -> Optional[datetime]:
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+
+
 # =============================================================================
 # CHAIN BUILDER
 # =============================================================================
@@ -204,6 +211,10 @@ class IntegrityChainBuilder:
     def get_root_hash(self) -> Optional[str]:
         """Get root hash of current chain."""
         return compute_chain_root_hash(self._links)
+
+
+class IntegrityChain(IntegrityChainBuilder):
+    """Backward-compatible chain builder name for import restoration."""
 
 
 # =============================================================================
@@ -276,6 +287,28 @@ class IntegrityChainVerifier:
                     message=f"Sequence mismatch at position {i}",
                 ))
                 continue
+
+            current_timestamp = _parse_chain_timestamp(link.timestamp)
+            if current_timestamp is None:
+                record_violation(i, IntegrityViolationRecord(
+                    violation_type=IntegrityViolation.TIMESTAMP_ANOMALY,
+                    link_id=link.link_id,
+                    expected="valid_iso_timestamp",
+                    actual=str(link.timestamp),
+                    message=f"Invalid timestamp at position {i}",
+                ))
+                continue
+            if i > 0:
+                previous_timestamp = _parse_chain_timestamp(chain[i - 1].timestamp)
+                if previous_timestamp is not None and current_timestamp < previous_timestamp:
+                    record_violation(i, IntegrityViolationRecord(
+                        violation_type=IntegrityViolation.TIMESTAMP_ANOMALY,
+                        link_id=link.link_id,
+                        expected=chain[i - 1].timestamp,
+                        actual=link.timestamp,
+                        message=f"Timestamp anomaly at position {i}",
+                    ))
+                    continue
             
             # Check prev_hash for non-genesis
             if i > 0:

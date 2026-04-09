@@ -15,11 +15,13 @@ Checkpointing is resumable and stores real training state.
 import json
 import logging
 import os
+import hashlib
+import ctypes
 import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -29,6 +31,12 @@ if PROJECT_ROOT not in sys.path:
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
+
+USE_MOE = os.getenv("YGB_USE_MOE", "true").lower() == "true"
+MOE_GLOBAL_REGISTRY_PATH = os.path.join("checkpoints", "moe_global_registry.json")
+EXPERT_CHECKPOINT_REGISTRY_PATH = os.path.join(
+    "checkpoints", "expert_checkpoint_registry.json"
+)
 
 from training_core.execution import (
     run_phase3_training_execution as _run_phase3_training_execution,
@@ -54,6 +62,482 @@ from training_core.contracts import (
 # =============================================================================
 # HELPERS
 # =============================================================================
+
+
+def _refresh_use_moe() -> bool:
+    global USE_MOE
+    USE_MOE = os.getenv("YGB_USE_MOE", "true").lower() == "true"
+    return USE_MOE
+
+
+def _compute_dataset_hash(features: np.ndarray, labels: np.ndarray) -> str:
+    digest = hashlib.sha256()
+    digest.update(np.ascontiguousarray(features, dtype=np.float32).tobytes())
+    digest.update(np.ascontiguousarray(labels, dtype=np.int64).tobytes())
+    return digest.hexdigest()
+
+
+def _build_failed_training_result(status: str) -> TrainingResult:
+    return TrainingResult(
+        epochs_completed=0,
+        final_loss=float("inf"),
+        final_accuracy=0.0,
+        best_accuracy=0.0,
+        cluster_sps=0.0,
+        merged_weight_hash="",
+        drift_aborted=False,
+        per_epoch=[],
+        val_accuracy=0.0,
+        val_f1=0.0,
+        val_precision=0.0,
+        val_recall=0.0,
+        best_val_loss=float("inf"),
+        checkpoint_path="",
+        status=status,
+    )
+
+
+def _build_legacy_hidden_dims(effective_hidden_dim: int) -> Tuple[int, ...]:
+    tail_dim = max(16, int(effective_hidden_dim))
+    mid_dim = max(tail_dim, min(tail_dim * 2, 256))
+    upper_dim = max(mid_dim, min(tail_dim * 4, 512))
+    head_dim = max(upper_dim, min(tail_dim * 8, 1024))
+    return (head_dim, upper_dim, mid_dim, tail_dim)
+
+
+def _build_configured_model(
+    *,
+    config: TrainingControllerConfig,
+    total_samples: int,
+    effective_hidden_dim: int,
+    device,
+    nn_module,
+):
+    del total_samples, nn_module
+
+    if _refresh_use_moe():
+        from impl_v1.phase49.moe import EXPERT_FIELDS, MoEBugClassifier, MoEConfig
+
+        moe_dim = max(64, min(256, int(effective_hidden_dim) * 2))
+        moe_config = MoEConfig(
+            d_model=moe_dim,
+            n_experts=len(EXPERT_FIELDS),
+            top_k=min(2, len(EXPERT_FIELDS)),
+            expert_hidden_mult=2,
+            dropout=0.3,
+            gate_noise=1.0,
+            aux_loss_coeff=0.01,
+        )
+        model = MoEBugClassifier(
+            moe_config,
+            input_dim=config.input_dim,
+            output_dim=config.num_classes,
+        ).to(device)
+        model.requires_unused_parameter_detection = True
+        logger.info(
+            "  MoE activated: experts=%s | top_k=%s | d_model=%s",
+            moe_config.n_experts,
+            moe_config.top_k,
+            moe_config.d_model,
+        )
+        return model, moe_config.d_model
+
+    from impl_v1.phase49.governors.g37_pytorch_backend import (
+        BugClassifier,
+        create_model_config,
+    )
+
+    legacy_config = create_model_config(
+        input_dim=config.input_dim,
+        output_dim=config.num_classes,
+        hidden_dims=_build_legacy_hidden_dims(effective_hidden_dim),
+        dropout=0.3,
+        learning_rate=config.base_lr,
+        batch_size=config.base_batch_size,
+        epochs=config.num_epochs,
+        seed=config.seed,
+    )
+    model = BugClassifier(legacy_config).to(device)
+    model.requires_unused_parameter_detection = False
+    logger.warning("  YGB_USE_MOE=false — using legacy BugClassifier fallback")
+    return model, effective_hidden_dim
+
+
+def _resolve_selected_checkpoint_meta(
+    config: TrainingControllerConfig,
+    training_result: TrainingResult,
+) -> dict:
+    candidate_meta_paths = [
+        training_result.best_checkpoint_meta_path,
+        training_result.latest_checkpoint_meta_path,
+    ]
+    for meta_path in candidate_meta_paths:
+        if not meta_path:
+            continue
+        meta = _load_json_if_exists(meta_path)
+        if not meta:
+            continue
+        if "model_path" not in meta:
+            shards = meta.get("shards") or []
+            if shards:
+                meta = {
+                    **meta,
+                    "model_path": shards[0].get("model_path", ""),
+                    "model_sha256": shards[0].get("model_sha256", ""),
+                    "meta_path": meta_path,
+                }
+        else:
+            meta = {**meta, "meta_path": meta_path}
+        if meta.get("model_path"):
+            return meta
+
+    latest = _load_latest_training_checkpoint(config.checkpoint_dir) or {}
+    if latest and "model_path" not in latest:
+        shards = latest.get("shards") or []
+        if shards:
+            latest = {
+                **latest,
+                "model_path": shards[0].get("model_path", ""),
+                "model_sha256": shards[0].get("model_sha256", ""),
+            }
+    return latest
+
+
+def _update_best_checkpoint_registry(
+    registry_path: str,
+    key: str,
+    val_f1: float,
+    checkpoint_path: str,
+    extra: Optional[dict] = None,
+) -> bool:
+    directory = os.path.dirname(registry_path)
+    if directory:
+        _ensure_dir(directory)
+    registry = _load_json_if_exists(registry_path)
+    if not isinstance(registry, dict):
+        registry = {}
+    current = registry.get(key) if isinstance(registry.get(key), dict) else {}
+    current_best = (
+        float(current.get("val_f1"))
+        if current.get("val_f1") is not None
+        else float("-inf")
+    )
+    improved = float(val_f1) > current_best
+    if improved:
+        registry[key] = {
+            "val_f1": float(val_f1),
+            "checkpoint_path": checkpoint_path,
+            "updated_at": datetime.now().isoformat(),
+            **(extra or {}),
+        }
+        _atomic_write_json(registry_path, registry)
+    return improved
+
+
+def _best_epoch_for_result(training_result: TrainingResult) -> int:
+    if not training_result.per_epoch:
+        return int(training_result.epochs_completed)
+    best_entry = max(
+        training_result.per_epoch,
+        key=lambda item: (
+            float(item.get("val_f1", float("-inf"))),
+            -float(item.get("val_loss", float("inf"))),
+            int(item.get("epoch", 0)),
+        ),
+    )
+    return int(best_entry.get("epoch", training_result.epochs_completed) or 0)
+
+
+def _save_expert_checkpoint(
+    config: TrainingControllerConfig,
+    training_result: TrainingResult,
+    expert_id: int,
+    field_name: str,
+) -> str:
+    if training_result.drift_aborted:
+        return ""
+
+    from backend.training.safetensors_store import CheckpointManager
+    from safetensors.torch import load_file as st_load
+
+    selected_meta = _resolve_selected_checkpoint_meta(config, training_result)
+    source_model_path = str(selected_meta.get("model_path", "") or "")
+    if not source_model_path:
+        return ""
+
+    state_dict = st_load(source_model_path, device="cpu")
+    manager = CheckpointManager(config.checkpoint_dir)
+    checkpoint_result = manager.save(
+        expert_id=int(expert_id),
+        field_name=field_name,
+        state_dict=state_dict,
+        val_f1=training_result.val_f1,
+        metadata={
+            "epoch": int(selected_meta.get("epoch") or _best_epoch_for_result(training_result) or 0),
+            "source_model_path": source_model_path,
+            "source_model_sha256": str(selected_meta.get("model_sha256", "") or ""),
+            "source_meta_path": str(selected_meta.get("meta_path", "") or ""),
+            "val_precision": float(training_result.val_precision),
+            "val_recall": float(training_result.val_recall),
+        },
+    )
+    checkpoint_path = str(checkpoint_result.get("checkpoint_path", "") or "")
+    logger.info(
+        "  expert checkpoint saved: %s%s",
+        checkpoint_path or "[not retained]",
+        " [best]" if checkpoint_result.get("is_best") else "",
+    )
+    return checkpoint_path
+
+
+def _maybe_save_moe_global_checkpoint(
+    config: TrainingControllerConfig,
+    training_result: TrainingResult,
+) -> str:
+    if not _refresh_use_moe() or training_result.drift_aborted:
+        return ""
+
+    from safetensors.torch import load_file as st_load
+    from safetensors.torch import save_file as st_save
+
+    selected_meta = _resolve_selected_checkpoint_meta(config, training_result)
+    source_model_path = str(selected_meta.get("model_path", "") or "")
+    if not source_model_path:
+        return ""
+
+    state_dict = st_load(source_model_path, device="cpu")
+    epoch = int(selected_meta.get("epoch") or _best_epoch_for_result(training_result) or 0)
+    _ensure_dir("checkpoints")
+    checkpoint_path = os.path.join(
+        "checkpoints",
+        f"moe_global_{epoch}_{training_result.val_f1:.3f}.safetensors",
+    )
+    if not os.path.exists(checkpoint_path):
+        st_save(state_dict, checkpoint_path)
+
+    improved = _update_best_checkpoint_registry(
+        MOE_GLOBAL_REGISTRY_PATH,
+        "global",
+        training_result.val_f1,
+        checkpoint_path,
+        extra={"epoch": epoch},
+    )
+    logger.info(
+        "  MoE global checkpoint saved: %s%s",
+        checkpoint_path,
+        " [best]" if improved else "",
+    )
+    return checkpoint_path
+
+
+def _load_real_ingestion_dataset(config: TrainingControllerConfig):
+    from impl_v1.training.data.real_dataset_loader import (
+        IngestionPipelineDataset,
+        STRICT_REAL_MODE,
+        validate_dataset_integrity,
+    )
+
+    if STRICT_REAL_MODE:
+        logger.info("  STRICT_REAL_MODE=True — loading expert data from ingestion pipeline")
+
+    verification_passed, verification_message = validate_dataset_integrity(
+        feature_dim=config.input_dim,
+        seed=config.seed,
+    )
+    if not verification_passed:
+        raise RuntimeError(verification_message)
+
+    dataset = IngestionPipelineDataset(
+        feature_dim=config.input_dim,
+        min_samples=100,
+        seed=config.seed,
+    )
+    if getattr(dataset, "dataset_source", "") != "INGESTION_PIPELINE":
+        raise RuntimeError(
+            f"Training source mismatch: {dataset.dataset_source} != INGESTION_PIPELINE"
+        )
+    return dataset
+
+
+def _read_verified_samples_from_bridge(dataset) -> List[dict]:
+    raw_samples = list(getattr(dataset, "_raw_samples", []) or [])
+    if raw_samples:
+        return raw_samples
+
+    bridge_state = getattr(dataset, "_bridge_state", None)
+    verified_count = int(getattr(dataset, "_verified_count", 0) or 0)
+    if bridge_state is not None:
+        persisted_samples = bridge_state.read_samples(max_samples=verified_count)
+        if persisted_samples:
+            return [sample for sample in persisted_samples if isinstance(sample, dict)]
+
+    lib = getattr(dataset, "_lib", None)
+    if lib is None or verified_count <= 0:
+        return []
+
+    field_len = 512
+    reconstructed: List[dict] = []
+    for idx in range(verified_count):
+        endpoint_buffer = ctypes.create_string_buffer(field_len)
+        parameters_buffer = ctypes.create_string_buffer(field_len)
+        exploit_buffer = ctypes.create_string_buffer(field_len)
+        impact_buffer = ctypes.create_string_buffer(field_len)
+        source_buffer = ctypes.create_string_buffer(field_len)
+        fingerprint_buffer = ctypes.create_string_buffer(65)
+        reliability = ctypes.c_double(0.0)
+        ingested_at = ctypes.c_long(0)
+
+        rc = lib.bridge_fetch_verified_sample(
+            idx,
+            endpoint_buffer,
+            field_len,
+            parameters_buffer,
+            field_len,
+            exploit_buffer,
+            field_len,
+            impact_buffer,
+            field_len,
+            source_buffer,
+            field_len,
+            fingerprint_buffer,
+            65,
+            ctypes.byref(reliability),
+            ctypes.byref(ingested_at),
+        )
+        if rc != 0:
+            continue
+
+        reconstructed.append(
+            {
+                "endpoint": endpoint_buffer.value.decode("utf-8", errors="replace"),
+                "parameters": parameters_buffer.value.decode("utf-8", errors="replace"),
+                "exploit_vector": exploit_buffer.value.decode(
+                    "utf-8", errors="replace"
+                ),
+                "impact": impact_buffer.value.decode("utf-8", errors="replace"),
+                "source_tag": source_buffer.value.decode("utf-8", errors="replace"),
+                "fingerprint": fingerprint_buffer.value.decode(
+                    "utf-8", errors="replace"
+                ),
+                "reliability": float(reliability.value),
+                "ingested_at": int(ingested_at.value),
+            }
+        )
+    return reconstructed
+
+
+def _materialize_ingestion_dataset(dataset) -> Tuple[List[dict], np.ndarray, np.ndarray]:
+    features_tensor = getattr(dataset, "_features_tensor", None)
+    labels_tensor = getattr(dataset, "_labels_tensor", None)
+    raw_samples = list(getattr(dataset, "_raw_samples", []) or [])
+    if (
+        raw_samples
+        and features_tensor is not None
+        and labels_tensor is not None
+        and len(raw_samples) == int(labels_tensor.shape[0])
+    ):
+        return (
+            raw_samples,
+            np.ascontiguousarray(
+                features_tensor.detach().cpu().numpy(), dtype=np.float32
+            ),
+            np.ascontiguousarray(labels_tensor.detach().cpu().numpy(), dtype=np.int64),
+        )
+
+    source_samples = _read_verified_samples_from_bridge(dataset)
+    if not source_samples:
+        raise RuntimeError("Unable to reconstruct expert dataset samples from ingestion")
+
+    import torch
+    from impl_v1.training.distributed.data_quality_scorer import DataQualityScorer
+    from impl_v1.training.distributed.ingestion_policy import IngestionPolicy
+
+    policy = IngestionPolicy()
+    scorer = DataQualityScorer()
+    validator = getattr(dataset, "_integrity_validator", None)
+    if validator is None:
+        raise RuntimeError("Dataset integrity validator unavailable for expert training")
+
+    dataset._raw_samples = []
+    dataset._features = []
+    dataset._labels = []
+
+    for sample in source_samples:
+        if not isinstance(sample, dict):
+            continue
+        reliability_val = float(sample.get("reliability", 0.0) or 0.0)
+        if reliability_val < 0.7:
+            continue
+
+        validation_sample = dataset._build_integrity_validation_sample(
+            endpoint=str(sample.get("endpoint", "") or ""),
+            parameters=str(sample.get("parameters", "") or ""),
+            exploit_vector=str(sample.get("exploit_vector", "") or ""),
+            impact=str(sample.get("impact", "") or ""),
+            published_at=str(
+                sample.get("published_at") or sample.get("ingested_at") or ""
+            ),
+        )
+        if not validator.validate_sample(validation_sample):
+            continue
+
+        dataset._process_one_sample(
+            endpoint=str(sample.get("endpoint", "") or ""),
+            parameters=str(sample.get("parameters", "") or ""),
+            exploit_vector=str(sample.get("exploit_vector", "") or ""),
+            impact=str(sample.get("impact", "") or ""),
+            source_tag=str(sample.get("source_tag", "") or ""),
+            fingerprint=str(sample.get("fingerprint", "") or ""),
+            reliability_val=reliability_val,
+            policy=policy,
+            scorer=scorer,
+        )
+
+    if not dataset._raw_samples or not dataset._features or not dataset._labels:
+        raise RuntimeError("No expert-trainable samples available after ingestion filtering")
+
+    dataset._features_tensor = torch.tensor(dataset._features, dtype=torch.float32)
+    dataset._labels_tensor = torch.tensor(dataset._labels, dtype=torch.long)
+
+    return (
+        list(dataset._raw_samples),
+        np.ascontiguousarray(
+            dataset._features_tensor.detach().cpu().numpy(), dtype=np.float32
+        ),
+        np.ascontiguousarray(
+            dataset._labels_tensor.detach().cpu().numpy(), dtype=np.int64
+        ),
+    )
+
+
+def _route_ingestion_sample(sample: dict) -> str:
+    from backend.ingest.normalize.canonicalize import canonicalize_record
+    from backend.ingest.router.router import route_record
+
+    payload = {
+        "title": str(sample.get("endpoint", "") or ""),
+        "summary": str(sample.get("impact", "") or ""),
+        "description": " ".join(
+            part
+            for part in (
+                str(sample.get("endpoint", "") or ""),
+                str(sample.get("parameters", "") or ""),
+                str(sample.get("exploit_vector", "") or ""),
+                str(sample.get("impact", "") or ""),
+            )
+            if part
+        ),
+        "source_id": str(sample.get("fingerprint", "") or ""),
+        "tags": [str(sample.get("source_tag", "") or "")],
+    }
+    record = canonicalize_record(
+        payload,
+        source_name=str(
+            sample.get("source_tag", "INGESTION_PIPELINE") or "INGESTION_PIPELINE"
+        ),
+        source_type="ingestion_pipeline",
+    )
+    return route_record(record).expert_name
 
 
 # =============================================================================
@@ -307,10 +791,7 @@ def phase2_dataset_finalization(
 
         return state, empty_X, empty_y
 
-    h = hashlib.sha256()
-    h.update(X.tobytes())
-    h.update(y.tobytes())
-    dataset_hash = h.hexdigest()
+    dataset_hash = _compute_dataset_hash(X, y)
 
     _, counts = np.unique(y, return_counts=True)
     probs = counts / counts.sum()
@@ -396,11 +877,99 @@ def phase3_training_execution(
     X: np.ndarray,
     y: np.ndarray,
     dataset_hash: str,
+    *,
+    save_moe_global_checkpoint: bool = True,
 ) -> TrainingResult:
-    shared_result = _run_phase3_training_execution(config, X, y, dataset_hash, logger)
-    if isinstance(shared_result, TrainingResult):
-        return shared_result
-    return TrainingResult(**shared_result.__dict__)
+    shared_result = _run_phase3_training_execution(
+        config,
+        X,
+        y,
+        dataset_hash,
+        logger,
+        model_factory=_build_configured_model,
+    )
+    result = (
+        shared_result
+        if isinstance(shared_result, TrainingResult)
+        else TrainingResult(**shared_result.__dict__)
+    )
+    selected_meta = _resolve_selected_checkpoint_meta(config, result)
+    result.checkpoint_path = str(selected_meta.get("model_path", "") or "")
+    result.status = "FAILED" if result.drift_aborted else "COMPLETED"
+    if save_moe_global_checkpoint:
+        _maybe_save_moe_global_checkpoint(config, result)
+    return result
+
+
+def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
+    from impl_v1.phase49.moe import EXPERT_FIELDS
+
+    normalized_field_name = str(field_name or "").strip()
+    if not 0 <= int(expert_id) < len(EXPERT_FIELDS):
+        raise ValueError(f"Invalid expert_id={expert_id}")
+    expected_field_name = EXPERT_FIELDS[int(expert_id)]
+    if normalized_field_name != expected_field_name:
+        raise ValueError(
+            f"Expert-field mismatch: expert_id={expert_id} expects {expected_field_name}, got {normalized_field_name}"
+        )
+
+    logger.info("\n╔══════════════════════════════════════════════════╗")
+    logger.info("║  EXPERT TRAINING                                ║")
+    logger.info("╚══════════════════════════════════════════════════╝")
+    logger.info("  expert_id=%s | field_name=%s", int(expert_id), normalized_field_name)
+
+    config = TrainingControllerConfig(world_size=1, rank=0)
+    dataset_state, _, _ = phase2_dataset_finalization(config)
+    if not dataset_state.trainable:
+        logger.error("  expert training aborted: dataset not trainable")
+        return _build_failed_training_result("FAILED")
+
+    dataset = _load_real_ingestion_dataset(config)
+    raw_samples, features, labels = _materialize_ingestion_dataset(dataset)
+    matching_indices = [
+        idx
+        for idx, sample in enumerate(raw_samples)
+        if _route_ingestion_sample(sample) == normalized_field_name
+    ]
+    logger.info("  expert subset matched samples=%s", len(matching_indices))
+
+    if not matching_indices:
+        logger.error("  expert training aborted: no routed samples for %s", normalized_field_name)
+        return _build_failed_training_result("FAILED")
+
+    expert_features = np.ascontiguousarray(features[matching_indices], dtype=np.float32)
+    expert_labels = np.ascontiguousarray(labels[matching_indices], dtype=np.int64)
+
+    class_values, class_counts = np.unique(expert_labels, return_counts=True)
+    class_distribution = {
+        int(value): int(count)
+        for value, count in zip(class_values.tolist(), class_counts.tolist())
+    }
+    logger.info("  expert class distribution: %s", class_distribution)
+    if len(class_distribution) < 2 or int(class_counts.min()) < 6:
+        logger.error(
+            "  expert training aborted: insufficient class support for train/val/test split"
+        )
+        return _build_failed_training_result("FAILED")
+
+    expert_dataset_hash = _compute_dataset_hash(expert_features, expert_labels)
+    expert_result = phase3_training_execution(
+        config,
+        expert_features,
+        expert_labels,
+        expert_dataset_hash,
+        save_moe_global_checkpoint=False,
+    )
+
+    if not expert_result.drift_aborted:
+        expert_result.checkpoint_path = _save_expert_checkpoint(
+            config,
+            expert_result,
+            int(expert_id),
+            normalized_field_name,
+        )
+    expert_result.status = "FAILED" if expert_result.drift_aborted else "COMPLETED"
+    return expert_result
 
 
 # =============================================================================
@@ -421,13 +990,27 @@ def phase4_model_freeze(
     logger.info("║  PHASE 4 — MODEL FREEZE                         ║")
     logger.info("╚══════════════════════════════════════════════════╝")
 
-    latest_meta = _load_latest_training_checkpoint(config.checkpoint_dir)
-    if not latest_meta:
+    selected_meta = {}
+    if training_result.best_checkpoint_meta_path:
+        selected_meta = _load_json_if_exists(training_result.best_checkpoint_meta_path)
+        if selected_meta and "model_path" not in selected_meta:
+            shards = selected_meta.get("shards") or []
+            if shards:
+                first_shard = shards[0]
+                selected_meta = {
+                    **selected_meta,
+                    "model_path": first_shard.get("model_path", ""),
+                    "model_sha256": first_shard.get("model_sha256", ""),
+                    "meta_path": training_result.best_checkpoint_meta_path,
+                }
+    if not selected_meta:
+        selected_meta = _load_latest_training_checkpoint(config.checkpoint_dir) or {}
+    if not selected_meta:
         raise FileNotFoundError(
-            "No resumable checkpoint metadata found for model freeze"
+            "No validation-selected checkpoint metadata found for model freeze"
         )
 
-    state_dict = st_load(latest_meta["model_path"], device="cpu")
+    state_dict = st_load(selected_meta["model_path"], device="cpu")
     fp16_dict = {
         k: (v.half() if v.is_floating_point() else v) for k, v in state_dict.items()
     }
@@ -442,12 +1025,16 @@ def phase4_model_freeze(
         dataset_hash=dataset_hash,
         leader_term=1,
         epoch=training_result.epochs_completed,
-        accuracy=training_result.best_accuracy,
+        accuracy=training_result.val_accuracy,
         hyperparameters={
             "input_dim": config.input_dim,
-            "hidden_dim": config.hidden_dim,
+            "hidden_dim": training_result.effective_hidden_dim or config.hidden_dim,
             "num_classes": config.num_classes,
-            "lr": config.base_lr,
+            "optimizer": "AdamW",
+            "lr": training_result.optimizer_lr,
+            "weight_decay": training_result.optimizer_weight_decay,
+            "label_smoothing": training_result.label_smoothing,
+            "dropout": 0.3,
             "batch_size": config.base_batch_size,
             "epochs": config.num_epochs,
             "amp": config.use_amp,
@@ -478,12 +1065,17 @@ def phase4_model_freeze(
         "version_id": version_id,
         "weight_hash": version.merged_weight_hash,
         "dataset_hash": dataset_hash,
-        "accuracy": training_result.best_accuracy,
+        "val_accuracy": training_result.val_accuracy,
+        "val_f1": training_result.val_f1,
+        "val_precision": training_result.val_precision,
+        "val_recall": training_result.val_recall,
+        "best_val_loss": training_result.best_val_loss,
+        "model_selection_metric": "val_f1",
         "fp16": True,
         "archive_path": version.archive_path,
         "weights_path": version.weights_path,
-        "source_checkpoint_meta": latest_meta.get("meta_path"),
-        "source_checkpoint_sha256": latest_meta.get("model_sha256"),
+        "source_checkpoint_meta": selected_meta.get("meta_path"),
+        "source_checkpoint_sha256": selected_meta.get("model_sha256"),
         "redundancy_verified": redundancy_ok,
         "frozen_at": datetime.now().isoformat(),
     }
@@ -494,7 +1086,8 @@ def phase4_model_freeze(
     logger.info(f"  ✓ FP16 saved: {version.weights_path}")
     logger.info(f"  ✓ Archive: {version.archive_path}")
     logger.info(f"  ✓ Hash: {version.merged_weight_hash[:32]}...")
-    logger.info(f"  ✓ Accuracy: {training_result.best_accuracy:.4f}")
+    logger.info(f"  ✓ val_accuracy: {training_result.val_accuracy:.4f}")
+    logger.info(f"  ✓ val_f1: {training_result.val_f1:.4f}")
 
     return freeze_info
 
@@ -546,7 +1139,13 @@ def phase5_post_training(
         "config": {
             "epochs": config.num_epochs,
             "batch_size": config.base_batch_size,
-            "lr": config.base_lr,
+            "optimizer": "AdamW",
+            "lr": training_result.optimizer_lr,
+            "weight_decay": training_result.optimizer_weight_decay,
+            "label_smoothing": training_result.label_smoothing,
+            "dropout": 0.3,
+            "effective_hidden_dim": training_result.effective_hidden_dim,
+            "split_seed": training_result.split_seed,
             "amp": config.use_amp,
             "cosine_lr": config.cosine_lr,
             "gradient_clip": config.gradient_clip,
@@ -557,9 +1156,12 @@ def phase5_post_training(
         },
         "results": {
             "epochs_completed": training_result.epochs_completed,
-            "final_loss": training_result.final_loss,
-            "final_accuracy": training_result.final_accuracy,
-            "best_accuracy": training_result.best_accuracy,
+            "final_val_loss": training_result.final_loss,
+            "best_val_loss": training_result.best_val_loss,
+            "val_accuracy": training_result.val_accuracy,
+            "val_f1": training_result.val_f1,
+            "val_precision": training_result.val_precision,
+            "val_recall": training_result.val_recall,
             "cluster_sps": training_result.cluster_sps,
             "merged_weight_hash": training_result.merged_weight_hash,
             "drift_aborted": training_result.drift_aborted,
@@ -567,6 +1169,10 @@ def phase5_post_training(
             "start_epoch": training_result.start_epoch,
             "latest_checkpoint_meta_path": training_result.latest_checkpoint_meta_path,
             "best_checkpoint_meta_path": training_result.best_checkpoint_meta_path,
+            "train_samples": training_result.train_samples,
+            "val_samples": training_result.val_samples,
+            "test_samples": training_result.test_samples,
+            "model_selection_metric": "val_f1",
         },
         "dataset": {
             "hash": dataset_state.hash,
@@ -638,7 +1244,11 @@ def main(config: Optional[TrainingControllerConfig] = None):
         "real_data_only": True,
         "determinism_match": True,
         "leader_term": 1,
-        "best_accuracy": result.best_accuracy,
+        "val_accuracy": result.val_accuracy,
+        "val_f1": result.val_f1,
+        "val_precision": result.val_precision,
+        "val_recall": result.val_recall,
+        "best_val_loss": result.best_val_loss,
         "epochs_completed": result.epochs_completed,
         "drift_aborted": result.drift_aborted,
         "model_version": model_freeze.get("version_id", ""),
@@ -647,6 +1257,16 @@ def main(config: Optional[TrainingControllerConfig] = None):
         "start_epoch": result.start_epoch,
         "latest_checkpoint_meta_path": result.latest_checkpoint_meta_path,
         "best_checkpoint_meta_path": result.best_checkpoint_meta_path,
+        "train_samples": result.train_samples,
+        "val_samples": result.val_samples,
+        "test_samples": result.test_samples,
+        "model_selection_metric": "val_f1",
+        "optimizer": "AdamW",
+        "optimizer_lr": result.optimizer_lr,
+        "optimizer_weight_decay": result.optimizer_weight_decay,
+        "label_smoothing": result.label_smoothing,
+        "effective_hidden_dim": result.effective_hidden_dim,
+        "split_seed": result.split_seed,
     }
 
     logger.info("\n╔══════════════════════════════════════════════════╗")

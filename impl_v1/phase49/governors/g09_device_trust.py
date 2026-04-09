@@ -9,13 +9,18 @@ RULES:
 - Block until verified
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Dict
-import uuid
+from pathlib import Path
+from typing import Dict, List, Optional
 import hashlib
+import json
+import os
 import secrets
-from datetime import datetime, UTC, timedelta
+import uuid
+from datetime import UTC, datetime, timedelta
 
 
 class DeviceTrustLevel(Enum):
@@ -69,11 +74,133 @@ class TrustAuditEntry:
 
 MAX_DEVICES = 3
 MAX_VERIFICATION_ATTEMPTS = 3
+_DEVICE_TRUST_REGISTRY_ENV = "YGB_DEVICE_TRUST_REGISTRY_PATH"
+_DEVICE_TRUST_CHALLENGE_ENV = "YGB_DEVICE_TRUST_CHALLENGE_PATH"
 
 
-# Device registry (in-memory for governance testing)
+# Device registry
 _device_registry: Dict[str, DeviceRegistration] = {}
 _pending_challenges: Dict[str, VerificationChallenge] = {}
+
+
+def _registry_path() -> Path:
+    return Path(
+        os.environ.get(
+            _DEVICE_TRUST_REGISTRY_ENV,
+            "secure_data/phase49/device_trust_registry.json",
+        )
+    )
+
+
+def _challenge_path() -> Path:
+    return Path(
+        os.environ.get(
+            _DEVICE_TRUST_CHALLENGE_ENV,
+            "secure_data/phase49/device_trust_challenges.json",
+        )
+    )
+
+
+def _atomic_write_json(path: Path, payload: Dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(f"{path.suffix}.tmp")
+    tmp_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    os.replace(tmp_path, path)
+
+
+def _device_to_dict(device: DeviceRegistration) -> Dict[str, object]:
+    return {
+        "device_id": device.device_id,
+        "device_name": device.device_name,
+        "fingerprint_hash": device.fingerprint_hash,
+        "trust_level": device.trust_level.value,
+        "ip_address": device.ip_address,
+        "registered_at": device.registered_at,
+        "last_seen": device.last_seen,
+        "verified": device.verified,
+    }
+
+
+def _challenge_to_dict(challenge: VerificationChallenge) -> Dict[str, object]:
+    return {
+        "challenge_id": challenge.challenge_id,
+        "device_id": challenge.device_id,
+        "password_hash": challenge.password_hash,
+        "expires_at": challenge.expires_at,
+        "status": challenge.status.value,
+        "attempts": challenge.attempts,
+        "max_attempts": challenge.max_attempts,
+    }
+
+
+def _load_state() -> None:
+    _device_registry.clear()
+    _pending_challenges.clear()
+
+    registry_path = _registry_path()
+    if registry_path.exists():
+        try:
+            payload = json.loads(registry_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            payload = {}
+        for item in payload.get("devices", []):
+            if not isinstance(item, dict):
+                continue
+            device = DeviceRegistration(
+                device_id=str(item.get("device_id", "") or ""),
+                device_name=str(item.get("device_name", "") or ""),
+                fingerprint_hash=str(item.get("fingerprint_hash", "") or ""),
+                trust_level=DeviceTrustLevel(str(item.get("trust_level", DeviceTrustLevel.PENDING.value))),
+                ip_address=str(item.get("ip_address", "") or ""),
+                registered_at=str(item.get("registered_at", "") or ""),
+                last_seen=str(item.get("last_seen", "") or ""),
+                verified=bool(item.get("verified", False)),
+            )
+            if device.device_id:
+                _device_registry[device.device_id] = device
+
+    challenge_path = _challenge_path()
+    if challenge_path.exists():
+        try:
+            payload = json.loads(challenge_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            payload = {}
+        for item in payload.get("challenges", []):
+            if not isinstance(item, dict):
+                continue
+            challenge = VerificationChallenge(
+                challenge_id=str(item.get("challenge_id", "") or ""),
+                device_id=str(item.get("device_id", "") or ""),
+                password_hash=str(item.get("password_hash", "") or ""),
+                expires_at=str(item.get("expires_at", "") or ""),
+                status=VerificationStatus(str(item.get("status", VerificationStatus.PENDING.value))),
+                attempts=int(item.get("attempts", 0)),
+                max_attempts=int(item.get("max_attempts", MAX_VERIFICATION_ATTEMPTS)),
+            )
+            if challenge.challenge_id:
+                _pending_challenges[challenge.challenge_id] = challenge
+
+
+def _persist_state() -> None:
+    _atomic_write_json(
+        _registry_path(),
+        {"devices": [_device_to_dict(device) for device in _device_registry.values()]},
+    )
+    _atomic_write_json(
+        _challenge_path(),
+        {"challenges": [_challenge_to_dict(challenge) for challenge in _pending_challenges.values()]},
+    )
+
+
+def _is_challenge_expired(challenge: VerificationChallenge) -> bool:
+    try:
+        expires_at = datetime.fromisoformat(challenge.expires_at.replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return True
+    return datetime.now(UTC) >= expires_at
+
+
+_load_state()
 
 
 class DeviceTrustGuard:
@@ -147,6 +274,11 @@ def clear_registry():
     """Clear device registry (for testing)."""
     _device_registry.clear()
     _pending_challenges.clear()
+    for path in (_registry_path(), _challenge_path()):
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            continue
     if "_trust_guard" in globals():
         _trust_guard._audit_log.clear()
 
@@ -181,6 +313,13 @@ def register_device(
     
     Returns (DeviceRegistration, Optional[VerificationChallenge], Optional[password])
     """
+    if not str(device_name or "").strip():
+        raise ValueError("device_name required")
+    if not str(fingerprint or "").strip():
+        raise ValueError("fingerprint required")
+    if not str(ip_address or "").strip():
+        raise ValueError("ip_address required")
+
     device_id = f"DEV-{uuid.uuid4().hex[:16].upper()}"
     fingerprint_hash = hashlib.sha256(fingerprint.encode()).hexdigest()[:32]
     now = datetime.now(UTC).isoformat()
@@ -213,6 +352,22 @@ def register_device(
         
         _device_registry[device_id] = device
         _pending_challenges[challenge.challenge_id] = challenge
+        try:
+            from impl_v1.phase49.governors.g10_owner_alerts import AlertType, create_alert
+
+            create_alert(
+                alert_type=AlertType.DEVICE_LIMIT,
+                title="Device verification required",
+                message=(
+                    f"Device '{device_name}' from IP {ip_address} requires owner verification "
+                    f"before trust can be granted."
+                ),
+                device_id=device_id,
+                ip_address=ip_address,
+            )
+        except Exception:
+            pass
+        _persist_state()
         
         return device, challenge, password
     
@@ -229,6 +384,7 @@ def register_device(
     )
     
     _device_registry[device_id] = device
+    _persist_state()
     return device, None, None
 
 
@@ -248,6 +404,20 @@ def verify_device(
     
     if challenge.status != VerificationStatus.PENDING:
         return False, f"Challenge status: {challenge.status.value}"
+
+    if _is_challenge_expired(challenge):
+        expired = VerificationChallenge(
+            challenge_id=challenge.challenge_id,
+            device_id=challenge.device_id,
+            password_hash=challenge.password_hash,
+            expires_at=challenge.expires_at,
+            status=VerificationStatus.FAILED,
+            attempts=challenge.attempts,
+            max_attempts=challenge.max_attempts,
+        )
+        _pending_challenges[challenge_id] = expired
+        _persist_state()
+        return False, "Challenge expired"
     
     if challenge.attempts >= challenge.max_attempts:
         return False, "Max attempts exceeded"
@@ -265,6 +435,7 @@ def verify_device(
             max_attempts=challenge.max_attempts,
         )
         _pending_challenges[challenge_id] = updated
+        _persist_state()
         return False, "Invalid password"
     
     # Success - update device to trusted
@@ -293,6 +464,8 @@ def verify_device(
         max_attempts=challenge.max_attempts,
     )
     _pending_challenges[challenge_id] = verified
+    _trust_guard._record_audit(challenge.device_id, DeviceTrustLevel.TRUSTED, "device verified")
+    _persist_state()
     
     return True, "Device verified"
 

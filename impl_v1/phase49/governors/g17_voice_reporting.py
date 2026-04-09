@@ -27,6 +27,14 @@ import uuid
 
 logger = logging.getLogger(__name__)
 VALID_DELIVERY_STATUSES = frozenset({"QUEUED", "DELIVERED", "FAILED"})
+VOICE_REPORTING_BACKEND_MESSAGE = (
+    "Voice reporting requires a provisioned TTS backend. "
+    "Provide a real TTS adapter exposing availability and delivery methods before generating voice reports."
+)
+
+
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when the required real TTS backend is not provisioned."""
 
 
 class VoiceReportType(Enum):
@@ -130,7 +138,7 @@ class VoiceReporter:
         suggestions: tuple[str, ...] = (),
         context: Optional[str] = None,
     ) -> VoiceReport:
-        delivery_status, tts_ready = self._deliver_or_queue(content)
+        delivery_status, tts_ready = self._deliver(content)
         report = VoiceReport(
             report_id=f"RPT-{uuid.uuid4().hex[:16].upper()}",
             content=content,
@@ -144,16 +152,13 @@ class VoiceReporter:
             context=context,
         )
 
-        if delivery_status == "QUEUED":
-            self.report_queue.enqueue(report)
-
         _reports.append(report)
         return report
 
-    def _deliver_or_queue(self, content: str) -> tuple[str, bool]:
+    def _deliver(self, content: str) -> tuple[str, bool]:
         delivery_method = self._resolve_delivery_method()
         if delivery_method is None:
-            return "QUEUED", False
+            raise RealBackendNotConfiguredError(VOICE_REPORTING_BACKEND_MESSAGE)
 
         try:
             delivered = bool(delivery_method(content))
@@ -190,6 +195,64 @@ class VoiceReporter:
 
 def _utc_now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _build_degraded_default_report(
+    *,
+    content: str,
+    report_type: Optional[VoiceReportType] = None,
+    content_en: Optional[str] = None,
+    content_hi: Optional[str] = None,
+    suggestions: tuple[str, ...] = (),
+    context: Optional[str] = None,
+) -> VoiceReport:
+    report = VoiceReport(
+        report_id=f"RPT-{uuid.uuid4().hex[:16].upper()}",
+        content=content,
+        generated_at=_utc_now(),
+        delivery_status="FAILED",
+        tts_ready=False,
+        report_type=report_type,
+        content_en=content_en or content,
+        content_hi=content_hi or content,
+        suggestions=suggestions,
+        context=context,
+    )
+    _reports.append(report)
+    return report
+
+
+def _build_default_report(
+    *,
+    content: str,
+    report_type: Optional[VoiceReportType] = None,
+    content_en: Optional[str] = None,
+    content_hi: Optional[str] = None,
+    suggestions: tuple[str, ...] = (),
+    context: Optional[str] = None,
+) -> VoiceReport:
+    try:
+        return _default_voice_reporter._build_report(
+            content=content,
+            report_type=report_type,
+            content_en=content_en,
+            content_hi=content_hi,
+            suggestions=suggestions,
+            context=context,
+        )
+    except RealBackendNotConfiguredError as exc:
+        logger.warning(
+            "Voice reporting backend unavailable; returning undelivered report instead: %s",
+            exc,
+        )
+        return _build_degraded_default_report(
+            content=content,
+            report_type=report_type,
+            content_en=content_en,
+            content_hi=content_hi,
+            suggestions=suggestions,
+            context=context,
+        )
 
 
 # High impact suggestions templates
@@ -274,7 +337,7 @@ def generate_high_impact_tips(bug_type: str) -> VoiceReport:
     content_en = f"To increase impact for your {bug_type} report:\n" + "\n".join(f"- {tip}" for tip in tips_en)
     content_hi = f"Aapke {bug_type} report ka impact badhane ke liye:\n" + "\n".join(f"- {tip}" for tip in tips_hi)
 
-    return _default_voice_reporter._build_report(
+    return _build_default_report(
         content=content_en,
         report_type=VoiceReportType.HIGH_IMPACT_TIPS,
         content_en=content_en,
@@ -294,7 +357,7 @@ def explain_report(
     content_en = f"Your report describes a {severity} {bug_type} vulnerability. {report_summary}"
     content_hi = f"Aapka report ek {severity} {bug_type} vulnerability describe karta hai. {report_summary}"
 
-    return _default_voice_reporter._build_report(
+    return _build_default_report(
         content=content_en,
         report_type=VoiceReportType.FINAL_EXPLANATION,
         content_en=content_en,
@@ -313,7 +376,7 @@ def answer_follow_up(question: str, context: Dict) -> VoiceReport:
     content_en = "Based on your current progress, I recommend focusing on demonstrating clear impact."
     content_hi = "Aapke current progress ke hisaab se, clear impact demonstrate karna important hai."
 
-    return _default_voice_reporter._build_report(
+    return _build_default_report(
         content=content_en,
         report_type=VoiceReportType.FOLLOW_UP_ANSWER,
         content_en=content_en,

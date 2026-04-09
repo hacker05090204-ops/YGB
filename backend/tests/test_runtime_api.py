@@ -18,6 +18,9 @@ import time
 import unittest
 from unittest import mock
 
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
 from backend.api.runtime_api import (
     get_runtime_status,
     get_detailed_status,
@@ -238,6 +241,74 @@ class TestDetailedRuntimeStatus(unittest.TestCase):
             self.assertIn(name, result["components"])
             self.assertIn("status", result["components"][name])
             self.assertIn("detail", result["components"][name])
+
+
+class TestTrainingExpertStatusApi(unittest.TestCase):
+    def test_combined_expert_status_view(self):
+        import backend.api.runtime_api as runtime_api_module
+        from backend.training.safetensors_store import CheckpointManager
+        from scripts.expert_task_queue import (
+            STATUS_COMPLETED,
+            claim_next_expert,
+            initialize_status_file,
+            release_expert,
+        )
+
+        try:
+            torch = __import__("torch")
+        except ImportError as exc:
+            self.skipTest(f"torch is required for checkpoint status test: {exc}")
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            status_path = os.path.join(tmp_dir, "experts_status.json")
+            checkpoint_root = os.path.join(tmp_dir, "checkpoints")
+            initialize_status_file(status_path)
+            claimed = claim_next_expert(
+                "worker-1",
+                status_path=status_path,
+                claim_timeout_seconds=60.0,
+            )
+            self.assertIsNotNone(claimed)
+
+            manager = CheckpointManager(checkpoint_root)
+            checkpoint_result = manager.save(
+                expert_id=0,
+                field_name="web_vulns",
+                state_dict={"weight": torch.ones(2, 2, dtype=torch.float32)},
+                val_f1=0.88,
+            )
+            release_expert(
+                0,
+                status_path=status_path,
+                worker_id="worker-1",
+                status=STATUS_COMPLETED,
+                val_f1=0.88,
+                checkpoint_path=checkpoint_result["checkpoint_path"],
+            )
+
+            app = FastAPI()
+            app.include_router(runtime_api_module.router)
+            app.dependency_overrides[runtime_api_module.require_auth] = (
+                lambda: {"sub": "user-1"}
+            )
+
+            with mock.patch.object(runtime_api_module, "EXPERT_STATUS_PATH", status_path), \
+                    mock.patch.object(runtime_api_module, "EXPERT_CHECKPOINT_ROOT", checkpoint_root):
+                client = TestClient(app)
+                response = client.get("/api/v1/training/experts/status")
+
+            self.assertEqual(response.status_code, 200)
+            payload = response.json()
+            self.assertEqual(payload["status"], "ok")
+            self.assertEqual(len(payload["experts"]), 23)
+            expert_record = next(
+                item for item in payload["experts"] if int(item["expert_id"]) == 0
+            )
+            self.assertEqual(expert_record["field_name"], "web_vulns")
+            self.assertEqual(expert_record["queue_status"], "COMPLETED")
+            self.assertTrue(expert_record["has_checkpoint"])
+            self.assertEqual(expert_record["best_val_f1"], 0.88)
+            self.assertIsNone(expert_record["claimed_by"])
 
 
 if __name__ == "__main__":

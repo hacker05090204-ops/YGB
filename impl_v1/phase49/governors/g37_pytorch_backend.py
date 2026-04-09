@@ -46,6 +46,11 @@ PYTORCH_BACKEND_PROVISIONING_MESSAGE = (
     "Verify dataset exists and torch is installed."
 )
 
+DEFAULT_TRAIN_LR = 2e-4
+DEFAULT_WEIGHT_DECAY = 1e-4
+DEFAULT_LABEL_SMOOTHING = 0.1
+DEFAULT_DROPOUT = 0.3
+
 
 class RealBackendNotConfiguredError(RuntimeError):
     """Raised when the real PyTorch backend contract is not provisioned."""
@@ -306,40 +311,44 @@ if PYTORCH_AVAILABLE:
             super().__init__()
             hidden_dims = tuple(config.hidden_dims) if len(config.hidden_dims) >= 4 else (1024, 512, 256, 128)
             dim_1024, dim_512, dim_256, dim_128 = hidden_dims[:4]
+            dropout_rate = DEFAULT_DROPOUT
             self.input_proj = nn.Linear(config.input_dim, dim_1024)
             self.input_norm = nn.LayerNorm(dim_1024)
             self.input_act = nn.GELU()
-            self.block_1024 = ResidualBlock(dim_1024, config.dropout)
+            self.input_drop = nn.Dropout(dropout_rate)
+            self.block_1024 = ResidualBlock(dim_1024, dropout_rate)
             self.down_1024_512 = nn.Sequential(
                 nn.Linear(dim_1024, dim_512),
                 nn.LayerNorm(dim_512),
                 nn.GELU(),
-                nn.Dropout(config.dropout),
+                nn.Dropout(dropout_rate),
             )
-            self.block_512 = ResidualBlock(dim_512, config.dropout)
+            self.block_512 = ResidualBlock(dim_512, dropout_rate)
             self.down_512_256 = nn.Sequential(
                 nn.Linear(dim_512, dim_256),
                 nn.LayerNorm(dim_256),
                 nn.GELU(),
-                nn.Dropout(config.dropout),
+                nn.Dropout(dropout_rate),
             )
-            self.block_256 = ResidualBlock(dim_256, config.dropout)
+            self.block_256 = ResidualBlock(dim_256, dropout_rate)
             self.down_256_128 = nn.Sequential(
                 nn.Linear(dim_256, dim_128),
                 nn.LayerNorm(dim_128),
                 nn.GELU(),
-                nn.Dropout(config.dropout),
+                nn.Dropout(dropout_rate),
             )
+            self.head_drop = nn.Dropout(dropout_rate)
             self.head = nn.Linear(dim_128, config.output_dim)
 
         def forward(self, x):
-            x = self.input_act(self.input_norm(self.input_proj(x)))
+            x = self.input_drop(self.input_act(self.input_norm(self.input_proj(x))))
             x = self.block_1024(x)
             x = self.down_1024_512(x)
             x = self.block_512(x)
             x = self.down_512_256(x)
             x = self.block_256(x)
             x = self.down_256_128(x)
+            x = self.head_drop(x)
             return self.head(x)
 else:
     ResidualBlock = None
@@ -354,8 +363,8 @@ def create_model_config(
     input_dim: int = 512,
     output_dim: int = 2,
     hidden_dims: Tuple[int, ...] = (1024, 512, 256, 128),
-    dropout: float = 0.3,
-    learning_rate: float = 0.001,
+    dropout: float = DEFAULT_DROPOUT,
+    learning_rate: float = DEFAULT_TRAIN_LR,
     batch_size: int = 32,
     epochs: int = 100,
     seed: int = 42,
@@ -479,10 +488,14 @@ def train_full(
     # Create model
     model = BugClassifier(config)
     model = model.to(device)
-    
+
     # Optimizer and loss
-    optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
-    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.AdamW(
+        model.parameters(),
+        lr=DEFAULT_TRAIN_LR,
+        weight_decay=DEFAULT_WEIGHT_DECAY,
+    )
+    criterion = nn.CrossEntropyLoss(label_smoothing=DEFAULT_LABEL_SMOOTHING)
     
     # Training loop
     metrics = []

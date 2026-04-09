@@ -10,12 +10,16 @@ These helpers make the voice stack truthful:
 from __future__ import annotations
 
 import html
+import importlib
+import importlib.util
 import json
 import logging
+import os
 import re
 from collections import deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -35,6 +39,283 @@ from native.research_assistant.source_consensus import (
 )
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_WHISPER_MODEL = "base"
+
+
+def _import_optional_dependency(module_name: str) -> Optional[Any]:
+    """Import an optional dependency without crashing startup."""
+    try:
+        if importlib.util.find_spec(module_name) is None:
+            return None
+    except Exception as exc:
+        logger.warning(
+            "Optional dependency probe failed for %s: %s: %s",
+            module_name,
+            type(exc).__name__,
+            exc,
+        )
+        return None
+
+    try:
+        return importlib.import_module(module_name)
+    except Exception as exc:
+        logger.warning(
+            "Optional dependency import failed for %s: %s: %s",
+            module_name,
+            type(exc).__name__,
+            exc,
+        )
+        return None
+
+
+def _fallback_microphone_capabilities(error_message: Optional[str] = None) -> Dict[str, Any]:
+    reason = error_message or "No local audio capture backend detected"
+    return {
+        "browser_relay_available": False,
+        "browser_runtime": str(os.environ.get("YGB_BROWSER_RUNTIME", "")).strip().lower() or None,
+        "local_capture_available": False,
+        "local_capture_backend": None,
+        "input_device_count": 0,
+        "dependency_status": {
+            "sounddevice": False,
+            "pyaudio": False,
+            "playwright": False,
+        },
+        "reason": reason,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        **({"error": error_message} if error_message else {}),
+    }
+
+
+def _fallback_stt_status(error_message: Optional[str] = None) -> Dict[str, Any]:
+    payload = {
+        "stt_status": "DEGRADED",
+        "active_provider": "UNAVAILABLE",
+        "local_only": True,
+        "external_deps": [],
+        "local_provider_status": "BLOCKED",
+        "local_model_loaded": False,
+        "local_service": {},
+        "browser_relay_available": False,
+        "provider_count": 0,
+        "provider_status": {},
+        "total_transcriptions": 0,
+        "avg_confidence": 0.0,
+        "circuit_breaker_state": {},
+        "no_whisper_dependency": True,
+        "no_google_stt_dependency": True,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    if error_message:
+        payload["error"] = error_message
+    return payload
+
+
+def _fallback_tts_stats(error_message: Optional[str] = None) -> Dict[str, Any]:
+    reason = error_message or "TTS runtime unavailable"
+    return {
+        "status": "ERROR",
+        "active_provider": "UNAVAILABLE",
+        "privacy_mode": False,
+        "total_spoken": 0,
+        "total_interrupted": 0,
+        "total_errors": 0,
+        "provider_health": {
+            "provider": "UNAVAILABLE",
+            "reachable": False,
+            "reason": reason,
+        },
+        "stream_health": {},
+    }
+
+
+class WhisperSTT:
+    """Optional offline Whisper runtime that fails closed when unavailable."""
+
+    def __init__(self, model_name: Optional[str] = None):
+        self.model_name = (
+            str(model_name or os.environ.get("YGB_WHISPER_MODEL", _DEFAULT_WHISPER_MODEL)).strip()
+            or _DEFAULT_WHISPER_MODEL
+        )
+        self.available = False
+        self.warning: Optional[str] = None
+        self.model_path: Optional[str] = None
+        self._whisper_module: Optional[Any] = None
+        self._model: Optional[Any] = None
+        self._initialize()
+
+    def _mark_unavailable(self, message: str, exc: Optional[Exception] = None) -> None:
+        self.warning = message if exc is None else f"{message}: {type(exc).__name__}: {exc}"
+        logger.warning("Whisper STT unavailable: %s", self.warning)
+
+    def _candidate_model_paths(self) -> List[Path]:
+        candidates: List[Path] = []
+        explicit_model_path = str(os.environ.get("YGB_WHISPER_MODEL_PATH", "")).strip()
+        explicit_model_dir = str(os.environ.get("YGB_WHISPER_MODEL_DIR", "")).strip()
+        explicit_download_root = str(os.environ.get("YGB_WHISPER_DOWNLOAD_ROOT", "")).strip()
+
+        model_name_path = Path(self.model_name)
+        if model_name_path.is_file():
+            candidates.append(model_name_path)
+
+        if explicit_model_path:
+            candidates.append(Path(explicit_model_path))
+
+        model_registry = getattr(self._whisper_module, "_MODELS", {}) or {}
+        model_url = model_registry.get(self.model_name, "")
+        model_filename = Path(urlparse(model_url).path).name if model_url else ""
+
+        if model_filename:
+            if explicit_model_dir:
+                candidates.append(Path(explicit_model_dir) / model_filename)
+            if explicit_download_root:
+                candidates.append(Path(explicit_download_root) / model_filename)
+            candidates.append(Path.home() / ".cache" / "whisper" / model_filename)
+            if os.name == "nt":
+                candidates.append(Path.home() / "AppData" / "Local" / "whisper" / model_filename)
+
+        deduped: List[Path] = []
+        seen = set()
+        for candidate in candidates:
+            normalized = str(candidate)
+            if normalized in seen:
+                continue
+            seen.add(normalized)
+            deduped.append(candidate)
+        return deduped
+
+    def _initialize(self) -> None:
+        whisper_module = _import_optional_dependency("whisper")
+        if whisper_module is None:
+            self._mark_unavailable("whisper package is not installed")
+            return
+
+        self._whisper_module = whisper_module
+        model_path = next(
+            (candidate for candidate in self._candidate_model_paths() if candidate.is_file()),
+            None,
+        )
+        if model_path is None:
+            self._mark_unavailable(
+                f"whisper package is installed but no offline model file was found for model '{self.model_name}'"
+            )
+            return
+
+        try:
+            self._model = whisper_module.load_model(str(model_path))
+            self.model_path = str(model_path)
+            self.available = True
+            self.warning = None
+        except Exception as exc:
+            self._mark_unavailable("failed to load whisper model", exc)
+
+    def is_available(self) -> bool:
+        return self.available
+
+    def transcribe(self, audio_source: str) -> Dict[str, Any]:
+        if not self.available or self._model is None:
+            return {
+                "text": "",
+                "language": None,
+                "segments": [],
+                "error": self.warning or "Whisper STT unavailable",
+            }
+
+        try:
+            result = self._model.transcribe(audio_source, fp16=False)
+        except Exception as exc:
+            logger.warning(
+                "Whisper STT transcription failed: %s: %s",
+                type(exc).__name__,
+                exc,
+            )
+            return {
+                "text": "",
+                "language": None,
+                "segments": [],
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+
+        return {
+            "text": result.get("text", ""),
+            "language": result.get("language"),
+            "segments": result.get("segments", []),
+            "error": None,
+        }
+
+    def status(self) -> Dict[str, Any]:
+        return {
+            "available": self.available,
+            "model_name": self.model_name,
+            "model_path": self.model_path,
+            "reason": self.warning or "offline whisper ready",
+        }
+
+
+class PyttxsTTS:
+    """Optional offline pyttsx3 runtime that degrades without crashing."""
+
+    def __init__(self):
+        self.available = False
+        self.warning: Optional[str] = None
+        self._pyttsx3_module: Optional[Any] = None
+        self._engine: Optional[Any] = None
+        self._initialize()
+
+    def _mark_unavailable(self, message: str, exc: Optional[Exception] = None) -> None:
+        self.warning = message if exc is None else f"{message}: {type(exc).__name__}: {exc}"
+        logger.warning("Local pyttsx3 TTS unavailable: %s", self.warning)
+
+    def _initialize(self) -> None:
+        pyttsx3_module = _import_optional_dependency("pyttsx3")
+        if pyttsx3_module is None:
+            self._mark_unavailable("pyttsx3 package is not installed")
+            return
+
+        self._pyttsx3_module = pyttsx3_module
+        try:
+            self._engine = pyttsx3_module.init()
+            self.available = True
+            self.warning = None
+        except Exception as exc:
+            self._mark_unavailable("failed to initialize pyttsx3 engine", exc)
+
+    def is_available(self) -> bool:
+        return self.available
+
+    def deliver(self, text: str) -> bool:
+        normalized = str(text or "").strip()
+        if not normalized:
+            logger.warning("Local pyttsx3 TTS rejected empty text payload")
+            return False
+        if not self.available or self._engine is None:
+            logger.warning(
+                "Local pyttsx3 TTS unavailable during delivery: %s",
+                self.warning or "engine not initialized",
+            )
+            return False
+
+        try:
+            self._engine.say(normalized)
+            self._engine.runAndWait()
+            return True
+        except Exception as exc:
+            logger.warning(
+                "Local pyttsx3 TTS delivery failed: %s: %s",
+                type(exc).__name__,
+                exc,
+            )
+            return False
+
+    def speak(self, text: str) -> bool:
+        return self.deliver(text)
+
+    def status(self) -> Dict[str, Any]:
+        return {
+            "available": self.available,
+            "reason": self.warning or "pyttsx3 ready",
+        }
 
 
 @dataclass
@@ -261,65 +542,92 @@ def _normalize_mode(value: Any) -> str:
 
 def probe_microphone_capabilities() -> Dict[str, Any]:
     """Probe local microphone support without faking availability."""
-    browser_relay_available = True
+    browser_runtime = str(os.environ.get("YGB_BROWSER_RUNTIME", "")).strip().lower()
+    playwright_module = _import_optional_dependency("playwright")
+    sounddevice_module = _import_optional_dependency("sounddevice")
+    dependency_status = {
+        "sounddevice": sounddevice_module is not None,
+        "pyaudio": False,
+        "playwright": playwright_module is not None,
+    }
+
+    browser_relay_available = bool(playwright_module is not None and browser_runtime == "playwright")
     local_capture_available = False
     local_capture_backend = None
     input_device_count = 0
     reason = "No local audio capture backend detected"
 
-    try:
-        import sounddevice  # type: ignore
-
-        devices = sounddevice.query_devices()
-        input_devices = [
-            device for device in devices
-            if float(device.get("max_input_channels", 0)) > 0
-        ]
-        input_device_count = len(input_devices)
-        if input_devices:
-            local_capture_available = True
-            local_capture_backend = "sounddevice"
-            reason = "Local capture available via sounddevice"
-    except Exception as exc:
-        logger.warning(
-            "Microphone probe via sounddevice failed: %s: %s",
-            type(exc).__name__,
-            exc,
-        )
-
-    if not local_capture_available:
+    if sounddevice_module is not None:
         try:
-            import pyaudio  # type: ignore
-
-            audio = pyaudio.PyAudio()
-            try:
-                count = 0
-                for idx in range(audio.get_device_count()):
-                    info = audio.get_device_info_by_index(idx)
-                    if int(info.get("maxInputChannels", 0)) > 0:
-                        count += 1
-                input_device_count = max(input_device_count, count)
-                if count > 0:
-                    local_capture_available = True
-                    local_capture_backend = "pyaudio"
-                    reason = "Local capture available via PyAudio"
-            finally:
-                audio.terminate()
+            devices = sounddevice_module.query_devices()
+            input_devices = [
+                device for device in devices
+                if float(device.get("max_input_channels", 0)) > 0
+            ]
+            input_device_count = len(input_devices)
+            if input_devices:
+                local_capture_available = True
+                local_capture_backend = "sounddevice"
+                reason = "Local capture available via sounddevice"
         except Exception as exc:
             logger.warning(
-                "Microphone probe via PyAudio failed: %s: %s",
+                "Microphone probe via sounddevice failed: %s: %s",
                 type(exc).__name__,
                 exc,
             )
 
-    if not local_capture_available and browser_relay_available:
-        reason = "Local capture unavailable; browser transcript relay remains available"
+    if not local_capture_available:
+        pyaudio_module = _import_optional_dependency("pyaudio")
+        dependency_status["pyaudio"] = pyaudio_module is not None
+        if pyaudio_module is not None:
+            try:
+                audio = pyaudio_module.PyAudio()
+                try:
+                    count = 0
+                    for idx in range(audio.get_device_count()):
+                        info = audio.get_device_info_by_index(idx)
+                        if int(info.get("maxInputChannels", 0)) > 0:
+                            count += 1
+                    input_device_count = max(input_device_count, count)
+                    if count > 0:
+                        local_capture_available = True
+                        local_capture_backend = "pyaudio"
+                        reason = "Local capture available via PyAudio"
+                finally:
+                    audio.terminate()
+            except Exception as exc:
+                logger.warning(
+                    "Microphone probe via PyAudio failed: %s: %s",
+                    type(exc).__name__,
+                    exc,
+                )
+
+    if not local_capture_available:
+        if browser_relay_available:
+            reason = "Local capture unavailable; browser transcript relay available via Playwright"
+        elif browser_runtime and browser_runtime != "playwright":
+            reason = (
+                "Local capture unavailable; browser relay disabled because "
+                f"YGB_BROWSER_RUNTIME={browser_runtime}"
+            )
+        elif dependency_status["playwright"]:
+            reason = (
+                "Local capture unavailable; Playwright is installed but browser relay is disabled "
+                "because YGB_BROWSER_RUNTIME is not set to playwright"
+            )
+        else:
+            reason = (
+                "Local capture unavailable; Playwright browser relay is not installed and "
+                "no local audio backend was detected"
+            )
 
     return {
         "browser_relay_available": browser_relay_available,
+        "browser_runtime": browser_runtime or None,
         "local_capture_available": local_capture_available,
         "local_capture_backend": local_capture_backend,
         "input_device_count": input_device_count,
+        "dependency_status": dependency_status,
         "reason": reason,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
@@ -520,20 +828,77 @@ def run_research_analysis(query: str) -> Dict[str, Any]:
 
 def build_voice_pipeline_status() -> Dict[str, Any]:
     """Build a truthful snapshot for the voice/chat pipeline."""
-    from impl_v1.training.voice.stt_adapter import get_stt_status
-    from impl_v1.training.voice.tts_streaming import TTSEngine
-    from impl_v1.training.voice.voice_metrics import get_voice_health
+    try:
+        from impl_v1.training.voice.stt_adapter import get_stt_status
 
-    stt = get_stt_status()
-    tts = TTSEngine()
-    tts_stats = tts.get_stats()
-    tts_health = tts_stats.get("provider_health", {})
-    mic = probe_microphone_capabilities()
-    metrics = get_voice_health()
+        stt = get_stt_status()
+    except Exception as exc:
+        logger.warning(
+            "STT status snapshot failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
+        stt = _fallback_stt_status(f"{type(exc).__name__}: {exc}")
+
+    try:
+        from impl_v1.training.voice.tts_streaming import TTSEngine
+
+        tts = TTSEngine()
+        tts_stats = tts.get_stats()
+    except Exception as exc:
+        logger.warning(
+            "TTS status snapshot failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
+        tts_stats = _fallback_tts_stats(f"{type(exc).__name__}: {exc}")
+
+    tts_health = tts_stats.get("provider_health", {}) or {}
+
+    try:
+        mic = probe_microphone_capabilities()
+    except Exception as exc:
+        logger.warning(
+            "Microphone capability probe failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
+        mic = _fallback_microphone_capabilities(f"{type(exc).__name__}: {exc}")
+
+    try:
+        from impl_v1.training.voice.voice_metrics import get_voice_health
+
+        metrics = get_voice_health()
+    except Exception as exc:
+        logger.warning(
+            "Voice metrics snapshot failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
+        metrics = {
+            "total_commands": 0,
+            "success_rate": 0.0,
+            "slo_met": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    whisper_runtime = WhisperSTT()
+    local_tts_runtime = PyttxsTTS()
+    stt = {
+        **stt,
+        "browser_relay_available": bool(mic.get("browser_relay_available")),
+        "local_capture_available": bool(mic.get("local_capture_available")),
+        "whisper_available": whisper_runtime.available,
+    }
     active_mode = _normalize_mode(runtime_state.get("active_voice_mode", "SECURITY"))
 
-    stt_ready = bool(stt.get("browser_relay_available")) or stt.get("stt_status") == "STT_READY"
-    tts_ready = bool(tts_health.get("reachable"))
+    stt_ready = bool(
+        stt.get("stt_status") == "STT_READY"
+        or mic.get("browser_relay_available")
+        or mic.get("local_capture_available")
+        or whisper_runtime.available
+    )
+    tts_ready = bool(tts_health.get("reachable")) or local_tts_runtime.available
 
     if stt_ready and tts_ready:
         pipeline_status = "ONLINE"
@@ -581,14 +946,28 @@ def build_voice_pipeline_status() -> Dict[str, Any]:
         "stt_status": stt.get("stt_status", "DEGRADED"),
         "tts_status": "TTS_READY" if tts_ready else "DEGRADED",
         "local_only": stt.get("local_only", True),
-        "external_deps": [],
+        "external_deps": [
+            name
+            for name, available in {
+                "playwright": bool(mic.get("dependency_status", {}).get("playwright")),
+                "sounddevice": bool(mic.get("dependency_status", {}).get("sounddevice")),
+                "pyaudio": bool(mic.get("dependency_status", {}).get("pyaudio")),
+                "whisper": whisper_runtime.available,
+                "pyttsx3": local_tts_runtime.available,
+            }.items()
+            if available
+        ],
         "no_whisper_dependency": True,
         "no_google_stt_dependency": True,
         "microphone": mic,
-        "stt": stt,
+        "stt": {
+            **stt,
+            "runtime": whisper_runtime.status(),
+        },
         "tts": {
             **tts_stats,
             "health": tts_health,
+            "runtime": local_tts_runtime.status(),
         },
         "metrics_summary": {
             "total_commands": metrics.get("total_commands"),

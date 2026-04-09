@@ -9,11 +9,13 @@ import pytest
 from impl_v1.phase49.governors.g17_voice_reporting import (
     HIGH_IMPACT_SUGGESTIONS,
     ProgressNarration,
+    RealBackendNotConfiguredError,
     ReportLanguage,
     ReportQueue,
     VoiceReport,
     VoiceReportType,
     VoiceReporter,
+    VOICE_REPORTING_BACKEND_MESSAGE,
     answer_follow_up,
     can_voice_execute,
     clear_reports,
@@ -108,28 +110,49 @@ class TestGenerateHighImpactTips:
     
     def setup_method(self):
         clear_reports()
+
+    @staticmethod
+    def _reporter(monkeypatch):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return bool(content)
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        monkeypatch.setattr(
+            "impl_v1.phase49.governors.g17_voice_reporting._default_voice_reporter",
+            reporter,
+        )
+        return reporter
     
-    def test_generates_report(self):
+    def test_generates_report(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("xss")
         assert isinstance(report, VoiceReport)
     
-    def test_report_type_is_high_impact_tips(self):
+    def test_report_type_is_high_impact_tips(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("sqli")
         assert report.report_type == VoiceReportType.HIGH_IMPACT_TIPS
     
-    def test_report_has_english_content(self):
+    def test_report_has_english_content(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("idor")
         assert len(report.content_en) > 0
     
-    def test_report_has_hindi_content(self):
+    def test_report_has_hindi_content(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("rce")
         assert len(report.content_hi) > 0
     
-    def test_report_has_suggestions(self):
+    def test_report_has_suggestions(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("xss")
         assert len(report.suggestions) > 0
     
-    def test_unknown_bug_type_uses_default(self):
+    def test_unknown_bug_type_uses_default(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("unknown-bug-type")
         assert len(report.suggestions) > 0
 
@@ -139,8 +162,24 @@ class TestExplainReport:
     
     def setup_method(self):
         clear_reports()
+
+    @staticmethod
+    def _reporter(monkeypatch):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return bool(content)
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        monkeypatch.setattr(
+            "impl_v1.phase49.governors.g17_voice_reporting._default_voice_reporter",
+            reporter,
+        )
+        return reporter
     
-    def test_creates_explanation(self):
+    def test_creates_explanation(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = explain_report(
             report_summary="Found stored XSS in profile page",
             bug_type="xss",
@@ -148,11 +187,13 @@ class TestExplainReport:
         )
         assert isinstance(report, VoiceReport)
     
-    def test_report_type_is_final_explanation(self):
+    def test_report_type_is_final_explanation(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = explain_report("Summary", "test", "LOW")
         assert report.report_type == VoiceReportType.FINAL_EXPLANATION
     
-    def test_includes_bug_type(self):
+    def test_includes_bug_type(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = explain_report("Summary", "sqli", "CRITICAL")
         assert "sqli" in report.content_en.lower()
 
@@ -162,16 +203,34 @@ class TestAnswerFollowUp:
     
     def setup_method(self):
         clear_reports()
+
+    @staticmethod
+    def _reporter(monkeypatch):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return bool(content)
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        monkeypatch.setattr(
+            "impl_v1.phase49.governors.g17_voice_reporting._default_voice_reporter",
+            reporter,
+        )
+        return reporter
     
-    def test_creates_answer(self):
+    def test_creates_answer(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = answer_follow_up("what else can I add", {"bug_type": "xss"})
         assert isinstance(report, VoiceReport)
     
-    def test_payout_question_gives_tips(self):
+    def test_payout_question_gives_tips(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = answer_follow_up("how to increase payout", {"bug_type": "xss"})
         assert report.report_type == VoiceReportType.HIGH_IMPACT_TIPS
     
-    def test_hindi_payout_question(self):
+    def test_hindi_payout_question(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = answer_follow_up("payout kaise badhao", {"bug_type": "xss"})
         assert report.report_type == VoiceReportType.HIGH_IMPACT_TIPS
 
@@ -181,13 +240,30 @@ class TestGetVoiceText:
     
     def setup_method(self):
         clear_reports()
+
+    @staticmethod
+    def _reporter(monkeypatch):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return bool(content)
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        monkeypatch.setattr(
+            "impl_v1.phase49.governors.g17_voice_reporting._default_voice_reporter",
+            reporter,
+        )
+        return reporter
     
-    def test_returns_english_by_default(self):
+    def test_returns_english_by_default(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("xss")
         text = get_voice_text(report)
         assert text == report.content_en
     
-    def test_returns_hindi_when_requested(self):
+    def test_returns_hindi_when_requested(self, monkeypatch):
+        self._reporter(monkeypatch)
         report = generate_high_impact_tips("xss")
         text = get_voice_text(report, ReportLanguage.HINDI)
         assert text == report.content_hi
@@ -233,44 +309,60 @@ class TestHighImpactSuggestions:
 
 
 class TestVoiceReporterQueueing:
-    """Tests for queue-backed voice report delivery."""
+    """Tests for fail-closed voice report delivery."""
 
     def setup_method(self):
         clear_reports()
 
-    def test_generate_report_returns_queued_report_without_tts(self):
+    def test_generate_report_requires_real_tts_backend(self):
         reporter = VoiceReporter()
 
-        report = reporter.generate_report("Queued voice summary")
+        with pytest.raises(RealBackendNotConfiguredError, match="requires a provisioned TTS backend"):
+            reporter.generate_report("Queued voice summary")
 
-        assert isinstance(report, VoiceReport)
-        assert report.content == "Queued voice summary"
-        assert report.delivery_status == "QUEUED"
+    def test_voice_report_delivers_with_real_backend(self):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return bool(content)
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        report = reporter.generate_report("first")
+
+        assert report.delivery_status == "DELIVERED"
+        assert report.tts_ready is True
+
+    def test_failed_delivery_marks_report_failed(self):
+        class Backend:
+            available = True
+
+            def deliver(self, content: str) -> bool:
+                return False
+
+        reporter = VoiceReporter(tts_backend=Backend())
+        report = reporter.generate_report("first")
+
+        assert report.delivery_status == "FAILED"
         assert report.tts_ready is False
 
-    def test_voice_reports_queue_correctly(self):
-        reporter = VoiceReporter()
+    def test_backend_error_marks_report_failed(self, caplog):
+        class Backend:
+            available = True
 
-        first = reporter.generate_report("first")
-        second = reporter.generate_report("second")
+            def deliver(self, content: str) -> bool:
+                raise RuntimeError("tts engine unavailable")
 
-        pending = reporter.report_queue.get_pending()
-
-        assert pending == [first, second]
-
-    def test_queue_overflow_drops_oldest_with_warning(self, caplog):
-        reporter = VoiceReporter(report_queue=ReportQueue(max_pending=100))
+        reporter = VoiceReporter(tts_backend=Backend())
 
         with caplog.at_level(logging.WARNING):
-            for index in range(101):
-                reporter.generate_report(f"report-{index}")
+            report = reporter.generate_report("first")
 
-        pending = reporter.report_queue.get_pending()
+        assert report.delivery_status == "FAILED"
+        assert any("tts engine unavailable" in record.message for record in caplog.records)
 
-        assert len(pending) == 100
-        assert pending[0].content == "report-1"
-        assert pending[-1].content == "report-100"
-        assert any("Dropping oldest queued voice report" in record.message for record in caplog.records)
+    def test_provisioning_message_is_exported(self):
+        assert "TTS backend" in VOICE_REPORTING_BACKEND_MESSAGE
 
     def test_production_file_has_no_simulated_tts_wording(self):
         source = (
