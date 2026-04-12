@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+import os
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -15,6 +16,7 @@ def test_key_manager_status_reports_fallback_and_authority_state(monkeypatch):
     monkeypatch.delenv("YGB_KEY_DIR", raising=False)
     monkeypatch.setenv("YGB_APPROVAL_SECRET", "a" * 64)
     monkeypatch.setenv("YGB_AUTHORITY_KEY", "authority-key-1234567890")
+    monkeypatch.setenv("YGB_ENV", "development")
     monkeypatch.setattr(approval_ledger, "last_integrity_report", None)
 
     manager = approval_ledger.KeyManager(strict=False)
@@ -25,11 +27,51 @@ def test_key_manager_status_reports_fallback_and_authority_state(monkeypatch):
 
     assert payload["available"] is True
     assert payload["status"] == "DEGRADED"
+    assert payload["key_mode"] == approval_ledger.LedgerKeyMode.ENV_KEY.value
+    assert payload["production_mode"] is False
     assert payload["using_env_fallback"] is True
     assert payload["source"] == "env"
+    assert payload["key_dir"] is None
+    assert payload["key_dir_configured"] is False
     assert payload["active_key_id"] == approval_ledger.KeyManager.DEFAULT_KEY_ID
     assert payload["authority_key_configured"] is True
     assert payload["error"] is None
+
+
+def test_get_ledger_key_mode_prefers_file_key_resolution(monkeypatch, tmp_path):
+    key_dir = tmp_path / "keys"
+    key_dir.mkdir()
+    key_path = key_dir / "prod-key-v1.key"
+    key_path.write_bytes(b"real-approval-secret")
+
+    monkeypatch.setenv("YGB_KEY_DIR", str(key_dir))
+    monkeypatch.delenv("YGB_APPROVAL_SECRET", raising=False)
+    if os.name != "nt":
+        key_path.chmod(0o600)
+
+    assert approval_ledger.get_ledger_key_mode() is approval_ledger.LedgerKeyMode.FILE_KEY
+
+
+def test_get_key_manager_status_reports_missing_key_mode_safely(monkeypatch, tmp_path):
+    empty_key_dir = tmp_path / "empty-keys"
+    empty_key_dir.mkdir()
+
+    monkeypatch.setenv("YGB_KEY_DIR", str(empty_key_dir))
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "b" * 64)
+    monkeypatch.setenv("YGB_ENV", "production")
+    monkeypatch.setattr(approval_ledger, "last_integrity_report", None)
+
+    payload = approval_ledger.get_key_manager_status(run_integrity=False, strict=False)
+
+    assert payload["available"] is False
+    assert payload["status"] == "ERROR"
+    assert payload["key_mode"] == approval_ledger.LedgerKeyMode.MISSING.value
+    assert payload["production_mode"] is True
+    assert payload["key_dir"] == "<configured>"
+    assert payload["key_dir_configured"] is True
+    assert payload["using_env_fallback"] is False
+    assert payload["active_key_id"] is None
+    assert payload["error"] == "signing_key_unavailable"
 
 
 def test_auth_runtime_status_reports_secret_and_backend_health(monkeypatch):

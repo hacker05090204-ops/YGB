@@ -1,0 +1,99 @@
+{
+  "adaptive_state_path": "c:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\.tmp_hdd_drive\\phase9b_integration_runtime\\checkpoints\\adaptive_learning_state.json",
+  "cycle_records": [
+    {
+      "accepted_count": 24,
+      "cycle_id": "cycle-1",
+      "event_count_after": 0,
+      "event_count_before": 0,
+      "fisher_after": false,
+      "fisher_before": false,
+      "previous_shard_count": 0,
+      "severity_counts": {
+        "HIGH": 8,
+        "LOW": 8,
+        "MEDIUM": 8
+      }
+    },
+    {
+      "accepted_count": 24,
+      "cycle_id": "cycle-2",
+      "event_count_after": 0,
+      "event_count_before": 0,
+      "fisher_after": false,
+      "fisher_before": false,
+      "previous_shard_count": 24,
+      "severity_counts": {
+        "HIGH": 8,
+        "LOW": 8,
+        "MEDIUM": 8
+      }
+    },
+    {
+      "accepted_count": 28,
+      "cycle_id": "cycle-3",
+      "event_count_after": 1,
+      "event_count_before": 0,
+      "fisher_after": true,
+      "fisher_before": false,
+      "previous_shard_count": 48,
+      "severity_counts": {
+        "CRITICAL": 24,
+        "HIGH": 4
+      }
+    }
+  ],
+  "ewc_state_path": "c:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\.tmp_hdd_drive\\phase9b_integration_runtime\\checkpoints\\adaptive_ewc_state.safetensors",
+  "ewc_used_in_training": true,
+  "fisher_computed_after_shift": true,
+  "last_event": {
+    "baseline_distribution": {
+      "HIGH": 0.3333333333333333,
+      "LOW": 0.3333333333333333,
+      "MEDIUM": 0.3333333333333333
+    },
+    "current_distribution": {
+      "CRITICAL": 0.8571428571428571,
+      "HIGH": 0.14285714285714285
+    },
+    "event_id": "abbe85f2737f4c279dfecbc2d7f8f713",
+    "fisher_sample_count": 48,
+    "history_depth": 2,
+    "js_distance": 0.7901688335165017,
+    "observed_at": "2026-04-12T10:29:59.726295+00:00",
+    "severity_counts": {
+      "CRITICAL": 24,
+      "HIGH": 4
+    },
+    "threshold": 0.15
+  },
+  "persisted_event_count": 1,
+  "persisted_last_event_id": "abbe85f2737f4c279dfecbc2d7f8f713",
+  "post_shift_train": {
+    "batch_count": 4,
+    "mean_ewc_loss": 1.6980205828076578e-06,
+    "sample_count": 28,
+    "train_loss": 0.3118219319730997
+  },
+  "pre_shift_train": {
+    "batch_count": 3,
+    "mean_ewc_loss": 0.0,
+    "sample_count": 24,
+    "train_loss": 1.5161556601524353
+  },
+  "real_data_counts": {
+    "CRITICAL": 2088,
+    "HIGH": 8567,
+    "INFO": 396,
+    "LOW": 5720,
+    "MEDIUM": 5344,
+    "UNKNOWN": 19049
+  },
+  "runtime_root": "c:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\.tmp_hdd_drive\\phase9b_integration_runtime",
+  "selected_baseline_severities": [
+    "LOW",
+    "MEDIUM",
+    "HIGH"
+  ],
+  "shift_detected": true
+}

@@ -1,4 +1,6 @@
 import logging
+import threading
+from collections import UserDict
 from unittest.mock import MagicMock
 
 
@@ -116,3 +118,78 @@ def test_sync_cycle_returns_real_counts_and_records_history(monkeypatch):
     assert result.errors == []
     assert len(history) == 1
     assert history[0] == result
+
+
+def test_local_sync_index_refresh_is_thread_safe(monkeypatch, tmp_path):
+    from backend.sync import sync_engine as se
+
+    class _BlockingIterDict(UserDict):
+        def __init__(self, *args, started_event: threading.Event, release_event: threading.Event, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._started_event = started_event
+            self._release_event = release_event
+            self._blocked = False
+
+        def __iter__(self):
+            iterator = iter(self.data)
+            current_thread = threading.current_thread().name
+            if self._blocked or current_thread != "first-refresh":
+                return iterator
+            self._blocked = True
+            return self._blocking_iterator(iterator)
+
+        def _blocking_iterator(self, iterator):
+            first_key = next(iterator)
+            self._started_event.set()
+            yield first_key
+            assert self._release_event.wait(timeout=5), "timed out waiting to release refresh"
+            yield from iterator
+
+    monkeypatch.setattr(se.LocalSyncIndex, "SCAN_DIRS", [])
+    monkeypatch.setattr(se.LocalSyncIndex, "INDEX_PATH", tmp_path / "local_sync_index.json")
+
+    index = se.LocalSyncIndex()
+    monkeypatch.setattr(index, "_save", lambda: None)
+    iteration_started = threading.Event()
+    release_iteration = threading.Event()
+    index._records = _BlockingIterDict(
+        {
+            "data/report.txt": se.LocalFileRecord(
+                path="data/report.txt",
+                sha256="hash-report",
+                size_bytes=1,
+                indexed_at="1.0",
+            ),
+            "data/report-2.txt": se.LocalFileRecord(
+                path="data/report-2.txt",
+                sha256="hash-report-2",
+                size_bytes=2,
+                indexed_at="2.0",
+            )
+        },
+        started_event=iteration_started,
+        release_event=release_iteration,
+    )
+
+    errors: list[Exception] = []
+
+    def _run_refresh() -> None:
+        try:
+            index.refresh()
+        except Exception as exc:  # pragma: no cover - assertion captures details below
+            errors.append(exc)
+
+    first = threading.Thread(target=_run_refresh, name="first-refresh")
+    second = threading.Thread(target=_run_refresh, name="second-refresh")
+
+    first.start()
+    assert iteration_started.wait(timeout=5), "first refresh never reached record iteration"
+    second.start()
+    release_iteration.set()
+    first.join(timeout=5)
+    second.join(timeout=5)
+
+    assert not first.is_alive()
+    assert not second.is_alive()
+    assert errors == []
+    assert index.get_file_count() == 0

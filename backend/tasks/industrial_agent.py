@@ -76,6 +76,12 @@ def _coerce_errors(value: Any) -> tuple[str, ...]:
 
 @dataclass(frozen=True)
 class WorkflowCycleResult:
+    """Result of a workflow cycle.
+
+    Status values are intentionally constrained to lifecycle truth states:
+    RUNNING, FULL_CYCLE, PARTIAL, SKIPPED, and FAILED.
+    """
+
     cycle_id: str
     trigger: str
     started_at: str
@@ -322,6 +328,113 @@ class AutonomousWorkflowOrchestrator:
             )
         return findings
 
+    @staticmethod
+    def _coerce_metric(value: Any) -> float | None:
+        if value in (None, ""):
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _load_latest_accuracy_snapshot(controller: Any) -> Any | None:
+        trainer = getattr(controller, "trainer", None)
+        if trainer is None:
+            return None
+        get_accuracy_history = getattr(trainer, "get_accuracy_history", None)
+        if not callable(get_accuracy_history):
+            return None
+        history = list(get_accuracy_history() or ())
+        if not history:
+            return None
+        return history[-1]
+
+    def _build_promotion_report_findings(
+        self,
+        *,
+        placeholder: WorkflowCycleResult,
+        training_run_id: str | None,
+        snapshot: Any,
+        ingest_result: Any,
+        bridge_published: int,
+    ) -> list[dict[str, Any]]:
+        epoch = _coerce_int(getattr(snapshot, "epoch", 0))
+        accuracy = self._coerce_metric(getattr(snapshot, "accuracy", None))
+        precision = self._coerce_metric(getattr(snapshot, "precision", None))
+        recall = self._coerce_metric(getattr(snapshot, "recall", None))
+        f1 = self._coerce_metric(getattr(snapshot, "f1", None))
+        auc_roc = self._coerce_metric(getattr(snapshot, "auc_roc", None))
+        taken_at = str(getattr(snapshot, "taken_at", "") or "").strip()
+        if (
+            epoch <= 0
+            or accuracy is None
+            or precision is None
+            or recall is None
+            or f1 is None
+            or auc_roc is None
+        ):
+            return []
+        evidence = [
+            f"workflow_cycle_id:{placeholder.cycle_id}",
+            f"training_run_id:{training_run_id}" if training_run_id else "",
+            f"metrics_timestamp:{taken_at}" if taken_at else "",
+        ]
+        return [
+            {
+                "finding_id": f"promotion-{training_run_id or placeholder.cycle_id}".lower(),
+                "title": (
+                    f"Model promotion succeeded for {training_run_id or placeholder.cycle_id}"
+                ),
+                "description": (
+                    f"Workflow cycle {placeholder.cycle_id} promoted training run "
+                    f"{training_run_id or 'unknown'} after epoch {epoch} reached "
+                    f"accuracy {accuracy:.4f}, precision {precision:.4f}, recall "
+                    f"{recall:.4f}, F1 {f1:.4f}, and AUC-ROC {auc_roc:.4f}. "
+                    f"The cycle accepted "
+                    f"{_coerce_int(getattr(ingest_result, 'samples_accepted', 0))} real "
+                    f"sample(s) and published {bridge_published} bridge sample(s)."
+                ),
+                "severity": "INFO",
+                "evidence": [item for item in evidence if item],
+            }
+        ]
+
+    @staticmethod
+    def _resolve_cycle_status(
+        *,
+        errors: list[str],
+        samples_accepted: int,
+        bridge_published: int,
+        training_status: str | None,
+        training_run_id: str | None,
+        training_promoted: bool | None,
+        report_generated: bool,
+    ) -> str:
+        normalized_training_status = str(training_status or "").strip().upper()
+        progress_made = any(
+            (
+                samples_accepted > 0,
+                bridge_published > 0,
+                bool(training_run_id)
+                and normalized_training_status not in {"", "RUNNING", "SKIPPED"},
+                report_generated,
+                normalized_training_status not in {"", "RUNNING", "SKIPPED"},
+            )
+        )
+        if errors:
+            return "PARTIAL" if progress_made else "FAILED"
+        if training_promoted is True and report_generated:
+            return "FULL_CYCLE"
+        if (
+            samples_accepted <= 0
+            and bridge_published <= 0
+            and not report_generated
+            and normalized_training_status in {"", "SKIPPED"}
+        ):
+            return "SKIPPED"
+        return "PARTIAL"
+
     def _execute_cycle(self, placeholder: WorkflowCycleResult) -> WorkflowCycleResult:
         ingest_result = self._resolve_autograbber().run_cycle()
         errors = list(_coerce_errors(getattr(ingest_result, "errors", ())))
@@ -355,8 +468,10 @@ class AutonomousWorkflowOrchestrator:
         training_run_id: str | None = None
         training_status: str | None = None
         training_promoted: bool | None = None
+        controller: Any | None = None
         try:
-            training_run = self._resolve_auto_train_controller().check_and_train(
+            controller = self._resolve_auto_train_controller()
+            training_run = controller.check_and_train(
                 trigger=f"workflow:{placeholder.trigger}"
             )
             training_run_id = str(getattr(training_run, "run_id", "") or "") or None
@@ -373,7 +488,92 @@ class AutonomousWorkflowOrchestrator:
         report_reason: str | None = None
 
         try:
-            if bridge_published <= 0:
+            if training_promoted is True:
+                snapshot = self._load_latest_accuracy_snapshot(controller)
+                promotion_findings = self._build_promotion_report_findings(
+                    placeholder=placeholder,
+                    training_run_id=training_run_id,
+                    snapshot=snapshot,
+                    ingest_result=ingest_result,
+                    bridge_published=bridge_published,
+                )
+                if not promotion_findings:
+                    errors.append("promotion_report_metrics_unavailable")
+                    report_reason = "promotion_metrics_unavailable"
+                else:
+                    snapshot_taken_at = str(
+                        getattr(snapshot, "taken_at", "") or ""
+                    ).strip() or None
+                    report = self._resolve_report_engine().build_report(
+                        report_id=f"workflow-promotion-{placeholder.cycle_id.lower()}",
+                        title=(
+                            f"Promotion report for workflow cycle {placeholder.cycle_id}"
+                        ),
+                        description=(
+                            f"Workflow cycle {placeholder.cycle_id} completed a real model "
+                            f"promotion for run {training_run_id or 'unknown'} using verified "
+                            f"training metrics and authoritative ingest counts."
+                        ),
+                        report_type="promotion",
+                        findings=promotion_findings,
+                        source_context={
+                            "workflow_cycle_id": placeholder.cycle_id,
+                            "workflow_trigger": placeholder.trigger,
+                            "ingest_cycle_id": str(
+                                getattr(ingest_result, "cycle_id", "") or ""
+                            ),
+                            "training_run_id": training_run_id,
+                            "training_status": training_status,
+                            "bridge_batch_id": bridge_batch_id,
+                            "metrics": {
+                                "epoch": _coerce_int(getattr(snapshot, "epoch", 0)),
+                                "accuracy": self._coerce_metric(
+                                    getattr(snapshot, "accuracy", None)
+                                ),
+                                "precision": self._coerce_metric(
+                                    getattr(snapshot, "precision", None)
+                                ),
+                                "recall": self._coerce_metric(
+                                    getattr(snapshot, "recall", None)
+                                ),
+                                "f1": self._coerce_metric(getattr(snapshot, "f1", None)),
+                                "auc_roc": self._coerce_metric(
+                                    getattr(snapshot, "auc_roc", None)
+                                ),
+                                "taken_at": snapshot_taken_at,
+                            },
+                            "ingest": {
+                                "sources_attempted": _coerce_int(
+                                    getattr(ingest_result, "sources_attempted", 0)
+                                ),
+                                "sources_succeeded": _coerce_int(
+                                    getattr(ingest_result, "sources_succeeded", 0)
+                                ),
+                                "samples_fetched": _coerce_int(
+                                    getattr(ingest_result, "samples_fetched", 0)
+                                ),
+                                "samples_accepted": _coerce_int(
+                                    getattr(ingest_result, "samples_accepted", 0)
+                                ),
+                                "samples_rejected": _coerce_int(
+                                    getattr(ingest_result, "samples_rejected", 0)
+                                ),
+                                "bridge_published": bridge_published,
+                            },
+                        },
+                    )
+                    report_generated = True
+                    report_id = report.report_id
+                    report_path = report.storage_path
+                    report_findings = len(promotion_findings)
+                    logger.info(
+                        "workflow promotion report generated cycle_id=%s training_run_id=%s report_id=%s path=%s",
+                        placeholder.cycle_id,
+                        training_run_id,
+                        report_id,
+                        report_path,
+                    )
+            elif bridge_published <= 0:
                 report_reason = "no_published_samples"
             else:
                 samples = self._load_reportable_samples(bridge_batch_id=bridge_batch_id)
@@ -409,16 +609,43 @@ class AutonomousWorkflowOrchestrator:
                     report_id = report.report_id
                     report_path = report.storage_path
                     report_findings = len(findings)
+                    logger.info(
+                        "workflow evidence report generated cycle_id=%s report_id=%s path=%s",
+                        placeholder.cycle_id,
+                        report_id,
+                        report_path,
+                    )
         except Exception as exc:
             errors.append(f"report_failed:{type(exc).__name__}:{exc}")
-            report_reason = "report_generation_failed"
+            report_reason = (
+                "promotion_report_generation_failed"
+                if training_promoted is True
+                else "report_generation_failed"
+            )
+
+        if not report_generated and report_reason is not None:
+            logger.info(
+                "workflow report skipped cycle_id=%s reason=%s",
+                placeholder.cycle_id,
+                report_reason,
+            )
+
+        cycle_status = self._resolve_cycle_status(
+            errors=errors,
+            samples_accepted=_coerce_int(getattr(ingest_result, "samples_accepted", 0)),
+            bridge_published=bridge_published,
+            training_status=training_status,
+            training_run_id=training_run_id,
+            training_promoted=training_promoted,
+            report_generated=report_generated,
+        )
 
         return WorkflowCycleResult(
             cycle_id=placeholder.cycle_id,
             trigger=placeholder.trigger,
             started_at=placeholder.started_at,
             completed_at=_utc_now(),
-            status="PARTIAL" if errors else "COMPLETED",
+            status=cycle_status,
             ingest_cycle_id=str(getattr(ingest_result, "cycle_id", "") or "") or None,
             sources_attempted=_coerce_int(getattr(ingest_result, "sources_attempted", 0)),
             sources_succeeded=_coerce_int(getattr(ingest_result, "sources_succeeded", 0)),

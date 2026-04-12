@@ -24,6 +24,7 @@ import time
 import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,16 @@ class IntegrityReport:
 
 
 last_integrity_report: Optional[IntegrityReport] = None
+
+
+class LedgerKeyMode(str, Enum):
+    FILE_KEY = "FILE_KEY"
+    ENV_KEY = "ENV_KEY"
+    MISSING = "MISSING"
+
+
+def _runtime_is_production() -> bool:
+    return os.environ.get("YGB_ENV", "").strip().lower() == "production"
 
 
 def _integrity_timestamp() -> str:
@@ -300,6 +311,73 @@ class KeyManager:
         return list(self._keys.keys())
 
 
+def _configured_key_dir() -> str:
+    return os.environ.get("YGB_KEY_DIR", "").strip()
+
+
+def _iter_configured_key_paths(key_dir: str) -> list[str]:
+    if not key_dir or not os.path.isdir(key_dir):
+        return []
+    return [
+        os.path.join(key_dir, name)
+        for name in sorted(os.listdir(key_dir))
+        if name.endswith(".key")
+    ]
+
+
+def get_ledger_key_mode() -> LedgerKeyMode:
+    key_dir = _configured_key_dir()
+    if key_dir and os.path.isdir(key_dir):
+        for path in _iter_configured_key_paths(key_dir):
+            perm_ok, _ = KeyManager._check_file_permissions(path)
+            if not perm_ok:
+                continue
+            try:
+                with open(path, "rb") as handle:
+                    if handle.read().strip():
+                        return LedgerKeyMode.FILE_KEY
+            except OSError as exc:
+                logger.warning(
+                    "Failed to inspect approval key file %s: %s",
+                    os.path.basename(path),
+                    exc,
+                )
+        return LedgerKeyMode.MISSING
+
+    if os.environ.get("YGB_APPROVAL_SECRET", "").strip():
+        return LedgerKeyMode.ENV_KEY
+
+    return LedgerKeyMode.MISSING
+
+
+def _sanitize_key_audit_event(entry: dict) -> dict:
+    return {
+        "timestamp": entry.get("timestamp"),
+        "event": entry.get("event"),
+        "key_id": entry.get("key_id"),
+    }
+
+
+def _log_ledger_key_mode_startup_status() -> None:
+    key_mode = get_ledger_key_mode()
+    if key_mode is LedgerKeyMode.FILE_KEY:
+        logger.info("Approval ledger key mode FILE_KEY is active.")
+        return
+
+    if key_mode is LedgerKeyMode.ENV_KEY:
+        message = "Approval ledger key mode ENV_KEY is active via environment fallback."
+        if _runtime_is_production():
+            logger.critical(message)
+        else:
+            logger.warning(message)
+        return
+
+    logger.critical("Approval ledger key mode MISSING: no usable approval signing key is configured.")
+
+
+_log_ledger_key_mode_startup_status()
+
+
 def get_key_manager_status(
     *,
     key_manager: Optional[KeyManager] = None,
@@ -307,23 +385,30 @@ def get_key_manager_status(
     strict: bool | None = None,
 ) -> dict:
     """Return non-secret governance key status for runtime inspection."""
+    key_mode = get_ledger_key_mode()
+    key_dir_configured = bool(_configured_key_dir())
+    safe_key_dir = "<configured>" if key_dir_configured else None
+
     try:
         manager = key_manager or KeyManager(strict=strict)
     except Exception as exc:
         return {
             "available": False,
             "status": "ERROR",
+            "key_mode": key_mode.value,
+            "production_mode": _runtime_is_production(),
             "strict_mode": None if strict is None else bool(strict),
             "source": "unavailable",
-            "key_dir": os.environ.get("YGB_KEY_DIR", "") or None,
+            "key_dir": safe_key_dir,
+            "key_dir_configured": key_dir_configured,
             "active_key_id": None,
             "available_key_ids": [],
             "revoked_keys": [],
-            "using_env_fallback": False,
+            "using_env_fallback": key_mode is LedgerKeyMode.ENV_KEY,
             "authority_key_configured": bool(os.environ.get("YGB_AUTHORITY_KEY", "").strip()),
             "integrity": asdict(last_integrity_report) if last_integrity_report is not None else None,
             "audit_events": [],
-            "error": f"{type(exc).__name__}: {exc}",
+            "error": "signing_key_unavailable",
         }
 
     active_key_id = manager.active_key_id or None
@@ -345,32 +430,39 @@ def get_key_manager_status(
                 "hash_chain_valid": False,
                 "first_broken_entry_id": None,
                 "checked_at": _integrity_timestamp(),
-                "error": f"{type(exc).__name__}: {exc}",
+                "error": "integrity_check_unavailable",
             }
             error = error or f"integrity_check_failed: {type(exc).__name__}: {exc}"
 
-    using_env_fallback = manager.source == "env"
+    using_env_fallback = key_mode is LedgerKeyMode.ENV_KEY or manager.source == "env"
     revoked_keys = sorted(str(key_id) for key_id in manager.revoked_keys)
     status = "HEALTHY"
-    if not available:
+    if key_mode is LedgerKeyMode.MISSING or not available:
         status = "ERROR"
     elif using_env_fallback or revoked_keys:
         status = "DEGRADED"
 
+    safe_error = None
+    if error:
+        safe_error = "integrity_check_failed" if error.startswith("integrity_check_failed") else "signing_key_unavailable"
+
     return {
         "available": available,
         "status": status,
+        "key_mode": key_mode.value,
+        "production_mode": _runtime_is_production(),
         "strict_mode": manager.strict_mode,
         "source": manager.source,
-        "key_dir": manager.key_dir or None,
-        "active_key_id": active_key_id,
+        "key_dir": "<configured>" if manager.key_dir else None,
+        "key_dir_configured": key_dir_configured,
+        "active_key_id": active_key_id if available else None,
         "available_key_ids": sorted(str(key_id) for key_id in manager.available_key_ids),
         "revoked_keys": revoked_keys,
         "using_env_fallback": using_env_fallback,
         "authority_key_configured": bool(os.environ.get("YGB_AUTHORITY_KEY", "").strip()),
         "integrity": integrity_payload,
-        "audit_events": manager.audit_log[-10:],
-        "error": error,
+        "audit_events": [_sanitize_key_audit_event(entry) for entry in manager.audit_log[-10:]],
+        "error": safe_error,
     }
 
 

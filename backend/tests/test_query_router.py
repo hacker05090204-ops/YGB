@@ -317,6 +317,71 @@ class TestResearchSearchPipeline:
         assert result.query_result.grounded is False
         assert result.query_result.production_ready is False
 
+    def test_grounding_validator_tracks_stats(self):
+        result = self.validator.validate_response_grounding(
+            "CVE-2024-1234 affects OpenSSL servers.",
+            {"extracted_text": "CVE-2024-1234 affects OpenSSL servers."},
+        )
+
+        stats = self.validator.get_hallucination_stats()
+
+        assert result.grounded is True
+        assert stats["total_checked"] == 1
+        assert stats["grounded"] == 1
+        assert stats["ungrounded"] == 0
+        assert stats["mean_confidence"] == pytest.approx(1.0)
+
+    def test_search_refuses_unsupported_cve_claims(self, monkeypatch, caplog):
+        monkeypatch.setattr(self.pipeline, "_resolve_edge_binary", lambda: None)
+        monkeypatch.setattr(
+            self.pipeline,
+            "_fetch_html_over_http",
+            lambda url: "<html><body><p>General advisory text without any identifier.</p></body></html>",
+        )
+        monkeypatch.setattr(
+            self.pipeline,
+            "_summarize",
+            lambda text, query: ("CVE-2024-9999 allows remote code execution.", ["cve"]),
+        )
+
+        with caplog.at_level("WARNING", logger="backend.assistant.query_router"):
+            result = self.pipeline.search("What is CVE-2024-9999?")
+
+        assert result.status == ResearchStatus.NO_RESULTS
+        assert result.summary == "Insufficient verified evidence."
+        assert result.query_result is not None
+        assert result.query_result.grounded is False
+        assert result.query_result.grounding_confidence < 0.3
+        assert any("grounding failed" in record.message.lower() for record in caplog.records)
+
+    def test_search_appends_disclaimer_for_speculative_response(self, monkeypatch, caplog):
+        monkeypatch.setattr(self.pipeline, "_resolve_edge_binary", lambda: None)
+        monkeypatch.setattr(
+            self.pipeline,
+            "_fetch_html_over_http",
+            lambda url: "<html><body><p>DNS poisoning changes cached responses on recursive resolvers.</p></body></html>",
+        )
+        monkeypatch.setattr(
+            self.pipeline,
+            "_summarize",
+            lambda text, query: (
+                "DNS poisoning may change cached responses on recursive resolvers.",
+                ["dns", "poisoning"],
+            ),
+        )
+
+        with caplog.at_level("WARNING", logger="backend.assistant.query_router"):
+            result = self.pipeline.search("What is DNS poisoning?")
+
+        assert result.status == ResearchStatus.SUCCESS
+        assert "could not be fully verified" in result.summary
+        assert result.query_result is not None
+        assert result.query_result.result == result.summary
+        assert result.query_result.grounded is False
+        assert result.query_result.grounding_confidence >= 0.3
+        assert result.query_result.production_ready is False
+        assert any("grounding failed" in record.message.lower() for record in caplog.records)
+
     # ====================================================================
     # GUARDS
     # ====================================================================

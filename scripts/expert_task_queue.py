@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import sys
 import time
@@ -20,14 +21,28 @@ STATUS_COMPLETED = "COMPLETED"
 STATUS_FAILED = "FAILED"
 
 DEFAULT_CLAIM_TIMEOUT_SECONDS = 3600.0
+CLAIM_TIMEOUT_SECONDS = DEFAULT_CLAIM_TIMEOUT_SECONDS
 STATUS_PATH_ENV_VAR = "YGB_EXPERT_STATUS_PATH"
-DEFAULT_STATUS_PATH = PROJECT_ROOT / "experts_status.json"
+DEFAULT_STATUS_PATH = (PROJECT_ROOT / "experts_status.json").resolve()
 _ALLOWED_STATUSES = {
     STATUS_AVAILABLE,
     STATUS_CLAIMED,
     STATUS_COMPLETED,
     STATUS_FAILED,
 }
+
+logger = logging.getLogger(__name__)
+
+
+def _resolve_status_path(status_path: Path | str) -> Path:
+    return Path(status_path).resolve()
+
+
+def _configure_logging(*, verbose: bool = False) -> None:
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.WARNING,
+        format="%(message)s",
+    )
 
 
 class ExpertTaskQueue:
@@ -39,7 +54,7 @@ class ExpertTaskQueue:
         *,
         claim_timeout_seconds: float = DEFAULT_CLAIM_TIMEOUT_SECONDS,
     ) -> None:
-        self.status_path = Path(status_path)
+        self.status_path = _resolve_status_path(status_path)
         self.claim_timeout_seconds = float(claim_timeout_seconds)
 
     def initialize_status_file(self) -> Dict[str, Any]:
@@ -47,6 +62,9 @@ class ExpertTaskQueue:
 
     def load_status(self) -> Dict[str, Any]:
         return load_status(self.status_path)
+
+    def get_status(self) -> Dict[str, Any]:
+        return self.load_status()
 
     def render_status(self) -> str:
         return render_status(self.status_path)
@@ -97,6 +115,8 @@ class ExpertTaskQueue:
 
 
 class _FileLock:
+    """Cross-platform advisory lock using [msvcrt.locking()](msvcrt:1) on Windows and [fcntl.flock()](fcntl:1) elsewhere."""
+
     def __init__(
         self,
         lock_path: Path,
@@ -182,6 +202,10 @@ def _default_expert_record(expert_id: int, field_name: str) -> Dict[str, Any]:
         "claimed_by": None,
         "claimed_at": None,
         "claim_expires_at_epoch": None,
+        "val_f1": None,
+        "val_precision": None,
+        "val_recall": None,
+        "checkpoint_path": "",
         "best_val_f1": None,
         "best_val_precision": None,
         "best_val_recall": None,
@@ -193,6 +217,9 @@ def _default_expert_record(expert_id: int, field_name: str) -> Dict[str, Any]:
         "last_result_status": None,
         "last_error": "",
         "last_released_at": None,
+        "claim_count": 0,
+        "completed_count": 0,
+        "failed_count": 0,
     }
 
 
@@ -281,13 +308,14 @@ def _release_expired_claims_unlocked(state: Dict[str, Any], now_epoch: float) ->
             expired = True
         if not expired:
             continue
-        record["status"] = STATUS_FAILED
+        record["status"] = STATUS_AVAILABLE
         record["claimed_by"] = None
         record["claimed_at"] = None
         record["claim_expires_at_epoch"] = None
         record["last_result_status"] = STATUS_FAILED
         record["last_error"] = "claim_expired"
         record["last_released_at"] = _utc_now_iso()
+        record["failed_count"] = int(record.get("failed_count", 0) or 0) + 1
         changed = True
     return changed
 
@@ -311,14 +339,14 @@ def _to_float(value: Any) -> Optional[float]:
 
 
 def initialize_status_file(status_path: Path | str = DEFAULT_STATUS_PATH) -> Dict[str, Any]:
-    resolved = Path(status_path)
+    resolved = _resolve_status_path(status_path)
     with _FileLock(_lock_path_for(resolved)):
         state = _load_state_unlocked(resolved)
         return _save_state_unlocked(resolved, state)
 
 
 def load_status(status_path: Path | str = DEFAULT_STATUS_PATH) -> Dict[str, Any]:
-    resolved = Path(status_path)
+    resolved = _resolve_status_path(status_path)
     with _FileLock(_lock_path_for(resolved)):
         state = _load_state_unlocked(resolved)
         if _release_expired_claims_unlocked(state, time.time()):
@@ -336,7 +364,7 @@ def claim_next_expert(
     if not worker_text:
         raise ValueError("worker_id is required")
 
-    resolved = Path(status_path)
+    resolved = _resolve_status_path(status_path)
     timeout_seconds = max(1e-6, float(claim_timeout_seconds))
     with _FileLock(_lock_path_for(resolved)):
         state = _load_state_unlocked(resolved)
@@ -359,6 +387,7 @@ def claim_next_expert(
         selected["claimed_at"] = _utc_now_iso()
         selected["claim_expires_at_epoch"] = time.time() + timeout_seconds
         selected["last_error"] = ""
+        selected["claim_count"] = int(selected.get("claim_count", 0) or 0) + 1
         state = _save_state_unlocked(resolved, state)
         return next(
             dict(record)
@@ -383,7 +412,7 @@ def release_expert(
     if status_text not in {STATUS_AVAILABLE, STATUS_COMPLETED, STATUS_FAILED}:
         raise ValueError(f"Unsupported release status: {status}")
 
-    resolved = Path(status_path)
+    resolved = _resolve_status_path(status_path)
     with _FileLock(_lock_path_for(resolved)):
         state = _load_state_unlocked(resolved)
         _release_expired_claims_unlocked(state, time.time())
@@ -423,7 +452,18 @@ def release_expert(
             record["last_checkpoint_path"] = str(checkpoint_path)
 
         best_val_f1 = _to_float(record.get("best_val_f1"))
-        if val_f1_value is not None and (best_val_f1 is None or val_f1_value > best_val_f1):
+        improved = bool(
+            val_f1_value is not None
+            and (best_val_f1 is None or val_f1_value > best_val_f1)
+        )
+        if improved:
+            record["val_f1"] = val_f1_value
+            if val_precision_value is not None:
+                record["val_precision"] = val_precision_value
+            if val_recall_value is not None:
+                record["val_recall"] = val_recall_value
+            if checkpoint_path:
+                record["checkpoint_path"] = str(checkpoint_path)
             record["best_val_f1"] = val_f1_value
             if val_precision_value is not None:
                 record["best_val_precision"] = val_precision_value
@@ -439,6 +479,10 @@ def release_expert(
         record["last_result_status"] = status_text
         record["last_error"] = str(error or "")
         record["last_released_at"] = _utc_now_iso()
+        if status_text == STATUS_COMPLETED:
+            record["completed_count"] = int(record.get("completed_count", 0) or 0) + 1
+        elif status_text == STATUS_FAILED:
+            record["failed_count"] = int(record.get("failed_count", 0) or 0) + 1
 
         state = _save_state_unlocked(resolved, state)
         return next(
@@ -463,7 +507,9 @@ def render_status(status_path: Path | str = DEFAULT_STATUS_PATH) -> str:
         ),
     ]
     for item in experts:
-        best_val_f1 = item.get("best_val_f1")
+        best_val_f1 = item.get("val_f1")
+        if best_val_f1 is None:
+            best_val_f1 = item.get("best_val_f1")
         best_text = "-" if best_val_f1 is None else f"{float(best_val_f1):.3f}"
         lines.append(
             (
@@ -491,6 +537,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--status-path",
         default=_default_status_path_text(),
         help="Path to experts status JSON",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable debug logging.",
     )
     subparsers = parser.add_subparsers(dest="command")
 
@@ -524,10 +575,12 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
-    status_path = Path(args.status_path)
+    _configure_logging(verbose=bool(args.verbose))
+    status_path = _resolve_status_path(args.status_path)
 
     if args.command == "init":
         result = initialize_status_file(status_path)
+        logger.debug("Initialized expert task queue at %s", status_path)
     elif args.command in {None, "status"}:
         print_status(status_path)
         return 0
@@ -537,6 +590,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             status_path=status_path,
             claim_timeout_seconds=args.claim_timeout_seconds,
         )
+        logger.debug("Claimed next expert for worker_id=%s from %s", args.worker_id, status_path)
     elif args.command == "release":
         result = release_expert(
             args.expert_id,
@@ -548,6 +602,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             val_recall=args.val_recall,
             checkpoint_path=args.checkpoint_path,
             error=args.error,
+        )
+        logger.debug(
+            "Released expert_id=%s with status=%s into %s",
+            args.expert_id,
+            args.status,
+            status_path,
         )
     else:
         raise RuntimeError(f"Unsupported command: {args.command}")

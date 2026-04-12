@@ -1,0 +1,44 @@
+{
+    "DocumentTracking": {
+        "ID": "2026-Mar",
+        "CurrentReleaseDate": "2026-03-10T07:00:00Z"
+    },
+    "Vulnerability": [
+        {
+            "CVE": "CVE-2026-4201",
+            "Title": {
+                "Value": "Microsoft Browser Remote Code Execution Vulnerability"
+            },
+            "Notes": [
+                {
+                    "Type": "Description",
+                    "Value": "A remote code execution vulnerability exists in Microsoft Browser when parsing crafted content."
+                }
+            ],
+            "Threats": [
+                {
+                    "Type": "Severity",
+                    "Description": {
+                        "Value": "Critical"
+                    }
+                },
+                {
+                    "Type": "Impact",
+                    "Description": {
+                        "Value": "Remote Code Execution"
+                    }
+                }
+            ],
+            "CVSSScoreSets": [
+                {
+                    "BaseScore": "9.8"
+                }
+            ],
+            "References": [
+                {
+                    "URL": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-4201"
+                }
+            ]
+        }
+    ]
+}

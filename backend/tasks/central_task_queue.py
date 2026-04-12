@@ -351,13 +351,13 @@ class TaskAgent:
                 await asyncio.sleep(poll_seconds)
 
 
-async def _demo_handler(task: TaskRecord) -> None:
-    _ensure_test_only_path_allowed("central task queue demo handler")
-    await asyncio.sleep(0.01)
-
-
 async def main() -> None:
     _ensure_test_only_path_allowed("central_task_queue.main()")
+
+    async def _test_only_demo_task_handler(task: TaskRecord) -> None:
+        _ensure_test_only_path_allowed("central task queue demo handler")
+        await asyncio.sleep(0.01)
+
     queue = FileBackedTaskQueue()
     await queue.enqueue(
         "demo_ingest",
@@ -365,7 +365,12 @@ async def main() -> None:
         priority=TaskPriority.HIGH,
         route="grabber",
     )
-    agent = TaskAgent(queue, "demo-agent", {"grabber"}, {"demo_ingest": _demo_handler})
+    agent = TaskAgent(
+        queue,
+        "demo-agent",
+        {"grabber"},
+        {"demo_ingest": _test_only_demo_task_handler},
+    )
     while await agent.run_once():
         pass
 

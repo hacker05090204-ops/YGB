@@ -87,16 +87,16 @@ class GitHubAdvisoryScraper(BaseScraper):
             if len(samples) >= max_items:
                 break
             if not isinstance(advisory, dict):
-                logger.warning("github_advisory_skipped reason=not_object")
+                self._log_partial_failure(reason="advisory_not_object")
                 continue
             advisory_id = str(advisory.get("ghsa_id", "")).strip() or str(advisory.get("id", "")).strip()
             summary = str(advisory.get("summary", "")).strip()
             description = str(advisory.get("description", "")).strip()
             combined_description = " ".join(part for part in (summary, description) if part).strip()
             if not advisory_id or not combined_description:
-                logger.debug(
-                    "github_advisory_skipped reason=missing_required_fields advisory_id=%s",
-                    advisory_id,
+                self._log_partial_failure(
+                    reason="missing_required_fields",
+                    advisory_id=advisory_id or "<missing-advisory-id>",
                 )
                 continue
             samples.append(
@@ -116,9 +116,7 @@ class GitHubAdvisoryScraper(BaseScraper):
             )
         return samples
 
-    def fetch(self, max_items: int) -> list[ScrapedSample]:
-        if max_items <= 0:
-            return []
+    def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
         headers = {"Accept": "application/vnd.github+json"}
         next_url: str | None = self.API_URL
         first_page = True

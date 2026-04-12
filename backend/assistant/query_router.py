@@ -25,7 +25,10 @@ from typing import Any, Optional, List, Dict, Tuple
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from backend.cve.anti_hallucination import get_anti_hallucination_validator
+from backend.cve.anti_hallucination import (
+    REFUSAL_TEXT,
+    get_anti_hallucination_validator,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +78,7 @@ class QueryResult:
     retrieved_at: str
     grounded: bool = False
     grounding_reason: str = ""
+    grounding_confidence: float = 0.0
     unverifiable_claim_rate: float = 0.0
     production_ready: bool = False
 
@@ -367,6 +371,7 @@ class ResearchSearchPipeline:
         retrieved_at: str,
         grounded: bool = False,
         grounding_reason: str = "",
+        grounding_confidence: float = 0.0,
         unverifiable_claim_rate: float = 0.0,
         production_ready: bool = False,
     ) -> QueryResult:
@@ -379,6 +384,7 @@ class ResearchSearchPipeline:
             retrieved_at=retrieved_at,
             grounded=grounded,
             grounding_reason=grounding_reason,
+            grounding_confidence=grounding_confidence,
             unverifiable_claim_rate=unverifiable_claim_rate,
             production_ready=production_ready,
         )
@@ -396,20 +402,45 @@ class ResearchSearchPipeline:
         source: str,
         confidence: float,
         retrieved_at: str,
-    ) -> tuple[bool, str, float, bool]:
+        evidence_store: Dict[str, Any],
+    ) -> Dict[str, Any]:
         validator = get_anti_hallucination_validator()
         normalized_query = str(query_text or "").strip()
         normalized_result = str(result or "").strip()
         normalized_source = str(source or "").strip()
         if not normalized_query:
             status = validator.get_status()
-            return False, "query_text_missing", status["unverifiable_claim_rate"], status["production_ready"]
+            return {
+                "grounded": False,
+                "grounding_reason": "query_text_missing",
+                "grounding_confidence": 0.0,
+                "final_text": REFUSAL_TEXT,
+                "refusal_required": True,
+                "unverifiable_claim_rate": float(status["unverifiable_claim_rate"]),
+                "production_ready": False,
+            }
         if not normalized_result or normalized_result.lower() == "no result available":
             status = validator.get_status()
-            return False, "research_result_missing", status["unverifiable_claim_rate"], status["production_ready"]
+            return {
+                "grounded": False,
+                "grounding_reason": "research_result_missing",
+                "grounding_confidence": 0.0,
+                "final_text": REFUSAL_TEXT,
+                "refusal_required": True,
+                "unverifiable_claim_rate": float(status["unverifiable_claim_rate"]),
+                "production_ready": False,
+            }
         if not normalized_source:
             status = validator.get_status()
-            return False, "grounding_source_missing", status["unverifiable_claim_rate"], status["production_ready"]
+            return {
+                "grounded": False,
+                "grounding_reason": "grounding_source_missing",
+                "grounding_confidence": 0.0,
+                "final_text": REFUSAL_TEXT,
+                "refusal_required": True,
+                "unverifiable_claim_rate": float(status["unverifiable_claim_rate"]),
+                "production_ready": False,
+            }
 
         check = validator.validate_provenance(
             query_id,
@@ -420,13 +451,26 @@ class ResearchSearchPipeline:
                 "confidence": confidence,
             },
         )
-        status = validator.get_status()
-        return (
-            check.passed,
-            check.detail,
-            float(status["unverifiable_claim_rate"]),
-            bool(status["production_ready"]),
+        grounding_check = validator.validate_response_grounding(
+            normalized_result,
+            evidence_store,
         )
+        status = validator.get_status()
+        combined_reason = check.detail
+        if grounding_check.reason:
+            combined_reason = f"{combined_reason}; {grounding_check.reason}"
+        final_text = grounding_check.final_text if check.passed else REFUSAL_TEXT
+        grounding_confidence = grounding_check.confidence if check.passed else 0.0
+        refusal_required = (not check.passed) or grounding_check.refusal_required
+        return {
+            "grounded": bool(check.passed and grounding_check.grounded),
+            "grounding_reason": combined_reason,
+            "grounding_confidence": grounding_confidence,
+            "final_text": final_text,
+            "refusal_required": refusal_required,
+            "unverifiable_claim_rate": float(status["unverifiable_claim_rate"]),
+            "production_ready": bool(status["production_ready"] and check.passed and grounding_check.grounded),
+        }
 
     def _resolve_edge_binary(self) -> Optional[str]:
         """Resolve Edge binary path from env/PATH/common install locations."""
@@ -660,25 +704,75 @@ class ResearchSearchPipeline:
 
             # Summarize (mirrors C++ result_summarizer)
             summary, key_terms = self._summarize(text, query)
-            grounded, grounding_reason, unverifiable_claim_rate, production_ready = (
-                self._validate_query_grounding(
-                    query_id=query_id,
-                    query_text=query,
-                    result=summary,
-                    source=source_domain or "",
-                    confidence=0.7 if self._last_fetch_used_http_fallback else 1.0,
-                    retrieved_at=timestamp,
-                )
+            retrieval_confidence = 0.7 if self._last_fetch_used_http_fallback else 1.0
+            grounding_outcome = self._validate_query_grounding(
+                query_id=query_id,
+                query_text=query,
+                result=summary,
+                source=source_domain or "",
+                confidence=retrieval_confidence,
+                retrieved_at=timestamp,
+                evidence_store={
+                    "source": source_domain or "",
+                    "raw_html": raw_html,
+                    "extracted_text": text,
+                },
             )
+            grounded = bool(grounding_outcome["grounded"])
+            grounding_reason = str(grounding_outcome["grounding_reason"])
+            grounding_confidence = float(grounding_outcome["grounding_confidence"])
+            unverifiable_claim_rate = float(grounding_outcome["unverifiable_claim_rate"])
+            production_ready = bool(grounding_outcome["production_ready"])
+            final_summary = str(grounding_outcome["final_text"])
+
+            if not grounded:
+                logger.warning(
+                    "Research grounding failed query_id=%s source=%s confidence=%.2f reason=%s",
+                    query_id,
+                    source_domain or "",
+                    grounding_confidence,
+                    grounding_reason,
+                )
+
+            if grounding_outcome["refusal_required"]:
+                return ResearchResult(
+                    query=query,
+                    status=ResearchStatus.NO_RESULTS,
+                    title="",
+                    summary=final_summary,
+                    source=source_domain or "",
+                    key_terms=tuple(key_terms[:10]),
+                    word_count=len(final_summary.split()),
+                    elapsed_ms=elapsed,
+                    mode=VoiceMode.CLARIFICATION,
+                    timestamp=timestamp,
+                    query_result=self._build_query_result(
+                        query_id=query_id,
+                        query_text=query,
+                        source=(
+                            "http_fallback"
+                            if self._last_fetch_used_http_fallback
+                            else "primary"
+                        ),
+                        result=final_summary,
+                        confidence=retrieval_confidence,
+                        retrieved_at=timestamp,
+                        grounded=False,
+                        grounding_reason=grounding_reason,
+                        grounding_confidence=grounding_confidence,
+                        unverifiable_claim_rate=unverifiable_claim_rate,
+                        production_ready=False,
+                    ),
+                )
 
             return ResearchResult(
                 query=query,
                 status=ResearchStatus.SUCCESS,
                 title=query.title(),
-                summary=summary,
+                summary=final_summary,
                 source=source_domain or "web",
                 key_terms=tuple(key_terms[:10]),
-                word_count=len(summary.split()),
+                word_count=len(final_summary.split()),
                 elapsed_ms=elapsed,
                 mode=VoiceMode.RESEARCH,
                 timestamp=timestamp,
@@ -690,11 +784,12 @@ class ResearchSearchPipeline:
                         if self._last_fetch_used_http_fallback
                         else "primary"
                     ),
-                    result=summary,
-                    confidence=0.7 if self._last_fetch_used_http_fallback else 1.0,
+                    result=final_summary,
+                    confidence=retrieval_confidence,
                     retrieved_at=timestamp,
                     grounded=grounded,
                     grounding_reason=grounding_reason,
+                    grounding_confidence=grounding_confidence,
                     unverifiable_claim_rate=unverifiable_claim_rate,
                     production_ready=production_ready,
                 ),

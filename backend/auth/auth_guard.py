@@ -203,15 +203,31 @@ def is_temporary_auth_bypass_enabled() -> bool:
 
 
 def _log_temporary_auth_bypass_startup_warning() -> None:
-    if is_temporary_auth_bypass_enabled():
-        logger.warning(
-            "Temporary auth bypass is enabled in non-production. "
-            "Disable YGB_TEMP_AUTH_BYPASS before deployment."
+    bypass_requested = _temporary_auth_bypass_requested()
+    bypass_enabled = is_temporary_auth_bypass_enabled()
+    production_mode = _runtime_is_production()
+
+    if bypass_requested and production_mode:
+        logger.critical(
+            "Temporary auth bypass was requested while YGB_ENV=production. "
+            "Bypass remains disabled and the deployment is misconfigured."
         )
-    elif _temporary_auth_bypass_requested():
-        logger.warning(
-            "Temporary auth bypass was requested but is ignored outside test-only execution."
-        )
+        return
+
+    if bypass_requested:
+        if bypass_enabled:
+            logger.warning(
+                "Temporary auth bypass is enabled in non-production. "
+                "Disable YGB_TEMP_AUTH_BYPASS before deployment."
+            )
+        else:
+            logger.warning(
+                "Temporary auth bypass was requested in non-production but remains disabled "
+                "outside test-only execution."
+            )
+        return
+
+    logger.info("Temporary auth bypass is disabled.")
 
 
 _log_temporary_auth_bypass_startup_warning()

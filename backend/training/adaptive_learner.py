@@ -84,6 +84,10 @@ class AdaptationEvent:
         object.__setattr__(self, "history_depth", history_depth)
         object.__setattr__(self, "fisher_sample_count", fisher_sample_count)
 
+    @property
+    def js_divergence(self) -> float:
+        return float(self.js_distance)
+
 
 @dataclass(frozen=True)
 class DistributionShift:
@@ -94,17 +98,21 @@ class DistributionShift:
     current_distribution: dict[str, float]
     history_depth: int
 
+    @property
+    def js_divergence(self) -> float:
+        return float(self.js_distance)
+
 
 class DistributionMonitor:
     def __init__(
         self,
         *,
         history_size: int = 5,
-        shift_threshold: float = 0.2,
+        shift_threshold: float = 0.15,
         severity_history: Sequence[Mapping[str, float]] | None = None,
     ) -> None:
         normalized_history_size = int(history_size)
-        normalized_threshold = float(shift_threshold)
+        normalized_threshold = min(float(shift_threshold), 0.15)
         if normalized_history_size <= 0:
             raise ValueError("history_size must be a positive integer")
         if not math.isfinite(normalized_threshold) or normalized_threshold < 0.0:
@@ -177,7 +185,7 @@ class DistributionMonitor:
         return cls._normalize_distribution(averaged)
 
     @classmethod
-    def _jensen_shannon_distance(
+    def _jensen_shannon_divergence(
         cls,
         left: Mapping[str, float],
         right: Mapping[str, float],
@@ -203,9 +211,22 @@ class DistributionMonitor:
             )
         )
         divergence = max(0.5 * left_kl + 0.5 * right_kl, 0.0)
-        return float(math.sqrt(divergence))
+        return float(divergence)
 
-    def observe(self, severity_counts: Mapping[str, int | float]) -> DistributionShift:
+    @classmethod
+    def _jensen_shannon_distance(
+        cls,
+        left: Mapping[str, float],
+        right: Mapping[str, float],
+    ) -> float:
+        return cls._jensen_shannon_divergence(left, right)
+
+    def _evaluate_shift(
+        self,
+        severity_counts: Mapping[str, int | float],
+        *,
+        update_history: bool,
+    ) -> DistributionShift:
         current_distribution = self._normalize_counts(severity_counts)
         history_depth = len(self._severity_history)
         if not current_distribution:
@@ -220,14 +241,15 @@ class DistributionMonitor:
         baseline_distribution = self._average_distribution(self._severity_history)
         if not baseline_distribution:
             baseline_distribution = dict(current_distribution)
-        js_distance = self._jensen_shannon_distance(
+        js_distance = self._jensen_shannon_divergence(
             baseline_distribution,
             current_distribution,
         )
-        shift_detected = bool(history_depth > 0 and js_distance >= self.shift_threshold)
-        self._severity_history.append(dict(current_distribution))
-        if len(self._severity_history) > self.history_size:
-            self._severity_history = self._severity_history[-self.history_size :]
+        shift_detected = bool(history_depth > 0 and js_distance > self.shift_threshold)
+        if update_history:
+            self._severity_history.append(dict(current_distribution))
+            if len(self._severity_history) > self.history_size:
+                self._severity_history = self._severity_history[-self.history_size :]
         return DistributionShift(
             shift_detected=shift_detected,
             js_distance=js_distance,
@@ -236,6 +258,12 @@ class DistributionMonitor:
             current_distribution=current_distribution,
             history_depth=history_depth,
         )
+
+    def observe(self, severity_counts: Mapping[str, int | float]) -> DistributionShift:
+        return self._evaluate_shift(severity_counts, update_history=True)
+
+    def detect_shift(self, severity_counts: Mapping[str, int | float]) -> bool:
+        return self._evaluate_shift(severity_counts, update_history=False).shift_detected
 
     def snapshot(self) -> dict[str, object]:
         return {
@@ -448,7 +476,7 @@ class AdaptiveLearner:
         state_path: str | Path = DEFAULT_ADAPTIVE_STATE_PATH,
         ewc_state_path: str | Path = DEFAULT_EWC_STATE_PATH,
         history_size: int = 5,
-        shift_threshold: float = 0.2,
+        shift_threshold: float = 0.15,
         ewc_lambda: float = 0.1,
         fisher_max_batches: int = 32,
         max_events: int = 200,

@@ -14,7 +14,6 @@ import logging
 import os
 import socket
 import struct
-import sys
 import time
 
 logger = logging.getLogger(__name__)
@@ -29,14 +28,26 @@ NTP_DEFAULT_SERVERS = [
 MAX_SKEW_SECONDS = 5.0
 NTP_TIMEOUT_SECONDS = 3.0
 NTP_PORT = 123
-_TRUTHY_VALUES = frozenset({"1", "true", "yes", "on"})
-_TEST_ONLY_PATH_ENV = "YGB_ENABLE_TEST_ONLY_PATHS"
+_CLOCK_SIMULATION_ENV = "YGB_CLOCK_SIMULATION"
 
 
-def _test_only_simulation_enabled() -> bool:
-    if "pytest" in sys.modules:
-        return True
-    return os.environ.get(_TEST_ONLY_PATH_ENV, "").strip().lower() in _TRUTHY_VALUES
+def _runtime_is_production() -> bool:
+    return os.environ.get("YGB_ENV", "").strip().lower() == "production"
+
+
+def _clock_simulation_enabled() -> bool:
+    return os.environ.get(_CLOCK_SIMULATION_ENV, "").strip() == "1"
+
+
+def _log_clock_simulation_startup_status() -> None:
+    if _runtime_is_production() and _clock_simulation_enabled():
+        logger.critical(
+            "Clock skew simulation is enabled while YGB_ENV=production. "
+            "Disable YGB_CLOCK_SIMULATION before deployment."
+        )
+
+
+_log_clock_simulation_startup_status()
 
 
 class ClockSkewResult:
@@ -170,9 +181,14 @@ class ClockGuard:
 
         Used for testing — does NOT contact NTP servers.
         """
-        if not _test_only_simulation_enabled():
+        if not _clock_simulation_enabled():
             raise RuntimeError(
-                "clock skew simulation is disabled outside test-only execution"
+                "clock skew simulation is disabled"
+            )
+        if _runtime_is_production():
+            logger.critical(
+                "Clock skew simulation executed while YGB_ENV=production and "
+                "YGB_CLOCK_SIMULATION=1."
             )
         skew = abs(local_time - ntp_time)
         passed = skew <= self._max_skew

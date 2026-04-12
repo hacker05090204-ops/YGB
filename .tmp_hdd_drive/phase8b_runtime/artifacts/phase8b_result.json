@@ -1,0 +1,101 @@
+{
+  "benchmark": {
+    "amp_requested": true,
+    "amp_used": true,
+    "benchmark_inference_throughput_samples_per_second": 1407.4409149269395,
+    "benchmark_metrics": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "loss": 0.7718496322631836,
+      "mrr": 1.0,
+      "precision": 1.0,
+      "precision_at_10": 1.0,
+      "precision_at_5": 1.0,
+      "recall": 1.0,
+      "recommended_f1": 1.0,
+      "recommended_strategy": "class_gap_midpoint",
+      "recommended_threshold": 0.14025137200951576,
+      "rejected_samples": 0,
+      "samples": 500,
+      "source": "exact_500_real_cve_samples",
+      "threshold": 0.17600174620747566
+    },
+    "benchmark_seconds": 0.3552546999999322,
+    "cpu_only": false,
+    "device": "cuda",
+    "effective_training_samples_processed": 4110,
+    "gpu_memory_mb": 114.103515625,
+    "observed_5_epoch_outcome": {
+      "early_stopped": false,
+      "epochs_completed": 5,
+      "validation_f1": 1.0
+    },
+    "training_seconds": 5.334185400002752,
+    "training_throughput_samples_per_second": 770.501902689374
+  },
+  "integration": {
+    "available_real_cve_samples": 6977,
+    "class_weights": [
+      5.769230842590332,
+      0.5474452376365662
+    ],
+    "class_weights_applied_in_loss_path": true,
+    "early_stopped": false,
+    "early_stopping_available": true,
+    "epochs_completed": 5,
+    "metrics_emitted": true,
+    "metrics_report": {
+      "accuracy": 1.0,
+      "best_class": {
+        "f1": 1.0,
+        "label": 1,
+        "name": "POSITIVE",
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 47
+      },
+      "macro_f1": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "per_class": {
+        "0": {
+          "f1": 1.0,
+          "label": 0,
+          "name": "NEGATIVE",
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 3
+        },
+        "1": {
+          "f1": 1.0,
+          "label": 1,
+          "name": "POSITIVE",
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 47
+        }
+      },
+      "support_total": 50,
+      "weighted_f1": 1.0,
+      "weighted_precision": 1.0,
+      "weighted_recall": 1.0,
+      "worst_class": {
+        "f1": 1.0,
+        "label": 0,
+        "name": "NEGATIVE",
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 3
+      }
+    },
+    "selected_sample_count": 500,
+    "slice_note": "exact_500_real_cve_samples",
+    "train_dataset_size_after_real_sample_oversampling": 822,
+    "validation_accuracy": 1.0,
+    "validation_auc_roc": 1.0,
+    "validation_dataset_size": 50,
+    "validation_f1": 1.0,
+    "validation_precision": 1.0,
+    "validation_recall": 1.0
+  }
+}

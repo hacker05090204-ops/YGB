@@ -71,7 +71,17 @@ def test_bootstrap_pipeline_starts_autograbber_and_auto_train(monkeypatch):
     assert controller.start_calls == 1
     assert result.autograbber is grabber
     assert result.auto_train_controller is controller
-    assert result.autograbber_config.sources == ["nvd", "cisa", "osv", "github"]
+    assert result.autograbber_config.sources == [
+        "nvd",
+        "cisa",
+        "osv",
+        "github",
+        "exploitdb",
+        "msrc",
+        "redhat",
+        "snyk",
+        "vulnrichment",
+    ]
     assert result.autograbber_config.cycle_interval_seconds == 17
     assert result.autograbber_started is True
     assert result.auto_train_started is True

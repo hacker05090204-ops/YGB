@@ -201,17 +201,56 @@ class RLFeedbackCollector:
     def _severity_rank(severity: str) -> int:
         return _SEVERITY_RANKS.get(normalize_severity(severity), 0)
 
+    @staticmethod
+    def _normalize_signal_source(source: str) -> str:
+        normalized_source = str(source or "").strip().lower()
+        if normalized_source.endswith("_severity_update"):
+            normalized_source = normalized_source[: -len("_severity_update")]
+        return normalized_source
+
+    @staticmethod
+    def _kev_event_key(cve_id: str, sample_id: str) -> str:
+        return f"kev:{str(cve_id or '').strip().upper()}:{str(sample_id or '').strip()}"
+
+    @classmethod
+    def _severity_event_key(
+        cls,
+        *,
+        source: str,
+        cve_id: str,
+        previous_severity: str,
+        new_severity: str,
+        sample_id: str,
+    ) -> str:
+        return (
+            f"sev:{cls._normalize_signal_source(source)}:{str(cve_id or '').strip().upper()}:"
+            f"{normalize_severity(previous_severity)}:{normalize_severity(new_severity)}:{str(sample_id or '').strip()}"
+        )
+
     def _hydrate_processed_events(self) -> None:
         for signal in self._reward_buffer.snapshot():
             if signal.source == "cisa_kev":
-                self._processed_events.add(f"kev:{signal.cve_id}:{signal.sample_id}")
+                self._processed_events.add(
+                    self._kev_event_key(signal.cve_id, signal.sample_id)
+                )
                 continue
-            if signal.source != "nvd_severity_update":
+            previous_severity = signal.metadata.get("previous_severity")
+            new_severity = signal.metadata.get("new_severity")
+            if previous_severity is None or new_severity is None:
                 continue
-            previous_severity = signal.metadata.get("previous_severity", "UNKNOWN")
-            new_severity = signal.metadata.get("new_severity", "UNKNOWN")
+            signal_source = self._normalize_signal_source(
+                str(signal.metadata.get("signal_source") or signal.source or "")
+            )
+            if not signal_source:
+                continue
             self._processed_events.add(
-                f"sev:{signal.cve_id}:{previous_severity}:{new_severity}:{signal.sample_id}"
+                self._severity_event_key(
+                    source=signal_source,
+                    cve_id=signal.cve_id,
+                    previous_severity=str(previous_severity),
+                    new_severity=str(new_severity),
+                    sample_id=signal.sample_id,
+                )
             )
 
     def record_prediction(
@@ -242,6 +281,19 @@ class RLFeedbackCollector:
         with self._lock:
             return list(self._predictions_by_cve.get(cve_id, {}).values())
 
+    def get_weighted_signals(
+        self,
+        *,
+        now: datetime | None = None,
+        max_age_days: float = 30.0,
+        half_life_days: float = 7.0,
+    ) -> dict[str, float]:
+        return self._reward_buffer.get_weighted_signals(
+            now=now,
+            max_age_days=max_age_days,
+            half_life_days=half_life_days,
+        )
+
     @staticmethod
     def _kev_reward(predicted_severity: str) -> float:
         severity = normalize_severity(predicted_severity)
@@ -262,7 +314,7 @@ class RLFeedbackCollector:
         )
         for cve_id in normalized_cve_ids:
             for prediction in self._predictions_for_cve(cve_id):
-                event_key = f"kev:{cve_id}:{prediction.sample_id}"
+                event_key = self._kev_event_key(cve_id, prediction.sample_id)
                 with self._lock:
                     if event_key in self._processed_events:
                         continue
@@ -307,12 +359,16 @@ class RLFeedbackCollector:
         cve_id: str,
         previous_severity: str,
         new_severity: str,
+        source: str = "nvd",
     ) -> int:
         normalized_cve_id = str(cve_id or "").strip().upper()
         normalized_previous = normalize_severity(previous_severity)
         normalized_new = normalize_severity(new_severity)
+        normalized_source = self._normalize_signal_source(source)
         if not normalized_cve_id:
             raise ValueError("process_severity_update() requires a non-empty cve_id")
+        if not normalized_source:
+            raise ValueError("process_severity_update() requires a non-empty source")
         if normalized_previous == normalized_new:
             return 0
         added_signals = 0
@@ -324,8 +380,12 @@ class RLFeedbackCollector:
             )
             if reward == 0.0:
                 continue
-            event_key = (
-                f"sev:{normalized_cve_id}:{normalized_previous}:{normalized_new}:{prediction.sample_id}"
+            event_key = self._severity_event_key(
+                source=normalized_source,
+                cve_id=normalized_cve_id,
+                previous_severity=normalized_previous,
+                new_severity=normalized_new,
+                sample_id=prediction.sample_id,
             )
             with self._lock:
                 if event_key in self._processed_events:
@@ -338,10 +398,11 @@ class RLFeedbackCollector:
                     predicted_severity=prediction.predicted_severity,
                     outcome=f"severity_update:{normalized_new}",
                     reward=reward,
-                    source="nvd_severity_update",
+                    source=normalized_source,
                     metadata={
                         "previous_severity": normalized_previous,
                         "new_severity": normalized_new,
+                        "signal_source": normalized_source,
                     },
                 )
             )
@@ -370,6 +431,20 @@ def get_rl_collector() -> RLFeedbackCollector:
         if _rl_collector_singleton is None:
             _rl_collector_singleton = RLFeedbackCollector(reward_buffer=get_reward_buffer())
         return _rl_collector_singleton
+
+
+def export_rewards_for_al() -> list[dict[str, object]]:
+    exported_records: list[dict[str, object]] = []
+    for signal in get_reward_buffer().snapshot():
+        exported_records.append(
+            {
+                "task_id": signal.cve_id,
+                "reward": float(signal.reward),
+                "outcome_type": signal.outcome,
+                "source": signal.source,
+            }
+        )
+    return exported_records
 
 
 def reset_rl_feedback_state() -> None:

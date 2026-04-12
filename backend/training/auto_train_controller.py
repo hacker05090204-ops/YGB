@@ -412,8 +412,13 @@ class AutoTrainController:
             run.total_samples,
         )
 
-    def _build_reward_weight_lookup(self, row_ids: list[str]) -> dict[str, float] | None:
-        weighted_rewards = self._reward_buffer.get_weighted_signals()
+    def _build_reward_weight_lookup(
+        self,
+        row_ids: list[str],
+        weighted_rewards: dict[str, float] | None = None,
+    ) -> dict[str, float] | None:
+        if weighted_rewards is None:
+            weighted_rewards = self._reward_buffer.get_weighted_signals()
         if not weighted_rewards:
             return None
         sample_weights: dict[str, float] = {}
@@ -550,6 +555,11 @@ class AutoTrainController:
                 model=getattr(self.trainer, "model", None),
                 prev_dataloader=self._build_adaptation_dataloader(features, labels),
             )
+            weighted_rewards = self._reward_buffer.get_weighted_signals()
+            sample_weight_lookup = self._build_reward_weight_lookup(
+                row_ids,
+                weighted_rewards,
+            )
             logger.info(
                 "auto train scan run_id=%s shard_count=%d total_samples=%d new_samples=%d",
                 placeholder.run_id,
@@ -559,12 +569,18 @@ class AutoTrainController:
             )
             trigger_threshold = self._compute_trigger_threshold()
             logger.info(
-                "auto train threshold run_id=%s threshold=%d total_samples=%d new_samples=%d",
-                placeholder.run_id,
+                "AutoTrain check: new=%d threshold=%d total=%d",
+                new_samples,
                 trigger_threshold,
                 total_samples,
-                new_samples,
             )
+            if weighted_rewards:
+                logger.info(
+                    "auto train reward signals loaded run_id=%s total_signals=%d matched_rows=%d",
+                    placeholder.run_id,
+                    len(weighted_rewards),
+                    0 if sample_weight_lookup is None else len(sample_weight_lookup),
+                )
             if adaptation_event is not None:
                 logger.info(
                     "adaptive learning event recorded run_id=%s js_distance=%.6f fisher_samples=%d",
@@ -627,7 +643,7 @@ class AutoTrainController:
 
             artifact_signature_before = self._artifact_signature()
             trainer_result = self._run_incremental_epoch(
-                sample_weights=self._build_reward_weight_lookup(row_ids),
+                sample_weights=sample_weight_lookup,
             )
             artifact_signature_after = self._artifact_signature()
             checkpoint_updated = artifact_signature_before != artifact_signature_after

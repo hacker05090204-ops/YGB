@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "baseline_distribution": {
+        "HIGH": 0.3333333333333333,
+        "LOW": 0.3333333333333333,
+        "MEDIUM": 0.3333333333333333
+      },
+      "current_distribution": {
+        "CRITICAL": 0.8571428571428571,
+        "HIGH": 0.14285714285714285
+      },
+      "event_id": "abbe85f2737f4c279dfecbc2d7f8f713",
+      "fisher_sample_count": 48,
+      "history_depth": 2,
+      "js_distance": 0.7901688335165017,
+      "observed_at": "2026-04-12T10:29:59.726295+00:00",
+      "severity_counts": {
+        "CRITICAL": 24,
+        "HIGH": 4
+      },
+      "threshold": 0.15
+    }
+  ],
+  "monitor": {
+    "history_size": 3,
+    "severity_history": [
+      {
+        "HIGH": 0.3333333333333333,
+        "LOW": 0.3333333333333333,
+        "MEDIUM": 0.3333333333333333
+      },
+      {
+        "HIGH": 0.3333333333333333,
+        "LOW": 0.3333333333333333,
+        "MEDIUM": 0.3333333333333333
+      },
+      {
+        "CRITICAL": 0.8571428571428571,
+        "HIGH": 0.14285714285714285
+      }
+    ],
+    "shift_threshold": 0.15
+  },
+  "schema_version": 1,
+  "updated_at": "2026-04-12T10:29:59.726295+00:00"
+}

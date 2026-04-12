@@ -17,6 +17,7 @@ import logging
 import os
 import hashlib
 import ctypes
+from pathlib import Path
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -32,11 +33,20 @@ if PROJECT_ROOT not in sys.path:
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
-USE_MOE = os.getenv("YGB_USE_MOE", "true").lower() == "true"
+YGB_USE_MOE_ENV_VAR = "YGB_USE_MOE"
+YGB_USE_MOE_DEFAULT = True
+YGB_USE_MOE = os.getenv(
+    YGB_USE_MOE_ENV_VAR,
+    str(YGB_USE_MOE_DEFAULT).lower(),
+).lower() == "true"
+USE_MOE = YGB_USE_MOE
+N_EXPERTS = 23
+REAL_SAFETENSORS_FEATURE_STORE_ROOT = Path("training") / "features_safetensors"
 MOE_GLOBAL_REGISTRY_PATH = os.path.join("checkpoints", "moe_global_registry.json")
 EXPERT_CHECKPOINT_REGISTRY_PATH = os.path.join(
     "checkpoints", "expert_checkpoint_registry.json"
 )
+SAFE_TENSORS_CHECKPOINT_METADATA_KEY = "checkpoint_metadata_json"
 
 from training_core.execution import (
     run_phase3_training_execution as _run_phase3_training_execution,
@@ -65,8 +75,12 @@ from training_core.contracts import (
 
 
 def _refresh_use_moe() -> bool:
-    global USE_MOE
-    USE_MOE = os.getenv("YGB_USE_MOE", "true").lower() == "true"
+    global USE_MOE, YGB_USE_MOE
+    YGB_USE_MOE = os.getenv(
+        YGB_USE_MOE_ENV_VAR,
+        str(YGB_USE_MOE_DEFAULT).lower(),
+    ).lower() == "true"
+    USE_MOE = YGB_USE_MOE
     return USE_MOE
 
 
@@ -105,6 +119,55 @@ def _build_legacy_hidden_dims(effective_hidden_dim: int) -> Tuple[int, ...]:
     return (head_dim, upper_dim, mid_dim, tail_dim)
 
 
+def _ensure_moe_hidden_dropout(model, nn_module, dropout_probability: float) -> int:
+    experts = getattr(getattr(model, "moe", None), "experts", None)
+    if experts is None:
+        return 0
+
+    enforced_expert_count = 0
+    for expert in experts:
+        dropout_layer = getattr(expert, "dropout", None)
+        if isinstance(dropout_layer, nn_module.Dropout):
+            if float(getattr(dropout_layer, "p", 0.0)) < float(dropout_probability):
+                setattr(expert, "dropout", nn_module.Dropout(dropout_probability))
+            enforced_expert_count += 1
+            continue
+        setattr(expert, "dropout", nn_module.Dropout(dropout_probability))
+        enforced_expert_count += 1
+    return enforced_expert_count
+
+
+def _write_safetensors_checkpoint(
+    checkpoint_path: str,
+    state_dict: Dict[str, Any],
+    *,
+    metadata: Optional[Dict[str, Any]] = None,
+    overwrite: bool = False,
+) -> str:
+    from safetensors.torch import save_file as st_save
+
+    checkpoint_path_text = str(checkpoint_path)
+    checkpoint_dir = os.path.dirname(checkpoint_path_text)
+    if checkpoint_dir:
+        _ensure_dir(checkpoint_dir)
+
+    if os.path.exists(checkpoint_path_text) and not overwrite:
+        return checkpoint_path_text
+
+    temp_path = f"{checkpoint_path_text}.{os.getpid()}.tmp"
+    serialized_metadata = {
+        SAFE_TENSORS_CHECKPOINT_METADATA_KEY: json.dumps(metadata or {}, sort_keys=True)
+    }
+    try:
+        st_save(state_dict, temp_path, metadata=serialized_metadata)
+        os.replace(temp_path, checkpoint_path_text)
+    except (OSError, RuntimeError, TypeError, ValueError):
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise
+    return checkpoint_path_text
+
+
 def _build_configured_model(
     *,
     config: TrainingControllerConfig,
@@ -113,32 +176,46 @@ def _build_configured_model(
     device,
     nn_module,
 ):
-    del total_samples, nn_module
-
     if _refresh_use_moe():
-        from impl_v1.phase49.moe import EXPERT_FIELDS, MoEBugClassifier, MoEConfig
+        from impl_v1.phase49.moe import EXPERT_FIELDS, MoEClassifier, MoEConfig
 
-        moe_dim = max(64, min(256, int(effective_hidden_dim) * 2))
+        if len(EXPERT_FIELDS) != N_EXPERTS:
+            raise RuntimeError(
+                f"MoE expert registry mismatch: expected {N_EXPERTS}, got {len(EXPERT_FIELDS)}"
+            )
+
+        baseline_moe_dim = max(1, min(256, int(config.hidden_dim)))
+        moe_dim = (
+            max(1, baseline_moe_dim // 2)
+            if int(total_samples) < 10_000
+            else baseline_moe_dim
+        )
         moe_config = MoEConfig(
             d_model=moe_dim,
-            n_experts=len(EXPERT_FIELDS),
-            top_k=min(2, len(EXPERT_FIELDS)),
+            n_experts=N_EXPERTS,
+            top_k=min(2, N_EXPERTS),
             expert_hidden_mult=2,
             dropout=0.3,
             gate_noise=1.0,
             aux_loss_coeff=0.01,
         )
-        model = MoEBugClassifier(
+        model = MoEClassifier(
             moe_config,
             input_dim=config.input_dim,
             output_dim=config.num_classes,
         ).to(device)
+        enforced_dropout_experts = _ensure_moe_hidden_dropout(model, nn_module, 0.3)
+        if enforced_dropout_experts != N_EXPERTS:
+            raise RuntimeError(
+                f"MoE hidden-layer dropout enforcement failed: expected {N_EXPERTS}, got {enforced_dropout_experts}"
+            )
         model.requires_unused_parameter_detection = True
         logger.info(
-            "  MoE activated: experts=%s | top_k=%s | d_model=%s",
+            "  MoE activated: experts=%s | top_k=%s | d_model=%s | hidden_dropout_enforced=%s",
             moe_config.n_experts,
             moe_config.top_k,
             moe_config.d_model,
+            enforced_dropout_experts,
         )
         return model, moe_config.d_model
 
@@ -266,27 +343,47 @@ def _save_expert_checkpoint(
         return ""
 
     state_dict = st_load(source_model_path, device="cpu")
-    manager = CheckpointManager(config.checkpoint_dir)
-    checkpoint_result = manager.save(
+    epoch = int(selected_meta.get("epoch") or _best_epoch_for_result(training_result) or 0)
+    checkpoint_manager = CheckpointManager("checkpoints")
+    save_result = checkpoint_manager.save_expert_checkpoint(
         expert_id=int(expert_id),
         field_name=field_name,
         state_dict=state_dict,
-        val_f1=training_result.val_f1,
+        val_f1=float(training_result.val_f1),
         metadata={
-            "epoch": int(selected_meta.get("epoch") or _best_epoch_for_result(training_result) or 0),
+            "expert_id": int(expert_id),
+            "field_name": field_name,
+            "epoch": epoch,
+            "checkpoint_name": str(selected_meta.get("checkpoint_name", "") or ""),
+            "checkpoint_dir": str(selected_meta.get("dir_path", "") or ""),
             "source_model_path": source_model_path,
             "source_model_sha256": str(selected_meta.get("model_sha256", "") or ""),
             "source_meta_path": str(selected_meta.get("meta_path", "") or ""),
+            "val_f1": float(training_result.val_f1),
             "val_precision": float(training_result.val_precision),
             "val_recall": float(training_result.val_recall),
         },
     )
-    checkpoint_path = str(checkpoint_result.get("checkpoint_path", "") or "")
-    logger.info(
-        "  expert checkpoint saved: %s%s",
-        checkpoint_path or "[not retained]",
-        " [best]" if checkpoint_result.get("is_best") else "",
-    )
+    checkpoint_path = str(save_result.get("checkpoint_path", "") or "")
+    if save_result.get("saved"):
+        logger.info(
+            "  expert checkpoint saved: %s%s",
+            checkpoint_path,
+            " [best]" if save_result.get("is_best") else "",
+        )
+    else:
+        retained_best_val_f1 = save_result.get("best_val_f1")
+        logger.info(
+            "  expert checkpoint skipped: expert_id=%s | field_name=%s | val_f1=%.4f | retained_best=%s",
+            int(expert_id),
+            field_name,
+            float(training_result.val_f1),
+            (
+                f"{float(retained_best_val_f1):.4f}"
+                if retained_best_val_f1 is not None
+                else "-"
+            ),
+        )
     return checkpoint_path
 
 
@@ -312,8 +409,19 @@ def _maybe_save_moe_global_checkpoint(
         "checkpoints",
         f"moe_global_{epoch}_{training_result.val_f1:.3f}.safetensors",
     )
-    if not os.path.exists(checkpoint_path):
-        st_save(state_dict, checkpoint_path)
+    checkpoint_path = _write_safetensors_checkpoint(
+        checkpoint_path,
+        state_dict,
+        metadata={
+            "epoch": epoch,
+            "source_model_path": source_model_path,
+            "source_model_sha256": str(selected_meta.get("model_sha256", "") or ""),
+            "source_meta_path": str(selected_meta.get("meta_path", "") or ""),
+            "val_f1": float(training_result.val_f1),
+            "val_precision": float(training_result.val_precision),
+            "val_recall": float(training_result.val_recall),
+        },
+    )
 
     improved = _update_best_checkpoint_registry(
         MOE_GLOBAL_REGISTRY_PATH,
@@ -538,6 +646,109 @@ def _route_ingestion_sample(sample: dict) -> str:
         source_type="ingestion_pipeline",
     )
     return route_record(record).expert_name
+
+
+def _feature_metadata_to_ingestion_sample(
+    shard_name: str,
+    metadata: Optional[Dict[str, Any]],
+) -> dict:
+    metadata_payload = metadata if isinstance(metadata, dict) else {}
+    sample_sha256 = str(metadata_payload.get("sample_sha256") or shard_name or "")
+    sample_url = str(metadata_payload.get("sample_url") or "")
+    sample_cve_id = str(metadata_payload.get("sample_cve_id") or "")
+    sample_source = str(metadata_payload.get("sample_source") or "")
+    sample_severity = str(metadata_payload.get("sample_severity") or "")
+    sample_token_count = str(metadata_payload.get("sample_token_count") or "")
+    endpoint = sample_cve_id or sample_url or sample_sha256
+    parameters = sample_url.partition("?")[2] if "?" in sample_url else ""
+    exploit_vector = " ".join(
+        part
+        for part in (sample_url, sample_source, sample_severity, sample_token_count)
+        if part
+    )
+    return {
+        "endpoint": endpoint,
+        "parameters": parameters[:512],
+        "exploit_vector": exploit_vector[:512],
+        "impact": sample_severity[:512],
+        "source_tag": sample_source[:512],
+        "fingerprint": sample_sha256,
+        "reliability": 1.0,
+    }
+
+
+def _route_safetensors_feature_shard(
+    shard_name: str,
+    metadata: Optional[Dict[str, Any]],
+) -> str:
+    metadata_payload = metadata if isinstance(metadata, dict) else {}
+    explicit_field_name = str(
+        metadata_payload.get("field_name") or metadata_payload.get("expert_name") or ""
+    ).strip()
+    if explicit_field_name:
+        return explicit_field_name
+    return _route_ingestion_sample(
+        _feature_metadata_to_ingestion_sample(shard_name, metadata_payload)
+    )
+
+
+def _load_real_safetensors_expert_subset(
+    field_name: str,
+) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    from backend.training.safetensors_store import SafetensorsFeatureStore
+
+    store_root = Path(REAL_SAFETENSORS_FEATURE_STORE_ROOT)
+    if not store_root.exists():
+        raise FileNotFoundError(
+            f"Real safetensors feature store not found: {store_root.as_posix()}"
+        )
+
+    store = SafetensorsFeatureStore(store_root)
+    shard_names = store.list_shards()
+    if not shard_names:
+        raise RuntimeError(
+            f"No real safetensors feature shards available in {store_root.as_posix()}"
+        )
+
+    matched_shards: List[str] = []
+    feature_batches: List[np.ndarray] = []
+    label_batches: List[np.ndarray] = []
+
+    for shard_name in shard_names:
+        shard = store.read(shard_name)
+        routed_field_name = _route_safetensors_feature_shard(shard_name, shard.metadata)
+        if routed_field_name != field_name:
+            continue
+
+        shard_features = np.ascontiguousarray(
+            np.asarray(shard.features, dtype=np.float32),
+            dtype=np.float32,
+        )
+        shard_labels = np.ascontiguousarray(
+            np.asarray(shard.labels, dtype=np.int64),
+            dtype=np.int64,
+        )
+        if shard_features.ndim != 2 or shard_labels.ndim != 1:
+            raise ValueError(
+                f"Invalid safetensors expert shard shape for {shard_name}: features={shard_features.shape}, labels={shard_labels.shape}"
+            )
+        if shard_features.shape[0] != shard_labels.shape[0]:
+            raise ValueError(
+                f"Feature-label row mismatch for {shard_name}: features={shard_features.shape[0]}, labels={shard_labels.shape[0]}"
+            )
+
+        matched_shards.append(shard_name)
+        feature_batches.append(shard_features)
+        label_batches.append(shard_labels)
+
+    if not feature_batches:
+        raise RuntimeError(f"No routed safetensors shards found for field {field_name}")
+
+    return (
+        np.ascontiguousarray(np.concatenate(feature_batches, axis=0), dtype=np.float32),
+        np.ascontiguousarray(np.concatenate(label_batches, axis=0), dtype=np.int64),
+        matched_shards,
+    )
 
 
 # =============================================================================
@@ -905,7 +1116,11 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
     from impl_v1.phase49.moe import EXPERT_FIELDS
 
     normalized_field_name = str(field_name or "").strip()
-    if not 0 <= int(expert_id) < len(EXPERT_FIELDS):
+    if len(EXPERT_FIELDS) != N_EXPERTS:
+        raise RuntimeError(
+            f"MoE expert registry mismatch: expected {N_EXPERTS}, got {len(EXPERT_FIELDS)}"
+        )
+    if not 0 <= int(expert_id) < N_EXPERTS:
         raise ValueError(f"Invalid expert_id={expert_id}")
     expected_field_name = EXPERT_FIELDS[int(expert_id)]
     if normalized_field_name != expected_field_name:
@@ -918,27 +1133,20 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
     logger.info("╚══════════════════════════════════════════════════╝")
     logger.info("  expert_id=%s | field_name=%s", int(expert_id), normalized_field_name)
 
-    config = TrainingControllerConfig(world_size=1, rank=0)
-    dataset_state, _, _ = phase2_dataset_finalization(config)
-    if not dataset_state.trainable:
-        logger.error("  expert training aborted: dataset not trainable")
+    try:
+        expert_features, expert_labels, matched_shards = _load_real_safetensors_expert_subset(
+            normalized_field_name
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        logger.error("  expert training aborted: %s", exc)
         return _build_failed_training_result("FAILED")
 
-    dataset = _load_real_ingestion_dataset(config)
-    raw_samples, features, labels = _materialize_ingestion_dataset(dataset)
-    matching_indices = [
-        idx
-        for idx, sample in enumerate(raw_samples)
-        if _route_ingestion_sample(sample) == normalized_field_name
-    ]
-    logger.info("  expert subset matched samples=%s", len(matching_indices))
-
-    if not matching_indices:
-        logger.error("  expert training aborted: no routed samples for %s", normalized_field_name)
-        return _build_failed_training_result("FAILED")
-
-    expert_features = np.ascontiguousarray(features[matching_indices], dtype=np.float32)
-    expert_labels = np.ascontiguousarray(labels[matching_indices], dtype=np.int64)
+    logger.info(
+        "  expert subset matched shards=%s | samples=%s | feature_store=%s",
+        len(matched_shards),
+        int(expert_labels.shape[0]),
+        REAL_SAFETENSORS_FEATURE_STORE_ROOT.as_posix(),
+    )
 
     class_values, class_counts = np.unique(expert_labels, return_counts=True)
     class_distribution = {
@@ -951,6 +1159,33 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
             "  expert training aborted: insufficient class support for train/val/test split"
         )
         return _build_failed_training_result("FAILED")
+
+    config = TrainingControllerConfig(
+        world_size=1,
+        rank=0,
+        input_dim=int(expert_features.shape[1]),
+        num_classes=max(2, int(class_values.max()) + 1 if class_values.size else 2),
+        checkpoint_dir=os.path.join(
+            "secure_data",
+            "checkpoints",
+            f"expert_{int(expert_id):02d}_{normalized_field_name}",
+        ),
+        experiment_dir=os.path.join(
+            "secure_data",
+            "experiments",
+            f"expert_{int(expert_id):02d}_{normalized_field_name}",
+        ),
+        model_dir=os.path.join(
+            "secure_data",
+            "model_versions",
+            f"expert_{int(expert_id):02d}_{normalized_field_name}",
+        ),
+        dataset_cache_dir=os.path.join(
+            "secure_data",
+            "dataset_cache",
+            f"expert_{int(expert_id):02d}_{normalized_field_name}",
+        ),
+    )
 
     expert_dataset_hash = _compute_dataset_hash(expert_features, expert_labels)
     expert_result = phase3_training_execution(

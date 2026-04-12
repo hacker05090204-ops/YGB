@@ -85,15 +85,28 @@ def resolve_claimed_expert(queue: ExpertTaskQueue) -> dict[str, Any]:
         if str(item.get("status", "")).upper() == STATUS_CLAIMED
     ]
 
-    if requested_expert.isdigit():
+    if requested_expert:
+        if not requested_expert.isdigit():
+            raise RuntimeError(f"YGB_EXPERT_ID must be an integer, got {requested_expert!r}")
         for record in claimed_records:
             if int(record.get("expert_id", -1)) == int(requested_expert):
                 return record
+        raise RuntimeError(
+            f"Requested YGB_EXPERT_ID={requested_expert} is not currently claimed in {queue.status_path}"
+        )
 
     if worker_id:
         for record in claimed_records:
             if str(record.get("claimed_by", "")).strip() == worker_id:
                 return record
+        if claimed_records:
+            claimed_ids = ", ".join(
+                str(int(record.get("expert_id", -1))) for record in claimed_records
+            )
+            raise RuntimeError(
+                f"No claimed expert is owned by worker_id={worker_id} "
+                f"(claimed={claimed_ids})"
+            )
 
     if len(claimed_records) == 1:
         return claimed_records[0]
@@ -113,6 +126,12 @@ def resolve_claimed_expert(queue: ExpertTaskQueue) -> dict[str, Any]:
     )
 
 
+def _export_follower_context(expert_id: int, field_name: str) -> None:
+    os.environ["YGB_EXPERT_ID"] = str(int(expert_id))
+    os.environ["YGB_EXPERT_FIELD_NAME"] = str(field_name)
+    os.environ["YGB_DDP_ROLE"] = "follower"
+
+
 def main():
     logger.info("=" * 60)
     logger.info("[RUNNER] RTX 3050 Follower Node — 8-Step Protocol")
@@ -123,7 +142,24 @@ def main():
     claimed_expert = resolve_claimed_expert(queue)
     expert_id = int(claimed_expert["expert_id"])
     field_name = str(claimed_expert.get("field_name", ""))
+    claimed_by = str(claimed_expert.get("claimed_by", "") or "").strip()
     logger.info("[RUNNER] Queue status:\n%s", queue.render_status())
+
+    master_addr = get_master_addr()
+    master_port = get_master_port()
+    os.environ["MASTER_ADDR"] = master_addr
+    os.environ["MASTER_PORT"] = master_port
+    os.environ["YGB_DDP_ADDR"] = master_addr
+    os.environ["YGB_DDP_PORT"] = master_port
+    _export_follower_context(expert_id, field_name)
+    logger.info(
+        "[RUNNER] Follower target: leader=%s:%s | expert_id=%s | field_name=%s | claimed_by=%s",
+        master_addr,
+        master_port,
+        expert_id,
+        field_name,
+        claimed_by or "-",
+    )
 
     _, dataset_state, X, y = load_real_dataset()
     dataset_hash = dataset_state.hash
@@ -140,11 +176,6 @@ def main():
     if tel:
         cuda_version = tel.get('cuda_version')
         driver_version = tel.get('driver_version')
-
-    master_addr = get_master_addr()
-    master_port = get_master_port()
-    os.environ["MASTER_ADDR"] = master_addr
-    os.environ["MASTER_PORT"] = master_port
 
     follower = RTX3050Follower(
         X=X,
@@ -167,7 +198,12 @@ def main():
 
     result = follower.run()
     if result.leader_connected:
-        logger.info("Follower connected to %s:%s for expert %s", master_addr, master_port, expert_id)
+        logger.info(
+            "Follower connected to %s:%s for expert %s",
+            master_addr,
+            master_port,
+            expert_id,
+        )
 
     os.makedirs('reports', exist_ok=True)
     report_path = os.path.join('reports', 'rtx3050_follower_report.json')
@@ -175,6 +211,7 @@ def main():
         **asdict(result),
         "expert_id": expert_id,
         "field_name": field_name,
+        "claimed_by": claimed_by,
         "master_addr": master_addr,
         "master_port": int(master_port),
         "dataset_source": dataset_state.dataset_source,

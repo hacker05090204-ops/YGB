@@ -71,6 +71,7 @@ run_cpp_tests
 *.gcda
 *.gcov
 *.safetensors.tmp
+*.descriptions.jsonl.tmp
 
 # Service account keys
 secure_data/

@@ -195,7 +195,7 @@ class HardNegativeMiner:
             loss_array[negative_mask],
         ):
             current_record = self._records.get(int(dataset_index))
-            next_record = (float(probability), float(loss))
+            next_record = (float(loss), float(probability))
             if current_record is None or next_record > current_record:
                 self._records[int(dataset_index)] = next_record
         self._seen_examples += int(label_array.shape[0])

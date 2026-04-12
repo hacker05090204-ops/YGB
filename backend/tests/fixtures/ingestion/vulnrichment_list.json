@@ -1,0 +1,68 @@
+[
+    {
+        "cveMetadata": {
+            "cveId": "CVE-2026-4401",
+            "datePublished": "2026-03-20T00:00:00Z",
+            "dateUpdated": "2026-03-21T00:00:00Z"
+        },
+        "containers": {
+            "cna": {
+                "title": "Acme Platform injection vulnerability",
+                "descriptions": [
+                    {
+                        "lang": "en",
+                        "value": "An injection flaw exists in Acme Platform."
+                    }
+                ],
+                "affected": [
+                    {
+                        "vendor": "Acme",
+                        "product": "Platform"
+                    }
+                ],
+                "references": [
+                    {
+                        "url": "https://www.cve.org/CVERecord?id=CVE-2026-4401"
+                    }
+                ]
+            },
+            "adp": [
+                {
+                    "providerMetadata": {
+                        "shortName": "Vulnrichment",
+                        "dateUpdated": "2026-03-21T00:00:00Z"
+                    },
+                    "title": "Vulnrichment analysis",
+                    "descriptions": [
+                        {
+                            "lang": "en",
+                            "value": "The flaw may allow remote attackers to execute arbitrary code."
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "cvssV3_1": {
+                                "baseScore": 8.8,
+                                "baseSeverity": "HIGH"
+                            }
+                        }
+                    ],
+                    "problemTypes": [
+                        {
+                            "descriptions": [
+                                {
+                                    "description": "CWE-94"
+                                }
+                            ]
+                        }
+                    ],
+                    "references": [
+                        {
+                            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4401"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]

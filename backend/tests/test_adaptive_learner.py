@@ -23,6 +23,19 @@ def test_distribution_monitor_does_not_flag_stable_history() -> None:
     assert third.js_distance < third.threshold
 
 
+def test_distribution_monitor_does_not_flag_uniform_severity_distribution() -> None:
+    monitor = DistributionMonitor(history_size=4, shift_threshold=0.2)
+
+    first = monitor.observe({"LOW": 25, "MEDIUM": 25, "HIGH": 25, "CRITICAL": 25})
+    second = monitor.observe({"LOW": 24, "MEDIUM": 26, "HIGH": 25, "CRITICAL": 25})
+    third = monitor.observe({"LOW": 25, "MEDIUM": 25, "HIGH": 24, "CRITICAL": 26})
+
+    assert first.shift_detected is False
+    assert second.shift_detected is False
+    assert third.shift_detected is False
+    assert third.js_distance < third.threshold
+
+
 def test_distribution_monitor_flags_sudden_skew() -> None:
     monitor = DistributionMonitor(history_size=4, shift_threshold=0.2)
     monitor.observe({"NEGATIVE": 50, "POSITIVE": 50})
@@ -33,6 +46,27 @@ def test_distribution_monitor_flags_sudden_skew() -> None:
 
     assert shifted.shift_detected is True
     assert shifted.js_distance > shifted.threshold
+
+
+def test_distribution_monitor_flags_sudden_critical_spike() -> None:
+    monitor = DistributionMonitor(history_size=4, shift_threshold=0.2)
+    monitor.observe({"LOW": 30, "MEDIUM": 35, "HIGH": 25, "CRITICAL": 10})
+    monitor.observe({"LOW": 31, "MEDIUM": 34, "HIGH": 25, "CRITICAL": 10})
+    monitor.observe({"LOW": 29, "MEDIUM": 36, "HIGH": 25, "CRITICAL": 10})
+
+    shifted = monitor.observe({"LOW": 5, "MEDIUM": 10, "HIGH": 10, "CRITICAL": 75})
+
+    assert shifted.shift_detected is True
+    assert shifted.current_distribution["CRITICAL"] > shifted.baseline_distribution["CRITICAL"]
+    assert shifted.js_distance > shifted.threshold
+
+
+def test_distribution_monitor_detect_shift_uses_js_divergence_threshold() -> None:
+    monitor = DistributionMonitor(history_size=4, shift_threshold=0.15)
+    monitor.observe({"NEGATIVE": 50, "POSITIVE": 50})
+    monitor.observe({"NEGATIVE": 51, "POSITIVE": 49})
+
+    assert monitor.detect_shift({"NEGATIVE": 95, "POSITIVE": 5}) is True
 
 
 def test_ewc_regularizer_loss_zero_without_fisher_and_positive_after_drift(tmp_path) -> None:

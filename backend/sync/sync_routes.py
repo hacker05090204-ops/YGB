@@ -14,6 +14,7 @@ from backend.sync.manifest import load_manifest
 from backend.sync.peer_transport import DEVICE_ID, MANIFEST_PATH, get_peers, save_peer_manifest
 from backend.sync.sync_engine import (
     SyncMode,
+    is_sync_configured,
     get_last_sync_cycle,
     get_local_sync_index,
     get_sync_mode,
@@ -95,17 +96,26 @@ async def sync_status() -> dict:
     health = get_sync_health()
     mode = get_sync_mode()
     index = get_local_sync_index()
+    index.refresh()
     last_cycle = get_last_sync_cycle()
+    configured = is_sync_configured()
     local_files = index.get_file_count()
     local_bytes = index.get_total_bytes()
+    peers = health.get("peers", {}) if isinstance(health.get("peers"), dict) else {}
+    peers_attempted = (
+        last_cycle.peers_attempted if last_cycle is not None else int(peers.get("total", 0) or 0)
+    )
+    peers_succeeded = (
+        last_cycle.peers_succeeded if last_cycle is not None else int(peers.get("online", 0) or 0)
+    )
     last_completed_at = (
         last_cycle.completed_at if last_cycle is not None else str(health.get("last_sync") or "")
     )
     stale = is_sync_stale(mode=mode, last_completed_at=last_completed_at)
     message = sync_status_message(
         mode,
-        peers_attempted=last_cycle.peers_attempted if last_cycle is not None else 0,
-        peers_succeeded=last_cycle.peers_succeeded if last_cycle is not None else 0,
+        peers_attempted=peers_attempted,
+        peers_succeeded=peers_succeeded,
     )
     if mode == SyncMode.STANDALONE:
         health["status"] = "HEALTHY"
@@ -116,6 +126,7 @@ async def sync_status() -> dict:
     health["local_bytes"] = local_bytes
     health["message"] = message
     health["stale"] = stale
+    health["configured"] = configured
     health["alerts"] = should_alert(health)
     return health
 

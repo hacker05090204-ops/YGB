@@ -78,6 +78,30 @@ def _temporary_auth_bypass_enabled() -> bool:
     return os.environ.get('YGB_TEMP_AUTH_BYPASS', 'false').strip().lower() in _TRUTHY_VALUES
 
 
+def _session_only_fallback_allowed() -> bool:
+    return not _runtime_is_production()
+
+
+def _abort_session_only_fallback(
+    session_token: str,
+    message: str,
+    exc: Exception | None = None,
+) -> None:
+    try:
+        destroy_session(session_token)
+    except OSError as cleanup_exc:
+        logger.critical(
+            "Failed to destroy admin session after refusing session-only fallback: %s",
+            cleanup_exc,
+            exc_info=True,
+        )
+
+    logger.critical(message, exc_info=exc is not None)
+    if exc is not None:
+        raise AuthenticationError(message) from exc
+    raise AuthenticationError(message)
+
+
 # =========================================================================
 # SECURE DATA DIRECTORY
 # =========================================================================
@@ -537,24 +561,19 @@ def login(email: str, totp_code: str, ip: str = '0.0.0.0') -> dict:
     try:
         jwt_token = create_jwt(user_id, role)
     except Exception as exc:
-        if _runtime_is_production():
-            try:
-                destroy_session(session_token)
-            except OSError as cleanup_exc:
-                logger.critical(
-                    "Failed to destroy admin session after production JWT failure: %s",
-                    cleanup_exc,
-                    exc_info=True,
-                )
-            logger.critical(
-                "JWT creation failed in production; refusing session-only fallback: %s",
+        if not _session_only_fallback_allowed():
+            _abort_session_only_fallback(
+                session_token,
+                'JWT creation failed in production; session-only fallback is disabled.',
                 exc,
-                exc_info=True,
             )
-            raise AuthenticationError(
-                'JWT creation failed in production; session-only fallback is disabled.'
-            ) from exc
         logger.warning("JWT creation unavailable; falling back to session-only mode: %s", exc)
+
+    if jwt_token is None and not _session_only_fallback_allowed():
+        _abort_session_only_fallback(
+            session_token,
+            'Session-only admin authentication is disabled in production.',
+        )
 
     # Phase 5: Login notification
     audit_log('LOGIN_SUCCESS', user_id, ip,

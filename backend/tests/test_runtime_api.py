@@ -311,5 +311,37 @@ class TestTrainingExpertStatusApi(unittest.TestCase):
             self.assertIsNone(expert_record["claimed_by"])
 
 
+class TestHallucinationStatsApi(unittest.TestCase):
+    def test_hallucination_stats_endpoint_returns_production_safe_metrics(self):
+        import backend.api.runtime_api as runtime_api_module
+        import backend.cve.anti_hallucination as anti_hallucination_module
+
+        anti_hallucination_module._validator = None
+        validator = anti_hallucination_module.get_anti_hallucination_validator()
+        validator.validate_response_grounding(
+            "CVE-2024-1234 affects OpenSSL servers.",
+            {"extracted_text": "CVE-2024-1234 affects OpenSSL servers."},
+        )
+
+        app = FastAPI()
+        app.include_router(runtime_api_module.router)
+        app.dependency_overrides[runtime_api_module.require_auth] = (
+            lambda: {"sub": "user-1"}
+        )
+        client = TestClient(app)
+
+        response = client.get("/api/v1/intelligence/hallucination-stats")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["status"], "ok")
+        self.assertNotIn("audit_log", payload)
+        stats = payload["hallucination_stats"]
+        self.assertEqual(stats["total_checked"], 1)
+        self.assertEqual(stats["grounded"], 1)
+        self.assertEqual(stats["ungrounded"], 0)
+        self.assertGreaterEqual(stats["mean_confidence"], 0.99)
+
+
 if __name__ == "__main__":
     unittest.main()

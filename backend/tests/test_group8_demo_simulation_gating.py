@@ -45,12 +45,23 @@ def test_non_demo_task_still_enqueues_normally(tmp_path):
 
 
 def test_clock_guard_simulation_blocked_outside_test_only_context(monkeypatch):
-    monkeypatch.delenv("YGB_ENABLE_TEST_ONLY_PATHS", raising=False)
-    monkeypatch.setattr("backend.governance.clock_guard.sys.modules", {})
+    monkeypatch.delenv("YGB_CLOCK_SIMULATION", raising=False)
     guard = ClockGuard()
 
-    with pytest.raises(RuntimeError, match="disabled outside test-only execution"):
+    with pytest.raises(RuntimeError, match="clock skew simulation is disabled"):
         guard.check_skew_simulated(1000.0, 1000.0)
+
+
+def test_clock_guard_simulation_logs_critical_in_production(monkeypatch, caplog):
+    monkeypatch.setenv("YGB_CLOCK_SIMULATION", "1")
+    monkeypatch.setenv("YGB_ENV", "production")
+    guard = ClockGuard()
+
+    with caplog.at_level("CRITICAL"):
+        result = guard.check_skew_simulated(1000.0, 1000.0)
+
+    assert result.passed is True
+    assert any("YGB_ENV=production" in record.message for record in caplog.records)
 
 
 def test_temporary_auth_bypass_ignored_outside_test_only_context(monkeypatch):

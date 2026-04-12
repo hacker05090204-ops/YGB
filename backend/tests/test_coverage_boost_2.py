@@ -257,8 +257,18 @@ class TestStorageScoreAndAutonomy(unittest.TestCase):
 class TestClockGuardExtras(unittest.TestCase):
     """Cover certification_allowed, last_result, history."""
 
+    def setUp(self):
+        self._previous_clock_simulation = os.environ.get("YGB_CLOCK_SIMULATION")
+        os.environ["YGB_CLOCK_SIMULATION"] = "1"
+
+    def tearDown(self):
+        if self._previous_clock_simulation is None:
+            os.environ.pop("YGB_CLOCK_SIMULATION", None)
+        else:
+            os.environ["YGB_CLOCK_SIMULATION"] = self._previous_clock_simulation
+
     def test_certification_allowed_simulated(self):
-        from governance.clock_guard import ClockGuard
+        from backend.governance.clock_guard import ClockGuard
         guard = ClockGuard()
         # Simulate good clock first
         guard.check_skew_simulated(1000.0, 1000.0)
@@ -267,7 +277,7 @@ class TestClockGuardExtras(unittest.TestCase):
         self.assertTrue(guard.last_result.passed)
 
     def test_history_grows(self):
-        from governance.clock_guard import ClockGuard
+        from backend.governance.clock_guard import ClockGuard
         guard = ClockGuard()
         guard.check_skew_simulated(1000.0, 1000.0)
         guard.check_skew_simulated(1000.0, 1020.0)

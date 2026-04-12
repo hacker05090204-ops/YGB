@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from backend.api.system_status import _get_voice_status
 from backend.assistant import voice_runtime as vr
 from backend.assistant.query_router import ResearchResult, ResearchStatus, VoiceMode
 from impl_v1.training.voice.voice_executors import ExecStatus
@@ -199,12 +200,19 @@ def test_build_voice_pipeline_status_truthful(monkeypatch):
         lambda: {
             "browser_relay_available": True,
             "browser_runtime": "playwright",
+            "playwright_available": True,
             "local_capture_available": False,
             "local_capture_backend": None,
             "input_device_count": 0,
+            "sounddevice_available": False,
+            "pyaudio_available": False,
+            "whisper_available": False,
+            "tts_available": False,
             "dependency_status": {
                 "sounddevice": False,
                 "pyaudio": False,
+                "whisper": False,
+                "pyttsx3": False,
                 "playwright": True,
             },
             "reason": "Local capture unavailable; browser transcript relay available via Playwright",
@@ -250,11 +258,42 @@ def test_whisper_stt_init_logs_warning_and_stays_unavailable_without_dependency(
         whisper = vr.WhisperSTT()
 
     assert whisper.available is False
+    assert whisper.dependency_available is False
     assert whisper.model_path is None
+    assert whisper.transcribe("sample.wav") == ""
     assert any("Whisper STT unavailable" in record.message for record in caplog.records)
 
 
-def test_pyttxs_tts_unavailable_without_dependency(monkeypatch, caplog):
+def test_whisper_stt_transcribe_returns_text_using_base_model(monkeypatch):
+    load_calls = []
+
+    class _FakeModel:
+        def transcribe(self, audio_source, fp16=False):
+            assert audio_source == "sample.wav"
+            assert fp16 is False
+            return {"text": "transcribed speech"}
+
+    class _FakeWhisperModule:
+        def load_model(self, model_name):
+            load_calls.append(model_name)
+            return _FakeModel()
+
+    original_import_optional_dependency = vr._import_optional_dependency
+    monkeypatch.setattr(
+        vr,
+        "_import_optional_dependency",
+        lambda name: _FakeWhisperModule() if name == "whisper" else original_import_optional_dependency(name),
+    )
+
+    whisper = vr.WhisperSTT()
+
+    assert whisper.available is True
+    assert whisper.transcribe("sample.wav") == "transcribed speech"
+    assert load_calls == ["base"]
+    assert whisper.status()["model_loaded"] is True
+
+
+def test_pyttsx_tts_unavailable_without_dependency(monkeypatch, caplog):
     original_import_optional_dependency = vr._import_optional_dependency
     monkeypatch.setattr(
         vr,
@@ -263,10 +302,52 @@ def test_pyttxs_tts_unavailable_without_dependency(monkeypatch, caplog):
     )
 
     with caplog.at_level(logging.WARNING):
-        tts = vr.PyttxsTTS()
+        tts = vr.PyttsxTTS()
 
     assert tts.available is False
+    assert tts.dependency_available is False
+    assert tts.speak("hello world") is False
+    assert tts.save_to_file("hello world", "voice.wav") is False
     assert any("Local pyttsx3 TTS unavailable" in record.message for record in caplog.records)
+
+
+def test_pyttsx_tts_supports_speak_and_save_to_file(monkeypatch, tmp_path):
+    events = []
+
+    class _FakeEngine:
+        def say(self, text):
+            events.append(("say", text))
+
+        def save_to_file(self, text, path):
+            events.append(("save_to_file", text, path))
+
+        def runAndWait(self):
+            events.append(("runAndWait",))
+
+    class _FakePyttsx3Module:
+        def init(self):
+            return _FakeEngine()
+
+    original_import_optional_dependency = vr._import_optional_dependency
+    monkeypatch.setattr(
+        vr,
+        "_import_optional_dependency",
+        lambda name: _FakePyttsx3Module() if name == "pyttsx3" else original_import_optional_dependency(name),
+    )
+
+    tts = vr.PyttsxTTS()
+    output_path = tmp_path / "voice.wav"
+
+    assert tts.available is True
+    assert tts.speak("hello world") is True
+    assert tts.save_to_file("save this", output_path) is True
+    assert events == [
+        ("say", "hello world"),
+        ("runAndWait",),
+        ("save_to_file", "save this", str(output_path)),
+        ("runAndWait",),
+    ]
+    assert vr.PyttxsTTS is vr.PyttsxTTS
 
 
 def test_probe_microphone_capabilities_disables_browser_relay_without_playwright(monkeypatch):
@@ -277,7 +358,33 @@ def test_probe_microphone_capabilities_disables_browser_relay_without_playwright
 
     assert capabilities["browser_relay_available"] is False
     assert capabilities["local_capture_available"] is False
+    assert capabilities["sounddevice_available"] is False
+    assert capabilities["pyaudio_available"] is False
+    assert capabilities["whisper_available"] is False
+    assert capabilities["tts_available"] is False
     assert capabilities["dependency_status"]["playwright"] is False
+
+
+def test_probe_microphone_capabilities_reports_local_backend_when_dependency_exists(monkeypatch):
+    class _BrokenSoundDevice:
+        @staticmethod
+        def query_devices():
+            raise RuntimeError("device query failed")
+
+    monkeypatch.delenv("YGB_BROWSER_RUNTIME", raising=False)
+    monkeypatch.setattr(
+        vr,
+        "_import_optional_dependency",
+        lambda name: _BrokenSoundDevice() if name == "sounddevice" else None,
+    )
+
+    capabilities = vr.probe_microphone_capabilities()
+
+    assert capabilities["sounddevice_available"] is True
+    assert capabilities["local_capture_available"] is True
+    assert capabilities["local_capture_backend"] == "sounddevice"
+    assert capabilities["input_device_count"] == 0
+    assert capabilities["browser_relay_available"] is False
 
 
 def test_build_voice_pipeline_status_fails_gracefully_when_runtime_helpers_raise(monkeypatch, caplog):
@@ -309,6 +416,46 @@ def test_build_voice_pipeline_status_fails_gracefully_when_runtime_helpers_raise
     assert status["stt"]["runtime"]["available"] is False
     assert any("stt exploded" in record.message for record in caplog.records)
     assert any("tts exploded" in record.message for record in caplog.records)
+
+
+def test_get_voice_status_does_not_crash_server_import_path_when_voice_deps_are_missing(monkeypatch):
+    monkeypatch.setattr(
+        "impl_v1.training.voice.stt_adapter.get_stt_status",
+        lambda: {
+            "stt_status": "DEGRADED",
+            "browser_relay_available": False,
+            "local_only": True,
+        },
+    )
+
+    class _FakeTTS:
+        def get_stats(self):
+            return {
+                "status": "ERROR",
+                "active_provider": "UNAVAILABLE",
+                "privacy_mode": False,
+                "total_spoken": 0,
+                "total_interrupted": 0,
+                "total_errors": 0,
+                "provider_health": {"reachable": False, "reason": "missing_deps"},
+                "stream_health": {},
+            }
+
+    monkeypatch.setattr("impl_v1.training.voice.tts_streaming.TTSEngine", _FakeTTS)
+    monkeypatch.setattr(
+        "impl_v1.training.voice.voice_metrics.get_voice_health",
+        lambda: {"total_commands": 0, "success_rate": 0.0, "slo_met": False},
+    )
+    monkeypatch.setattr(vr, "_import_optional_dependency", lambda name: None)
+
+    status = _get_voice_status()
+
+    assert status["pipeline_status"] == "OFFLINE"
+    assert status["microphone"]["browser_relay_available"] is False
+    assert status["microphone"]["whisper_available"] is False
+    assert status["microphone"]["tts_available"] is False
+    assert status["stt"]["runtime"]["available"] is False
+    assert status["tts"]["runtime"]["available"] is False
 
 
 def test_run_research_analysis_includes_verification(monkeypatch):

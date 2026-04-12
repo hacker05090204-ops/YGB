@@ -1,0 +1,9 @@
+{
+  "baseline_accuracy": 0.0,
+  "checkpoint_accuracy": 0.0,
+  "checkpoint_f1": 0.0,
+  "checkpoint_precision": 0.0,
+  "checkpoint_recall": 0.0,
+  "positive_threshold": 0.5,
+  "updated_at": null
+}

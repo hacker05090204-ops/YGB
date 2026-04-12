@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
+
+import numpy as np
 
 import backend.ingestion.autograbber as autograbber_module
 from backend.ingestion.scrapers import ScrapedSample
+from backend.training.adaptive_learner import AdaptationEvent
 from backend.training.safetensors_store import SafetensorsFeatureStore
 
 
@@ -78,23 +82,54 @@ def _configure_test_environment(monkeypatch, tmp_path):
     monkeypatch.setattr(
         autograbber_module.feature_extractor,
         "load_vocabulary",
-        lambda: [f"token_{index}" for index in range(508)],
+        lambda *args, **kwargs: [f"token_{index}" for index in range(508)],
     )
 
 
 class FakeRLCollector:
     def __init__(self) -> None:
         self.kev_batches: list[list[str]] = []
-        self.severity_updates: list[tuple[str, str, str]] = []
+        self.severity_updates: list[tuple[str, str, str, str]] = []
 
     def process_new_cisa_kev_batch(self, cve_ids):
         batch = list(cve_ids)
         self.kev_batches.append(batch)
         return len(batch)
 
-    def process_severity_update(self, cve_id: str, previous_severity: str, new_severity: str):
-        self.severity_updates.append((cve_id, previous_severity, new_severity))
+    def process_severity_update(
+        self,
+        cve_id: str,
+        previous_severity: str,
+        new_severity: str,
+        source: str = "nvd",
+    ):
+        self.severity_updates.append((cve_id, previous_severity, new_severity, source))
         return 1
+
+
+class FakeAdaptiveLearner:
+    def __init__(self) -> None:
+        self.calls: list[dict[str, object]] = []
+
+    def on_new_grab_cycle(self, severity_counts, model=None, prev_dataloader=None):
+        self.calls.append(
+            {
+                "severity_counts": dict(severity_counts),
+                "model": model,
+                "has_prev_dataloader": prev_dataloader is not None,
+            }
+        )
+        return AdaptationEvent(
+            event_id="adaptive-event-1",
+            observed_at="2026-04-08T00:00:00+00:00",
+            severity_counts=dict(severity_counts),
+            baseline_distribution={"HIGH": 0.5, "LOW": 0.5},
+            current_distribution={"HIGH": 0.5, "LOW": 0.5},
+            js_distance=0.2,
+            threshold=0.15,
+            history_depth=2,
+            fisher_sample_count=4,
+        )
 
 
 class NVDSuccessScraper:
@@ -254,6 +289,23 @@ class MultiSampleNVDScraper:
         return None
 
 
+def test_default_source_registry_includes_all_phase7_sources():
+    expected_sources = [
+        "nvd",
+        "cisa",
+        "osv",
+        "github",
+        "exploitdb",
+        "msrc",
+        "redhat",
+        "snyk",
+        "vulnrichment",
+    ]
+    assert autograbber_module.DEFAULT_SOURCE_NAMES == expected_sources
+    assert list(autograbber_module.AutoGrabberConfig().sources) == expected_sources
+    assert sorted(autograbber_module.SCRAPER_TYPES_BY_SOURCE) == sorted(expected_sources)
+
+
 def test_run_cycle_returns_real_counts_and_stores_history(monkeypatch, tmp_path):
     _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
@@ -284,6 +336,9 @@ def test_run_cycle_returns_real_counts_and_stores_history(monkeypatch, tmp_path)
     assert grabber.get_all_results() == [result]
     assert bridge_worker.manifest_updates == 1
     assert feature_store.total_samples() == 3
+    stored_descriptions = feature_store.read_descriptions(feature_store.list_shards()[0])
+    assert stored_descriptions and stored_descriptions[0]["raw_text"]
+    assert stored_descriptions[0]["cve_id"].startswith("CVE-2026-")
 
 
 def test_one_source_failure_does_not_stop_other_sources(monkeypatch, tmp_path):
@@ -777,8 +832,68 @@ def test_run_cycle_processes_rl_feedback_and_persists_previous_severities(monkey
 
     assert result.sources_attempted == 2
     assert fake_rl_collector.kev_batches == [["CVE-2026-7101"]]
-    assert fake_rl_collector.severity_updates == [("CVE-2026-6100", "LOW", "HIGH")]
+    assert fake_rl_collector.severity_updates == [
+        ("CVE-2026-6100", "LOW", "HIGH", "nvd")
+    ]
     assert persisted_payload["CVE-2026-6100"] == "HIGH"
+
+
+def test_run_cycle_calls_adaptive_learner_hook_and_logs_shift_warning(monkeypatch, tmp_path, caplog):
+    _configure_test_environment(monkeypatch, tmp_path)
+    previous_store = SafetensorsFeatureStore(tmp_path / "features_safetensors")
+    previous_store.write(
+        "previous_0000",
+        np.linspace(0.01, 1.01, 256, dtype=np.float32).reshape(1, 256),
+        np.asarray([1], dtype=np.int64),
+        metadata={"sample_sha256": "previous-0000", "sample_severity": "HIGH"},
+    )
+    MultiSampleNVDScraper.samples = [
+        _scraped_sample(
+            "nvd",
+            "NVD-ADAPT-1",
+            "CVE-2026-7801",
+            _long_description("Adaptive learning high severity sample."),
+            severity="HIGH",
+        ),
+        _scraped_sample(
+            "nvd",
+            "NVD-ADAPT-2",
+            "CVE-2026-7802",
+            _long_description("Adaptive learning low severity sample."),
+            severity="LOW",
+        ),
+    ]
+    fake_adaptive_learner = FakeAdaptiveLearner()
+    monkeypatch.setattr(
+        autograbber_module,
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": MultiSampleNVDScraper},
+    )
+    monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: FakeBridgeWorker())
+    monkeypatch.setattr(
+        autograbber_module,
+        "get_adaptive_learner",
+        lambda: fake_adaptive_learner,
+    )
+
+    with caplog.at_level(logging.WARNING, logger="ygb.ingestion.autograbber"):
+        grabber = autograbber_module.AutoGrabber(
+            autograbber_module.AutoGrabberConfig(sources=["nvd"], max_per_cycle=4)
+        )
+        result = grabber.run_cycle()
+
+    assert result.samples_accepted == 2
+    assert fake_adaptive_learner.calls == [
+        {
+            "severity_counts": {"HIGH": 1, "LOW": 1},
+            "model": None,
+            "has_prev_dataloader": True,
+        }
+    ]
+    assert any(
+        "distribution shift detected and EWC was computed" in record.getMessage()
+        for record in caplog.records
+    )
 
 
 def test_scheduled_loop_starts_and_stops_cleanly(monkeypatch, tmp_path):

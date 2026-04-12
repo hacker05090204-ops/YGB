@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from dataclasses import dataclass
@@ -22,8 +23,13 @@ METADATA_JSON_KEY = "json_metadata"
 FEATURE_DIM_METADATA_KEY = "ygb_feature_dim"
 FEATURE_DIM = 256
 CHECKPOINT_METADATA_JSON_KEY = "ygb_checkpoint_metadata"
+LEGACY_CHECKPOINT_METADATA_JSON_KEY = "checkpoint_metadata_json"
 CHECKPOINT_SCHEMA_VERSION = 1
 DEFAULT_TOP_K_CHECKPOINTS = 3
+
+
+logger = logging.getLogger(__name__)
+DESCRIPTION_SIDECAR_SUFFIX = ".descriptions.jsonl"
 
 
 def _atomic_write_json_file(path: Path, payload: dict[str, Any]) -> None:
@@ -32,6 +38,16 @@ def _atomic_write_json_file(path: Path, payload: dict[str, Any]) -> None:
     with open(temp_path, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, sort_keys=True)
         handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(str(temp_path), str(path))
+
+
+def _atomic_write_text_file(path: Path, payload: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = Path(f"{path}.tmp")
+    with open(temp_path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(payload)
         handle.flush()
         os.fsync(handle.fileno())
     os.replace(str(temp_path), str(path))
@@ -61,6 +77,10 @@ class SafetensorsFeatureStore:
     def shard_path(self, shard_name: str | Path) -> Path:
         normalized_name = self._normalize_shard_name(shard_name)
         return self.root / f"{normalized_name}.safetensors"
+
+    def description_path(self, shard_name: str | Path) -> Path:
+        normalized_name = self._normalize_shard_name(shard_name)
+        return self.root / f"{normalized_name}{DESCRIPTION_SIDECAR_SUFFIX}"
 
     def write(
         self,
@@ -116,15 +136,71 @@ class SafetensorsFeatureStore:
             return []
         return sorted(path.stem for path in self.root.glob("*.safetensors"))
 
+    def write_descriptions(
+        self,
+        shard_name: str | Path,
+        descriptions: list[dict[str, Any]],
+    ) -> Path:
+        if not isinstance(descriptions, list):
+            raise TypeError("descriptions must be a list of JSON-serializable dict records")
+        serialized_lines: list[str] = []
+        for index, record in enumerate(descriptions):
+            if not isinstance(record, dict):
+                raise TypeError(
+                    f"description record at index {index} must be a dict, got {type(record).__name__}"
+                )
+            normalized_record = {str(key): value for key, value in record.items()}
+            try:
+                serialized_lines.append(
+                    json.dumps(normalized_record, ensure_ascii=False, sort_keys=True)
+                )
+            except TypeError as exc:
+                raise TypeError(
+                    f"description record at index {index} is not JSON-serializable"
+                ) from exc
+        payload = "\n".join(serialized_lines)
+        if serialized_lines:
+            payload += "\n"
+        target_path = self.description_path(shard_name)
+        _atomic_write_text_file(target_path, payload)
+        return target_path
+
+    def read_descriptions(self, shard_name: str | Path) -> list[dict[str, Any]]:
+        target_path = self.description_path(shard_name)
+        if not target_path.exists():
+            return []
+        descriptions: list[dict[str, Any]] = []
+        with open(target_path, "r", encoding="utf-8") as handle:
+            for line_number, raw_line in enumerate(handle, start=1):
+                line = raw_line.strip()
+                if not line:
+                    continue
+                try:
+                    parsed = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(
+                        f"{target_path}: invalid JSON on line {line_number}"
+                    ) from exc
+                if not isinstance(parsed, dict):
+                    raise ValueError(
+                        f"{target_path}: description line {line_number} must decode to an object"
+                    )
+                descriptions.append(parsed)
+        return descriptions
+
     def shard_exists(self, shard_name: str | Path) -> bool:
         return self.shard_path(shard_name).exists()
 
     def delete_shard(self, shard_name: str | Path) -> bool:
         target_path = self.shard_path(shard_name)
-        if not target_path.exists():
-            return False
-        target_path.unlink()
-        return True
+        description_path = self.description_path(shard_name)
+        deleted = False
+        if target_path.exists():
+            target_path.unlink()
+            deleted = True
+        if description_path.exists():
+            description_path.unlink()
+        return deleted
 
     def total_samples(self) -> int:
         total = 0
@@ -323,6 +399,36 @@ class CheckpointManager:
             expert_fields = EXPERT_FIELDS
         self.expert_fields = tuple(str(field_name) for field_name in expert_fields)
 
+    def save_expert_checkpoint(
+        self,
+        *,
+        expert_id: int,
+        field_name: str,
+        state_dict: dict[str, Any],
+        val_f1: float,
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        return self.save(
+            expert_id=expert_id,
+            field_name=field_name,
+            state_dict=state_dict,
+            val_f1=val_f1,
+            metadata=metadata,
+        )
+
+    def load_best_checkpoint(
+        self,
+        *,
+        expert_id: int,
+        field_name: str,
+        device: str = "cpu",
+    ) -> dict[str, Any]:
+        return self.load(
+            expert_id=expert_id,
+            field_name=field_name,
+            device=device,
+        )
+
     def save(
         self,
         *,
@@ -337,6 +443,10 @@ class CheckpointManager:
             field_name,
         )
         val_f1_value = self._coerce_float(val_f1, field_name="val_f1")
+        metadata_payload = metadata or {}
+        if not isinstance(metadata_payload, dict):
+            raise TypeError("metadata must be a dict with JSON-serializable values")
+        epoch_value = self._coerce_epoch(metadata_payload.get("epoch", 0))
 
         registry = self._load_registry()
         registry_key = self._registry_key(expert_id_value, field_name_value)
@@ -346,14 +456,16 @@ class CheckpointManager:
             field_name_value,
             existing_entry,
         )
+        retained_existing_records, stale_records = self._prune_records(existing_records)
+        self._delete_removed_records(stale_records)
 
-        if len(existing_records) >= self.keep_top_k:
-            worst_retained = existing_records[-1]
+        if len(retained_existing_records) >= self.keep_top_k:
+            worst_retained = retained_existing_records[-1]
             if val_f1_value <= float(worst_retained["val_f1"]):
                 normalized_entry = self._entry_from_records(
                     expert_id_value,
                     field_name_value,
-                    existing_records,
+                    retained_existing_records,
                 )
                 if existing_entry != normalized_entry:
                     registry["experts"][registry_key] = normalized_entry
@@ -361,7 +473,14 @@ class CheckpointManager:
                 status = self._status_from_records(
                     expert_id_value,
                     field_name_value,
-                    existing_records,
+                    retained_existing_records,
+                )
+                logger.info(
+                    "Skipped worse expert checkpoint expert_id=%s field_name=%s val_f1=%.6f retained_best=%.6f",
+                    expert_id_value,
+                    field_name_value,
+                    val_f1_value,
+                    float(status.get("best_val_f1") or 0.0),
                 )
                 return {
                     "saved": False,
@@ -374,14 +493,16 @@ class CheckpointManager:
         checkpoint_path = self._next_checkpoint_path(
             expert_id_value,
             field_name_value,
+            epoch_value,
             val_f1_value,
         )
         checkpoint_metadata = {
             "expert_id": expert_id_value,
             "field_name": field_name_value,
+            "epoch": epoch_value,
             "val_f1": val_f1_value,
             "created_at": self._timestamp_now(),
-            **(metadata or {}),
+            **metadata_payload,
         }
         self._write_checkpoint(
             checkpoint_path,
@@ -395,7 +516,9 @@ class CheckpointManager:
             "created_at": str(checkpoint_metadata["created_at"]),
             "metadata": checkpoint_metadata,
         }
-        retained_records, removed_records = self._prune_records(existing_records + [new_record])
+        retained_records, removed_records = self._prune_records(
+            retained_existing_records + [new_record]
+        )
         self._delete_removed_records(removed_records)
 
         normalized_entry = self._entry_from_records(
@@ -412,6 +535,14 @@ class CheckpointManager:
             retained_records,
         )
         retained_path = self._serialize_path(checkpoint_path)
+        logger.info(
+            "Saved expert checkpoint expert_id=%s field_name=%s val_f1=%.6f path=%s best=%s",
+            expert_id_value,
+            field_name_value,
+            val_f1_value,
+            retained_path,
+            normalized_entry["best_checkpoint_path"] == retained_path,
+        )
         return {
             "saved": True,
             "retained": any(
@@ -460,18 +591,23 @@ class CheckpointManager:
         registry = self._load_registry()
         registry_key = self._registry_key(expert_id_value, field_name_value)
         existing_entry = registry["experts"].get(registry_key)
-        retained_records = self._collect_checkpoint_records(
+        existing_records = self._collect_checkpoint_records(
             expert_id_value,
             field_name_value,
             existing_entry,
         )
+        retained_records, removed_records = self._prune_records(existing_records)
+        self._delete_removed_records(removed_records)
         normalized_entry = self._entry_from_records(
             expert_id_value,
             field_name_value,
             retained_records,
         )
         if existing_entry != normalized_entry:
-            registry["experts"][registry_key] = normalized_entry
+            if normalized_entry["checkpoints"]:
+                registry["experts"][registry_key] = normalized_entry
+            else:
+                registry["experts"].pop(registry_key, None)
             self._save_registry(registry)
         return self._status_from_records(
             expert_id_value,
@@ -486,18 +622,23 @@ class CheckpointManager:
         for expert_id, field_name in enumerate(self.expert_fields):
             registry_key = self._registry_key(expert_id, field_name)
             existing_entry = registry["experts"].get(registry_key)
-            retained_records = self._collect_checkpoint_records(
+            existing_records = self._collect_checkpoint_records(
                 expert_id,
                 field_name,
                 existing_entry,
             )
+            retained_records, removed_records = self._prune_records(existing_records)
+            self._delete_removed_records(removed_records)
             normalized_entry = self._entry_from_records(
                 expert_id,
                 field_name,
                 retained_records,
             )
             if existing_entry != normalized_entry:
-                registry["experts"][registry_key] = normalized_entry
+                if normalized_entry["checkpoints"]:
+                    registry["experts"][registry_key] = normalized_entry
+                else:
+                    registry["experts"].pop(registry_key, None)
                 changed = True
             statuses.append(
                 self._status_from_records(
@@ -538,6 +679,16 @@ class CheckpointManager:
         if not np.isfinite(parsed):
             raise ValueError(f"{field_name} must be a finite float, got {parsed!r}")
         return parsed
+
+    @staticmethod
+    def _coerce_epoch(value: Any) -> int:
+        try:
+            epoch_value = int(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"epoch must be an integer, got {value!r}") from exc
+        if epoch_value < 0:
+            raise ValueError(f"epoch must be >= 0, got {epoch_value}")
+        return epoch_value
 
     def _validate_expert_identity(
         self,
@@ -693,7 +844,9 @@ class CheckpointManager:
     def _read_checkpoint_metadata(self, checkpoint_path: Path) -> dict[str, Any]:
         with safe_open(str(checkpoint_path), framework="np") as handle:
             metadata = handle.metadata() or {}
-        raw_metadata = metadata.get(CHECKPOINT_METADATA_JSON_KEY, "{}")
+        raw_metadata = metadata.get(CHECKPOINT_METADATA_JSON_KEY)
+        if raw_metadata in (None, ""):
+            raw_metadata = metadata.get(LEGACY_CHECKPOINT_METADATA_JSON_KEY, "{}")
         parsed_metadata = json.loads(raw_metadata)
         if not isinstance(parsed_metadata, dict):
             raise ValueError(
@@ -723,15 +876,19 @@ class CheckpointManager:
             if normalized is not None:
                 records.append(normalized)
 
-        return self._sort_checkpoint_records(records)[: self.keep_top_k]
+        return self._sort_checkpoint_records(records)
 
     def _discover_checkpoint_paths(
         self,
         expert_id: int,
         field_name: str,
     ) -> list[Path]:
-        legacy_pattern = f"expert_{expert_id}_{field_name}_*.safetensors"
-        discovered = list(self.root.glob(legacy_pattern))
+        discovered: list[Path] = []
+        for pattern in (
+            f"expert_{expert_id:02d}_{field_name}_e*_f1*.safetensors",
+            f"expert_{expert_id}_{field_name}_*.safetensors",
+        ):
+            discovered.extend(list(self.root.glob(pattern)))
         expert_dir = self.experts_root / f"{expert_id:02d}_{field_name}"
         if expert_dir.exists():
             discovered.extend(sorted(expert_dir.glob("*.safetensors")))
@@ -784,6 +941,11 @@ class CheckpointManager:
     ) -> dict[str, Any]:
         retained_records = self._sort_checkpoint_records(list(records))[: self.keep_top_k]
         best_record = retained_records[0] if retained_records else None
+        updated_at = (
+            max(str(record.get("created_at", "") or "") for record in retained_records)
+            if retained_records
+            else ""
+        )
         return {
             "expert_id": int(expert_id),
             "field_name": str(field_name),
@@ -794,7 +956,7 @@ class CheckpointManager:
                 str(best_record["checkpoint_path"]) if best_record is not None else ""
             ),
             "checkpoints": retained_records,
-            "updated_at": self._timestamp_now(),
+            "updated_at": updated_at,
         }
 
     def _status_from_records(
@@ -822,13 +984,12 @@ class CheckpointManager:
         self,
         expert_id: int,
         field_name: str,
+        epoch: int,
         val_f1: float,
     ) -> Path:
-        expert_dir = self.experts_root / f"{expert_id:02d}_{field_name}"
-        expert_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-        return expert_dir / (
-            f"expert_{expert_id}_{field_name}_f1_{val_f1:.6f}_{timestamp}.safetensors"
+        self.root.mkdir(parents=True, exist_ok=True)
+        return self.root / (
+            f"expert_{expert_id:02d}_{field_name}_e{int(epoch)}_f1{val_f1:.4f}.safetensors"
         )
 
     def _write_checkpoint(
@@ -842,8 +1003,10 @@ class CheckpointManager:
 
         checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
         temp_path = Path(f"{checkpoint_path}.tmp")
+        metadata_json = json.dumps(metadata, sort_keys=True)
         metadata_payload = {
-            CHECKPOINT_METADATA_JSON_KEY: json.dumps(metadata, sort_keys=True),
+            CHECKPOINT_METADATA_JSON_KEY: metadata_json,
+            LEGACY_CHECKPOINT_METADATA_JSON_KEY: metadata_json,
         }
         try:
             save_torch_safetensors_file(
@@ -872,6 +1035,7 @@ class CheckpointManager:
             checkpoint_path = Path(str(record["checkpoint_path"]))
             if checkpoint_path.exists():
                 checkpoint_path.unlink()
+                logger.info("Deleted pruned expert checkpoint: %s", checkpoint_path.as_posix())
 
     @staticmethod
     def _extract_f1(path_or_name: str | Path) -> float | None:
@@ -883,7 +1047,7 @@ class CheckpointManager:
         if legacy_match is not None:
             return float(legacy_match.group("f1"))
         named_match = re.search(
-            r"(?:^|_)f1_(?P<f1>\d+(?:\.\d+)?)(?=(_|\.safetensors$))",
+            r"(?:^|_)f1_?(?P<f1>\d+(?:\.\d+)?)(?=(_|\.safetensors$))",
             filename,
         )
         if named_match is not None:

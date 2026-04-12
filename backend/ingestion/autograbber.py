@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
 from backend.cve.bridge_ingestion_worker import get_bridge_worker
 from backend.ingestion._integrity import log_module_sha256
@@ -23,13 +25,19 @@ from backend.ingestion.normalizer import (
     SampleQualityScorer,
     normalize_text,
 )
+from backend.training.adaptive_learner import get_adaptive_learner
 from backend.ingestion.scrapers import (
     BaseScraper,
     CISAScraper,
+    ExploitDBScraper,
     GitHubAdvisoryScraper,
+    MSRCScraper,
     NVDScraper,
     OSVScraper,
+    RedHatAdvisoryScraper,
     ScrapedSample,
+    SnykScraper,
+    VulnrichmentScraper,
 )
 import backend.training.feature_extractor as feature_extractor
 from backend.training.data_purity import (
@@ -37,15 +45,30 @@ from backend.training.data_purity import (
     DataPurityEnforcer,
 )
 from backend.training.rl_feedback import get_rl_collector
-from backend.training.safetensors_store import SafetensorsFeatureStore
+from backend.training.safetensors_store import FEATURE_DIM, SafetensorsFeatureStore
 
 logger = logging.getLogger("ygb.ingestion.autograbber")
-DEFAULT_SOURCE_NAMES = ["nvd", "cisa", "osv", "github"]
+DEFAULT_SOURCE_NAMES = [
+    "nvd",
+    "cisa",
+    "osv",
+    "github",
+    "exploitdb",
+    "msrc",
+    "redhat",
+    "snyk",
+    "vulnrichment",
+]
 SCRAPER_TYPES_BY_SOURCE: dict[str, type[BaseScraper]] = {
     "nvd": NVDScraper,
     "cisa": CISAScraper,
     "osv": OSVScraper,
     "github": GitHubAdvisoryScraper,
+    "exploitdb": ExploitDBScraper,
+    "msrc": MSRCScraper,
+    "redhat": RedHatAdvisoryScraper,
+    "snyk": SnykScraper,
+    "vulnrichment": VulnrichmentScraper,
 }
 VALIDATOR_REJECTION_KEYS = ("structural", "purity", "quality", "dedup", "feature")
 
@@ -174,6 +197,7 @@ class AutoGrabber:
         self._feature_store = SafetensorsFeatureStore(self._feature_store_root)
         self._integrity_validator = DataIntegrityValidator()
         self._purity_enforcer = DataPurityEnforcer()
+        self._adaptive_learner = get_adaptive_learner()
         self._rl_collector = get_rl_collector()
         self._previous_severities_path = Path(
             os.environ.get(
@@ -237,6 +261,26 @@ class AutoGrabber:
             "stored_feature_dim": 256,
             "compression": "pairwise_mean_repeat_v1",
         }
+
+    @staticmethod
+    def _description_sidecar_payload(sample: IngestedSample) -> list[dict[str, object]]:
+        raw_text = str(sample.raw_text or "").strip()
+        if not raw_text:
+            raise ValueError("REAL_DATA_REQUIRED: description sidecar payload requires non-empty raw_text")
+        return [
+            {
+                "row_id": sample.sha256_hash,
+                "sample_sha256": sample.sha256_hash,
+                "cve_id": sample.cve_id,
+                "source": sample.source,
+                "severity": sample.severity,
+                "raw_text": raw_text,
+                "url": sample.url,
+                "lang": sample.lang,
+                "token_count": sample.token_count,
+                "ingested_at": sample.ingested_at.isoformat(),
+            }
+        ]
 
     @staticmethod
     def _new_validator_rejections() -> dict[str, int]:
@@ -362,6 +406,22 @@ class AutoGrabber:
             labels,
             metadata=self._feature_metadata(sample),
         )
+        try:
+            self._feature_store.write_descriptions(
+                sample.sha256_hash,
+                self._description_sidecar_payload(sample),
+            )
+        except (OSError, TypeError, ValueError):
+            try:
+                self._feature_store.delete_shard(sample.sha256_hash)
+            except OSError as cleanup_exc:
+                logger.warning(
+                    "autograbber_description_sidecar_cleanup_failed sample=%s reason=%s: %s",
+                    sample.sha256_hash,
+                    type(cleanup_exc).__name__,
+                    cleanup_exc,
+                )
+            raise
 
     def _store_feature_artifact(self, sample: IngestedSample):
         feature_tensor = self._extract_feature_tensor(sample)
@@ -521,6 +581,7 @@ class AutoGrabber:
                     cve_id,
                     previous_severity,
                     new_severity,
+                    source="nvd",
                 )
             self._previous_severities[cve_id] = new_severity
 
@@ -547,6 +608,127 @@ class AutoGrabber:
             if errors is not None:
                 errors.append(error_message)
 
+    @staticmethod
+    def _severity_counts_from_samples(samples: list[IngestedSample]) -> dict[str, int]:
+        severity_counts: dict[str, int] = {}
+        for sample in samples:
+            severity = normalize_severity(sample.severity)
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
+        return severity_counts
+
+    @staticmethod
+    def _expand_adaptation_features(features: np.ndarray) -> np.ndarray:
+        feature_array = np.asarray(features, dtype=np.float32)
+        if feature_array.ndim != 2:
+            raise ValueError(
+                f"autograbber adaptive features must have shape (N, D), got {feature_array.shape}"
+            )
+        if feature_array.shape[1] == 512:
+            return feature_array
+        if feature_array.shape[1] == FEATURE_DIM:
+            return np.repeat(feature_array, 2, axis=1).astype(np.float32, copy=False)
+        raise ValueError(
+            f"autograbber adaptive features must have width {FEATURE_DIM} or 512, got {feature_array.shape[1]}"
+        )
+
+    def _build_adaptation_dataloader(
+        self,
+        shard_names: list[str] | tuple[str, ...] | None = None,
+    ) -> DataLoader | None:
+        selected_shards = list(shard_names) if shard_names is not None else self._feature_store.list_shards()
+        if not selected_shards:
+            return None
+        feature_batches: list[np.ndarray] = []
+        label_batches: list[np.ndarray] = []
+        for shard_name in selected_shards:
+            try:
+                shard = self._feature_store.read(shard_name)
+            except (FileNotFoundError, OSError, TypeError, ValueError) as exc:
+                logger.warning(
+                    "autograbber adaptive dataloader skipped shard=%s reason=%s",
+                    shard_name,
+                    type(exc).__name__,
+                )
+                continue
+            shard_features = np.asarray(shard.features, dtype=np.float32)
+            shard_labels = np.asarray(shard.labels, dtype=np.int64)
+            if (
+                shard_features.ndim != 2
+                or shard_labels.ndim != 1
+                or shard_features.shape[0] != shard_labels.shape[0]
+            ):
+                logger.warning(
+                    "autograbber adaptive dataloader skipped shard=%s invalid_shapes features=%s labels=%s",
+                    shard_name,
+                    shard_features.shape,
+                    shard_labels.shape,
+                )
+                continue
+            feature_batches.append(shard_features)
+            label_batches.append(shard_labels)
+        if not feature_batches or not label_batches:
+            return None
+        try:
+            expanded_features = self._expand_adaptation_features(
+                np.concatenate(feature_batches, axis=0)
+            )
+        except ValueError as exc:
+            logger.warning("autograbber adaptive dataloader skipped: %s", exc)
+            return None
+        labels = np.concatenate(label_batches, axis=0)
+        if labels.size == 0:
+            return None
+        dataset = TensorDataset(
+            torch.from_numpy(np.ascontiguousarray(expanded_features)),
+            torch.from_numpy(np.ascontiguousarray(labels)),
+        )
+        return DataLoader(
+            dataset,
+            batch_size=min(256, max(len(dataset), 1)),
+            shuffle=False,
+        )
+
+    def _run_adaptive_learning_hook(
+        self,
+        *,
+        cycle_id: str,
+        accepted_samples: list[IngestedSample],
+        previous_shard_names: list[str] | tuple[str, ...],
+        errors: list[str] | None = None,
+    ) -> None:
+        severity_counts = self._severity_counts_from_samples(accepted_samples)
+        if not severity_counts:
+            return
+        try:
+            adaptation_event = self._adaptive_learner.on_new_grab_cycle(
+                severity_counts=severity_counts,
+                prev_dataloader=self._build_adaptation_dataloader(previous_shard_names),
+            )
+        except (OSError, RuntimeError, TypeError, ValueError) as exc:
+            error_message = (
+                f"adaptive learning hook failed for {cycle_id}: {type(exc).__name__}: {exc}"
+            )
+            logger.warning("autograbber_adaptive_learning_failed %s", error_message)
+            if errors is not None:
+                errors.append(error_message)
+            return
+        if adaptation_event is None:
+            return
+        if adaptation_event.fisher_sample_count > 0:
+            logger.warning(
+                "distribution shift detected and EWC was computed cycle_id=%s js_divergence=%.6f fisher_samples=%d",
+                cycle_id,
+                adaptation_event.js_divergence,
+                adaptation_event.fisher_sample_count,
+            )
+            return
+        logger.warning(
+            "distribution shift detected cycle_id=%s js_divergence=%.6f fisher_samples=%d",
+            cycle_id,
+            adaptation_event.js_divergence,
+            adaptation_event.fisher_sample_count,
+        )
+
     def run_cycle(self) -> GrabberCycleResult:
         cycle_id = self._next_cycle_id()
         started_at = datetime.now(timezone.utc).isoformat()
@@ -568,6 +750,7 @@ class AutoGrabber:
             dedup_store=dedup_store,
             rejection_log=QualityRejectionLog(),
         )
+        previous_shard_names = tuple(self._feature_store.list_shards())
 
         try:
             per_source_limit = self.config.max_per_cycle // len(self._scraper_types)
@@ -840,6 +1023,13 @@ class AutoGrabber:
                         logger.error("autograbber_sample_processing_failed %s", error_message)
                         errors.append(error_message)
                 sources_succeeded += 1
+
+            self._run_adaptive_learning_hook(
+                cycle_id=cycle_id,
+                accepted_samples=accepted_samples,
+                previous_shard_names=previous_shard_names,
+                errors=errors,
+            )
 
             if accepted_samples:
                 bridge_worker = get_bridge_worker()

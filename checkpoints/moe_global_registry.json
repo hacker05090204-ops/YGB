@@ -1,8 +1,8 @@
 {
   "global": {
-    "val_f1": 0.5333333333333333,
-    "checkpoint_path": "checkpoints\\moe_global_1_0.533.safetensors",
-    "updated_at": "2026-04-09T21:01:59.654040",
+    "val_f1": 0.6606334841628959,
+    "checkpoint_path": "checkpoints\\moe_global_1_0.661.safetensors",
+    "updated_at": "2026-04-10T03:22:15.461272",
     "epoch": 1
   }
 }

@@ -17,6 +17,7 @@ from typing import Any
 from scripts.expert_task_queue import (
     DEFAULT_STATUS_PATH,
     ExpertTaskQueue,
+    STATUS_CLAIMED,
     STATUS_COMPLETED,
     STATUS_FAILED,
 )
@@ -25,6 +26,9 @@ from training_core.entrypoints import run_leader_ddp_main
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
+
+MASTER_PORT = int(os.getenv("YGB_DDP_PORT", "29500"))
+MASTER_ADDR = os.getenv("YGB_DDP_ADDR", "127.0.0.1")
 
 
 @dataclass
@@ -49,11 +53,11 @@ class LeaderDDPConfig:
 
 
 def get_master_port() -> int:
-    return int(os.getenv("YGB_DDP_PORT", "29500"))
+    return int(os.getenv("YGB_DDP_PORT", str(MASTER_PORT)))
 
 
 def get_master_addr() -> str:
-    return os.getenv("YGB_DDP_ADDR", "127.0.0.1")
+    return os.getenv("YGB_DDP_ADDR", MASTER_ADDR)
 
 
 def get_status_path() -> Path:
@@ -76,23 +80,89 @@ def build_leader_config() -> LeaderDDPConfig:
 
 def _result_to_dict(result: Any) -> dict[str, Any]:
     if isinstance(result, dict):
-        return result
+        return dict(result)
     if hasattr(result, "__dict__"):
         return dict(vars(result))
     return {}
 
 
-def _detect_gpu_info() -> tuple[str, float]:
+def _claimed_records(state: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        dict(item)
+        for item in state.get("experts", [])
+        if str(item.get("status", "")).upper() == STATUS_CLAIMED
+    ]
+
+
+def _format_claim_record(record: dict[str, Any]) -> str:
+    return (
+        f"expert_id={int(record.get('expert_id', -1))} "
+        f"field_name={record.get('field_name', '')} "
+        f"claimed_by={record.get('claimed_by') or '-'}"
+    )
+
+
+def _claim_leader_expert(
+    queue: ExpertTaskQueue,
+    worker_id: str,
+) -> tuple[dict[str, Any] | None, str]:
+    state = queue.load_status()
+    claimed_records = _claimed_records(state)
+
+    foreign_claims = [
+        record
+        for record in claimed_records
+        if str(record.get("claimed_by", "")).strip() not in {"", worker_id}
+    ]
+    if foreign_claims:
+        foreign_text = "; ".join(_format_claim_record(record) for record in foreign_claims)
+        raise RuntimeError(
+            "Leader must remain the only claimant; found active foreign claims: "
+            f"{foreign_text}"
+        )
+
+    own_claims = [
+        record
+        for record in claimed_records
+        if str(record.get("claimed_by", "")).strip() == worker_id
+    ]
+    if len(own_claims) > 1:
+        own_text = "; ".join(_format_claim_record(record) for record in own_claims)
+        raise RuntimeError(
+            f"Leader worker_id={worker_id} holds multiple active claims: {own_text}"
+        )
+    if own_claims:
+        return own_claims[0], "resumed"
+
+    claimed = queue.claim_next_expert(worker_id)
+    if claimed is None:
+        return None, "none"
+    return claimed, "claimed"
+
+
+def _export_claim_context(expert_id: int, field_name: str) -> None:
+    os.environ["YGB_EXPERT_ID"] = str(int(expert_id))
+    os.environ["YGB_EXPERT_FIELD_NAME"] = str(field_name)
+    os.environ["YGB_DDP_ROLE"] = "leader"
+
+
+def _detect_gpu_info() -> tuple[str, float | None]:
     try:
         import torch
     except ImportError:
-        return "CPU", 0.0
+        return "CPU", None
 
     if not torch.cuda.is_available():
-        return "CPU", 0.0
+        return "CPU", None
 
     props = torch.cuda.get_device_properties(0)
     return props.name, round(props.total_memory / (1024**3), 2)
+
+
+def _format_vram_gb(vram_gb: float | None) -> str:
+    if vram_gb is None:
+        return "unknown"
+    return f"{vram_gb:.2f}"
 
 
 def _resolve_checkpoint_path(result: dict[str, Any]) -> str:
@@ -124,14 +194,17 @@ def main():
     config = build_leader_config()
     os.environ["MASTER_ADDR"] = config.master_addr
     os.environ["MASTER_PORT"] = str(config.master_port)
+    os.environ["YGB_DDP_ADDR"] = config.master_addr
+    os.environ["YGB_DDP_PORT"] = str(config.master_port)
+    os.environ["YGB_DDP_ROLE"] = "leader"
 
     hostname = socket.gethostname()
     gpu_name, vram_gb = _detect_gpu_info()
     logger.info(
-        "Leader startup: hostname=%s | gpu=%s | vram_gb=%.2f | master=%s:%s",
+        "Leader startup: hostname=%s | gpu=%s | vram_gb=%s | master=%s:%s",
         hostname,
         gpu_name,
-        vram_gb,
+        _format_vram_gb(vram_gb),
         config.master_addr,
         config.master_port,
     )
@@ -140,15 +213,17 @@ def main():
     logger.info("Current expert queue status:\n%s", queue.render_status())
 
     worker_id = get_worker_id()
-    claimed = queue.claim_next_expert(worker_id)
+    claimed, claim_mode = _claim_leader_expert(queue, worker_id)
     if claimed is None:
         logger.info("No expert available for worker_id=%s", worker_id)
         return None
 
     expert_id = int(claimed["expert_id"])
     field_name = str(claimed["field_name"])
+    _export_claim_context(expert_id, field_name)
     logger.info(
-        "Leader claimed expert_id=%s field_name=%s for worker_id=%s",
+        "Leader %s expert_id=%s field_name=%s for worker_id=%s",
+        claim_mode,
         expert_id,
         field_name,
         worker_id,
@@ -162,6 +237,15 @@ def main():
     try:
         result = run_leader_ddp_main(config)
         result_dict = _result_to_dict(result)
+        if result_dict:
+            result_dict.setdefault("expert_id", expert_id)
+            result_dict.setdefault("field_name", field_name)
+            result_dict.setdefault("claimed_by", worker_id)
+            result_dict.setdefault("master_addr", config.master_addr)
+            result_dict.setdefault("master_port", int(config.master_port))
+            result_dict.setdefault("hostname", hostname)
+            result_dict.setdefault("gpu_name", gpu_name)
+            result_dict.setdefault("vram_gb", vram_gb)
     except Exception as exc:
         training_failed = True
         error_text = f"{type(exc).__name__}: {exc}"
@@ -175,8 +259,11 @@ def main():
         if result is None and not error_text:
             error_text = "training_result_missing"
 
+        result_status = str(result_dict.get("status", "") or "").upper()
         release_status = STATUS_FAILED
-        if result_dict and not bool(result_dict.get("drift_aborted")):
+        if result_status == STATUS_COMPLETED:
+            release_status = STATUS_COMPLETED
+        elif result_dict and not bool(result_dict.get("drift_aborted")) and result_status != STATUS_FAILED:
             release_status = STATUS_COMPLETED
         if training_failed or result is None:
             release_status = STATUS_FAILED
@@ -210,9 +297,10 @@ def main():
             if not training_failed:
                 raise
 
-    if result is not None:
-        print(json.dumps(result, indent=2))
-    return result
+    result_payload = result_dict if result_dict else result
+    if result_payload is not None:
+        print(json.dumps(result_payload, indent=2))
+    return result_payload
 
 
 if __name__ == "__main__":

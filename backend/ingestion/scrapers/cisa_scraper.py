@@ -36,14 +36,14 @@ class CISAScraper(BaseScraper):
             if len(samples) >= max_items:
                 break
             if not isinstance(entry, dict):
-                logger.warning("cisa_entry_skipped reason=not_object")
+                self._log_partial_failure(reason="entry_not_object")
                 continue
             cve_id = str(entry.get("cveID", "")).strip()
             short_description = str(entry.get("shortDescription", "")).strip()
             if not cve_id or not short_description:
-                logger.debug(
-                    "cisa_entry_skipped reason=missing_required_fields cve_id=%s",
-                    cve_id,
+                self._log_partial_failure(
+                    reason="missing_required_fields",
+                    cve_id=cve_id or "<missing-cve-id>",
                 )
                 continue
             required_action = str(entry.get("requiredAction", "")).strip()
@@ -72,8 +72,6 @@ class CISAScraper(BaseScraper):
             )
         return samples
 
-    def fetch(self, max_items: int) -> list[ScrapedSample]:
-        if max_items <= 0:
-            return []
+    def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
         payload = self._get_json(self.FEED_URL)
         return self.parse_feed(payload, max_items=max_items)

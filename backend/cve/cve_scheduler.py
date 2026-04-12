@@ -22,6 +22,7 @@ logger = logging.getLogger("ygb.cve_scheduler")
 _INGEST_INTERVAL = int(os.environ.get("CVE_INGEST_INTERVAL_SECONDS", "300"))
 _MAX_RETRIES = 3
 _BACKOFF_BASE = 30  # seconds
+NVD_V2_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 
 @dataclass(frozen=True)
@@ -56,6 +57,7 @@ class FeedSourceStatus:
     available: bool
     requires_credentials: bool
     requires_format_fix: bool = False
+    health_state: str = "HEALTHY"
 
 
 class CVEIngestScheduler:
@@ -142,6 +144,7 @@ class CVEIngestScheduler:
                 available=(not requires_credentials) or credentials_present,
                 requires_credentials=requires_credentials,
                 requires_format_fix=False,
+                health_state="HEALTHY",
             )
         return statuses
 
@@ -167,6 +170,7 @@ class CVEIngestScheduler:
                 available=base_available,
                 requires_credentials=requires_credentials,
                 requires_format_fix=False,
+                health_state="HEALTHY",
             )
         else:
             current = replace(
@@ -179,6 +183,7 @@ class CVEIngestScheduler:
                     else base_available
                 ),
                 requires_format_fix=current.requires_format_fix,
+                health_state=current.health_state,
             )
 
         self._feed_source_status[source_name] = current
@@ -221,6 +226,7 @@ class CVEIngestScheduler:
             available=(not requires_credentials) or credentials_present,
             requires_credentials=requires_credentials,
             requires_format_fix=False,
+            health_state="HEALTHY",
         )
         self._feed_source_status[updated.source_name] = updated
         return updated
@@ -247,6 +253,11 @@ class CVEIngestScheduler:
             ),
             requires_credentials=requires_credentials,
             requires_format_fix=False,
+            health_state=(
+                self.STATE_DEGRADED
+                if next_failures >= self._DEGRADED_THRESHOLD
+                else current.health_state
+            ),
         )
         self._feed_source_status[updated.source_name] = updated
 
@@ -274,6 +285,23 @@ class CVEIngestScheduler:
             available=False,
             requires_credentials=requires_credentials,
             requires_format_fix=True,
+            health_state="BROKEN",
+        )
+        self._feed_source_status[updated.source_name] = updated
+        return updated
+
+    def _mark_feed_degraded(
+        self,
+        source_id: str,
+        cfg: Optional[Dict[str, Any]] = None,
+        attempted_at: Optional[str] = None,
+    ) -> FeedSourceStatus:
+        config = cfg or {}
+        current = self._ensure_feed_source_status(source_id, config)
+        updated = replace(
+            current,
+            last_attempt=attempted_at or datetime.now(timezone.utc).isoformat(),
+            health_state=self.STATE_DEGRADED,
         )
         self._feed_source_status[updated.source_name] = updated
         return updated
@@ -292,6 +320,7 @@ class CVEIngestScheduler:
             available=False,
             requires_credentials=True,
             requires_format_fix=False,
+            health_state=current.health_state,
         )
         self._feed_source_status[updated.source_name] = updated
 
@@ -559,7 +588,7 @@ class CVEIngestScheduler:
     def _is_nvd_v2_source(self, source_id: str, url: str) -> bool:
         return (
             source_id in {"nvd", "cve_services"}
-            or url.startswith("https://services.nvd.nist.gov/rest/json/cves/2.0")
+            or url.startswith(NVD_V2_URL)
         )
 
     def _minimum_delay_for_source(self, source_id: str, cfg: Dict[str, Any]) -> float:
@@ -689,6 +718,33 @@ class CVEIngestScheduler:
                 requires_format_fix=True,
             )
 
+        if response.status_code == 429:
+            logger.warning(
+                "[CVE_SCHEDULER] %s rate limited (HTTP 429)",
+                source_id,
+            )
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error="HTTP 429",
+                non_retryable=False,
+                trip_circuit=False,
+            )
+
+        if response.status_code >= 500:
+            logger.warning(
+                "[CVE_SCHEDULER] %s server error (HTTP %d)",
+                source_id,
+                response.status_code,
+            )
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error=f"HTTP {response.status_code}",
+                non_retryable=False,
+                trip_circuit=False,
+            )
+
         response.raise_for_status()
         etag = response.headers.get("ETag", "")
         last_mod = response.headers.get("Last-Modified", "")
@@ -778,7 +834,12 @@ class CVEIngestScheduler:
 
             last_result = result
             if attempt < _MAX_RETRIES:
-                backoff = _BACKOFF_BASE * (2 ** (attempt - 1))
+                if result.error == "HTTP 429":
+                    backoff = 10 * (2 ** (attempt - 1))
+                elif result.error.startswith("HTTP 5"):
+                    backoff = 10
+                else:
+                    backoff = _BACKOFF_BASE * (2 ** (attempt - 1))
                 logger.warning(
                     f"[CVE_SCHEDULER] {source_id} attempt {attempt}/"
                     f"{_MAX_RETRIES} failed: {result.error}. "
@@ -793,12 +854,30 @@ class CVEIngestScheduler:
                 cfg,
                 attempted_at=last_attempted_at,
             )
+        elif failure_message.startswith("HTTP 5"):
+            self._mark_feed_degraded(
+                source_id,
+                cfg,
+                attempted_at=last_attempted_at,
+            )
         else:
             self._record_feed_failure(
                 source_id,
                 cfg,
                 attempted_at=last_attempted_at,
             )
+
+        if failure_message.startswith("HTTP 5"):
+            try:
+                from backend.cve.cve_pipeline import SourceStatus
+
+                pipeline._source_status[source_id] = SourceStatus.DEGRADED
+            except Exception:
+                logger.warning(
+                    "[CVE_SCHEDULER] unable to mark %s degraded after 5xx exhaustion",
+                    source_id,
+                    exc_info=True,
+                )
 
         if last_result.trip_circuit:
             pipeline.mark_source_error(source_id, failure_message)
@@ -919,6 +998,33 @@ class CVEIngestScheduler:
                         non_retryable=True,
                         trip_circuit=False,
                         requires_format_fix=True,
+                    )
+
+                if resp.status_code == 429:
+                    logger.warning(
+                        "[CVE_SCHEDULER] %s rate limited (HTTP 429)",
+                        source_id,
+                    )
+                    return SourceCycleStats(
+                        source_id=source_id,
+                        success=False,
+                        error="HTTP 429",
+                        non_retryable=False,
+                        trip_circuit=False,
+                    )
+
+                if resp.status_code >= 500:
+                    logger.warning(
+                        "[CVE_SCHEDULER] %s server error (HTTP %d)",
+                        source_id,
+                        resp.status_code,
+                    )
+                    return SourceCycleStats(
+                        source_id=source_id,
+                        success=False,
+                        error=f"HTTP {resp.status_code}",
+                        non_retryable=False,
+                        trip_circuit=False,
                     )
 
                 resp.raise_for_status()

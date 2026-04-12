@@ -17,7 +17,7 @@ from backend.ingestion.models import IngestedSample, make_sample, sample_to_dict
 from backend.observability.metrics import metrics_registry
 from backend.training import feature_extractor
 from backend.training.data_watcher import DataWatcher
-from backend.training.feature_extractor import build_vocabulary, extract as extract_features, get_text_embedding, load_vocabulary
+from backend.training.feature_extractor import CVEFeatureEngineer, build_vocabulary, extract as extract_features, get_text_embedding, load_vocabulary
 from backend.training.incremental_trainer import (
     AccuracyHistory,
     AccuracySnapshot,
@@ -196,12 +196,18 @@ def test_feature_extractor_builds_vocab_and_extracts_features(monkeypatch, tmp_p
     loaded = load_vocabulary()
     embedding = get_text_embedding("alpha gamma")
     combined = extract_features(sample)
+    engineered = CVEFeatureEngineer(
+        raw_data_root=raw_root,
+        vocab_path=tmp_path / "vocab" / "vocab_256.json",
+    ).extract(second_sample)
 
     assert len(vocabulary) == 508
     assert loaded[:2] == vocabulary[:2]
     assert embedding.shape[0] == 508
     assert combined.shape[0] == 512
     assert combined[-4:].tolist()[0] == 0.75
+    assert engineered.shape[0] == 267
+    assert engineered[engineered.shape[0] - CVEFeatureEngineer.DOMAIN_SIGNAL_DIM :].sum().item() > 0.0
 
 
 def test_emit_training_metrics_computes_ece_and_drift(tmp_path):
@@ -274,8 +280,12 @@ def test_incremental_trainer_build_dataset_splits_90_10(monkeypatch, tmp_path):
     samples = _quality_gate_samples(100)
     train_loader, eval_loader = trainer.build_dataset(samples)
 
-    assert len(train_loader.dataset) == 90
+    assert len(train_loader.dataset) >= 90
     assert len(eval_loader.dataset) == 10
+    assert trainer._last_balance_report is not None
+    assert sum(trainer._last_balance_report.class_counts.values()) == 90
+    train_labels = [trainer._label_for_sample(samples[index]) for index in train_loader.dataset.sample_indices]
+    assert train_labels.count(0) == train_labels.count(1)
 
 
 def test_incremental_trainer_build_dataset_rejects_too_few_samples(monkeypatch, tmp_path):
@@ -550,7 +560,7 @@ def test_incremental_trainer_normalizes_and_persists_feature_stats(monkeypatch, 
 
     assert cache_path.exists()
     assert legacy_stats_path.exists() is False
-    assert cached_features.shape == (1, 256)
+    assert cached_features.shape == (1, 267)
     assert cached_labels.tolist() == [trainer._label_for_sample(sample)]
     assert cached_metadata["stats"]["safe_std"] > 0.0
     assert abs(float(feature.mean().item())) < 1e-3
@@ -1224,9 +1234,10 @@ def test_incremental_trainer_train_logs_val_loss_and_uses_validation_split(
             return_history=True,
         )
 
-    assert len(train_loader.dataset) == 90
+    assert len(train_loader.dataset) >= 90
     assert len(val_loader.dataset) == 10
     assert summary.eval_loss >= 0.0
+    assert summary.metrics_report is not None
     assert "val_loss=" in caplog.text
 
 
@@ -1405,6 +1416,62 @@ def test_incremental_trainer_train_early_stops_before_max_epochs_when_val_loss_i
 
     assert summary.early_stopped is True
     assert summary.epochs_completed < config.max_epochs
+
+
+def test_cve_feature_engineer_surfaces_exploit_and_rce_signals(tmp_path):
+    sample = make_sample(
+        "nvd",
+        "Critical remote code execution exploit with CVSS 9.8 actively exploited in the wild and patch immediately.",
+        "https://example.com/rce",
+        "CVE-2026-4242",
+        "CRITICAL",
+        ("rce", "kev"),
+    )
+    engineer = CVEFeatureEngineer(
+        raw_data_root=tmp_path / "raw",
+        vocab_path=tmp_path / "vocab" / "vocab_256.json",
+    )
+
+    features = engineer.extract(sample)
+
+    assert features.shape == (267,)
+    assert features[engineer.signal_index("critical_severity_cue")].item() == pytest.approx(1.0)
+    assert features[engineer.signal_index("exploit_cue")].item() == pytest.approx(1.0)
+    assert features[engineer.signal_index("rce_cue")].item() == pytest.approx(1.0)
+    assert features[engineer.signal_index("known_exploited_or_patch_urgency_cue")].item() == pytest.approx(1.0)
+
+
+def test_incremental_trainer_run_epoch_records_metrics_report_and_amp_fallback(monkeypatch, tmp_path, caplog):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: fake_state,
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.optimizer_config = replace(
+        trainer.optimizer_config,
+        max_epochs=1,
+        use_amp=True,
+    )
+    trainer.device = torch.device("cpu")
+    trainer.model = trainer.model.to(trainer.device)
+    trainer.feature_engineer.extract = lambda sample: torch.linspace(0.0, 1.0, 267)
+    trainer.load_new_samples = lambda: _quality_gate_samples(100)
+
+    with caplog.at_level(logging.INFO, logger="ygb.training.incremental_trainer"):
+        result = trainer.run_incremental_epoch()
+
+    persisted_state = json.loads(trainer.state_path.read_text(encoding="utf-8"))
+    assert result.metrics_report is not None
+    assert result.metrics_report.support_total > 0
+    assert persisted_state["metrics_report"]["worst_class"]["name"] in {"NEGATIVE", "POSITIVE"}
+    assert "CUDA AMP requested but unavailable" in caplog.text
 
 
 def test_data_watcher_triggers_on_file_count_and_time(monkeypatch, tmp_path):

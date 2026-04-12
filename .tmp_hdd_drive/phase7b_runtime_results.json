@@ -1,0 +1,621 @@
+{
+  "benchmark": {
+    "accepted_by_source": {
+      "cisa": 5
+    },
+    "accepted_cves": [
+      "CVE-2026-1340",
+      "CVE-2026-35616",
+      "CVE-2026-3502",
+      "CVE-2026-5281",
+      "CVE-2026-3055"
+    ],
+    "accepted_records": [
+      {
+        "cve_id": "CVE-2026-1340",
+        "severity": "CRITICAL",
+        "sha256_hash": "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-35616",
+        "severity": "CRITICAL",
+        "sha256_hash": "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-3502",
+        "severity": "CRITICAL",
+        "sha256_hash": "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-5281",
+        "severity": "CRITICAL",
+        "sha256_hash": "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-3055",
+        "severity": "CRITICAL",
+        "sha256_hash": "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d",
+        "source": "cisa"
+      }
+    ],
+    "accepted_samples_purity_aligned": true,
+    "bridge_manifest_updates": 1,
+    "bridge_stub": {
+      "failed": 0,
+      "last_attempt": "stubbed",
+      "published": 5
+    },
+    "cycle_error": null,
+    "duration_seconds": 45.334,
+    "feature_store_shard_count": 5,
+    "feature_store_shards": [
+      "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d.safetensors",
+      "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5.safetensors",
+      "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123.safetensors",
+      "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96.safetensors",
+      "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40.safetensors"
+    ],
+    "per_source_limit": 5,
+    "result": {
+      "bridge_published": 5,
+      "cycle_id": "AGC-000001",
+      "errors": [],
+      "features_stored": 5,
+      "purity_rejected": 20,
+      "samples_accepted": 5,
+      "samples_fetched": 25,
+      "samples_rejected": 20,
+      "sources_attempted": 9,
+      "sources_succeeded": 9,
+      "validator_rejections": {
+        "dedup": 0,
+        "feature": 0,
+        "purity": 20,
+        "quality": 0,
+        "structural": 0
+      }
+    },
+    "root": "C:\\Users\\Unkno\\AppData\\Local\\Temp\\phase7b_benchmark_fjmfmfns",
+    "source_fetch": {
+      "cisa": {
+        "elapsed_seconds": 0.614,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "exploitdb": {
+        "elapsed_seconds": 2.764,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "github": {
+        "elapsed_seconds": 1.017,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "msrc": {
+        "elapsed_seconds": 5.628,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "nvd": {
+        "elapsed_seconds": 1.305,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "osv": {
+        "elapsed_seconds": 0.668,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "redhat": {
+        "elapsed_seconds": 5.896,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "snyk": {
+        "elapsed_seconds": 24.821,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "vulnrichment": {
+        "elapsed_seconds": 2.374,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      }
+    },
+    "sources": [
+      "nvd",
+      "cisa",
+      "osv",
+      "github",
+      "exploitdb",
+      "msrc",
+      "redhat",
+      "snyk",
+      "vulnrichment"
+    ],
+    "sources_with_samples": 5,
+    "under_120_seconds": true
+  },
+  "bridge_strategy": "real_network_and_real_autograbber_path_with_in_process_bridge_stub_only",
+  "integration": {
+    "accepted_by_source": {
+      "cisa": 5
+    },
+    "accepted_cves": [
+      "CVE-2026-1340",
+      "CVE-2026-35616",
+      "CVE-2026-3502",
+      "CVE-2026-5281",
+      "CVE-2026-3055"
+    ],
+    "accepted_records": [
+      {
+        "cve_id": "CVE-2026-1340",
+        "severity": "CRITICAL",
+        "sha256_hash": "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-35616",
+        "severity": "CRITICAL",
+        "sha256_hash": "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-3502",
+        "severity": "CRITICAL",
+        "sha256_hash": "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-5281",
+        "severity": "CRITICAL",
+        "sha256_hash": "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96",
+        "source": "cisa"
+      },
+      {
+        "cve_id": "CVE-2026-3055",
+        "severity": "CRITICAL",
+        "sha256_hash": "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d",
+        "source": "cisa"
+      }
+    ],
+    "accepted_samples_purity_aligned": true,
+    "bridge_manifest_updates": 1,
+    "bridge_stub": {
+      "failed": 0,
+      "last_attempt": "stubbed",
+      "published": 5
+    },
+    "cycle_error": null,
+    "duration_seconds": 43.682,
+    "feature_store_shard_count": 5,
+    "feature_store_shards": [
+      "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d.safetensors",
+      "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5.safetensors",
+      "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123.safetensors",
+      "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96.safetensors",
+      "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40.safetensors"
+    ],
+    "per_source_limit": 5,
+    "result": {
+      "bridge_published": 5,
+      "cycle_id": "AGC-000001",
+      "errors": [],
+      "features_stored": 5,
+      "purity_rejected": 20,
+      "samples_accepted": 5,
+      "samples_fetched": 25,
+      "samples_rejected": 20,
+      "sources_attempted": 9,
+      "sources_succeeded": 9,
+      "validator_rejections": {
+        "dedup": 0,
+        "feature": 0,
+        "purity": 20,
+        "quality": 0,
+        "structural": 0
+      }
+    },
+    "root": "C:\\Users\\Unkno\\AppData\\Local\\Temp\\phase7b_integration_6fmg4tan",
+    "source_fetch": {
+      "cisa": {
+        "elapsed_seconds": 0.84,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "exploitdb": {
+        "elapsed_seconds": 7.292,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "github": {
+        "elapsed_seconds": 0.723,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "msrc": {
+        "elapsed_seconds": 6.023,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "nvd": {
+        "elapsed_seconds": 1.567,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "osv": {
+        "elapsed_seconds": 0.797,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "redhat": {
+        "elapsed_seconds": 7.163,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 5
+      },
+      "snyk": {
+        "elapsed_seconds": 17.843,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      },
+      "vulnrichment": {
+        "elapsed_seconds": 0.996,
+        "error": null,
+        "fetch_success": true,
+        "fetched": 0
+      }
+    },
+    "sources": [
+      "nvd",
+      "cisa",
+      "osv",
+      "github",
+      "exploitdb",
+      "msrc",
+      "redhat",
+      "snyk",
+      "vulnrichment"
+    ],
+    "sources_with_samples": 5
+  },
+  "real_bridge": {
+    "loaded": true,
+    "status": {
+      "batches_completed": 0,
+      "bridge_count": 127347,
+      "bridge_loaded": true,
+      "bridge_verified_count": 127347,
+      "idempotency_keys_cached": 127347,
+      "last_batch": null,
+      "last_ingest_at": null,
+      "publish_stats": {
+        "failed": 0,
+        "last_attempt": null,
+        "published": 0
+      },
+      "total_deduped": 0,
+      "total_dropped": 0,
+      "total_ingested": 0
+    }
+  },
+  "stress": {
+    "bridge_manifest_updates": 1,
+    "bridge_stub": {
+      "failed": 0,
+      "last_attempt": "stubbed",
+      "published": 5
+    },
+    "cycles": [
+      {
+        "accepted_cves": [
+          "CVE-2026-1340",
+          "CVE-2026-35616",
+          "CVE-2026-3502",
+          "CVE-2026-5281",
+          "CVE-2026-3055"
+        ],
+        "accepted_records": [
+          {
+            "cve_id": "CVE-2026-1340",
+            "severity": "CRITICAL",
+            "sha256_hash": "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40",
+            "source": "cisa"
+          },
+          {
+            "cve_id": "CVE-2026-35616",
+            "severity": "CRITICAL",
+            "sha256_hash": "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5",
+            "source": "cisa"
+          },
+          {
+            "cve_id": "CVE-2026-3502",
+            "severity": "CRITICAL",
+            "sha256_hash": "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123",
+            "source": "cisa"
+          },
+          {
+            "cve_id": "CVE-2026-5281",
+            "severity": "CRITICAL",
+            "sha256_hash": "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96",
+            "source": "cisa"
+          },
+          {
+            "cve_id": "CVE-2026-3055",
+            "severity": "CRITICAL",
+            "sha256_hash": "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d",
+            "source": "cisa"
+          }
+        ],
+        "cycle_error": null,
+        "cycle_number": 1,
+        "duration_seconds": 37.74,
+        "result": {
+          "bridge_published": 5,
+          "cycle_id": "AGC-000001",
+          "errors": [],
+          "features_stored": 5,
+          "purity_rejected": 20,
+          "samples_accepted": 5,
+          "samples_fetched": 25,
+          "samples_rejected": 20,
+          "sources_attempted": 9,
+          "sources_succeeded": 9,
+          "validator_rejections": {
+            "dedup": 0,
+            "feature": 0,
+            "purity": 20,
+            "quality": 0,
+            "structural": 0
+          }
+        },
+        "source_fetch": {
+          "cisa": {
+            "elapsed_seconds": 0.715,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "exploitdb": {
+            "elapsed_seconds": 3.571,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "github": {
+            "elapsed_seconds": 0.764,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "msrc": {
+            "elapsed_seconds": 4.825,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "nvd": {
+            "elapsed_seconds": 1.244,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "osv": {
+            "elapsed_seconds": 0.719,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "redhat": {
+            "elapsed_seconds": 5.979,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "snyk": {
+            "elapsed_seconds": 18.347,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "vulnrichment": {
+            "elapsed_seconds": 1.313,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          }
+        }
+      },
+      {
+        "accepted_cves": [],
+        "accepted_records": [],
+        "cycle_error": null,
+        "cycle_number": 2,
+        "duration_seconds": 41.534,
+        "result": {
+          "bridge_published": 0,
+          "cycle_id": "AGC-000002",
+          "errors": [],
+          "features_stored": 0,
+          "purity_rejected": 20,
+          "samples_accepted": 0,
+          "samples_fetched": 25,
+          "samples_rejected": 25,
+          "sources_attempted": 9,
+          "sources_succeeded": 9,
+          "validator_rejections": {
+            "dedup": 5,
+            "feature": 0,
+            "purity": 20,
+            "quality": 0,
+            "structural": 0
+          }
+        },
+        "source_fetch": {
+          "cisa": {
+            "elapsed_seconds": 0.661,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "exploitdb": {
+            "elapsed_seconds": 3.689,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "github": {
+            "elapsed_seconds": 0.438,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "msrc": {
+            "elapsed_seconds": 5.548,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "nvd": {
+            "elapsed_seconds": 1.329,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "osv": {
+            "elapsed_seconds": 0.649,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "redhat": {
+            "elapsed_seconds": 5.748,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "snyk": {
+            "elapsed_seconds": 22.223,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "vulnrichment": {
+            "elapsed_seconds": 1.14,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          }
+        }
+      },
+      {
+        "accepted_cves": [],
+        "accepted_records": [],
+        "cycle_error": null,
+        "cycle_number": 3,
+        "duration_seconds": 35.839,
+        "result": {
+          "bridge_published": 0,
+          "cycle_id": "AGC-000003",
+          "errors": [],
+          "features_stored": 0,
+          "purity_rejected": 20,
+          "samples_accepted": 0,
+          "samples_fetched": 25,
+          "samples_rejected": 25,
+          "sources_attempted": 9,
+          "sources_succeeded": 9,
+          "validator_rejections": {
+            "dedup": 5,
+            "feature": 0,
+            "purity": 20,
+            "quality": 0,
+            "structural": 0
+          }
+        },
+        "source_fetch": {
+          "cisa": {
+            "elapsed_seconds": 0.574,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "exploitdb": {
+            "elapsed_seconds": 5.591,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "github": {
+            "elapsed_seconds": 0.763,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "msrc": {
+            "elapsed_seconds": 5.828,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "nvd": {
+            "elapsed_seconds": 1.216,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "osv": {
+            "elapsed_seconds": 0.864,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "redhat": {
+            "elapsed_seconds": 5.951,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 5
+          },
+          "snyk": {
+            "elapsed_seconds": 13.806,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          },
+          "vulnrichment": {
+            "elapsed_seconds": 1.133,
+            "error": null,
+            "fetch_success": true,
+            "fetched": 0
+          }
+        }
+      }
+    ],
+    "dedup_prevented_duplicate_acceptance": true,
+    "duplicate_cves_across_accepted_cycles": [],
+    "duplicate_hashes_across_accepted_cycles": [],
+    "root": "C:\\Users\\Unkno\\AppData\\Local\\Temp\\phase7b_stress_wmef6qrq"
+  }
+}

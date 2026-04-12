@@ -39,6 +39,34 @@ def test_local_sync_index_refresh_finds_files_in_data_dir(monkeypatch, tmp_path)
     assert index.get_total_bytes() > 0
 
 
+def test_local_sync_index_excludes_its_own_persisted_file(monkeypatch, tmp_path):
+    from backend.sync.sync_engine import LocalSyncIndex
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    payload = data_dir / "sample.txt"
+    payload.write_text("payload", encoding="utf-8")
+
+    monkeypatch.setattr(LocalSyncIndex, "SCAN_DIRS", [str(data_dir)])
+    monkeypatch.setattr(LocalSyncIndex, "INDEX_PATH", data_dir / "local_sync_index.json")
+
+    index = LocalSyncIndex()
+    index.refresh()
+    index.refresh()
+
+    assert index.get_file_count() == 1
+    assert index.get_total_bytes() == payload.stat().st_size
+
+
+def test_is_sync_stale_always_true_for_degraded_mode():
+    from backend.sync import sync_engine as se
+
+    assert se.is_sync_stale(
+        mode=se.SyncMode.DEGRADED,
+        last_completed_at="3026-04-08T00:00:00+00:00",
+    ) is True
+
+
 def test_sync_status_response_includes_local_counts_and_standalone_not_stale(monkeypatch, tmp_path):
     from backend.sync import sync_routes
     from backend.sync.sync_engine import LocalSyncIndex, SyncMode
@@ -81,6 +109,7 @@ def test_sync_status_response_includes_local_counts_and_standalone_not_stale(mon
     assert payload["local_files"] > 0
     assert payload["local_bytes"] > 0
     assert payload["stale"] is False
+    assert payload["configured"] is False
     assert payload["message"] == "Single-device mode. Set YGB_SYNC_PEERS for mesh sync."
 
 
@@ -116,4 +145,5 @@ def test_sync_cycle_returns_real_local_counts(monkeypatch, tmp_path):
     assert result.local_bytes > 0
     persisted = json.loads(status_path.read_text(encoding="utf-8"))
     assert persisted["mode"] == "STANDALONE"
+    assert persisted["configured"] is False
     assert persisted["stale"] is False

@@ -9,6 +9,8 @@ import os
 import sys
 import tempfile
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'backend'))
@@ -24,7 +26,10 @@ class TestTokenSigning:
     """Verify HMAC-based token creation."""
 
     def setup_method(self):
-        self.ledger = ApprovalLedger(ledger_path="/tmp/test_ledger.jsonl")
+        self.tmp = tempfile.mkdtemp()
+        self.ledger = ApprovalLedger(
+            ledger_path=os.path.join(self.tmp, "test_ledger.jsonl")
+        )
 
     def test_sign_returns_token(self):
         token = self.ledger.sign_approval(0, "admin-001", "Certification review passed")
@@ -58,7 +63,10 @@ class TestTokenVerification:
     """Verify HMAC signature checks."""
 
     def setup_method(self):
-        self.ledger = ApprovalLedger(ledger_path="/tmp/test_ledger.jsonl")
+        self.tmp = tempfile.mkdtemp()
+        self.ledger = ApprovalLedger(
+            ledger_path=os.path.join(self.tmp, "test_ledger.jsonl")
+        )
 
     def test_valid_token_verifies(self):
         token = self.ledger.sign_approval(0, "admin", "passed")
@@ -172,3 +180,54 @@ class TestLedgerPersistence:
             assert ledger2.entry_count == 2
             assert ledger2.has_approval(0) is True
             assert ledger2.has_approval(1) is True
+
+
+def test_env_key_mode_logs_critical_in_production(monkeypatch, caplog):
+    import backend.governance.approval_ledger as approval_ledger_module
+
+    monkeypatch.delenv("YGB_KEY_DIR", raising=False)
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "a" * 64)
+    monkeypatch.setenv("YGB_ENV", "production")
+
+    with caplog.at_level("CRITICAL"):
+        approval_ledger_module._log_ledger_key_mode_startup_status()
+
+    assert approval_ledger_module.get_ledger_key_mode() is approval_ledger_module.LedgerKeyMode.ENV_KEY
+    assert any(
+        record.levelname == "CRITICAL" and "ENV_KEY" in record.message
+        for record in caplog.records
+    )
+
+
+def test_governance_key_status_endpoint_returns_production_safe_payload(monkeypatch):
+    import backend.api.runtime_api as runtime_api
+
+    monkeypatch.delenv("YGB_KEY_DIR", raising=False)
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "a" * 64)
+    monkeypatch.setenv("YGB_ENV", "production")
+    monkeypatch.delenv("YGB_AUTHORITY_KEY", raising=False)
+
+    app = FastAPI()
+    app.include_router(runtime_api.router)
+    app.dependency_overrides[runtime_api.require_admin] = lambda: {
+        "sub": "admin-1",
+        "role": "admin",
+    }
+    client = TestClient(app)
+
+    response = client.get("/api/v1/governance/key-status")
+
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["status"] == "ERROR"
+    assert payload["production_mode"] is True
+    assert payload["key_mode"] == "ENV_KEY"
+    assert payload["using_env_fallback"] is True
+    assert payload["key_dir"] is None
+    assert payload["available"] is False
+    assert payload["available_key_ids"] == []
+    assert payload["audit_events"] == []
+    assert payload["error"] == "signing_key_unavailable"
+    assert "YGB_APPROVAL_SECRET" not in response.text
+    assert ("a" * 64) not in response.text

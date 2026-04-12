@@ -9,9 +9,11 @@ import pytest
 torch = pytest.importorskip("torch")
 
 import training_controller
-from impl_v1.phase49.moe import EXPERT_FIELDS, MoEBugClassifier, MoEConfig, NoisyTopKGate
+from impl_v1.phase49.moe import EXPERT_FIELDS, MoEClassifier, MoEConfig, NoisyTopKGate
 from scripts import device_agent
 from scripts.expert_task_queue import (
+    CLAIM_TIMEOUT_SECONDS,
+    ExpertTaskQueue,
     STATUS_COMPLETED,
     STATUS_FAILED,
     claim_next_expert,
@@ -29,26 +31,22 @@ def _get_expert_record(state: dict, expert_id: int) -> dict:
 
 def test_claim_next_expert_returns_none_when_all_experts_claimed(tmp_path):
     status_path = tmp_path / "experts_status.json"
-    initialize_status_file(status_path)
+    queue = ExpertTaskQueue(
+        status_path=status_path,
+        claim_timeout_seconds=CLAIM_TIMEOUT_SECONDS,
+    )
+    queue.initialize_status_file()
 
     claims = [
-        claim_next_expert(
+        queue.claim_next_expert(
             f"worker-{idx}",
-            status_path=status_path,
             claim_timeout_seconds=60.0,
         )
         for idx in range(len(EXPERT_FIELDS))
     ]
 
     assert all(claim is not None for claim in claims)
-    assert (
-        claim_next_expert(
-            "worker-extra",
-            status_path=status_path,
-            claim_timeout_seconds=60.0,
-        )
-        is None
-    )
+    assert queue.claim_next_expert("worker-extra", claim_timeout_seconds=60.0) is None
 
 
 def test_expired_claims_are_released_after_timeout(tmp_path):
@@ -148,6 +146,8 @@ def test_release_expert_updates_best_val_f1_only_when_improved(tmp_path):
 
     state = load_status(status_path)
     record = _get_expert_record(state, expert_id)
+    assert record["val_f1"] == pytest.approx(0.80)
+    assert record["checkpoint_path"] == "checkpoints/better.safetensors"
     assert record["best_val_f1"] == pytest.approx(0.80)
     assert record["best_checkpoint_path"] == "checkpoints/better.safetensors"
     assert record["last_val_f1"] == pytest.approx(0.40)
@@ -164,7 +164,7 @@ def test_moe_model_imports_and_runs_forward_without_error():
         gate_noise=0.0,
         aux_loss_coeff=0.01,
     )
-    model = MoEBugClassifier(config, input_dim=32, output_dim=2)
+    model = MoEClassifier(config, input_dim=32, output_dim=2)
 
     logits = model(torch.randn(4, 32))
 
@@ -216,7 +216,7 @@ def test_build_configured_model_switches_between_moe_and_legacy(monkeypatch):
         device=torch.device("cpu"),
         nn_module=torch.nn,
     )
-    assert moe_model.__class__.__name__ == "MoEBugClassifier"
+    assert moe_model.__class__.__name__ == "MoEClassifier"
 
     monkeypatch.setenv("YGB_USE_MOE", "false")
     legacy_model, _ = training_controller._build_configured_model(
@@ -231,51 +231,13 @@ def test_build_configured_model_switches_between_moe_and_legacy(monkeypatch):
 
 def test_train_single_expert_returns_required_result_fields(monkeypatch):
     field_name = EXPERT_FIELDS[0]
-    fake_dataset_state = training_controller.DatasetState(
-        hash="dataset-hash",
-        sample_count=12,
-        feature_dim=32,
-        num_classes=2,
-        entropy=1.0,
-        trainable=True,
-        manifest_path="secure_data/dataset_manifest.json",
-        enforcement_passed=True,
-        dataset_source="INGESTION_PIPELINE",
-        verification_passed=True,
-        verification_code="DATASET_VALIDATED",
-        verification_message="ok",
-    )
-    monkeypatch.setattr(
-        training_controller,
-        "phase2_dataset_finalization",
-        lambda config: (
-            fake_dataset_state,
-            np.empty((0, config.input_dim), dtype=np.float32),
-            np.empty((0,), dtype=np.int64),
-        ),
-    )
-    monkeypatch.setattr(training_controller, "_load_real_ingestion_dataset", lambda config: object())
-
-    samples = [
-        {
-            "endpoint": f"CVE-2024-00{i:02d}",
-            "parameters": "id=1",
-            "exploit_vector": "api rest injection",
-            "impact": "CVSS:8.0|HIGH",
-            "source_tag": "nvd",
-            "fingerprint": f"fp-{i}",
-            "reliability": 0.9,
-        }
-        for i in range(12)
-    ]
     features = np.random.default_rng(7).normal(size=(12, 32)).astype(np.float32)
     labels = np.asarray([0] * 6 + [1] * 6, dtype=np.int64)
     monkeypatch.setattr(
         training_controller,
-        "_materialize_ingestion_dataset",
-        lambda dataset: (samples, features, labels),
+        "_load_real_safetensors_expert_subset",
+        lambda requested_field_name: (features, labels, [f"{requested_field_name}_001"]),
     )
-    monkeypatch.setattr(training_controller, "_route_ingestion_sample", lambda sample: field_name)
 
     fake_result = training_controller.TrainingResult(
         epochs_completed=1,
@@ -364,3 +326,77 @@ def test_device_agent_marks_failed_on_exception(monkeypatch, tmp_path):
     assert released["status"] == STATUS_FAILED
     assert released["worker_id"] == "worker-x"
     assert "boom" in released["error"]
+
+
+def test_device_agent_stops_after_optional_max_experts(monkeypatch, tmp_path):
+    status_path = tmp_path / "experts_status.json"
+    field_name = EXPERT_FIELDS[0]
+    claims = iter(
+        [
+            {"expert_id": 0, "field_name": field_name},
+            {"expert_id": 1, "field_name": EXPERT_FIELDS[1]},
+        ]
+    )
+    released: list[dict[str, object]] = []
+
+    monkeypatch.setattr(
+        device_agent,
+        "claim_next_expert",
+        lambda worker_id, status_path, claim_timeout_seconds: next(claims),
+    )
+
+    fake_result = training_controller.TrainingResult(
+        epochs_completed=1,
+        final_loss=0.4,
+        final_accuracy=0.8,
+        best_accuracy=0.8,
+        cluster_sps=12.0,
+        merged_weight_hash="hash-1",
+        drift_aborted=False,
+        per_epoch=[{"epoch": 1, "val_f1": 0.8}],
+        val_accuracy=0.8,
+        val_f1=0.8,
+        val_precision=0.78,
+        val_recall=0.82,
+        best_val_loss=0.4,
+        checkpoint_path="checkpoints/expert_0_web_vulns_0.800.safetensors",
+        status="COMPLETED",
+    )
+    monkeypatch.setattr(device_agent, "train_single_expert", lambda expert_id, field_name: fake_result)
+
+    def _capture_release(
+        expert_id,
+        *,
+        status_path,
+        worker_id,
+        status,
+        val_f1=None,
+        val_precision=None,
+        val_recall=None,
+        checkpoint_path="",
+        error="",
+    ):
+        payload = {
+            "expert_id": expert_id,
+            "worker_id": worker_id,
+            "status": status,
+            "val_f1": val_f1,
+            "checkpoint_path": checkpoint_path,
+            "error": error,
+        }
+        released.append(payload)
+        return payload
+
+    monkeypatch.setattr(device_agent, "release_expert", _capture_release)
+
+    summary = device_agent.run_device_agent(
+        "worker-limit",
+        status_path=status_path,
+        max_experts=1,
+    )
+
+    assert summary["processed_experts"] == 1
+    assert summary["stopped_reason"] == "max_experts_reached"
+    assert len(summary["results"]) == 1
+    assert len(released) == 1
+    assert released[0]["status"] == STATUS_COMPLETED

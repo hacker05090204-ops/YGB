@@ -29,6 +29,10 @@ OUTPUT_ROOT = (PROJECT_ROOT / "training" / "features_safetensors").resolve()
 FEATURE_DIM = 256
 
 
+def _resolve_path(path: Path | str) -> Path:
+    return Path(path).resolve()
+
+
 def _read_json_payload(source_path: Path) -> dict[str, Any]:
     if not source_path.exists():
         raise FileNotFoundError(f"JSON feature file not found: {source_path}")
@@ -106,7 +110,7 @@ def extract_legacy_feature_payload(
 def iter_json_feature_files(source_roots: Sequence[Path] = SOURCE_ROOTS) -> list[Path]:
     candidates: set[Path] = set()
     for source_root in source_roots:
-        resolved_root = Path(source_root)
+        resolved_root = _resolve_path(source_root)
         if not resolved_root.exists():
             continue
         candidates.update(resolved_root.glob("learned_features_*.json"))
@@ -127,13 +131,13 @@ def migrate_paths(
     *,
     output_root: Path | str = OUTPUT_ROOT,
 ) -> dict[str, int]:
-    store = SafetensorsFeatureStore(Path(output_root))
+    store = SafetensorsFeatureStore(_resolve_path(output_root))
     migrated = 0
     skipped = 0
     total_samples = 0
 
     for raw_source_path in paths:
-        source_path = Path(raw_source_path)
+        source_path = _resolve_path(raw_source_path)
         if not source_path.exists():
             logger.warning("Skipping missing JSON feature file: %s", source_path)
             skipped += 1
@@ -207,7 +211,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     args = build_parser().parse_args(argv)
-    output_root = Path(args.output_root)
+    output_root = _resolve_path(args.output_root)
 
     if args.paths:
         result = migrate_paths(args.paths, output_root=output_root)

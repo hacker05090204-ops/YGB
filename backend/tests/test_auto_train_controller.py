@@ -398,6 +398,38 @@ def test_controller_passes_reward_weight_lookup_to_trainer(tmp_path, monkeypatch
     assert trainer.sample_weights["sample_0000"] == pytest.approx(2.0)
 
 
+def test_controller_does_not_invent_weights_without_reward_signals(tmp_path, monkeypatch):
+    class _WeightCapturingTrainer(_FakeTrainer):
+        def __init__(self, root: Path, *, snapshot: AccuracySnapshot) -> None:
+            super().__init__(root, snapshot=snapshot)
+            self.sample_weights = "unset"
+
+        def run_incremental_epoch(self, sample_weights=None):
+            self.sample_weights = sample_weights
+            return super().run_incremental_epoch()
+
+    feature_root = tmp_path / "training" / "features_safetensors"
+    _write_feature_shards(feature_root, 120, positive_ratio=0.5)
+    reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
+    collector = RLFeedbackCollector(reward_buffer=reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_reward_buffer", lambda: reward_buffer)
+    monkeypatch.setattr(auto_train_controller_module, "get_rl_collector", lambda: collector)
+    trainer = _WeightCapturingTrainer(tmp_path, snapshot=_passing_snapshot())
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            min_new_samples=100,
+        ),
+        trainer=trainer,
+    )
+
+    run = controller.check_and_train()
+
+    assert run.status == "COMPLETED"
+    assert trainer.sample_weights is None
+
+
 def test_controller_get_rl_stats_returns_correct_counts(tmp_path, monkeypatch):
     reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
     reward_buffer.add(

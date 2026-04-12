@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import logging
 
+import numpy as np
 import pytest
 
 torch = pytest.importorskip("torch")
 
+import training_controller
 from impl_v1.phase49.governors import g37_pytorch_backend
 from training_controller import TrainingControllerConfig
 from training_core.execution_impl import (
+    DATA_SPLIT_SEED,
     EARLY_STOPPING_PATIENCE,
     LABEL_SMOOTHING,
     MODEL_DROPOUT,
@@ -17,6 +20,7 @@ from training_core.execution_impl import (
     _create_training_stack,
     _log_overfit_status,
     _should_save_best_checkpoint,
+    _split_train_validation_test,
     _update_val_loss_plateau,
 )
 
@@ -122,6 +126,49 @@ def test_training_stack_enforces_label_smoothing_weight_decay_and_capacity(tmp_p
     ]
     assert dropout_modules
     assert all(module.p == pytest.approx(MODEL_DROPOUT) for module in dropout_modules)
+
+
+def test_split_train_validation_test_is_deterministic_and_uses_exact_global_sizes():
+    X = np.arange(20, dtype=np.float32).reshape(20, 1)
+    y = np.asarray([0] * 10 + [1] * 10, dtype=np.int64)
+
+    first = _split_train_validation_test(X, y, seed=DATA_SPLIT_SEED)
+    second = _split_train_validation_test(X, y, seed=DATA_SPLIT_SEED)
+
+    assert [part.shape[0] for part in first[::2]] == [14, 3, 3]
+    for first_part, second_part in zip(first, second):
+        assert np.array_equal(first_part, second_part)
+
+    all_feature_ids = np.concatenate([first[0].ravel(), first[2].ravel(), first[4].ravel()])
+    assert sorted(all_feature_ids.tolist()) == list(range(20))
+    assert set(first[0].ravel().tolist()).isdisjoint(first[2].ravel().tolist())
+    assert set(first[0].ravel().tolist()).isdisjoint(first[4].ravel().tolist())
+    assert set(first[2].ravel().tolist()).isdisjoint(first[4].ravel().tolist())
+
+
+def test_active_moe_classifier_hidden_dim_reduces_by_half_for_small_datasets(monkeypatch):
+    monkeypatch.setenv("YGB_USE_MOE", "true")
+    config = TrainingControllerConfig(input_dim=32, hidden_dim=512, num_classes=2)
+
+    small_model, small_hidden_dim = training_controller._build_configured_model(
+        config=config,
+        total_samples=9_999,
+        effective_hidden_dim=256,
+        device=torch.device("cpu"),
+        nn_module=torch.nn,
+    )
+    large_model, large_hidden_dim = training_controller._build_configured_model(
+        config=config,
+        total_samples=10_000,
+        effective_hidden_dim=512,
+        device=torch.device("cpu"),
+        nn_module=torch.nn,
+    )
+
+    assert small_model.config.d_model == 128
+    assert small_hidden_dim == 128
+    assert large_model.config.d_model == 256
+    assert large_hidden_dim == 256
 
 
 def test_early_stopping_triggers_on_validation_loss_plateau():

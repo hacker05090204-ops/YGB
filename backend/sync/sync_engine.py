@@ -50,12 +50,28 @@ from backend.sync.chunker import (
 logger = logging.getLogger("ygb.sync")
 _SYNC_STOP_EVENT = threading.Event()
 SYNC_STATUS_PATH = Path("data/sync_status.json")
+SYNC_CONFIG_ENV_VARS = ("YGB_SYNC_PEERS", "YGB_PEER_NODES")
 
 
 class SyncMode(str, Enum):
     STANDALONE = "STANDALONE"
     PEER_SYNC = "PEER_SYNC"
     DEGRADED = "DEGRADED"
+
+
+def is_sync_configured() -> bool:
+    return any(os.getenv(name, "").strip() for name in SYNC_CONFIG_ENV_VARS)
+
+
+def _hash_local_sync_file(file_path: Path) -> str:
+    digest = hashlib.sha256()
+    with file_path.open("rb") as handle:
+        while True:
+            chunk = handle.read(1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 @dataclass
@@ -107,38 +123,82 @@ class LocalSyncIndex:
     SCAN_DIRS = [
         "data",
         "checkpoints",
-        "secure_data",
         "training/features_safetensors",
     ]
     INDEX_PATH = Path("data/local_sync_index.json")
+    EXCLUDED_SUBTREES = {
+        "data/raw",
+        "data/normalized",
+    }
 
     def __init__(self):
         self._records: dict[str, LocalFileRecord] = {}
+        self._lock = threading.Lock()
         self._load()
 
+    @classmethod
+    def _iter_files(cls, directory: Path):
+        excluded_roots = {
+            Path(path).resolve() for path in cls.EXCLUDED_SUBTREES
+        }
+        for root, dirnames, filenames in os.walk(directory):
+            root_path = Path(root)
+            try:
+                resolved_root = root_path.resolve()
+            except OSError as exc:
+                logger.warning("LocalSyncIndex: cannot resolve %s: %s", root_path, exc)
+                continue
+
+            if resolved_root in excluded_roots:
+                dirnames[:] = []
+                continue
+
+            filtered_dirnames: list[str] = []
+            for dirname in dirnames:
+                candidate = root_path / dirname
+                try:
+                    if candidate.resolve() in excluded_roots:
+                        continue
+                except OSError as exc:
+                    logger.warning("LocalSyncIndex: cannot resolve %s: %s", candidate, exc)
+                    continue
+                filtered_dirnames.append(dirname)
+            dirnames[:] = filtered_dirnames
+
+            for filename in filenames:
+                yield root_path / filename
+
     def refresh(self):
-        seen_keys: set[str] = set()
+        with self._lock:
+            existing_records = dict(self._records)
+
+        refreshed_records: dict[str, LocalFileRecord] = {}
+        index_path = self.INDEX_PATH.resolve()
         for dir_name in self.SCAN_DIRS:
             directory = Path(dir_name)
             if not directory.exists():
                 continue
-            for file_path in directory.rglob("*"):
-                if not file_path.is_file():
+            for file_path in self._iter_files(directory):
+                try:
+                    if file_path.resolve() == index_path:
+                        continue
+                except OSError as exc:
+                    logger.warning("LocalSyncIndex: cannot resolve %s: %s", file_path, exc)
                     continue
                 key = str(file_path).replace("\\", "/")
-                seen_keys.add(key)
                 try:
                     stat_result = file_path.stat()
                 except OSError as exc:
                     logger.warning("LocalSyncIndex: cannot stat %s: %s", file_path, exc)
                     continue
-                mtime = str(stat_result.st_mtime)
-                existing = self._records.get(key)
+                mtime = str(stat_result.st_mtime_ns)
+                existing = existing_records.get(key)
                 if existing and existing.indexed_at == mtime:
+                    refreshed_records[key] = existing
                     continue
                 try:
-                    sha = hashlib.sha256(file_path.read_bytes()).hexdigest()
-                    self._records[key] = LocalFileRecord(
+                    sha = _hash_local_sync_file(file_path)
+                    refreshed_records[key] = LocalFileRecord(
                         path=key,
                         sha256=sha,
                         size_bytes=int(stat_result.st_size),
@@ -146,23 +206,29 @@ class LocalSyncIndex:
                     )
                 except OSError as exc:
                     logger.warning("LocalSyncIndex: cannot index %s: %s", file_path, exc)
-        stale_keys = [key for key in self._records if key not in seen_keys]
-        for key in stale_keys:
-            self._records.pop(key, None)
+
+        with self._lock:
+            self._records = refreshed_records
         self._save()
 
     def get_file_count(self) -> int:
-        return len(self._records)
+        with self._lock:
+            return len(self._records)
 
     def get_total_bytes(self) -> int:
-        return sum(record.size_bytes for record in self._records.values())
+        with self._lock:
+            return sum(record.size_bytes for record in self._records.values())
 
     def _save(self):
         self.INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
-        self.INDEX_PATH.write_text(
-            json.dumps({key: value.__dict__ for key, value in self._records.items()}, indent=2),
+        with self._lock:
+            payload = {key: value.__dict__ for key, value in self._records.items()}
+        temp_path = self.INDEX_PATH.with_suffix(".json.tmp")
+        temp_path.write_text(
+            json.dumps(payload, indent=2),
             encoding="utf-8",
         )
+        temp_path.replace(self.INDEX_PATH)
 
     def _load(self):
         if not self.INDEX_PATH.exists():
@@ -172,7 +238,8 @@ class LocalSyncIndex:
         except (OSError, json.JSONDecodeError):
             logger.warning("LocalSyncIndex: failed to load persisted index", exc_info=True)
             return
-        self._records = {key: LocalFileRecord(**value) for key, value in data.items()}
+        with self._lock:
+            self._records = {key: LocalFileRecord(**value) for key, value in data.items()}
 
 
 _sync_index = LocalSyncIndex()
@@ -183,13 +250,28 @@ def get_local_sync_index() -> LocalSyncIndex:
 
 
 def get_sync_mode() -> SyncMode:
-    peers_env = os.getenv("YGB_SYNC_PEERS", "").strip() or os.getenv("YGB_PEER_NODES", "").strip()
-    if not peers_env:
+    if not is_sync_configured():
         return SyncMode.STANDALONE
-    from backend.sync.peer_transport import PeerStatus, get_peer_statuses
+    from backend.sync.peer_transport import PeerStatus, get_peer_statuses, get_peers
+
+    try:
+        peers = get_peers()
+    except Exception as exc:
+        logger.warning("Sync mode peer discovery failed: %s", exc, exc_info=True)
+        peers = []
+
+    if peers and any(
+        str(peer.get("peer_status", "")).upper() == PeerStatus.REACHABLE.value
+        or str(peer.get("status", "")).upper() == "ONLINE"
+        for peer in peers
+    ):
+        return SyncMode.PEER_SYNC
 
     statuses = get_peer_statuses()
-    if any(status == PeerStatus.REACHABLE for status in statuses.values()):
+    if any(
+        str(getattr(status, "value", status)).upper() == PeerStatus.REACHABLE.value
+        for status in statuses.values()
+    ):
         return SyncMode.PEER_SYNC
     return SyncMode.DEGRADED
 
@@ -217,6 +299,8 @@ def is_sync_stale(
     resolved_mode = mode or get_sync_mode()
     if resolved_mode == SyncMode.STANDALONE:
         return False
+    if resolved_mode == SyncMode.DEGRADED:
+        return True
     completed_at = _parse_iso_datetime(last_completed_at)
     if completed_at is None:
         last_cycle = get_last_sync_cycle()
@@ -236,7 +320,10 @@ def sync_status_message(mode: SyncMode, *, peers_attempted: int = 0, peers_succe
     if mode == SyncMode.STANDALONE:
         return "Single-device mode. Set YGB_SYNC_PEERS for mesh sync."
     if mode == SyncMode.PEER_SYNC:
-        return f"Mesh sync active. Reachable peers: {peers_succeeded}/{max(peers_attempted, peers_succeeded)}."
+        total_peers = max(peers_attempted, peers_succeeded)
+        if total_peers <= 0:
+            return "Mesh sync active. Peer replication available."
+        return f"Mesh sync active. Reachable peers: {peers_succeeded}/{total_peers}."
     return "Mesh sync configured but peers are unreachable. Running in degraded mode."
 
 
@@ -473,6 +560,7 @@ def sync_cycle() -> SyncCycleResult:
     _init_dirs()
     _sync_index.refresh()
     sync_mode = get_sync_mode()
+    configured = is_sync_configured()
     started_dt = datetime.now(timezone.utc)
     cycle_id = f"{DEVICE_ID}-{started_dt.strftime('%Y%m%dT%H%M%S%fZ')}"
     logger.info("═══ Sync cycle start [%s] cycle_id=%s ═══", DEVICE_ID, cycle_id)
@@ -541,6 +629,7 @@ def sync_cycle() -> SyncCycleResult:
             "last_sync_time": result.completed_at,
             "peers_connected": result.peers_succeeded,
             "files_synced_last_cycle": result.files_changed,
+            "configured": configured,
             "stale": is_sync_stale(mode=sync_mode, last_completed_at=result.completed_at),
             "message": sync_status_message(
                 sync_mode,
@@ -687,6 +776,7 @@ def print_status():
     status = {
         "device_id": manifest.device_id,
         "mode": mode.value,
+        "configured": is_sync_configured(),
         "vector_clock": manifest.vector_clock,
         "file_count": manifest.file_count(),
         "local_files": _sync_index.get_file_count(),

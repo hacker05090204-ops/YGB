@@ -11,6 +11,7 @@ import backend.api.runtime_api as runtime_api
 import backend.startup.pipeline_bootstrap as pipeline_bootstrap_module
 from backend.reporting.report_engine import ReportEngine
 from backend.tasks.industrial_agent import AutonomousWorkflowOrchestrator
+from backend.training.incremental_trainer import AccuracySnapshot
 
 
 def test_workflow_orchestrator_runs_cycle_and_persists_status(tmp_path):
@@ -78,10 +79,11 @@ def test_workflow_orchestrator_runs_cycle_and_persists_status(tmp_path):
 
     result = orchestrator.run_cycle(trigger="manual")
 
-    assert result.status == "COMPLETED"
+    assert result.status == "PARTIAL"
     assert result.ingest_cycle_id == "grabber-001"
     assert result.bridge_batch_id == "CBI-000001"
     assert result.training_run_id == "train-001"
+    assert result.training_promoted is False
     assert result.report_generated is True
     assert result.report_findings == 2
     assert result.report_path is not None
@@ -92,9 +94,127 @@ def test_workflow_orchestrator_runs_cycle_and_persists_status(tmp_path):
 
     assert status_payload["run_in_progress"] is False
     assert status_payload["last_cycle"]["cycle_id"] == result.cycle_id
+    assert status_payload["last_cycle"]["status"] == "PARTIAL"
     assert status_payload["history_size"] == 1
     assert len(history_payload) == 1
     assert history_payload[0]["report_generated"] is True
+
+
+def test_workflow_orchestrator_generates_promotion_report_on_successful_promotion(tmp_path):
+    class _FakeGrabber:
+        def run_cycle(self):
+            return SimpleNamespace(
+                cycle_id="grabber-002",
+                sources_attempted=3,
+                sources_succeeded=3,
+                samples_fetched=5,
+                samples_accepted=4,
+                samples_rejected=1,
+                bridge_published=4,
+                errors=[],
+            )
+
+    class _FakeController:
+        def __init__(self):
+            self.trainer = SimpleNamespace(
+                get_accuracy_history=lambda: [
+                    AccuracySnapshot(
+                        epoch=7,
+                        accuracy=0.9421,
+                        precision=0.9142,
+                        recall=0.9011,
+                        f1=0.9076,
+                        auc_roc=0.9614,
+                        taken_at="2026-04-10T00:00:00+00:00",
+                    )
+                ]
+            )
+
+        def check_and_train(self, *, trigger="manual"):
+            return SimpleNamespace(
+                run_id="train-002",
+                status="COMPLETED",
+                promoted=True,
+                trigger=trigger,
+            )
+
+    orchestrator = AutonomousWorkflowOrchestrator(
+        root=tmp_path / "workflow-promotion",
+        autograbber=_FakeGrabber(),
+        auto_train_controller=_FakeController(),
+        report_engine=ReportEngine(output_dir=tmp_path / "reports"),
+        worker_status_loader=lambda: {
+            "bridge_count": 4,
+            "bridge_verified_count": 4,
+            "last_batch": {
+                "batch_id": "CBI-000002",
+                "ingested": 4,
+                "mode": "autograbber",
+            },
+        },
+        bridge_samples_loader=lambda max_samples=0: [],
+    )
+
+    result = orchestrator.run_cycle(trigger="scheduled")
+
+    assert result.status == "FULL_CYCLE"
+    assert result.training_run_id == "train-002"
+    assert result.training_promoted is True
+    assert result.report_generated is True
+    assert result.report_findings == 1
+    assert result.report_path is not None
+    assert Path(result.report_path).exists()
+
+    status_payload = json.loads(
+        (tmp_path / "workflow-promotion" / "status.json").read_text(encoding="utf-8")
+    )
+
+    assert status_payload["last_cycle"]["status"] == "FULL_CYCLE"
+    assert status_payload["last_cycle"]["report_generated"] is True
+
+
+def test_workflow_orchestrator_marks_cycle_skipped_when_no_work_progresses(tmp_path):
+    class _FakeGrabber:
+        def run_cycle(self):
+            return SimpleNamespace(
+                cycle_id="grabber-003",
+                sources_attempted=1,
+                sources_succeeded=1,
+                samples_fetched=0,
+                samples_accepted=0,
+                samples_rejected=0,
+                bridge_published=0,
+                errors=[],
+            )
+
+    class _FakeController:
+        def check_and_train(self, *, trigger="manual"):
+            return SimpleNamespace(
+                run_id="train-003",
+                status="SKIPPED",
+                promoted=False,
+                trigger=trigger,
+            )
+
+    orchestrator = AutonomousWorkflowOrchestrator(
+        root=tmp_path / "workflow-skipped",
+        autograbber=_FakeGrabber(),
+        auto_train_controller=_FakeController(),
+        report_engine=ReportEngine(output_dir=tmp_path / "reports"),
+        worker_status_loader=lambda: {
+            "bridge_count": 0,
+            "bridge_verified_count": 0,
+            "last_batch": None,
+        },
+        bridge_samples_loader=lambda max_samples=0: [],
+    )
+
+    result = orchestrator.run_cycle(trigger="manual")
+
+    assert result.status == "SKIPPED"
+    assert result.training_status == "SKIPPED"
+    assert result.report_generated is False
+    assert result.report_reason == "no_published_samples"
 
 
 def test_workflow_runtime_api_endpoints_return_expected_payloads(monkeypatch):
@@ -107,7 +227,7 @@ def test_workflow_runtime_api_endpoints_return_expected_payloads(monkeypatch):
                 "history_size": 1,
                 "last_cycle": {
                     "cycle_id": "WFC-EXAMPLE",
-                    "status": "COMPLETED",
+                    "status": "FULL_CYCLE",
                     "report_generated": True,
                 },
             }
@@ -116,7 +236,7 @@ def test_workflow_runtime_api_endpoints_return_expected_payloads(monkeypatch):
             return [
                 {
                     "cycle_id": "WFC-EXAMPLE",
-                    "status": "COMPLETED",
+                    "status": "FULL_CYCLE",
                     "report_generated": True,
                 }
             ][: limit or 1]
@@ -151,7 +271,7 @@ def test_workflow_runtime_api_endpoints_return_expected_payloads(monkeypatch):
         "history_size": 1,
         "last_cycle": {
             "cycle_id": "WFC-EXAMPLE",
-            "status": "COMPLETED",
+            "status": "FULL_CYCLE",
             "report_generated": True,
         },
     }
@@ -161,7 +281,7 @@ def test_workflow_runtime_api_endpoints_return_expected_payloads(monkeypatch):
         "history": [
             {
                 "cycle_id": "WFC-EXAMPLE",
-                "status": "COMPLETED",
+                "status": "FULL_CYCLE",
                 "report_generated": True,
             }
         ],

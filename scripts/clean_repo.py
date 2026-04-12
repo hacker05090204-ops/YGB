@@ -65,6 +65,8 @@ class RepoClean:
         ".tmp_hdd_drive/**/*.meta",
         ".tmp_hdd_drive/**/*.log",
         "*.log",
+        "*.safetensors.tmp",
+        "*.descriptions.jsonl.tmp",
     )
 
     KEEP_ALWAYS = (
@@ -81,6 +83,7 @@ class RepoClean:
     )
 
     LOG_RETENTION_DAYS = 7
+    TEMP_RETENTION_DAYS = 1
     INTERNAL_SKIP = {".git"}
     OUT_OF_SCOPE_ROOTS = {"frontend"}
 
@@ -171,6 +174,7 @@ class RepoClean:
         result: CleanResult,
     ) -> CleanCandidate | None:
         suffix = entry.suffix.lower()
+        entry_name = entry.name.lower()
 
         if suffix == ".pyc":
             return CleanCandidate(relative_path=relative_path, rule=self.REMOVE_PATTERNS[1], is_dir=False)
@@ -193,6 +197,28 @@ class RepoClean:
             return CleanCandidate(
                 relative_path=relative_path,
                 rule=rule,
+                is_dir=False,
+                age_days=age_days,
+            )
+
+        if entry_name.endswith(".safetensors.tmp"):
+            age_days = self._get_age_days(entry, result)
+            if age_days is None or age_days < self.TEMP_RETENTION_DAYS:
+                return None
+            return CleanCandidate(
+                relative_path=relative_path,
+                rule=self.REMOVE_PATTERNS[12],
+                is_dir=False,
+                age_days=age_days,
+            )
+
+        if entry_name.endswith(".descriptions.jsonl.tmp"):
+            age_days = self._get_age_days(entry, result)
+            if age_days is None or age_days < self.TEMP_RETENTION_DAYS:
+                return None
+            return CleanCandidate(
+                relative_path=relative_path,
+                rule=self.REMOVE_PATTERNS[13],
                 is_dir=False,
                 age_days=age_days,
             )
@@ -277,6 +303,7 @@ class RepoClean:
         print(f"Candidate directories: {result.directory_candidates}")
         print(f"Candidate files: {result.file_candidates}")
         print(f"Eligible log files (>= {self.LOG_RETENTION_DAYS} days): {result.eligible_log_candidates}")
+        print(f"Eligible temp sidecars (>= {self.TEMP_RETENTION_DAYS} day): {self._eligible_temp_candidates(result)}")
 
         if include_candidates and result.candidates:
             print("Candidates:")
@@ -304,6 +331,13 @@ class RepoClean:
             print("Execution errors:")
             for error in result.errors:
                 print(f"  - {error}")
+
+    def _eligible_temp_candidates(self, result: CleanResult) -> int:
+        return sum(
+            1
+            for candidate in result.candidates
+            if candidate.rule in {self.REMOVE_PATTERNS[12], self.REMOVE_PATTERNS[13]}
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:

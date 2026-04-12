@@ -123,18 +123,18 @@ class NVDScraper(BaseScraper):
             if len(samples) >= max_items:
                 break
             if not isinstance(entry, dict):
-                logger.warning("nvd_entry_skipped reason=not_object")
+                self._log_partial_failure(reason="entry_not_object")
                 continue
             cve_payload = entry.get("cve", {})
             if not isinstance(cve_payload, dict):
-                logger.warning("nvd_entry_skipped reason=missing_cve_object")
+                self._log_partial_failure(reason="missing_cve_object")
                 continue
             cve_id = str(cve_payload.get("id", "")).strip()
             description = self._extract_description(cve_payload)
             if not cve_id or not description:
-                logger.debug(
-                    "nvd_entry_skipped reason=missing_required_fields cve_id=%s",
-                    cve_id,
+                self._log_partial_failure(
+                    reason="missing_required_fields",
+                    cve_id=cve_id or "<missing-cve-id>",
                 )
                 continue
             samples.append(
@@ -155,9 +155,7 @@ class NVDScraper(BaseScraper):
             )
         return samples
 
-    def fetch(self, max_items: int) -> list[ScrapedSample]:
-        if max_items <= 0:
-            return []
+    def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
         raw_bytes = self._get_bytes(self.RECENT_FEED_URL)
         try:
             decoded_bytes = gzip.decompress(raw_bytes)

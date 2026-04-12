@@ -715,31 +715,32 @@ def get_training_expert_status() -> dict[str, object]:
         (int(item["expert_id"]), str(item["field_name"])): item
         for item in checkpoint_manager.get_all_expert_status()
     }
+    queue_status_by_expert = {
+        (int(item.get("expert_id", 0)), str(item.get("field_name", "") or "")): item
+        for item in queue_state.get("experts", [])
+        if isinstance(item, dict)
+    }
 
     combined_status = []
-    for record in queue_state.get("experts", []):
-        expert_id = int(record.get("expert_id", 0))
-        field_name = str(record.get("field_name", "") or "")
-        checkpoint_status = checkpoint_status_by_expert.get(
-            (expert_id, field_name),
-            {
-                "has_checkpoint": False,
-                "best_val_f1": None,
-            },
-        )
-        queue_best_val_f1 = record.get("best_val_f1")
+    for (expert_id, field_name), checkpoint_status in sorted(
+        checkpoint_status_by_expert.items(),
+        key=lambda item: item[0][0],
+    ):
+        queue_record = queue_status_by_expert.get((expert_id, field_name), {})
+        queue_best_val_f1 = queue_record.get("best_val_f1")
+        resolved_best_val_f1 = checkpoint_status.get("best_val_f1")
+        if resolved_best_val_f1 is None:
+            resolved_best_val_f1 = queue_best_val_f1
+        if resolved_best_val_f1 is None:
+            resolved_best_val_f1 = 0.0
         combined_status.append(
             {
                 "expert_id": expert_id,
                 "field_name": field_name,
-                "queue_status": str(record.get("status", "") or ""),
+                "queue_status": str(queue_record.get("status", "AVAILABLE") or "AVAILABLE"),
                 "has_checkpoint": bool(checkpoint_status.get("has_checkpoint", False)),
-                "best_val_f1": (
-                    checkpoint_status.get("best_val_f1")
-                    if checkpoint_status.get("best_val_f1") is not None
-                    else queue_best_val_f1
-                ),
-                "claimed_by": record.get("claimed_by"),
+                "best_val_f1": float(resolved_best_val_f1),
+                "claimed_by": queue_record.get("claimed_by"),
             }
         )
 
@@ -792,6 +793,17 @@ def get_governance_key_status() -> dict[str, object]:
     return {
         "status": "ok",
         **get_key_manager_status(run_integrity=True),
+    }
+
+
+def get_hallucination_stats() -> dict[str, object]:
+    from backend.cve.anti_hallucination import get_anti_hallucination_validator
+
+    return {
+        "status": "ok",
+        "hallucination_stats": (
+            get_anti_hallucination_validator().get_hallucination_stats()
+        ),
     }
 
 
@@ -857,6 +869,11 @@ async def auth_status(user=Depends(require_auth)) -> dict[str, object]:
 @router.get("/api/v1/governance/key-status")
 async def governance_key_status(user=Depends(require_admin)) -> dict[str, object]:
     return get_governance_key_status()
+
+
+@router.get("/api/v1/intelligence/hallucination-stats")
+async def hallucination_stats(user=Depends(require_auth)) -> dict[str, object]:
+    return get_hallucination_stats()
 
 
 # =========================================================================

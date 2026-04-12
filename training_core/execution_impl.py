@@ -65,6 +65,55 @@ def _split_counts(total: int) -> Tuple[int, int, int]:
     return counts[0], counts[1], counts[2]
 
 
+def _allocate_stratified_counts(
+    class_counts: Dict[int, int],
+    *,
+    target_total: int,
+) -> Dict[int, int]:
+    total_available = int(sum(int(count) for count in class_counts.values()))
+    if target_total < 0 or target_total > total_available:
+        raise RuntimeError("Invalid stratified split target")
+    if target_total == 0:
+        return {int(label): 0 for label in class_counts}
+
+    exact_allocations = {
+        int(label): (float(count) * float(target_total) / float(total_available))
+        for label, count in class_counts.items()
+    }
+    allocated = {
+        int(label): min(int(class_counts[int(label)]), int(math.floor(exact_value)))
+        for label, exact_value in exact_allocations.items()
+    }
+
+    remaining = int(target_total - sum(allocated.values()))
+    if remaining <= 0:
+        return allocated
+
+    order = sorted(
+        exact_allocations,
+        key=lambda label: (
+            exact_allocations[int(label)] - allocated[int(label)],
+            int(class_counts[int(label)]),
+            -int(label),
+        ),
+        reverse=True,
+    )
+    while remaining > 0:
+        progressed = False
+        for label in order:
+            label = int(label)
+            if allocated[label] >= int(class_counts[label]):
+                continue
+            allocated[label] += 1
+            remaining -= 1
+            progressed = True
+            if remaining == 0:
+                break
+        if not progressed:
+            raise RuntimeError("Unable to complete stratified split allocation")
+    return allocated
+
+
 def _split_train_validation_test(
     X: np.ndarray,
     y: np.ndarray,
@@ -76,15 +125,35 @@ def _split_train_validation_test(
     val_indices: List[int] = []
     test_indices: List[int] = []
 
+    label_buckets: Dict[int, np.ndarray] = {}
+    class_counts: Dict[int, int] = {}
     for label in np.unique(y):
-        label_indices = np.flatnonzero(y == label)
+        label_value = int(label)
+        label_indices = np.flatnonzero(y == label_value)
         rng.shuffle(label_indices)
-        train_count, val_count, test_count = _split_counts(int(label_indices.size))
+        label_buckets[label_value] = label_indices
+        class_counts[label_value] = int(label_indices.size)
+
+    target_train, target_val, target_test = _split_counts(int(y.size))
+    test_counts = _allocate_stratified_counts(class_counts, target_total=target_test)
+    remaining_counts = {
+        label: int(class_counts[label] - test_counts[label]) for label in class_counts
+    }
+    val_counts = _allocate_stratified_counts(remaining_counts, target_total=target_val)
+    train_counts = {
+        label: int(remaining_counts[label] - val_counts[label]) for label in remaining_counts
+    }
+
+    for label, label_indices in label_buckets.items():
+        train_count = int(train_counts[label])
+        val_count = int(val_counts[label])
+        test_count = int(test_counts[label])
         train_end = train_count
         val_end = train_end + val_count
+        test_end = val_end + test_count
         train_indices.extend(label_indices[:train_end].tolist())
         val_indices.extend(label_indices[train_end:val_end].tolist())
-        test_indices.extend(label_indices[val_end : val_end + test_count].tolist())
+        test_indices.extend(label_indices[val_end:test_end].tolist())
 
     for bucket in (train_indices, val_indices, test_indices):
         rng.shuffle(bucket)
@@ -425,6 +494,7 @@ def run_phase3_training_execution(
     logger.info(f"  val_class_distribution: {_class_distribution(val_y)}")
     logger.info(f"  test_class_distribution: {_class_distribution(test_y)}")
     logger.info("  test split reserved and never used during training")
+    logger.info("  validation split drives early stopping and checkpoint selection")
 
     model, optimizer, criterion, effective_hidden_dim = _create_training_stack(
         config,

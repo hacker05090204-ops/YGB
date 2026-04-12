@@ -211,23 +211,57 @@ class SampleQualityScorer:
         except (TypeError, ValueError):
             return None
 
+    @staticmethod
+    def _coerce_cvss_v2_score(payload: dict[str, object]) -> float | None:
+        """Extract CVSS v2 score as fallback."""
+        raw_score = payload.get("cvss_v2_score") or payload.get("cvssV2Score")
+        if raw_score in (None, ""):
+            return None
+        try:
+            return float(raw_score)
+        except (TypeError, ValueError):
+            return None
+
     @classmethod
     def _normalize_severity(cls, payload: dict[str, object]) -> str:
         severity = str(payload.get("severity", "") or "").strip().upper()
         if severity and severity != "UNKNOWN":
             return severity
 
+        # Try CVSS v3 score first
         cvss_score = cls._coerce_cvss_score(payload)
         if cvss_score is not None:
-            if cvss_score >= 9.0:
-                return "CRITICAL"
-            if cvss_score >= 7.0:
-                return "HIGH"
-            if cvss_score >= 4.0:
-                return "MEDIUM"
-            return "LOW"
+            derived_severity = cls._derive_severity_from_cvss(cvss_score)
+            logger.info(
+                "severity derived from CVSS score %.1f → %s",
+                cvss_score,
+                derived_severity,
+            )
+            return derived_severity
+
+        # Fallback to CVSS v2 score
+        cvss_v2_score = cls._coerce_cvss_v2_score(payload)
+        if cvss_v2_score is not None:
+            derived_severity = cls._derive_severity_from_cvss(cvss_v2_score)
+            logger.info(
+                "severity derived from CVSS score %.1f → %s",
+                cvss_v2_score,
+                derived_severity,
+            )
+            return derived_severity
 
         return "INFORMATIONAL"
+
+    @staticmethod
+    def _derive_severity_from_cvss(cvss_score: float) -> str:
+        """Derive severity from CVSS score."""
+        if cvss_score >= 9.0:
+            return "CRITICAL"
+        if cvss_score >= 7.0:
+            return "HIGH"
+        if cvss_score >= 4.0:
+            return "MEDIUM"
+        return "LOW"
 
     def score(self, sample: dict[str, object] | IngestedSample) -> float:
         payload = self._coerce_sample(sample)

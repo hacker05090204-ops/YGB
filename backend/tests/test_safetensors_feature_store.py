@@ -80,6 +80,48 @@ def test_safetensors_feature_store_atomic_write_uses_tmp_then_rename(tmp_path, m
     ]
 
 
+def test_safetensors_feature_store_description_sidecar_roundtrip(tmp_path):
+    store = SafetensorsFeatureStore(tmp_path / "feature_store")
+    store.write(
+        "with_descriptions",
+        np.linspace(0.1, 1.1, 256, dtype=np.float32).reshape(1, 256),
+        np.asarray([1], dtype=np.int64),
+        metadata={"sample_cve_id": "CVE-2026-8001", "sample_severity": "HIGH"},
+    )
+    descriptions = [
+        {
+            "row_id": "row-1",
+            "sample_sha256": "row-1",
+            "cve_id": "CVE-2026-8001",
+            "severity": "HIGH",
+            "raw_text": "A real CVE description recorded beside the shard.",
+        }
+    ]
+
+    store.write_descriptions("with_descriptions", descriptions)
+
+    assert store.read_descriptions("with_descriptions") == descriptions
+
+
+def test_delete_shard_removes_description_sidecar(tmp_path):
+    store = SafetensorsFeatureStore(tmp_path / "feature_store")
+    store.write(
+        "deletable",
+        np.linspace(0.2, 1.2, 256, dtype=np.float32).reshape(1, 256),
+        np.asarray([0], dtype=np.int64),
+    )
+    store.write_descriptions(
+        "deletable",
+        [{"row_id": "delete-row", "raw_text": "Delete me truthfully."}],
+    )
+
+    deleted = store.delete_shard("deletable")
+
+    assert deleted is True
+    assert store.shard_exists("deletable") is False
+    assert store.read_descriptions("deletable") == []
+
+
 def test_migration_script_runs_against_real_repository_json_files(tmp_path):
     candidate_paths = []
     for source_root in (Path("training/learned_features"), Path("reports/g38_training")):

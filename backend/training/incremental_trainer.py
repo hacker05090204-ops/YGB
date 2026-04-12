@@ -28,7 +28,9 @@ from backend.ingestion.normalizer import SampleQualityScorer
 from backend.ingestion.models import IngestedSample
 from backend.observability.metrics import metrics_registry
 from backend.training.adaptive_learner import get_adaptive_learner
-from backend.training.feature_extractor import extract
+from backend.training.class_balancer import ClassBalanceReport, ClassBalancer
+from backend.training.feature_extractor import CVEFeatureEngineer, extract
+from backend.training.metrics_tracker import MetricsReport, MetricsTracker
 from backend.training.model_thresholds import (
     calibrate_positive_threshold,
     compute_binary_metrics,
@@ -60,8 +62,13 @@ DEFAULT_RAW_DATA_ROOT = Path("data/raw")
 DEFAULT_DATASET_INDEX_PATH = Path("checkpoints/raw_data_index.json")
 DEFAULT_FEATURE_CACHE_ROOT = Path("checkpoints/feature_cache")
 DEFAULT_FEATURE_STORE_ROOT = Path("training/features_safetensors")
+DEFAULT_INCREMENTAL_FEATURE_STORE_ROOT = Path(
+    "checkpoints/incremental_features_safetensors"
+)
+MODEL_INPUT_DIM = 512
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
 _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
+_DEFAULT_COMPAT_FEATURE_EXTRACTOR = extract
 
 
 class AccuracyThresholds:
@@ -125,6 +132,7 @@ class EpochResult:
     early_stopped: bool
     prediction_hash: str = ""
     status: str = "COMPLETED"
+    metrics_report: MetricsReport | None = None
 
 
 TrainingResult = EpochResult
@@ -147,6 +155,7 @@ class TrainingLoopResult:
     hard_negative_indices: list[int]
     epochs_completed: int
     early_stopped: bool
+    metrics_report: MetricsReport | None = None
 
 
 @dataclass(frozen=True)
@@ -567,6 +576,7 @@ class IncrementalTrainer:
         self.state_path = Path(state_path)
         self.baseline_path = Path(baseline_path)
         self.raw_data_root = Path(raw_data_root)
+        self.feature_engineer = CVEFeatureEngineer(raw_data_root=self.raw_data_root)
         self.dataset_index_path = (
             Path(dataset_index_path)
             if dataset_index_path is not None
@@ -582,15 +592,18 @@ class IncrementalTrainer:
         self.feature_store_root = (
             Path(feature_store_root)
             if feature_store_root is not None
-            else project_root / DEFAULT_FEATURE_STORE_ROOT
+            else project_root / DEFAULT_INCREMENTAL_FEATURE_STORE_ROOT
         )
-        self.feature_store = SafetensorsFeatureStore(self.feature_store_root)
+        self.feature_store = SafetensorsFeatureStore(
+            self.feature_store_root,
+            feature_dim=self.feature_engineer.output_dim,
+        )
         self._indexed_raw_samples_cache: list[tuple[str, IngestedSample]] | None = None
         self._invalid_sample_warnings: set[str] = set()
         self._invalid_sample_count: int = 0
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_config = create_model_config(
-            input_dim=512,
+            input_dim=MODEL_INPUT_DIM,
             output_dim=2,
             hidden_dims=(1024, 512, 256, 128),
             dropout=0.3,
@@ -603,6 +616,7 @@ class IncrementalTrainer:
             learning_rate=float(self.model_config.learning_rate),
             max_epochs=max(int(self.model_config.epochs), 5),
             shuffle_seed=int(self.model_config.seed),
+            accumulation_steps=1,
         )
         self.training_state = self._load_training_state()
         self.baseline_state = self._load_baseline_state()
@@ -622,6 +636,12 @@ class IncrementalTrainer:
         self._last_dataset_quality_report: DatasetQualityReport | None = None
         self._accuracy_history = AccuracyHistory()
         self._last_epoch_mean_ewc_loss = 0.0
+        self.class_balancer = ClassBalancer()
+        self.metrics_tracker = MetricsTracker(
+            label_names={0: "NEGATIVE", 1: "POSITIVE"}
+        )
+        self._last_balance_report: ClassBalanceReport | None = None
+        self._last_metrics_report: MetricsReport | None = None
 
     def _load_training_state(self) -> dict[str, object]:
         if not self.state_path.exists():
@@ -680,22 +700,49 @@ class IncrementalTrainer:
     @staticmethod
     def _compress_feature_tensor(feature: torch.Tensor) -> np.ndarray:
         feature_cpu = feature.detach().cpu().to(dtype=torch.float32).reshape(-1)
-        if tuple(feature_cpu.shape) != (512,):
+        if tuple(feature_cpu.shape) != (CVEFeatureEngineer.FEATURE_DIM,):
             raise RuntimeError(
-                f"REAL_DATA_REQUIRED: feature tensor must have shape (512,), got {tuple(feature_cpu.shape)}"
+                "REAL_DATA_REQUIRED: feature tensor must have shape "
+                f"({CVEFeatureEngineer.FEATURE_DIM},), got {tuple(feature_cpu.shape)}"
             )
-        compressed = feature_cpu.reshape(256, 2).mean(dim=1).numpy().astype(np.float32, copy=False)
-        return compressed.reshape(1, 256)
+        return feature_cpu.numpy().astype(np.float32, copy=False).reshape(
+            1, CVEFeatureEngineer.FEATURE_DIM
+        )
 
     @staticmethod
     def _expand_feature_tensor(stored_feature: np.ndarray) -> torch.Tensor:
         feature_row = np.asarray(stored_feature)
-        if feature_row.dtype != np.float32 or feature_row.shape != (256,):
+        if (
+            feature_row.dtype != np.float32
+            or feature_row.shape != (CVEFeatureEngineer.FEATURE_DIM,)
+        ):
             raise ValueError(
-                f"stored feature row must have shape (256,) and dtype float32, got {feature_row.shape}/{feature_row.dtype}"
+                "stored feature row must have shape "
+                f"({CVEFeatureEngineer.FEATURE_DIM},) and dtype float32, got "
+                f"{feature_row.shape}/{feature_row.dtype}"
             )
-        expanded = np.repeat(feature_row, 2).astype(np.float32, copy=False)
-        return torch.from_numpy(expanded.copy())
+        return torch.from_numpy(feature_row.copy())
+
+    @staticmethod
+    def _expand_to_model_feature(feature: torch.Tensor) -> torch.Tensor:
+        feature_cpu = feature.detach().cpu().to(dtype=torch.float32).reshape(-1)
+        if tuple(feature_cpu.shape) == (MODEL_INPUT_DIM,):
+            return feature_cpu
+        if tuple(feature_cpu.shape) == (CVEFeatureEngineer.FEATURE_DIM,):
+            expanded = torch.zeros(MODEL_INPUT_DIM, dtype=torch.float32)
+            expanded[: CVEFeatureEngineer.FEATURE_DIM] = feature_cpu
+            return expanded
+        if tuple(feature_cpu.shape) == (256,):
+            expanded = torch.repeat_interleave(feature_cpu, 2).to(dtype=torch.float32)
+            if tuple(expanded.shape) != (MODEL_INPUT_DIM,):
+                raise RuntimeError(
+                    f"REAL_DATA_REQUIRED: legacy expanded feature must have shape ({MODEL_INPUT_DIM},), got {tuple(expanded.shape)}"
+                )
+            return expanded
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: unsupported feature tensor shape "
+            f"{tuple(feature_cpu.shape)}"
+        )
 
     def _feature_store_metadata(
         self,
@@ -710,9 +757,10 @@ class IncrementalTrainer:
             "sample_ingested_at": sample.ingested_at.isoformat(),
             "sample_token_count": sample.token_count,
             "label": self._label_for_sample(sample),
-            "original_feature_dim": 512,
-            "stored_feature_dim": 256,
-            "compression": "pairwise_mean_repeat_v1",
+            "original_feature_dim": int(stats_payload.get("source_feature_dim", 0)),
+            "stored_feature_dim": CVEFeatureEngineer.FEATURE_DIM,
+            "model_input_dim": MODEL_INPUT_DIM,
+            "compression": "none",
             "stats": stats_payload,
         }
 
@@ -727,7 +775,10 @@ class IncrementalTrainer:
         try:
             shard = self.feature_store.read(sample.sha256_hash)
             stats_available = isinstance(shard.metadata.get("stats"), dict)
-            if shard.features.shape != (1, 256) or not stats_available:
+            if (
+                shard.features.shape != (1, CVEFeatureEngineer.FEATURE_DIM)
+                or not stats_available
+            ):
                 logger.warning(
                     "feature_cache_invalid",
                     extra={
@@ -738,7 +789,8 @@ class IncrementalTrainer:
                     },
                 )
                 return None
-            return self._expand_feature_tensor(shard.features[0])
+            cached_feature = self._expand_feature_tensor(shard.features[0])
+            return self._expand_to_model_feature(cached_feature)
         except (FileNotFoundError, OSError, ValueError, TypeError) as exc:
             logger.warning(
                 "feature_cache_unavailable",
@@ -770,6 +822,53 @@ class IncrementalTrainer:
             "clip_max": 3.0,
         }
         return normalized, stats
+
+    def _extract_training_feature(self, sample: IngestedSample) -> torch.Tensor:
+        active_extractor = extract
+        if active_extractor is _DEFAULT_COMPAT_FEATURE_EXTRACTOR:
+            return self.feature_engineer.extract(sample)
+        compatibility_feature = active_extractor(sample)
+        return torch.as_tensor(compatibility_feature, dtype=torch.float32)
+
+    def _prepare_cached_and_model_feature(
+        self,
+        raw_feature: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, dict[str, object]]:
+        raw_feature_cpu = torch.as_tensor(raw_feature, dtype=torch.float32).detach().cpu().reshape(-1)
+        source_dim = int(raw_feature_cpu.numel())
+        stats: dict[str, object]
+        compatibility_mode: str | None = None
+
+        if source_dim == CVEFeatureEngineer.FEATURE_DIM:
+            cached_feature, stats = self._normalize_feature_tensor(raw_feature_cpu)
+            model_feature = self._expand_to_model_feature(cached_feature)
+        elif source_dim == MODEL_INPUT_DIM:
+            model_feature, stats = self._normalize_feature_tensor(raw_feature_cpu)
+            cached_feature = model_feature[: CVEFeatureEngineer.FEATURE_DIM].clone()
+            compatibility_mode = "legacy_512_slice"
+        elif source_dim == 256:
+            normalized_legacy_feature, stats = self._normalize_feature_tensor(raw_feature_cpu)
+            model_feature = self._expand_to_model_feature(normalized_legacy_feature)
+            cached_feature = torch.cat(
+                [
+                    normalized_legacy_feature,
+                    torch.zeros(CVEFeatureEngineer.DOMAIN_SIGNAL_DIM, dtype=torch.float32),
+                ],
+                dim=0,
+            )
+            compatibility_mode = "legacy_256_repeat"
+        else:
+            raise RuntimeError(
+                "REAL_DATA_REQUIRED: feature extractor returned invalid shape "
+                f"{tuple(raw_feature_cpu.shape)}"
+            )
+
+        stats["source_feature_dim"] = source_dim
+        stats["stored_feature_dim"] = CVEFeatureEngineer.FEATURE_DIM
+        stats["model_input_dim"] = MODEL_INPUT_DIM
+        if compatibility_mode is not None:
+            stats["compatibility_mode"] = compatibility_mode
+        return cached_feature, model_feature, stats
 
     @staticmethod
     def _validate_feature_tensor(feature: torch.Tensor) -> tuple[bool, str]:
@@ -826,16 +925,21 @@ class IncrementalTrainer:
         if cached_feature is not None:
             return cached_feature
 
-        raw_feature = extract(sample).detach().cpu().to(dtype=torch.float32)
-        feature, stats_payload = self._normalize_feature_tensor(raw_feature)
-        if tuple(feature.shape) != (512,):
+        raw_feature = self._extract_training_feature(sample)
+        cached_feature, feature, stats_payload = self._prepare_cached_and_model_feature(
+            raw_feature
+        )
+        is_valid, reason = self._validate_feature_tensor(feature)
+        if not is_valid:
+            self._record_invalid_sample(sample, reason)
             raise RuntimeError(
-                f"REAL_DATA_REQUIRED: feature extractor returned invalid shape {tuple(feature.shape)}"
+                "REAL_DATA_REQUIRED: feature extractor returned invalid feature tensor "
+                f"{reason}"
             )
         try:
             self.feature_store.write(
                 sample.sha256_hash,
-                self._compress_feature_tensor(feature),
+                self._compress_feature_tensor(cached_feature),
                 np.asarray([self._label_for_sample(sample)], dtype=np.int64),
                 metadata=self._feature_store_metadata(sample, stats_payload),
             )
@@ -1426,6 +1530,21 @@ class IncrementalTrainer:
             raise RuntimeError(
                 "REAL_DATA_REQUIRED: Deterministic train/validation split failed"
             )
+        train_labels = [self._label_for_sample(samples[index]) for index in train_indices]
+        self._last_balance_report = self.class_balancer.balance_indices(
+            sample_indices=train_indices,
+            labels=train_labels,
+        )
+        balanced_train_indices = list(self._last_balance_report.oversampled_indices)
+        logger.info(
+            "incremental class balancing train_counts=%s class_weights=%s added_repeats=%d",
+            self._last_balance_report.class_counts,
+            {
+                label: round(weight, 6)
+                for label, weight in self._last_balance_report.class_weights.items()
+            },
+            self._last_balance_report.added_indices,
+        )
 
         val_class_distribution = {severity: 0 for severity in DatasetQualityGate._SEVERITY_CLASSES}
         for eval_index in eval_indices:
@@ -1443,7 +1562,7 @@ class IncrementalTrainer:
         train_dataset = _StreamingFeatureDataset(
             self,
             samples,
-            train_indices,
+            balanced_train_indices,
             return_dataset_index=include_train_dataset_indices,
         )
         eval_dataset = _StreamingFeatureDataset(self, samples, eval_indices)
@@ -1479,7 +1598,7 @@ class IncrementalTrainer:
             return
         scaled_loss.backward()
 
-    def _step_optimizer(
+    def _clip_gradients(
         self,
         optimizer: torch.optim.Optimizer,
         scaler,
@@ -1488,15 +1607,32 @@ class IncrementalTrainer:
     ) -> None:
         if scaler is not None:
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(
-                self.model.parameters(), float(gradient_clip_norm)
-            )
+        torch.nn.utils.clip_grad_norm_(
+            self.model.parameters(),
+            float(gradient_clip_norm),
+        )
+
+    def _step_optimizer(
+        self,
+        optimizer: torch.optim.Optimizer,
+        scaler,
+        *,
+        gradient_clip_norm: float = 1.0,
+        gradients_clipped: bool = False,
+    ) -> None:
+        if scaler is not None:
+            if not gradients_clipped:
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(), float(gradient_clip_norm)
+                )
             scaler.step(optimizer)
             scaler.update()
         else:
-            torch.nn.utils.clip_grad_norm_(
-                self.model.parameters(), float(gradient_clip_norm)
-            )
+            if not gradients_clipped:
+                torch.nn.utils.clip_grad_norm_(
+                    self.model.parameters(), float(gradient_clip_norm)
+                )
             optimizer.step()
         optimizer.zero_grad(set_to_none=True)
 
@@ -1583,6 +1719,10 @@ class IncrementalTrainer:
             positive_probabilities,
             fallback_threshold=self.positive_threshold,
         )
+        metrics_report = self.metrics_tracker.update(
+            labels=labels_out,
+            predictions=list(threshold_metrics["predictions"]),
+        )
         return {
             "eval_loss": float(sum(eval_losses) / max(len(eval_losses), 1)),
             "labels": labels_out,
@@ -1595,6 +1735,7 @@ class IncrementalTrainer:
             "recall": float(threshold_metrics["recall"]),
             "f1": float(threshold_metrics["f1"]),
             "auc_roc": self._compute_auc_roc(labels_out, positive_probabilities),
+            "metrics_report": metrics_report,
         }
 
     def _train_single_epoch(
@@ -1619,7 +1760,13 @@ class IncrementalTrainer:
         self.adaptive_learner.attach_model(self.model)
         self.model.train()
         optimizer.zero_grad(set_to_none=True)
-        accum_steps = max(int(accumulation_steps), 1)
+        requested_accumulation_steps = max(int(accumulation_steps), 1)
+        if requested_accumulation_steps != 1:
+            logger.info(
+                "gradient accumulation disabled to preserve per-backward clipping honesty requested=%d effective=1",
+                requested_accumulation_steps,
+            )
+        accum_steps = 1
         step_count = 0
         epoch_losses: list[float] = []
         epoch_ewc_losses: list[float] = []
@@ -1705,6 +1852,11 @@ class IncrementalTrainer:
                     ),
                 )
             self._backward_pass(scaled_loss, scaler)
+            self._clip_gradients(
+                optimizer,
+                scaler,
+                gradient_clip_norm=gradient_clip_norm,
+            )
             epoch_losses.append(float(total_loss.detach().item()))
             epoch_ewc_losses.append(float(ewc_loss.detach().item()))
 
@@ -1713,6 +1865,7 @@ class IncrementalTrainer:
                     optimizer,
                     scaler,
                     gradient_clip_norm=gradient_clip_norm,
+                    gradients_clipped=True,
                 )
                 scheduler.step()
 
@@ -1841,6 +1994,7 @@ class IncrementalTrainer:
                 "val_loader and eval_criterion are required when return_history is enabled"
             )
 
+        self.metrics_tracker.reset()
         base_sample_weights = (
             self._coerce_sample_weights(sample_weights, len(train_loader.dataset))
             if sample_weights is not None
@@ -1903,6 +2057,7 @@ class IncrementalTrainer:
                 hard_negative_indices=list(current_hard_negative_indices),
                 epochs_completed=epoch_index + 1,
                 early_stopped=False,
+                metrics_report=evaluation["metrics_report"],
             )
             epochs_completed = epoch_index + 1
             learning_rate = self._current_learning_rate(optimizer, scheduler)
@@ -1944,7 +2099,22 @@ class IncrementalTrainer:
             hard_negative_indices=list(best_result.hard_negative_indices),
             epochs_completed=epochs_completed,
             early_stopped=early_stopper.stopped,
+            metrics_report=best_result.metrics_report,
         )
+
+    def _current_class_weight_tensor(self) -> torch.Tensor | None:
+        if self._last_balance_report is None or not self._last_balance_report.class_weights:
+            return None
+        class_weight_tensor = self._last_balance_report.weights_tensor(
+            num_classes=int(self.model_config.output_dim)
+        )
+        device_type = str(getattr(self.device, "type", self.device)).lower()
+        if device_type == "cuda" and torch.cuda.is_available():
+            return class_weight_tensor.to(self.device)
+        return class_weight_tensor
+
+    def get_metrics_history(self) -> list[MetricsReport]:
+        return self.metrics_tracker.history
 
     @staticmethod
     def _compute_auc_roc(
@@ -2122,12 +2292,21 @@ class IncrementalTrainer:
             min_lr=self.optimizer_config.min_learning_rate,
             warmup_start_factor=self.optimizer_config.warmup_start_factor,
         )
+        amp_enabled = self.optimizer_config.amp_enabled(self.device)
+        if self.optimizer_config.use_amp and not amp_enabled:
+            logger.info(
+                "CUDA AMP requested but unavailable on device=%s; using full precision",
+                getattr(self.device, "type", self.device),
+            )
         scaler = (
             torch.cuda.amp.GradScaler(enabled=True)
-            if self.optimizer_config.amp_enabled(self.device)
+            if amp_enabled
             else None
         )
-        train_criterion = torch.nn.CrossEntropyLoss(reduction="none")
+        train_criterion = torch.nn.CrossEntropyLoss(
+            weight=self._current_class_weight_tensor(),
+            reduction="none",
+        )
         eval_criterion = torch.nn.CrossEntropyLoss()
         previous_state = self._clone_model_state(self.model.state_dict())
 
@@ -2156,6 +2335,8 @@ class IncrementalTrainer:
         f1 = float(training_loop_result.f1)
         auc_roc = float(training_loop_result.auc_roc)
         eval_loss = float(training_loop_result.eval_loss)
+        metrics_report = training_loop_result.metrics_report
+        self._last_metrics_report = metrics_report
         duration_ms = (time.perf_counter() - start_time) * 1000
         snapshot = AccuracySnapshot(
             epoch=epoch_number,
@@ -2210,6 +2391,14 @@ class IncrementalTrainer:
                 "prediction_hash": prediction_hash,
             },
         )
+        if metrics_report is not None:
+            logger.info(
+                "incremental per-class validation worst=%s f1=%.4f best=%s f1=%.4f",
+                metrics_report.worst_class.name,
+                metrics_report.worst_class.f1,
+                metrics_report.best_class.name,
+                metrics_report.best_class.f1,
+            )
 
         if self._accuracy_history.should_rollback():
             best_snapshot = self._accuracy_history.get_best()
@@ -2234,6 +2423,7 @@ class IncrementalTrainer:
                 early_stopped=False,
                 prediction_hash=prediction_hash,
                 status=result_status,
+                metrics_report=metrics_report,
             )
 
         if accuracy < self.baseline_accuracy - 0.05:
@@ -2252,6 +2442,7 @@ class IncrementalTrainer:
                 early_stopped=False,
                 prediction_hash=prediction_hash,
                 status=result_status,
+                metrics_report=metrics_report,
             )
 
         early_stopped = bool(training_loop_result.early_stopped)
@@ -2317,6 +2508,7 @@ class IncrementalTrainer:
             "best_eval_loss": best_eval_loss,
             "no_improve_count": no_improve_count,
             "prediction_hash": prediction_hash,
+            "metrics_report": metrics_report.to_dict() if metrics_report is not None else None,
         }
         self._atomic_write_json(self.state_path, self.training_state)
 
@@ -2332,6 +2524,7 @@ class IncrementalTrainer:
             early_stopped=early_stopped,
             prediction_hash=prediction_hash,
             status=result_status,
+            metrics_report=metrics_report,
         )
 
 

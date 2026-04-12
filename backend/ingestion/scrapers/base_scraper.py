@@ -17,7 +17,7 @@ from urllib3.util.retry import Retry
 from backend.ingestion.models import normalize_severity
 
 logger = logging.getLogger("ygb.ingestion.scrapers.base")
-REAL_USER_AGENT = "YGB-Autograbber/1.0 (+https://github.com/)"
+REAL_USER_AGENT = "YGB-Autograbber-Research/1.0 (non-commercial research use)"
 
 
 @dataclass(frozen=True)
@@ -76,9 +76,19 @@ class BaseScraper(abc.ABC):
     """Real HTTP scraper base with retries, timeout, user-agent, and polite delay."""
 
     SOURCE = "base"
+    MAX_RETRIES = 3
     REQUEST_DELAY_SECONDS = 1.0
     TIMEOUT_SECONDS = 30.0
     USER_AGENT = REAL_USER_AGENT
+    ACCEPT_HEADER = (
+        "application/json, application/octet-stream;q=0.9, text/plain;q=0.8, text/html;q=0.7"
+    )
+    SEVERITY_ALIASES: dict[str, str] = {
+        "IMPORTANT": "HIGH",
+        "MODERATE": "MEDIUM",
+        "NEGLIGIBLE": "LOW",
+        "NONE": "UNKNOWN",
+    }
 
     def __init__(
         self,
@@ -93,16 +103,18 @@ class BaseScraper(abc.ABC):
         self.timeout_seconds = float(timeout_seconds or self.TIMEOUT_SECONDS)
         self._owns_session = session is None
         self.session = session or self._build_session()
+        self.session.headers.setdefault("User-Agent", self.USER_AGENT)
+        self.session.headers.setdefault("Accept", self.ACCEPT_HEADER)
         self._last_request_monotonic: float | None = None
         self._last_response_headers: dict[str, str] = {}
 
-    @staticmethod
-    def _build_retry() -> Retry:
+    @classmethod
+    def _build_retry(cls) -> Retry:
         return Retry(
-            total=3,
-            connect=3,
-            read=3,
-            status=3,
+            total=cls.MAX_RETRIES,
+            connect=cls.MAX_RETRIES,
+            read=cls.MAX_RETRIES,
+            status=cls.MAX_RETRIES,
             backoff_factor=1.0,
             status_forcelist=(429, 500, 502, 503, 504),
             allowed_methods=frozenset({"GET", "HEAD"}),
@@ -114,7 +126,7 @@ class BaseScraper(abc.ABC):
         session.headers.update(
             {
                 "User-Agent": self.USER_AGENT,
-                "Accept": "application/json, application/octet-stream;q=0.9, text/plain;q=0.8",
+                "Accept": self.ACCEPT_HEADER,
             }
         )
         adapter = HTTPAdapter(max_retries=self._build_retry())
@@ -158,7 +170,7 @@ class BaseScraper(abc.ABC):
             )
             return response
         except requests.RequestException as exc:
-            logger.error(
+            logger.warning(
                 "scraper_request_failed source=%s method=%s url=%s error=%s",
                 self.SOURCE,
                 method,
@@ -175,7 +187,7 @@ class BaseScraper(abc.ABC):
             return response.json()
         except ValueError as exc:
             preview = response.text[:200].replace("\n", " ")
-            logger.error(
+            logger.warning(
                 "scraper_json_decode_failed source=%s url=%s preview=%s",
                 self.SOURCE,
                 url,
@@ -185,6 +197,9 @@ class BaseScraper(abc.ABC):
 
     def _get_bytes(self, url: str, **kwargs: Any) -> bytes:
         return self._request("GET", url, **kwargs).content
+
+    def _get_text(self, url: str, **kwargs: Any) -> str:
+        return self._request("GET", url, **kwargs).text
 
     @staticmethod
     def _coerce_score(value: object) -> float | None:
@@ -219,6 +234,66 @@ class BaseScraper(abc.ABC):
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise ValueError(f"{source}: invalid JSON payload") from exc
 
-    @abc.abstractmethod
+    @classmethod
+    def _normalize_source_severity(cls, severity: object) -> str:
+        candidate = str(severity or "").strip().upper()
+        normalized = normalize_severity(candidate or "UNKNOWN")
+        if normalized != "UNKNOWN" or not candidate:
+            return normalized
+        return cls.SEVERITY_ALIASES.get(candidate, "UNKNOWN")
+
+    @staticmethod
+    def _severity_from_score(score: float | None) -> str:
+        if score is None:
+            return "UNKNOWN"
+        if score >= 9.0:
+            return "CRITICAL"
+        if score >= 7.0:
+            return "HIGH"
+        if score >= 4.0:
+            return "MEDIUM"
+        if score > 0.0:
+            return "LOW"
+        return "UNKNOWN"
+
+    def _log_partial_failure(self, *, reason: str, **context: Any) -> None:
+        context_parts = [
+            f"{key}={value}"
+            for key, value in context.items()
+            if value not in (None, "", (), [], {})
+        ]
+        if context_parts:
+            logger.warning(
+                "scraper_partial_failure source=%s reason=%s %s",
+                self.SOURCE,
+                reason,
+                " ".join(context_parts),
+            )
+            return
+        logger.warning("scraper_partial_failure source=%s reason=%s", self.SOURCE, reason)
+
+    def _log_empty_result(self, *, reason: str) -> None:
+        logger.info("scraper_empty_result source=%s reason=%s", self.SOURCE, reason)
+
     def fetch(self, max_items: int) -> list[ScrapedSample]:
+        if max_items <= 0:
+            self._log_empty_result(reason="non_positive_limit")
+            return []
+        try:
+            samples = list(self._fetch_impl(max_items))[:max_items]
+        except Exception as exc:
+            logger.warning(
+                "scraper_fetch_failed source=%s error_type=%s error=%s",
+                self.SOURCE,
+                type(exc).__name__,
+                exc,
+            )
+            self._log_empty_result(reason="fetch_failed")
+            return []
+        if not samples:
+            self._log_empty_result(reason="no_results")
+        return samples
+
+    @abc.abstractmethod
+    def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
         """Fetch real vulnerability entries from the upstream source."""

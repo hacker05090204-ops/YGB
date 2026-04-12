@@ -160,9 +160,9 @@ class OSVScraper(BaseScraper):
         details = str(vulnerability_payload.get("details", "")).strip()
         description = " ".join(part for part in (summary, details) if part).strip()
         if not advisory_id or not description:
-            logger.debug(
-                "osv_entry_skipped reason=missing_required_fields advisory_id=%s",
-                advisory_id,
+            self._log_partial_failure(
+                reason="missing_required_fields",
+                advisory_id=advisory_id or "<missing-advisory-id>",
             )
             return None
         aliases = tuple(
@@ -186,9 +186,7 @@ class OSVScraper(BaseScraper):
             modified_at=str(vulnerability_payload.get("modified", "") or "") or None,
         )
 
-    def fetch(self, max_items: int) -> list[ScrapedSample]:
-        if max_items <= 0:
-            return []
+    def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
         index_payload = self._get_json(self.INDEX_URL)
         vulnerability_ids = self._extract_recent_ids(index_payload, max_items=max_items)
         samples: list[ScrapedSample] = []
@@ -200,10 +198,10 @@ class OSVScraper(BaseScraper):
                 sample = self.parse_vulnerability(payload)
                 if sample is not None:
                     samples.append(sample)
-            except (requests.RequestException, ValueError) as exc:
-                logger.error(
-                    "osv_vulnerability_fetch_failed advisory_id=%s error=%s",
-                    vulnerability_id,
-                    exc,
+            except Exception as exc:
+                self._log_partial_failure(
+                    reason="vulnerability_fetch_failed",
+                    advisory_id=vulnerability_id,
+                    error_type=type(exc).__name__,
                 )
         return samples

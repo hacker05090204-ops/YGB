@@ -12,6 +12,7 @@ def _reset_status_cache() -> None:
     with system_status._cache_lock:
         system_status._status_cache = {}
         system_status._cache_ts = 0.0
+        system_status._cache_has_refresh = False
         system_status._refresh_in_progress = False
 
 
@@ -49,11 +50,7 @@ def _base_status_payload() -> dict[str, object]:
 def test_second_request_returns_with_cache_hit_under_5ms(monkeypatch):
     _reset_status_cache()
 
-    def _slow_compute() -> dict[str, object]:
-        time.sleep(0.02)
-        return _base_status_payload()
-
-    monkeypatch.setattr(system_status, "_compute_full_status", _slow_compute)
+    system_status._store_status_cache(_base_status_payload(), refreshed=True)
 
     first = asyncio.run(system_status.aggregated_system_status(user={"sub": "user-1"}))
     started = time.perf_counter()
@@ -61,6 +58,7 @@ def test_second_request_returns_with_cache_hit_under_5ms(monkeypatch):
     elapsed_ms = (time.perf_counter() - started) * 1000
 
     assert first["overall_health"] == "HEALTHY"
+    assert first["cached"] is True
     assert second["cached"] is True
     assert "cache_age_seconds" in second
     assert elapsed_ms < 5.0
@@ -68,8 +66,8 @@ def test_second_request_returns_with_cache_hit_under_5ms(monkeypatch):
 
 def test_cache_age_field_present_and_background_thread_started_on_stale_cache(monkeypatch):
     _reset_status_cache()
+    system_status._store_status_cache(_base_status_payload(), refreshed=True)
     with system_status._cache_lock:
-        system_status._status_cache = _base_status_payload()
         system_status._cache_ts = time.monotonic() - (system_status.CACHE_TTL_SECONDS + 1)
 
     thread_events: list[str] = []
@@ -87,7 +85,27 @@ def test_cache_age_field_present_and_background_thread_started_on_stale_cache(mo
     result = asyncio.run(system_status.aggregated_system_status(user={"sub": "user-1"}))
 
     assert "cache_age_seconds" in result
+    assert result["cached"] is False
     assert thread_events == ["started"]
+
+
+def test_refresh_failure_preserves_previous_cache_and_clears_flag(monkeypatch):
+    _reset_status_cache()
+    system_status._store_status_cache(_base_status_payload(), refreshed=True)
+    previous = dict(system_status._status_cache)
+    with system_status._cache_lock:
+        system_status._refresh_in_progress = True
+
+    def _boom() -> dict[str, object]:
+        raise RuntimeError("refresh exploded")
+
+    monkeypatch.setattr(system_status, "_compute_full_status", _boom)
+
+    system_status._refresh_status_background()
+
+    with system_status._cache_lock:
+        assert system_status._status_cache == previous
+        assert system_status._refresh_in_progress is False
 
 
 def test_standalone_sync_mode_keeps_overall_health_healthy(monkeypatch):

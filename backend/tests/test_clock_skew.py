@@ -25,7 +25,15 @@ class TestClockSkewSimulated(unittest.TestCase):
     """Test clock skew detection with simulated times (no NTP)."""
 
     def setUp(self):
+        self._previous_clock_simulation = os.environ.get("YGB_CLOCK_SIMULATION")
+        os.environ["YGB_CLOCK_SIMULATION"] = "1"
         self.guard = ClockGuard(max_skew=5.0)
+
+    def tearDown(self):
+        if self._previous_clock_simulation is None:
+            os.environ.pop("YGB_CLOCK_SIMULATION", None)
+        else:
+            os.environ["YGB_CLOCK_SIMULATION"] = self._previous_clock_simulation
 
     def test_zero_skew_passes(self):
         """Zero skew → CLOCK_OK."""
@@ -68,6 +76,16 @@ class TestClockSkewSimulated(unittest.TestCase):
 class TestCertificationBlocking(unittest.TestCase):
     """Test that certification is blocked when clock is skewed."""
 
+    def setUp(self):
+        self._previous_clock_simulation = os.environ.get("YGB_CLOCK_SIMULATION")
+        os.environ["YGB_CLOCK_SIMULATION"] = "1"
+
+    def tearDown(self):
+        if self._previous_clock_simulation is None:
+            os.environ.pop("YGB_CLOCK_SIMULATION", None)
+        else:
+            os.environ["YGB_CLOCK_SIMULATION"] = self._previous_clock_simulation
+
     def test_certification_blocked_on_skew(self):
         """Simulated skew blocks certification."""
         guard = ClockGuard(max_skew=5.0)
@@ -88,6 +106,16 @@ class TestCertificationBlocking(unittest.TestCase):
 
 class TestClockGuardHistory(unittest.TestCase):
     """Test that clock check history is maintained."""
+
+    def setUp(self):
+        self._previous_clock_simulation = os.environ.get("YGB_CLOCK_SIMULATION")
+        os.environ["YGB_CLOCK_SIMULATION"] = "1"
+
+    def tearDown(self):
+        if self._previous_clock_simulation is None:
+            os.environ.pop("YGB_CLOCK_SIMULATION", None)
+        else:
+            os.environ["YGB_CLOCK_SIMULATION"] = self._previous_clock_simulation
 
     def test_history_accumulates(self):
         """Each check adds an entry to history."""
@@ -125,6 +153,16 @@ class TestClockGuardHistory(unittest.TestCase):
 
 class TestCustomThresholds(unittest.TestCase):
     """Test custom skew thresholds."""
+
+    def setUp(self):
+        self._previous_clock_simulation = os.environ.get("YGB_CLOCK_SIMULATION")
+        os.environ["YGB_CLOCK_SIMULATION"] = "1"
+
+    def tearDown(self):
+        if self._previous_clock_simulation is None:
+            os.environ.pop("YGB_CLOCK_SIMULATION", None)
+        else:
+            os.environ["YGB_CLOCK_SIMULATION"] = self._previous_clock_simulation
 
     def test_tight_threshold_1s(self):
         """1s threshold blocks 2s skew."""
