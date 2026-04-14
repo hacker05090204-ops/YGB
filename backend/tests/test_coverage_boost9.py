@@ -330,32 +330,35 @@ class TestTrainingProgress(unittest.TestCase):
     def test_format_eta_small(self):
         try:
             from backend.api.training_progress import format_eta
-            result = format_eta(30)
-            self.assertIn("s", result)
-        except ImportError:
-            pass
+        except ImportError as exc:
+            self.skipTest(f"training_progress.format_eta unavailable: {exc}")
+        result = format_eta(30)
+        self.assertIn("s", result)
 
     def test_format_eta_hours(self):
         try:
             from backend.api.training_progress import format_eta
-            result = format_eta(7200)
-            self.assertIn("h", result)
-        except ImportError:
-            pass
+        except ImportError as exc:
+            self.skipTest(f"training_progress.format_eta unavailable: {exc}")
+        result = format_eta(7200)
+        self.assertIn("h", result)
 
     def test_training_status_no_file(self):
         try:
             from backend.api.training_progress import get_training_status
-            with patch.dict(os.environ, {"YGB_HDD_ROOT": tempfile.mkdtemp()}):
+        except ImportError as exc:
+            self.skipTest(f"training_progress.get_training_status unavailable: {exc}")
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.dict(os.environ, {"YGB_HDD_ROOT": tmp}):
                 result = get_training_status()
-            self.assertIn("status", result)
-        except ImportError:
-            pass
+        self.assertIn("status", result)
 
     def test_training_status_with_data(self):
         try:
             from backend.api.training_progress import get_training_status
-            tmp = tempfile.mkdtemp()
+        except ImportError as exc:
+            self.skipTest(f"training_progress.get_training_status unavailable: {exc}")
+        with tempfile.TemporaryDirectory() as tmp:
             progress_path = os.path.join(tmp, "training_progress.json")
             data = {"epoch": 5, "total_epochs": 10, "loss": 0.02,
                     "status": "training", "eta_seconds": 3600}
@@ -363,9 +366,7 @@ class TestTrainingProgress(unittest.TestCase):
                 json.dump(data, f)
             with patch.dict(os.environ, {"YGB_HDD_ROOT": tmp}):
                 result = get_training_status()
-            shutil.rmtree(tmp)
-        except ImportError:
-            pass
+        self.assertIn("status", result)
 
 
 # ---------------------------------------------------------------------------
@@ -377,15 +378,21 @@ class TestAuthGuardEdgeCases(unittest.TestCase):
 
     def test_preflight_check_with_env_secrets(self):
         try:
-            from backend.auth.auth_guard import preflight_check_secrets
-            strong_secret = secrets.token_hex(32)  # 64 chars
-            with patch.dict(os.environ, {
-                "JWT_SECRET": strong_secret,
-                "YGB_VIDEO_JWT_SECRET": strong_secret,
-            }):
-                result = preflight_check_secrets()
-        except (ImportError, AttributeError):
-            pass
+            from backend.auth import auth_guard
+        except ImportError as exc:
+            self.skipTest(f"backend.auth.auth_guard unavailable: {exc}")
+        preflight_check_secrets = getattr(auth_guard, "preflight_check_secrets", None)
+        if preflight_check_secrets is None:
+            self.skipTest("auth_guard.preflight_check_secrets unavailable")
+        strong_secret = secrets.token_hex(32)  # 64 chars
+        with patch.dict(os.environ, {
+            "JWT_SECRET": strong_secret,
+            "YGB_HMAC_SECRET": strong_secret,
+            "YGB_VIDEO_JWT_SECRET": strong_secret,
+            "YGB_TEMP_AUTH_BYPASS": "false",
+        }):
+            result = preflight_check_secrets()
+        self.assertIsNone(result)
 
     def test_require_auth_missing_header(self):
         from backend.auth.auth_guard import require_auth

@@ -16,6 +16,10 @@ from typing import Dict, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 
+class CheckpointIntegrityError(RuntimeError):
+    """Raised when checkpoint integrity verification fails."""
+
+
 def _import_torch():
     try:
         import torch
@@ -160,19 +164,19 @@ def load_safetensors(
     device: str = "cpu",
     verify_hash: bool = True,
 ) -> Dict:
-    """Load tensors from .safetensors with optional checksum verification.
+    """Load tensors from .safetensors with mandatory checksum verification.
 
     Args:
         path: Path to .safetensors file.
         device: Device to load tensors to (default: cpu).
-        verify_hash: If True, verify tensor hash from metadata.
+        verify_hash: Retained for compatibility; hardened mode always verifies.
 
     Returns:
         Dict of tensor name -> tensor.
 
     Raises:
         FileNotFoundError: If file doesn't exist.
-        RuntimeError: If hash verification fails.
+        CheckpointIntegrityError: If integrity verification fails.
     """
     from safetensors import safe_open
     torch = _import_torch()
@@ -197,26 +201,36 @@ def load_safetensors(
     else:
         tensors = load_file(path)
 
-    # Verify hash if requested
-    if verify_hash:
-        try:
-            with safe_open(path, framework=framework) as f:
-                meta = f.metadata()
-            if meta and "tensor_hash" in meta:
-                expected = meta["tensor_hash"]
-                actual = _compute_tensor_hash(tensors)
-                if actual != expected:
-                    raise RuntimeError(
-                        f"SafeTensors hash mismatch: "
-                        f"expected={expected[:16]}..., got={actual[:16]}..."
-                    )
-                logger.info(
-                    f"[SAFETENSORS] Verified: {os.path.basename(path)} "
-                    f"hash={actual[:16]}..."
-                )
-        except RuntimeError:
-            raise
-        except Exception as e:
-            logger.warning(f"[SAFETENSORS] Hash verify skipped: {e}")
+    if not verify_hash:
+        logger.warning(
+            "[SAFETENSORS] Verification disable request ignored for %s; hardened mode enforces integrity checks",
+            path,
+        )
+
+    try:
+        with safe_open(path, framework=framework) as f:
+            meta = f.metadata() or {}
+    except Exception as exc:
+        raise CheckpointIntegrityError(
+            f"SafeTensors metadata verification failed for {path}: {exc}"
+        ) from exc
+
+    expected = str(meta.get("tensor_hash", "") or "").strip()
+    if not expected:
+        raise CheckpointIntegrityError(
+            f"SafeTensors tensor_hash metadata is required for {path}"
+        )
+
+    actual = _compute_tensor_hash(tensors)
+    if actual != expected:
+        raise CheckpointIntegrityError(
+            f"SafeTensors hash mismatch: "
+            f"expected={expected[:16]}..., got={actual[:16]}..."
+        )
+
+    logger.info(
+        f"[SAFETENSORS] Verified: {os.path.basename(path)} "
+        f"hash={actual[:16]}..."
+    )
 
     return tensors

@@ -7,6 +7,7 @@ import json
 import os
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
+from backend.runtime.context_paging import PagedContextBuffer
 from impl_v1.agents import AgentOrchestrator, AgentRegistry, RegisteredAgent
 from impl_v1.enterprise.training_controller import TrainingController, TrainingMode
 from impl_v1.training.accuracy.engine import AccuracyEngine
@@ -25,6 +26,7 @@ from impl_v1.training.voice.streaming_pipeline import (
     StreamingVoicePipeline,
     StreamingVoiceSession,
 )
+from scripts.device_manager import resolve_device_configuration
 
 from .memory import UnifiedMemoryStore
 from .performance import ComputeSnapshot, PerformanceIntelligence
@@ -77,7 +79,9 @@ class UnifiedAIOrchestrator:
         self.performance = PerformanceIntelligence()
         self.monitor = TrainingMonitor(training_dashboard_path)
         self.voice_pipeline = voice_pipeline or StreamingVoicePipeline(self.agent_orchestrator)
+        self.device_configuration = resolve_device_configuration(configure_runtime=False)
         self._voice_sessions: Dict[str, StreamingVoiceSession] = {}
+        self._voice_runtime_contexts: Dict[str, PagedContextBuffer] = {}
         self._executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="unified-system")
         self._latest_checkpoint_manifest: Dict[str, Any] = {}
         self._register_builtin_agents()
@@ -119,15 +123,63 @@ class UnifiedAIOrchestrator:
             )
 
     def _voice_reasoning_agent(self, message: Any) -> Dict[str, Any]:
+        session_id = str(message.payload.get("session_id", "") or "").strip() or "voice-session"
         transcript = str(message.payload.get("transcript", "")).strip()
         related = self.memory.retrieve(transcript, top_k=2) if transcript else []
-        hint = related[0].prompt if related else ""
-        text = transcript if not hint else f"{transcript} | context:{hint}"
+        context_buffer = self._get_voice_runtime_context(session_id)
+        recent_hint = next(
+            (
+                str(entry.get("text", "")).strip()
+                for entry in reversed(context_buffer.tail(limit=2))
+                if entry.get("speaker") == "user" and str(entry.get("text", "")).strip()
+            ),
+            "",
+        )
+        hint = related[0].prompt if related else recent_hint
+        if transcript and hint:
+            text = f"{transcript} | context:{hint}"
+        elif transcript:
+            text = transcript
+        else:
+            text = hint
+        if transcript:
+            context_buffer.append({"speaker": "user", "text": transcript, "source": "stream"})
+        if text:
+            context_buffer.append({"speaker": "assistant", "text": text, "source": "reasoning"})
         return {
             "text": text,
             "memory_hits": len(related),
-            "session_id": message.payload.get("session_id", ""),
+            "session_id": session_id,
+            "context_mode": context_buffer.mode,
+            "conversation_context": self._render_voice_runtime_context(context_buffer),
         }
+
+    def _get_voice_runtime_context(self, session_id: str) -> PagedContextBuffer:
+        context = self._voice_runtime_contexts.get(session_id)
+        if context is None:
+            context = PagedContextBuffer(
+                max_items=20,
+                page_size=6,
+                device_configuration=self.device_configuration,
+                namespace="unified_voice_runtime",
+                context_id=session_id,
+            )
+            self._voice_runtime_contexts[session_id] = context
+        return context
+
+    def _render_voice_runtime_context(self, context: PagedContextBuffer) -> str:
+        recent = [
+            item
+            for item in context.tail(limit=6)
+            if str(item.get("text", "") or "").strip()
+        ]
+        if not recent:
+            return "[page 1/1]"
+        body = "\n".join(
+            f"{item.get('speaker', 'context')}: {str(item.get('text', '')).strip()}"
+            for item in recent
+        )
+        return f"[page {context.current_page}/{context.page_count}]\n{body}"
 
     def _memory_agent(self, message: Any) -> Dict[str, Any]:
         query = str(message.payload.get("query", ""))

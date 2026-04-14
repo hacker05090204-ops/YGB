@@ -19,11 +19,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <vector>
 
 #ifdef _WIN32
 #include <wincrypt.h>
 #include <windows.h>
-
 
 #else
 #include <sys/stat.h>
@@ -515,6 +515,10 @@ static VaultResult vault_encrypt_file(const char *user_id, const char *filename,
   uint8_t user_key_input[128];
   std::memcpy(user_key_input, master_key, 32);
   size_t uid_len = std::strlen(user_id);
+  if (uid_len > sizeof(user_key_input) - 32) {
+    std::snprintf(res.error, sizeof(res.error), "user_id too long");
+    return res;
+  }
   std::memcpy(user_key_input + 32, user_id, uid_len);
   uint8_t user_key[32];
   sha256(user_key_input, 32 + uid_len, user_key);
@@ -540,7 +544,7 @@ static VaultResult vault_encrypt_file(const char *user_id, const char *filename,
   j0[15] = 1;
 
   // CTR encryption
-  uint8_t *ciphertext = new uint8_t[plain_len];
+  std::vector<uint8_t> ciphertext(plain_len);
   uint8_t counter[16];
   std::memcpy(counter, j0, 16);
 
@@ -565,7 +569,7 @@ static VaultResult vault_encrypt_file(const char *user_id, const char *filename,
   for (size_t i = 0; i < plain_len; i += 16) {
     uint8_t block[16] = {0};
     size_t bl = (plain_len - i < 16) ? plain_len - i : 16;
-    std::memcpy(block, ciphertext + i, bl);
+    std::memcpy(block, ciphertext.data() + i, bl);
     for (int j = 0; j < 16; ++j)
       ghash_acc[j] ^= block[j];
     ghash_mul(ghash_acc, h_block);
@@ -596,16 +600,15 @@ static VaultResult vault_encrypt_file(const char *user_id, const char *filename,
   FILE *f = std::fopen(path, "wb");
   if (!f) {
     std::snprintf(res.error, sizeof(res.error), "Cannot write vault file");
-    delete[] ciphertext;
     return res;
   }
 
   std::fwrite(iv, 1, AES_IV_SIZE, f);
   std::fwrite(tag, 1, AES_TAG_SIZE, f);
-  std::fwrite(ciphertext, 1, plain_len, f);
+  if (plain_len > 0)
+    std::fwrite(ciphertext.data(), 1, plain_len, f);
   std::fclose(f);
 
-  delete[] ciphertext;
   res.success = true;
   res.output_len = AES_IV_SIZE + AES_TAG_SIZE + plain_len;
   return res;
@@ -651,10 +654,18 @@ static VaultResult vault_decrypt_file(const char *user_id, const char *filename,
   }
 
   uint8_t iv[AES_IV_SIZE], tag[AES_TAG_SIZE];
-  std::fread(iv, 1, AES_IV_SIZE, f);
-  std::fread(tag, 1, AES_TAG_SIZE, f);
-  uint8_t *ciphertext = new uint8_t[ct_len];
-  std::fread(ciphertext, 1, ct_len, f);
+  if (std::fread(iv, 1, AES_IV_SIZE, f) != AES_IV_SIZE ||
+      std::fread(tag, 1, AES_TAG_SIZE, f) != AES_TAG_SIZE) {
+    std::fclose(f);
+    std::snprintf(res.error, sizeof(res.error), "Vault file truncated");
+    return res;
+  }
+  std::vector<uint8_t> ciphertext(ct_len);
+  if (ct_len > 0 && std::fread(ciphertext.data(), 1, ct_len, f) != ct_len) {
+    std::fclose(f);
+    std::snprintf(res.error, sizeof(res.error), "Vault ciphertext truncated");
+    return res;
+  }
   std::fclose(f);
 
   // Load and derive key
@@ -668,6 +679,10 @@ static VaultResult vault_decrypt_file(const char *user_id, const char *filename,
   uint8_t user_key_input[128];
   std::memcpy(user_key_input, master_key, 32);
   size_t uid_len = std::strlen(user_id);
+  if (uid_len > sizeof(user_key_input) - 32) {
+    std::snprintf(res.error, sizeof(res.error), "user_id too long");
+    return res;
+  }
   std::memcpy(user_key_input + 32, user_id, uid_len);
   uint8_t user_key[32];
   sha256(user_key_input, 32 + uid_len, user_key);
@@ -687,7 +702,7 @@ static VaultResult vault_decrypt_file(const char *user_id, const char *filename,
   for (size_t i = 0; i < ct_len; i += 16) {
     uint8_t blk[16] = {0};
     size_t bl = (ct_len - i < 16) ? ct_len - i : 16;
-    std::memcpy(blk, ciphertext + i, bl);
+    std::memcpy(blk, ciphertext.data() + i, bl);
     for (int j = 0; j < 16; ++j)
       ghash_acc[j] ^= blk[j];
     ghash_mul(ghash_acc, h_block);
@@ -710,7 +725,6 @@ static VaultResult vault_decrypt_file(const char *user_id, const char *filename,
   for (int i = 0; i < AES_TAG_SIZE; ++i)
     diff |= tag[i] ^ expected_tag[i];
   if (diff != 0) {
-    delete[] ciphertext;
     std::snprintf(res.error, sizeof(res.error),
                   "Authentication failed — data tampered");
     return res;
@@ -731,7 +745,6 @@ static VaultResult vault_decrypt_file(const char *user_id, const char *filename,
       output[i + j] = ciphertext[i + j] ^ keystream[j];
   }
 
-  delete[] ciphertext;
   *output_len = ct_len;
   res.success = true;
   res.output_len = ct_len;

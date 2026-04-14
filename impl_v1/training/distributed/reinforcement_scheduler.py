@@ -91,7 +91,12 @@ class ReinforcementScheduler:
                 result = retrain_fn(weights)
                 accuracy_after = result.get("accuracy", accuracy_before)
             except Exception:
-                pass
+                logger.warning(
+                    "[REINFORCE] Retrain callback failed for cycle %s; preserving previous accuracy",
+                    self._cycle_count,
+                    exc_info=True,
+                )
+                accuracy_after = accuracy_before
 
         self._last_retrain = time.time()
 

@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import hashlib
 import json
+import logging
 import os
 import secrets
 import uuid
@@ -76,6 +77,8 @@ MAX_DEVICES = 3
 MAX_VERIFICATION_ATTEMPTS = 3
 _DEVICE_TRUST_REGISTRY_ENV = "YGB_DEVICE_TRUST_REGISTRY_PATH"
 _DEVICE_TRUST_CHALLENGE_ENV = "YGB_DEVICE_TRUST_CHALLENGE_PATH"
+
+logger = logging.getLogger(__name__)
 
 
 # Device registry
@@ -366,7 +369,13 @@ def register_device(
                 ip_address=ip_address,
             )
         except Exception:
-            pass
+            _device_registry.pop(device_id, None)
+            _pending_challenges.pop(challenge.challenge_id, None)
+            logger.exception(
+                "Failed to create owner alert for pending device verification %s",
+                device_id,
+            )
+            raise
         _persist_state()
         
         return device, challenge, password

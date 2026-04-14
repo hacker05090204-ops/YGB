@@ -217,13 +217,19 @@ class IdleResourceScheduler:
                     mem_total = float(parts[3].strip())
                     gpu_mem = (mem_used / max(mem_total, 1)) * 100
         except Exception:
-            pass
+            logger.warning(
+                "[SCHEDULER] Failed to probe GPU resources with nvidia-smi; using busy GPU defaults",
+                exc_info=True,
+            )
 
         try:
             import psutil
             cpu_util = psutil.cpu_percent(interval=0.1)
         except Exception:
-            pass
+            logger.warning(
+                "[SCHEDULER] Failed to probe CPU utilization with psutil; using default CPU load",
+                exc_info=True,
+            )
 
         return ResourceSnapshot(
             gpu_util_pct=gpu_util,

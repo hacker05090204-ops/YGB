@@ -43,8 +43,11 @@ def _get_gpu_architecture() -> str:
         if torch.cuda.is_available():
             props = torch.cuda.get_device_properties(0)
             return f"{props.name}_cc{props.major}.{props.minor}"
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(
+            "[CACHE] GPU architecture detection failed; defaulting cache key to cpu: %s",
+            exc,
+        )
     return "cpu"
 
 
@@ -121,12 +124,20 @@ def _file_lock(dataset_hash: str):
                     import fcntl
                     fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
             except Exception:
-                pass
+                logger.warning(
+                    "[CACHE] Failed to release file lock cleanly for %s",
+                    lock_file,
+                    exc_info=True,
+                )
             fd.close()
             try:
                 os.remove(lock_file)
             except Exception:
-                pass
+                logger.warning(
+                    "[CACHE] Failed to remove lock file %s",
+                    lock_file,
+                    exc_info=True,
+                )
 
 
 def cache_exists(dataset_hash: str) -> bool:

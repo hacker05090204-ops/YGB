@@ -1,7 +1,7 @@
 {
   "AuthorityLock.verify_all_locked()": {
     "status": "PASS",
-    "elapsed_s": 0.004,
+    "elapsed_s": 0.003,
     "result": {
       "verify_result": {
         "all_locked": true,
@@ -29,7 +29,7 @@
   },
   "CVE Ingestion Accuracy Probe": {
     "status": "PASS",
-    "elapsed_s": 0.6,
+    "elapsed_s": 0.449,
     "result": {
       "total": 5,
       "passed": 5,
@@ -72,14 +72,14 @@
           "acceptable": true,
           "expected": true,
           "correct": true,
-          "score": 0.6654935369734065,
+          "score": 0.6656400442589916,
           "reason": null
         }
       ],
       "quality_stats": {
         "accepted": 2,
         "rejected": 3,
-        "mean_score": 0.4710280139581345,
+        "mean_score": 0.4710573154152515,
         "rejection_reasons": {
           "description_too_short": 2,
           "missing_cve_id": 1
@@ -89,15 +89,29 @@
   },
   "MoE Smoke Test": {
     "status": "PASS",
-    "elapsed_s": 4.454,
+    "elapsed_s": 9.069,
     "result": {
-      "error": "run_smoke_test() got an unexpected keyword argument 'verbose'",
-      "model_created": false
+      "expert_fields_count": 23,
+      "config_n_experts": 23,
+      "total_params": 310084096,
+      "expert_params": 289406976,
+      "active_params": 45842944,
+      "logits_shape": [
+        2,
+        64,
+        32000
+      ],
+      "ce_loss": 10.534210205078125,
+      "aux_loss": 4.7884907722473145,
+      "total_loss": 10.5820951461792,
+      "grad_norm": 6.407519061029001,
+      "vram_mb": 4095,
+      "expert_budget": 23
     }
   },
   "Expert Queue Status": {
     "status": "PASS",
-    "elapsed_s": 0.016,
+    "elapsed_s": 0.017,
     "result": {
       "schema_version": 1,
       "updated_at": "2026-04-12T17:02:34Z",
@@ -113,7 +127,7 @@
   },
   "Feature Dimension Check": {
     "status": "PASS",
-    "elapsed_s": 0.028,
+    "elapsed_s": 0.03,
     "result": {
       "configured_feature_dim": 256,
       "expected_from_constant": 256,
@@ -155,263 +169,35 @@
       ]
     }
   },
-  "Exception Audit (except.*pass)": {
-    "status": "PASS",
-    "elapsed_s": 0.505,
-    "result": {
-      "directories_checked": 3,
-      "total_bare_excepts": 98,
-      "results": [
-        {
-          "dir": "backend",
-          "py_files_scanned": 331,
-          "except_pass_count": 15,
-          "matches": [
-            {
-              "file": "backend\\tests\\test_coverage_boost11.py",
-              "line": 142,
-              "snippet": "except (ImportError, AttributeError):\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost11.py",
-              "line": 151,
-              "snippet": "except (ImportError, AttributeError):\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost12.py",
-              "line": 109,
-              "snippet": "except (ImportError, AttributeError):\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost7_real.py",
-              "line": 490,
-              "snippet": "except sqlite3.OperationalError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost9.py",
-              "line": 335,
-              "snippet": "except ImportError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost9.py",
-              "line": 343,
-              "snippet": "except ImportError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost9.py",
-              "line": 352,
-              "snippet": "except ImportError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost9.py",
-              "line": 367,
-              "snippet": "except ImportError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost9.py",
-              "line": 387,
-              "snippet": "except (ImportError, AttributeError):\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_boost_2.py",
-              "line": 328,
-              "snippet": "except Exception:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_zero_modules.py",
-              "line": 506,
-              "snippet": "except RuntimeError:\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_coverage_zero_modules.py",
-              "line": 692,
-              "snippet": "except ValueError:\n                pass"
-            },
-            {
-              "file": "backend\\tests\\test_governance_guards.py",
-              "line": 118,
-              "snippet": "except (AttributeError, TypeError):\n            pass"
-            },
-            {
-              "file": "backend\\tests\\test_production_readiness.py",
-              "line": 326,
-              "snippet": "except OSError:\n                pass"
-            },
-            {
-              "file": "backend\\tests\\test_scope_normalization.py",
-              "line": 95,
-              "snippet": "except ValueError:\n                    pass"
-            }
-          ]
-        },
-        {
-          "dir": "impl_v1",
-          "py_files_scanned": 654,
-          "except_pass_count": 78,
-          "matches": [
-            {
-              "file": "impl_v1\\aviation\\decision_trace.py",
-              "line": 69,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\enterprise\\checkpoint_sync.py",
-              "line": 58,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\enterprise\\training_controller.py",
-              "line": 87,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\governance\\evolution_test.py",
-              "line": 190,
-              "snippet": "except Exception:\n                    pass"
-            },
-            {
-              "file": "impl_v1\\governance\\human_override.py",
-              "line": 66,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\governance\\human_override.py",
-              "line": 249,
-              "snippet": "except Exception:\n                    pass"
-            },
-            {
-              "file": "impl_v1\\governance\\incident_automation.py",
-              "line": 103,
-              "snippet": "except (json.JSONDecodeError, OSError):\n                pass"
-            },
-            {
-              "file": "impl_v1\\governance\\model_registry.py",
-              "line": 58,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\phase49\\governors\\g09_device_trust.py",
-              "line": 368,
-              "snippet": "except Exception:\n            pass"
-            },
-            {
-              "file": "impl_v1\\phase50\\monitoring\\dependency_monitor.py",
-              "line": 65,
-              "snippet": "except Exception:\n        pass"
-            },
-            {
-              "file": "impl_v1\\phase50\\monitoring\\dependency_monitor.py",
-              "line": 96,
-              "snippet": "except Exception:\n            pass"
-            },
-            {
-              "file": "impl_v1\\training\\automode\\automode_controller.py",
-              "line": 61,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\training\\checkpoints\\checkpoint_hardening.py",
-              "line": 102,
-              "snippet": "except Exception:\n            pass"
-            },
-            {
-              "file": "impl_v1\\training\\checkpoints\\checkpoint_hardening.py",
-              "line": 1008,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\training\\config\\adaptive_batch.py",
-              "line": 168,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "impl_v1\\training\\config\\adaptive_batch.py",
-              "line": 278,
-              "snippet": "except Exception:\n            pass"
-            },
-            {
-              "file": "impl_v1\\training\\data\\feature_cache.py",
-              "line": 46,
-              "snippet": "except Exception:\n        pass"
-            },
-            {
-              "file": "impl_v1\\training\\data\\feature_cache.py",
-              "line": 123,
-              "snippet": "except Exception:\n                pass\n            fd.close()\n            try:\n                os.re"
-            },
-            {
-              "file": "impl_v1\\training\\data\\governance_pipeline.py",
-              "line": 387,
-              "snippet": "except Exception:\n        pass"
-            },
-            {
-              "file": "impl_v1\\training\\data\\governance_pipeline.py",
-              "line": 398,
-              "snippet": "except Exception:\n        pass"
-            }
-          ]
-        },
-        {
-          "dir": "scripts",
-          "py_files_scanned": 20,
-          "except_pass_count": 5,
-          "matches": [
-            {
-              "file": "scripts\\ci_security_scan.py",
-              "line": 169,
-              "snippet": "except Exception:\n        pass"
-            },
-            {
-              "file": "scripts\\fast_bridge_ingest.py",
-              "line": 56,
-              "snippet": "except AttributeError:\n    pass"
-            },
-            {
-              "file": "scripts\\ingestion_bootstrap.py",
-              "line": 81,
-              "snippet": "except Exception:\n                pass"
-            },
-            {
-              "file": "scripts\\migrate_pt_to_safetensors.py",
-              "line": 139,
-              "snippet": "except Exception:\n            try:\n                if os.path.exists(_tmp_st):\n                    o"
-            },
-            {
-              "file": "scripts\\remediation_scan.py",
-              "line": 283,
-              "snippet": "except Exception:\n                pass"
-            }
-          ]
-        }
-      ]
-    }
-  },
-  "Mock Path Audit": {
-    "status": "PASS",
-    "elapsed_s": 0.525,
-    "result": {
-      "directories_checked": 3,
-      "mock_patterns_found": 0,
-      "results": []
-    }
-  },
   "Live Server /healthz": {
     "status": "PASS",
-    "elapsed_s": 4.106,
+    "elapsed_s": 0.01,
     "result": {
-      "server_available": false,
-      "url": "http://localhost:8001/healthz",
-      "error": "URLError: [WinError 10061] No connection could be made because the target machine actively refused it",
-      "note": "Server not running on localhost:8001"
+      "server_available": true,
+      "url": "http://127.0.0.1:8000/healthz",
+      "status_code": 200,
+      "response_time_ms": 10.16,
+      "response": {
+        "status": "alive",
+        "uptime_s": 59.8,
+        "boot_time": 1776111437.525668
+      }
     }
   },
   "Concurrent Stress Test": {
     "status": "PASS",
-    "elapsed_s": 4.128,
+    "elapsed_s": 0.042,
     "result": {
-      "server_available": false,
-      "error": "Server not available for stress test",
-      "note": "Start server with start_full_stack.cmd first"
+      "server_available": true,
+      "url": "http://127.0.0.1:8000/healthz",
+      "total_requests": 20,
+      "successful": 20,
+      "failed": 0,
+      "total_time_s": 0.042,
+      "avg_time_ms": 11.96,
+      "min_time_ms": 4.87,
+      "max_time_ms": 21.89,
+      "requests_per_second": 476.21
     }
   }
 }

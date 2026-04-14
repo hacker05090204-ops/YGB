@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import hashlib
+import math
 import ctypes
 from pathlib import Path
 import subprocess
@@ -67,6 +68,7 @@ from training_core.contracts import (
     TrainingControllerConfig,
     TrainingResult,
 )
+from backend.training.runtime_status_validator import TrainingGovernanceError
 
 
 # =============================================================================
@@ -137,6 +139,23 @@ def _ensure_moe_hidden_dropout(model, nn_module, dropout_probability: float) -> 
     return enforced_expert_count
 
 
+def _compute_phase1_moe_expert_hidden_dim(
+    d_model: int,
+    *,
+    n_experts: int,
+    expert_hidden_mult: int,
+    required_total_params: int = 100_000_001,
+) -> int:
+    resolved_d_model = max(1, int(d_model))
+    resolved_n_experts = max(1, int(n_experts))
+    base_hidden_dim = max(1, resolved_d_model * max(1, int(expert_hidden_mult)))
+    per_expert_target = math.ceil(int(required_total_params) / resolved_n_experts)
+    required_hidden_dim = math.ceil(
+        max(0, per_expert_target - resolved_d_model) / ((2 * resolved_d_model) + 1)
+    )
+    return max(base_hidden_dim, int(required_hidden_dim))
+
+
 def _write_safetensors_checkpoint(
     checkpoint_path: str,
     state_dict: Dict[str, Any],
@@ -190,6 +209,13 @@ def _build_configured_model(
             if int(total_samples) < 10_000
             else baseline_moe_dim
         )
+        phase1_required_total_params = 100_000_001
+        expert_hidden_dim = _compute_phase1_moe_expert_hidden_dim(
+            moe_dim,
+            n_experts=N_EXPERTS,
+            expert_hidden_mult=2,
+            required_total_params=phase1_required_total_params,
+        )
         moe_config = MoEConfig(
             d_model=moe_dim,
             n_experts=N_EXPERTS,
@@ -199,6 +225,7 @@ def _build_configured_model(
             gate_noise=1.0,
             aux_loss_coeff=0.01,
         )
+        setattr(moe_config, "expert_hidden_dim", expert_hidden_dim)
         model = MoEClassifier(
             moe_config,
             input_dim=config.input_dim,
@@ -209,12 +236,21 @@ def _build_configured_model(
             raise RuntimeError(
                 f"MoE hidden-layer dropout enforcement failed: expected {N_EXPERTS}, got {enforced_dropout_experts}"
             )
+        model_parameter_count = sum(parameter.numel() for parameter in model.parameters())
+        if model_parameter_count <= phase1_required_total_params:
+            raise RuntimeError(
+                "MoE Phase 1 capacity gate failed: "
+                f"expected > {phase1_required_total_params:,} params, got {model_parameter_count:,}"
+            )
         model.requires_unused_parameter_detection = True
+        model.total_parameter_count = int(model_parameter_count)
         logger.info(
-            "  MoE activated: experts=%s | top_k=%s | d_model=%s | hidden_dropout_enforced=%s",
+            "  MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s",
             moe_config.n_experts,
             moe_config.top_k,
             moe_config.d_model,
+            expert_hidden_dim,
+            f"{model_parameter_count:,}",
             enforced_dropout_experts,
         )
         return model, moe_config.d_model
@@ -800,8 +836,11 @@ def phase1_architecture_freeze(config: TrainingControllerConfig) -> dict:
         )
         if r.returncode == 0:
             freeze_state["git_commit"] = r.stdout.strip()
-    except Exception:
-        pass
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.warning(
+            "  ⚠ Unable to resolve git commit during architecture freeze: %s",
+            exc,
+        )
 
     _ensure_dir("secure_data")
     _atomic_write_json(
@@ -997,8 +1036,11 @@ def phase2_dataset_finalization(
                     rejection_reason=str(exc),
                 )
             )
-        except Exception:
-            pass
+        except Exception as ledger_exc:
+            logger.warning(
+                "  ⚠ Failed to append dataset rejection to truth ledger: %s",
+                ledger_exc,
+            )
 
         return state, empty_X, empty_y
 
@@ -1026,9 +1068,20 @@ def phase2_dataset_finalization(
         for c in report.checks:
             icon = "✓" if c.passed else "✗"
             logger.info(f"  {icon} [{c.check_id}] {c.name}: {c.detail}")
+        if not report.passed:
+            raise TrainingGovernanceError(
+                report.abort_reason or "phase2 data policy enforcement blocked training",
+                status="DATA_POLICY_BLOCKED",
+                reasons=[c.name for c in report.checks if not c.passed],
+            )
+    except TrainingGovernanceError:
+        raise
     except Exception as exc:
-        logger.warning(f"  Enforcement error: {exc}")
-        enforcement_passed = True
+        logger.error(f"  ✗ Enforcement error: {exc}")
+        raise TrainingGovernanceError(
+            f"phase2 data policy enforcement failed: {exc}",
+            status="DATA_POLICY_BLOCKED",
+        ) from exc
 
     manifest = {
         "dataset_source": dataset_source,
@@ -1280,7 +1333,7 @@ def phase4_model_freeze(
         base_dir=config.model_dir,
     )
 
-    redundancy_ok = True
+    redundancy_ok = False
     try:
         from impl_v1.training.distributed.redundancy_gate import RedundancyGate
 
@@ -1291,10 +1344,13 @@ def phase4_model_freeze(
             nas_copies=0,
             cloud_copies=0,
         )
-        gate.check_training_allowed()
-        redundancy_ok = False
-    except Exception:
-        pass
+        redundancy_ok = bool(gate.check_training_allowed().training_allowed)
+    except Exception as exc:
+        logger.warning(
+            "  ⚠ Redundancy verification failed during model freeze; "
+            "marking redundancy_verified=false: %s",
+            exc,
+        )
 
     freeze_info = {
         "version_id": version_id,

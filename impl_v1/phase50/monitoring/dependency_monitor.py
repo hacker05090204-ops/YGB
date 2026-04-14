@@ -20,6 +20,10 @@ from typing import Dict, Tuple, Optional
 from pathlib import Path
 from datetime import datetime
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -62,8 +66,13 @@ def get_cuda_version() -> Optional[str]:
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except Exception:
-        pass
+    except FileNotFoundError:
+        logger.debug("nvidia-smi not available; falling back to CUDA_VERSION environment variable")
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.warning(
+            "Failed to query CUDA version via nvidia-smi; falling back to CUDA_VERSION environment variable: %s",
+            exc,
+        )
     
     # Try CUDA_VERSION env
     return os.environ.get("CUDA_VERSION")
@@ -93,8 +102,10 @@ def get_compiler_version() -> str:
             )
             if result.returncode == 0:
                 return result.stdout.split("\n")[0]
-        except Exception:
-            pass
+        except FileNotFoundError:
+            logger.debug("gcc not available; returning Unknown compiler version")
+        except (OSError, subprocess.SubprocessError) as exc:
+            logger.warning("Failed to query compiler version via gcc: %s", exc)
     
     return "Unknown"
 
@@ -165,8 +176,13 @@ def load_environment_baseline() -> Optional[EnvironmentSnapshot]:
         with open(BASELINE_FILE, "r") as f:
             data = json.load(f)
         return EnvironmentSnapshot(**data)
-    except Exception:
-        return None
+    except (OSError, json.JSONDecodeError, TypeError):
+        logger.error(
+            "Failed to load environment baseline from %s",
+            BASELINE_FILE,
+            exc_info=True,
+        )
+        raise
 
 
 # =============================================================================

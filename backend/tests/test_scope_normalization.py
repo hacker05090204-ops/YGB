@@ -93,7 +93,9 @@ class ScopeNormalizer:
                     i += 3
                     continue
                 except ValueError:
-                    pass
+                    result.append(s[i])
+                    i += 1
+                    continue
             result.append(s[i])
             i += 1
         return "".join(result)

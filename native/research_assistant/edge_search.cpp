@@ -200,7 +200,6 @@ struct EdgeCommand {
              "msedge "
              "--headless "
              "--disable-gpu "
-             "--no-sandbox "
              "--disable-extensions "
              "--disable-plugins "
              "--disable-dev-shm-usage "
@@ -210,6 +209,8 @@ struct EdgeCommand {
              "--disable-features=TranslateUI "
              "--disable-default-apps "
              "--disable-component-update "
+             /* Keep the browser sandbox enabled. Requires the normal host */
+             /* desktop/session sandbox primitives to stay available. */
              "--no-first-run "
              "--inprivate "
              "--disable-web-security=false "

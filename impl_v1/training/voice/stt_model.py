@@ -30,6 +30,7 @@ import torch.nn.functional as F
 from impl_v1.training.checkpoints.checkpoint_hardening import (
     HardenedCheckpointManager,
 )
+from training.safetensors_io import CheckpointIntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -414,8 +415,11 @@ class LocalSTTService:
         if resolve_path:
             try:
                 candidates.append(resolve_path("checkpoint") / "stt")
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[STT] Failed to resolve checkpoint directory via storage resolver: %s",
+                    exc,
+                )
 
         if get_storage_topology:
             try:
@@ -426,8 +430,11 @@ class LocalSTTService:
                     candidates.append(Path(active_root) / "stt" / "checkpoints")
                 if fallback_root:
                     candidates.append(Path(fallback_root) / "stt" / "checkpoints")
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[STT] Failed to inspect storage topology for checkpoint directories: %s",
+                    exc,
+                )
 
         deduped: List[Path] = []
         seen = set()
@@ -457,8 +464,11 @@ class LocalSTTService:
                     dataset_root / "stt_manifest.jsonl",
                     dataset_root / "stt" / "stt_manifest.jsonl",
                 ])
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[STT] Failed to resolve dataset manifest paths via storage resolver: %s",
+                    exc,
+                )
 
         if get_storage_topology:
             try:
@@ -471,8 +481,11 @@ class LocalSTTService:
                             root / "stt" / "stt_manifest.jsonl",
                             root / "datasets" / "stt_manifest.jsonl",
                         ])
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[STT] Failed to inspect storage topology for manifest paths: %s",
+                    exc,
+                )
 
         deduped: List[Path] = []
         seen = set()
@@ -519,6 +532,8 @@ class LocalSTTService:
                     logger.info("[STT] Loaded hardened checkpoint: %s", resolved_path)
                     break
                 except Exception as checkpoint_error:
+                    if isinstance(checkpoint_error, CheckpointIntegrityError):
+                        raise
                     logger.warning(
                         "[STT] Failed to load hardened checkpoint from %s: %s",
                         checkpoint_dir,
@@ -532,17 +547,18 @@ class LocalSTTService:
                     continue
 
                 try:
-                    state = torch.load(
-                        str(checkpoint_path),
-                        map_location="cpu",
-                        weights_only=False,
+                    state = HardenedCheckpointManager._load_legacy_checkpoint(
+                        checkpoint_path,
+                        device="cpu",
                     )
                     self._model.load_state_dict(state["model_state_dict"])
                     self._model_loaded = True
                     self._loaded_checkpoint_path = str(checkpoint_path)
-                    logger.info(f"[STT] Loaded checkpoint: {checkpoint_path}")
+                    logger.info(f"[STT] Loaded verified checkpoint: {checkpoint_path}")
                     break
                 except Exception as checkpoint_error:
+                    if isinstance(checkpoint_error, CheckpointIntegrityError):
+                        raise
                     logger.warning(
                         "[STT] Failed to load checkpoint %s: %s",
                         checkpoint_path,

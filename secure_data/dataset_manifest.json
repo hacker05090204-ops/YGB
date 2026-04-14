@@ -1,29 +1,33 @@
 {
   "schema_version": 1,
   "dataset_source": "INGESTION_PIPELINE",
-  "total_samples": 127347,
-  "verified_samples": 127347,
+  "total_samples": 129411,
+  "verified_samples": 129411,
   "per_field_counts": {
-    "endpoint": 0,
-    "parameters": 0,
-    "exploit_vector": 0,
-    "impact": 0,
-    "source_tag": 0,
-    "reliability": 0
+    "endpoint": 2064,
+    "parameters": 2064,
+    "exploit_vector": 2064,
+    "impact": 2064,
+    "source_tag": 2064,
+    "reliability": 2064
   },
-  "source_mix": {},
+  "source_mix": {
+    "CVE Services / cve.org": 1514,
+    "NVD API v2": 419,
+    "CISA KEV Catalog": 1480
+  },
   "strict_real_mode": true,
-  "updated_at": "2026-04-08T20:03:51.439568+00:00",
-  "ingestion_manifest_hash": "d4c35b218e38c3f2",
+  "updated_at": "2026-04-14T23:54:25.655463+00:00",
+  "ingestion_manifest_hash": "485315f8542a6691",
   "worker_stats": {
-    "total_ingested": 0,
-    "total_dropped": 4,
-    "total_deduped": 0
+    "total_ingested": 2064,
+    "total_dropped": 341,
+    "total_deduped": 1003240
   },
-  "sample_count": 127347,
-  "dataset_hash": "d4c35b218e38c3f2",
-  "signed_by": "3e1a64c5cb00d8cbdbea8095936731bc9eb5290716b2a393249c7e9b1634ca69",
+  "sample_count": 129411,
+  "dataset_hash": "485315f8542a6691",
+  "signed_by": "f23d19936b0de6de8db931770553aa3daa4604c95e9a327588bb2988b3f5f213",
   "version": "1.0",
-  "created_at": "2026-04-08T20:03:51.439568+00:00",
-  "signature_hash": "8d46307ea13e62044bd24640cdb7129108aaf19d8d7c92bc3391d6ac74a31282"
+  "created_at": "2026-04-14T23:54:25.655463+00:00",
+  "signature_hash": "b5af38530443a79367b2002e2b9931e55c27d8339c4fb2f9f314c43b3f090a06"
 }

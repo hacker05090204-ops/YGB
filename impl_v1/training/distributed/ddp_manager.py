@@ -68,7 +68,10 @@ def setup_ddp(config: DDPConfig) -> bool:
     try:
         torch.use_deterministic_algorithms(True)
     except Exception:
-        pass
+        logger.warning(
+            "[DDP] Failed to enable deterministic algorithms; continuing with backend-level determinism only",
+            exc_info=True,
+        )
 
     try:
         dist.init_process_group(
@@ -91,11 +94,17 @@ def cleanup_ddp():
     """Clean up distributed process group."""
     try:
         import torch.distributed as dist
+    except ImportError:
+        logger.warning("[DDP] torch.distributed unavailable during cleanup; skipping teardown")
+        return
+
+    try:
         if dist.is_initialized():
             dist.destroy_process_group()
             logger.info("[DDP] Process group destroyed")
     except Exception:
-        pass
+        logger.error("[DDP] Failed to destroy process group", exc_info=True)
+        raise
 
 
 def compute_weight_hash(model) -> str:

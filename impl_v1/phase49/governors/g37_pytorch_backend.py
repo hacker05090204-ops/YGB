@@ -27,6 +27,7 @@ from backend.training.model_thresholds import (
     classify_positive_probability,
     load_positive_threshold,
 )
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 
 # Try importing PyTorch - fail closed in training/inference paths if unavailable
 try:
@@ -204,6 +205,14 @@ def _is_non_empty_real_dataloader(dataloader: Any) -> bool:
         return False
 
 
+def _is_managed_checkpoint_file(checkpoint_path: Path) -> bool:
+    """Return True only for checkpoint files that carry hardening metadata."""
+    suffix = checkpoint_path.suffix.lower()
+    if suffix == ".safetensors":
+        return True
+    return bool(HardenedCheckpointManager._read_sha256_sidecar(checkpoint_path))
+
+
 class PyTorchBackend:
     """Infrastructure-gated PyTorch backend contract."""
 
@@ -221,10 +230,24 @@ class PyTorchBackend:
         if not PYTORCH_AVAILABLE or torch is None:
             raise RealBackendNotConfiguredError(PYTORCH_BACKEND_PROVISIONING_MESSAGE)
 
-        try:
-            checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-        except TypeError:
-            checkpoint = torch.load(checkpoint_path, map_location="cpu")
+        if _is_managed_checkpoint_file(checkpoint_path):
+            checkpoint = HardenedCheckpointManager._load_legacy_checkpoint(
+                checkpoint_path,
+                device="cpu",
+            )
+        elif checkpoint_path.suffix.lower() == ".pt":
+            # Explicit compatibility path for unmanaged ad hoc pytest fixtures
+            # created with torch.save({...}, path) and no hardening metadata.
+            checkpoint = torch.load(
+                checkpoint_path,
+                map_location="cpu",
+                weights_only=False,
+            )
+        else:
+            checkpoint = HardenedCheckpointManager._load_legacy_checkpoint(
+                checkpoint_path,
+                device="cpu",
+            )
 
         if not isinstance(checkpoint, dict):
             raise ValueError("Checkpoint payload must be a dict")
@@ -525,6 +548,8 @@ def save_model_checkpoint(
             'model_state_dict': model.state_dict(),
             'accuracy': metrics.train_accuracy,
         }, path)
+        checkpoint_sha256 = HardenedCheckpointManager._compute_hash(Path(path))
+        Path(f"{path}.sha256").write_text(checkpoint_sha256, encoding="utf-8")
     
     return ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
@@ -546,18 +571,22 @@ def load_model_checkpoint(
     
     device = get_torch_device()
     model = BugClassifier(config)
-    
-    checkpoint = torch.load(path, map_location=device, weights_only=True)
+
+    checkpoint = HardenedCheckpointManager._load_legacy_checkpoint(
+        Path(path),
+        device=str(device),
+    )
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
+    training_state = checkpoint.get("training_state", {})
     
     return model, ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
-        epoch=checkpoint['epoch'],
-        train_accuracy=checkpoint['accuracy'],
-        val_accuracy=checkpoint.get('holdout_accuracy'),  # Real holdout, not fabricated
-        model_hash=_hash_content(f"{config.seed}:{checkpoint['epoch']}"),
+        epoch=int(training_state.get('epoch', 0) or 0),
+        train_accuracy=float(training_state.get('accuracy', 0.0) or 0.0),
+        val_accuracy=training_state.get('holdout_accuracy'),  # Real holdout, not fabricated
+        model_hash=_hash_content(f"{config.seed}:{int(training_state.get('epoch', 0) or 0)}"),
         created_at=_now_iso(),
         path=path,
     )

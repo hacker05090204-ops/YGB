@@ -11,12 +11,14 @@ Scans the codebase for:
 Exit code 0 = clean, 1 = violations found.
 """
 
+import logging
 import os
 import sys
 import re
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # SCAN CONFIGURATION
@@ -167,7 +169,13 @@ def scan_file(filepath: Path, patterns: list, label: str) -> list:
                         "content": stripped[:120],
                     })
     except Exception:
-        pass
+        logger.error(
+            "Failed to scan %s for %s violations",
+            filepath,
+            label,
+            exc_info=True,
+        )
+        raise
     return violations
 
 

@@ -97,10 +97,16 @@ class HardenedCheckpointManager:
         self._executor.shutdown(wait=True)
 
     def __del__(self):  # pragma: no cover - defensive cleanup only
+        executor = getattr(self, "_executor", None)
+        if executor is None:
+            return
         try:
-            self._executor.shutdown(wait=False, cancel_futures=False)
+            executor.shutdown(wait=False, cancel_futures=False)
         except Exception:
-            pass
+            logger.warning(
+                "[CKPT] Failed to shut down checkpoint executor during cleanup",
+                exc_info=True,
+            )
 
     @property
     def latest_checkpoint_id(self) -> str:
@@ -298,13 +304,24 @@ class HardenedCheckpointManager:
         if metadata is None:
             legacy_path = self._legacy_checkpoint_path(checkpoint_id)
             if legacy_path and legacy_path.exists():
-                return True, "Legacy checkpoint present"
+                expected_hash = self._read_sha256_sidecar(legacy_path)
+                if not expected_hash:
+                    return False, "Legacy checkpoint sha256 sidecar missing"
+                current_hash = self._compute_hash(legacy_path)
+                if current_hash != expected_hash:
+                    return False, "Legacy checkpoint hash mismatch"
+                return True, "Legacy checkpoint verified"
             return False, "Checkpoint not in manifest"
 
         checkpoint_path = Path(metadata.checkpoint_path or self.checkpoint_dir / checkpoint_id)
         if checkpoint_path.is_file():
+            expected_hash = str(
+                metadata.sha256 or self._read_sha256_sidecar(checkpoint_path) or ""
+            ).strip()
+            if not expected_hash:
+                return False, "Legacy checkpoint sha256 missing"
             current_hash = self._compute_hash(checkpoint_path)
-            if current_hash != metadata.sha256:
+            if current_hash != expected_hash:
                 return False, "Legacy checkpoint hash mismatch"
             return True, "Legacy checkpoint verified"
 
@@ -366,6 +383,9 @@ class HardenedCheckpointManager:
         if not resolved_id:
             return None
 
+        from training.safetensors_io import CheckpointIntegrityError, load_safetensors
+        import torch
+
         metadata = self.checkpoints.get(resolved_id)
         if metadata is None:
             legacy_path = self._legacy_checkpoint_path(resolved_id)
@@ -373,18 +393,41 @@ class HardenedCheckpointManager:
                 return None
             return self._load_legacy_checkpoint(legacy_path, device=device)
 
+        valid, reason = self.verify_checkpoint(resolved_id)
+        if not valid:
+            raise CheckpointIntegrityError(
+                f"Checkpoint integrity verification failed for {resolved_id}: {reason}"
+            )
+
         checkpoint_path = Path(metadata.checkpoint_path or self.checkpoint_dir / resolved_id)
         if checkpoint_path.is_file():
-            return self._load_legacy_checkpoint(checkpoint_path, device=device)
-
-        from training.safetensors_io import load_safetensors
-        import torch
+            return self._load_legacy_checkpoint(
+                checkpoint_path,
+                device=device,
+                expected_sha256=metadata.sha256,
+            )
 
         model_path = checkpoint_path / f"model_shard_{rank}.safetensors"
         if not model_path.exists():
             model_path = checkpoint_path / "model_shard_0.safetensors"
         if not model_path.exists():
             return None
+
+        on_disk_metadata = self._read_json(checkpoint_path / "metadata.json")
+        artifact_hashes = {
+            str(item.get("relative_path", "") or ""): str(item.get("sha256", "") or "")
+            for item in (on_disk_metadata.get("shards", []) or [])
+            if isinstance(item, dict)
+        }
+
+        def _artifact_hash(artifact_path: Path) -> str:
+            relative_path = artifact_path.relative_to(checkpoint_path).as_posix()
+            expected_hash = artifact_hashes.get(relative_path, "")
+            if not expected_hash:
+                raise CheckpointIntegrityError(
+                    f"Checkpoint artifact hash missing for {resolved_id}:{relative_path}"
+                )
+            return expected_hash
 
         optimizer_path = checkpoint_path / f"optimizer_{rank}.pt"
         if not optimizer_path.exists():
@@ -402,31 +445,43 @@ class HardenedCheckpointManager:
             "checkpoint_id": resolved_id,
             "model_state_dict": load_safetensors(str(model_path), device=device),
             "optimizer_state_dict": (
-                torch.load(optimizer_path, map_location=device, weights_only=False)
+                self._load_torch_artifact(
+                    optimizer_path,
+                    device=device,
+                    expected_sha256=_artifact_hash(optimizer_path),
+                )
                 if optimizer_path.exists()
                 else None
             ),
             "scheduler_state_dict": (
-                torch.load(
+                self._load_torch_artifact(
                     checkpoint_path / "scheduler.pt",
-                    map_location=device,
-                    weights_only=False,
+                    device=device,
+                    expected_sha256=_artifact_hash(checkpoint_path / "scheduler.pt"),
                 )
                 if (checkpoint_path / "scheduler.pt").exists()
                 else None
             ),
             "rng_state": (
-                torch.load(rng_path, map_location="cpu", weights_only=False)
+                self._load_torch_artifact(
+                    rng_path,
+                    device="cpu",
+                    expected_sha256=_artifact_hash(rng_path),
+                )
                 if rng_path.exists()
                 else None
             ),
             "scaler_state_dict": (
-                torch.load(scaler_path, map_location=device, weights_only=False)
+                self._load_torch_artifact(
+                    scaler_path,
+                    device=device,
+                    expected_sha256=_artifact_hash(scaler_path),
+                )
                 if scaler_path.exists()
                 else None
             ),
             "training_state": self._read_json(checkpoint_path / "training_state.json"),
-            "metadata": self._read_json(checkpoint_path / "metadata.json"),
+            "metadata": on_disk_metadata,
         }
 
     def resume_from_latest(
@@ -755,10 +810,8 @@ class HardenedCheckpointManager:
         if prefer_best:
             best_id = self.get_best_checkpoint()
             if best_id:
-                valid, _ = self.verify_checkpoint(best_id)
-                if valid:
-                    return best_id
-        return self.get_latest_valid_checkpoint()
+                return best_id
+        return self.get_latest_checkpoint()
 
     def _load_manifest(self) -> None:
         if not self.metadata_file.exists():
@@ -1006,7 +1059,11 @@ class HardenedCheckpointManager:
             try:
                 return value.isoformat()
             except Exception:
-                pass
+                logger.warning(
+                    "[CKPT] Failed to serialize %s via isoformat(); falling back to string",
+                    type(value).__name__,
+                    exc_info=True,
+                )
         return str(value)
 
     @staticmethod
@@ -1017,8 +1074,71 @@ class HardenedCheckpointManager:
         return None
 
     @staticmethod
-    def _load_legacy_checkpoint(path: Path, *, device: str) -> Dict[str, Any]:
+    def _read_sha256_sidecar(path: Path) -> str:
+        candidates = []
+        for candidate in (
+            Path(str(path) + ".sha256"),
+            path.with_suffix(path.suffix + ".sha256") if path.suffix else Path(str(path) + ".sha256"),
+            path.with_suffix(".sha256"),
+        ):
+            candidate_str = str(candidate)
+            if candidate_str not in candidates:
+                candidates.append(candidate_str)
+        for candidate_str in candidates:
+            candidate = Path(candidate_str)
+            if not candidate.exists():
+                continue
+            raw_value = candidate.read_text(encoding="utf-8").strip()
+            if raw_value:
+                return raw_value.split()[0].strip().lower()
+        return ""
+
+    @classmethod
+    def _require_verified_file_hash(
+        cls,
+        path: Path,
+        *,
+        expected_sha256: Optional[str] = None,
+    ) -> str:
+        from training.safetensors_io import CheckpointIntegrityError
+
+        expected = str(expected_sha256 or cls._read_sha256_sidecar(path) or "").strip().lower()
+        if not expected:
+            raise CheckpointIntegrityError(f"Checkpoint SHA-256 metadata missing for {path}")
+        if len(expected) != 64 or any(ch not in "0123456789abcdef" for ch in expected):
+            raise CheckpointIntegrityError(f"Checkpoint SHA-256 metadata invalid for {path}")
+
+        actual = cls._compute_hash(path)
+        if actual != expected:
+            raise CheckpointIntegrityError(
+                f"Checkpoint SHA-256 mismatch for {path}: expected={expected[:16]}..., got={actual[:16]}..."
+            )
+        return actual
+
+    @classmethod
+    def _load_torch_artifact(
+        cls,
+        path: Path,
+        *,
+        device: str,
+        expected_sha256: Optional[str],
+    ) -> Any:
         import torch
+
+        cls._require_verified_file_hash(path, expected_sha256=expected_sha256)
+        return torch.load(path, map_location=device, weights_only=False)
+
+    @classmethod
+    def _load_legacy_checkpoint(
+        cls,
+        path: Path,
+        *,
+        device: str,
+        expected_sha256: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        import torch
+
+        cls._require_verified_file_hash(path, expected_sha256=expected_sha256)
 
         if path.suffix == ".safetensors":
             from training.safetensors_io import load_safetensors

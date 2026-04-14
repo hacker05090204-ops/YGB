@@ -10,6 +10,7 @@ from pathlib import Path
 import torch
 
 from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier, create_model_config
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 from training.safetensors_io import load_safetensors, save_safetensors
 
 logger = logging.getLogger("ygb.scripts.migrate_checkpoint_to_v2")
@@ -48,6 +49,7 @@ def _load_checkpoint_state(input_path: str) -> tuple[dict[str, torch.Tensor], di
     if source_path.suffix.lower() == ".safetensors":
         return load_safetensors(input_path, device="cpu"), metadata
 
+    HardenedCheckpointManager._require_verified_file_hash(source_path)
     payload = torch.load(input_path, map_location="cpu")
     if isinstance(payload, dict):
         for key in ("model_state_dict", "model_state", "state_dict"):

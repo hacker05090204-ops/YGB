@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-
+#include <vector>
 
 // =========================================================================
 // CONSTANTS
@@ -168,25 +168,33 @@ private:
                        time_t ts, char out_hash[65]) {
     // Hash = SHA256(frame_data + frame_num + timestamp + previous_hash)
     char meta[256];
-    int mlen = std::snprintf(meta, sizeof(meta), "|%d|%ld|%s", frame_num, (long)ts,
-                        last_hash_);
+    int mlen = std::snprintf(meta, sizeof(meta), "|%d|%ld|%s", frame_num,
+                             (long)ts, last_hash_);
 
-    // Build combined buffer
-    size_t total = (size_t)size + (size_t)(mlen > 0 ? mlen : 0);
-    unsigned char *buf = (unsigned char *)std::malloc(total + 1);
-    if (!buf) {
+    if (size < 0 || size > MAX_FRAME_SIZE) {
       std::memset(out_hash, '0', 64);
       out_hash[64] = '\0';
       return;
     }
-    std::memcpy(buf, data, size);
+
+    const size_t payload_size = static_cast<size_t>(size);
+    const size_t meta_size = mlen > 0 ? static_cast<size_t>(mlen) : 0;
+    const size_t total = payload_size + meta_size;
+    std::vector<unsigned char> buf(total);
+    if (total > 0 && buf.empty()) {
+      std::memset(out_hash, '0', 64);
+      out_hash[64] = '\0';
+      return;
+    }
+
+    if (payload_size > 0)
+      std::memcpy(buf.data(), data, payload_size);
     if (mlen > 0)
-      std::memcpy(buf + size, meta, mlen);
+      std::memcpy(buf.data() + payload_size, meta, meta_size);
 
     unsigned char digest[32];
-    sha256_hash(buf, total, digest);
+    sha256_hash(buf.data(), total, digest);
     to_hex(digest, out_hash);
-    std::free(buf);
   }
 
 public:
@@ -205,7 +213,8 @@ public:
       fps = 15;
 
     std::memset(&session_, 0, sizeof(session_));
-    std::strncpy(session_.session_id, session_id, sizeof(session_.session_id) - 1);
+    std::strncpy(session_.session_id, session_id,
+                 sizeof(session_.session_id) - 1);
     session_.start_time = std::time(nullptr);
     session_.fps = fps;
     session_.recording = true;

@@ -5,10 +5,21 @@ import logging
 import os
 import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict
 
 
 logger = logging.getLogger(__name__)
+
+
+def _sha256_file(path: str) -> str:
+    import hashlib
+
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def checkpoint_paths_for(base_dir: str) -> tuple[str, str, str]:
@@ -48,25 +59,23 @@ def save_checkpoint_bundle(
 ) -> None:
     if not safetensors_available or save_safetensors_file is None:
         raise RuntimeError("safetensors package not available")
+    from training.safetensors_io import save_safetensors
 
     os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
-    fd, tmp_weights = tempfile.mkstemp(
-        dir=os.path.dirname(checkpoint_path),
-        prefix=os.path.basename(checkpoint_path) + ".",
-        suffix=".tmp",
+    file_sha256, tensor_hash = save_safetensors(
+        model_state,
+        checkpoint_path,
+        metadata={
+            "checkpoint_path": str(checkpoint_path),
+            "schema_version": str(metadata.get("schema_version", 1)),
+        },
     )
-    os.close(fd)
-    try:
-        save_safetensors_file(model_state, tmp_weights)
-        os.replace(tmp_weights, checkpoint_path)
-    except Exception:
-        try:
-            os.remove(tmp_weights)
-        except OSError as exc:
-            logger.warning("Failed to remove temporary checkpoint file %s: %s", tmp_weights, exc)
-        raise
 
-    atomic_write_json(checkpoint_meta_path, metadata)
+    metadata_payload = dict(metadata)
+    metadata_payload["checkpoint_path"] = str(checkpoint_path)
+    metadata_payload["file_sha256"] = file_sha256
+    metadata_payload["tensor_hash"] = tensor_hash
+    atomic_write_json(checkpoint_meta_path, metadata_payload)
 
 
 def load_checkpoint_metadata(checkpoint_meta_path: str) -> Dict[str, Any]:
@@ -91,3 +100,6 @@ def archive_legacy_checkpoint(legacy_checkpoint_path: str) -> None:
         return
     archived_path = legacy_checkpoint_path + ".legacy"
     os.replace(legacy_checkpoint_path, archived_path)
+    sidecar_path = legacy_checkpoint_path + ".sha256"
+    if os.path.exists(sidecar_path):
+        os.replace(sidecar_path, archived_path + ".sha256")

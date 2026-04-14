@@ -27,7 +27,10 @@ from backend.training.incremental_trainer import (
     IncrementalTrainer,
 )
 from backend.training.rl_feedback import get_reward_buffer, get_rl_collector
-from backend.training.runtime_status_validator import validate_promotion_readiness
+from backend.training.runtime_status_validator import (
+    TrainingGovernanceError,
+    validate_promotion_readiness,
+)
 from backend.training.safetensors_store import FEATURE_DIM, SafetensorsFeatureStore
 
 logger = logging.getLogger("ygb.training.auto_train_controller")
@@ -257,6 +260,13 @@ class AutoTrainController:
                     break
                 try:
                     self.check_and_train(trigger="scheduled")
+                except TrainingGovernanceError as exc:
+                    logger.critical(
+                        "scheduled auto train governance hard block: %s",
+                        exc,
+                    )
+                    self._stop_event.set()
+                    raise
                 except Exception as exc:
                     logger.exception("scheduled auto train check failed: %s", exc)
                 finally:
@@ -545,6 +555,9 @@ class AutoTrainController:
         new_samples = placeholder.new_samples
         processed_total_samples: int | None = None
         trigger_threshold = self._compute_trigger_threshold()
+        dataset_quality_payload: dict[str, Any] | None = None
+        checkpoint_updated = False
+        trainer_status: str | None = None
         try:
             features, labels, row_ids, shard_count = self._load_store_snapshot()
             total_samples = int(labels.shape[0])
@@ -649,11 +662,10 @@ class AutoTrainController:
             checkpoint_updated = artifact_signature_before != artifact_signature_after
             trainer_status = str(getattr(trainer_result, "status", "COMPLETED"))
             latest_snapshot = self._latest_accuracy_snapshot()
-            promotion_ready = (
+            promotion_ready = False
+            if latest_snapshot is not None:
                 validate_promotion_readiness(latest_snapshot)
-                if latest_snapshot is not None
-                else False
-            )
+                promotion_ready = True
             promoted = bool(
                 latest_snapshot is not None
                 and promotion_ready
@@ -719,6 +731,34 @@ class AutoTrainController:
                 failed_run,
                 processed_total_samples=None,
             )
+        except TrainingGovernanceError as exc:
+            logger.critical(
+                "auto train governance hard block run_id=%s trigger=%s status=%s error=%s",
+                placeholder.run_id,
+                placeholder.trigger,
+                exc.status,
+                exc,
+            )
+            failed_run = replace(
+                placeholder,
+                status=str(getattr(exc, "status", "FAILED")),
+                finished_at=_utc_now(),
+                shard_count=shard_count,
+                total_samples=total_samples,
+                new_samples=new_samples,
+                promoted=False,
+                promotion_ready=False,
+                checkpoint_updated=checkpoint_updated,
+                dataset_quality=dataset_quality_payload,
+                trainer_status=trainer_status or str(getattr(exc, "status", "FAILED")),
+                error=str(exc),
+            )
+            self._log_run_summary(failed_run, threshold=trigger_threshold)
+            self._finalize_run(
+                failed_run,
+                processed_total_samples=None,
+            )
+            raise
         except Exception as exc:
             logger.exception(
                 "auto train failed run_id=%s trigger=%s error=%s",

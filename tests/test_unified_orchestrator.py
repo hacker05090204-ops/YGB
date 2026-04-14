@@ -222,10 +222,13 @@ def test_unified_orchestrator_connects_training_accuracy_and_voice(tmp_path, mon
         ]
     )
     voice_events = orchestrator.process_voice_chunk("voice-1", b"hello cluster")
+    follow_up_events = orchestrator.process_voice_chunk("voice-1", b"status please")
     status = orchestrator.get_system_status()
     orchestrator.close()
 
     assert training_outcome.parallelism_plan["healthy_gpus"] == 1
     assert accuracy_outcome.findings == 1
     assert voice_events[1]["payload"]["text"].startswith("hello cluster")
+    assert follow_up_events[1]["payload"]["text"].endswith("context:hello cluster")
+    assert "user: hello cluster" in follow_up_events[1]["payload"]["conversation_context"]
     assert status["memory"]["entries"] >= 3

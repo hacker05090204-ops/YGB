@@ -57,6 +57,11 @@ def _load_env_file(
                 os.environ[_key] = _val
 
 
+def _load_startup_env_files() -> None:
+    for candidate_name in (".env", ".env.benchmark", ".env.connected"):
+        _load_env_file(_ENV_ROOT / candidate_name, allow_placeholders=False)
+
+
 def _oauth_provider_env_keys(provider: str) -> dict[str, str]:
     normalized = (provider or "github").strip().lower()
     if normalized == "google":
@@ -130,8 +135,7 @@ async def _abort_if_disconnected(request: "Request") -> None:
 
 # Load env files FIRST — before any other imports read env vars.
 _ENV_ROOT = _Path(__file__).resolve().parent.parent
-_load_env_file(_ENV_ROOT / ".env", allow_placeholders=False)
-_load_env_file(_ENV_ROOT / ".env.connected", allow_placeholders=False)
+_load_startup_env_files()
 _load_shared_oauth_env("github")
 _load_shared_oauth_env("google")
 
@@ -4707,6 +4711,11 @@ def _refresh_oauth_env(provider: str) -> None:
         _ENV_ROOT / ".env", allow_placeholders=False, allowed_keys=allowed_keys
     )
     _load_env_file(
+        _ENV_ROOT / ".env.benchmark",
+        allow_placeholders=False,
+        allowed_keys=allowed_keys,
+    )
+    _load_env_file(
         _ENV_ROOT / ".env.connected",
         allow_placeholders=False,
         allowed_keys=allowed_keys,
@@ -4785,7 +4794,7 @@ def _oauth_not_configured_detail(provider: str = "github") -> Dict[str, Any]:
         "missing": cfg["missing"],
         "redirect_uri": cfg["redirect_uri"],
         "frontend_url": cfg["frontend_url"],
-        "checked_files": [".env", ".env.connected"],
+        "checked_files": [".env", ".env.benchmark", ".env.connected"],
         "shared_candidates": [
             str(path) for path in _shared_oauth_candidate_files(normalized)
         ],

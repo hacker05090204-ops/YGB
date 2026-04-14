@@ -158,7 +158,11 @@ def sync_entry(
                         f">= source v{entry.version}"
                     )
             except Exception:
-                pass
+                logger.error(
+                    f"[SYNC] Failed to read version metadata {meta} for target {entry.target_path}",
+                    exc_info=True,
+                )
+                return False, f"Version metadata unreadable: {meta}"
 
     # Copy
     os.makedirs(target_dir, exist_ok=True)

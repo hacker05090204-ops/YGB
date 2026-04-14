@@ -85,7 +85,10 @@ def classify_device() -> DeviceClassification:
             can_train = False
 
     except ImportError:
-        pass
+        logger.warning(
+            "[CLASSIFY] PyTorch unavailable during device classification; defaulting to CPU validation-only role",
+            exc_info=True,
+        )
 
     result = DeviceClassification(
         backend=backend,

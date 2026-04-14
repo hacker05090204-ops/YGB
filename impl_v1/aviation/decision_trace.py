@@ -21,6 +21,10 @@ from datetime import datetime
 from pathlib import Path
 import json
 import hashlib
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -66,8 +70,12 @@ class DecisionTraceEngine:
                 with open(self.CHAIN_FILE, "r") as f:
                     data = json.load(f)
                 return data.get("last_hash", "GENESIS")
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[TRACE] Failed to load chain head from %s; restarting at GENESIS: %s",
+                    self.CHAIN_FILE,
+                    exc,
+                )
         return "GENESIS"
     
     def _save_chain_head(self, hash_value: str) -> None:

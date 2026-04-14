@@ -1476,8 +1476,14 @@ class IngestionPipelineDataset(Dataset):
                 try:
                     score = float(impact.split("|", 1)[0].split(":", 1)[1])
                     impact_sev = min(score / 10.0, 1.0)
-                except (ValueError, IndexError):
-                    pass
+                except (ValueError, IndexError) as exc:
+                    impact_sev = 0.5
+                    logger.warning(
+                        "[INGESTION] Invalid CVSS impact %r while deriving impact severity; using default %.2f: %s",
+                        impact,
+                        impact_sev,
+                        exc,
+                    )
             elif "critical" in impact_lower:
                 impact_sev = 0.95
             elif "high" in impact_lower:
@@ -1497,8 +1503,14 @@ class IngestionPipelineDataset(Dataset):
                 try:
                     score = float(impact.split("|", 1)[0].split(":", 1)[1])
                     impact_sev = min(score / 10.0, 1.0)
-                except (ValueError, IndexError):
-                    pass
+                except (ValueError, IndexError) as exc:
+                    impact_sev = 0.5
+                    logger.warning(
+                        "[INGESTION] Invalid CVSS impact %r while deriving impact severity; using default %.2f: %s",
+                        impact,
+                        impact_sev,
+                        exc,
+                    )
             elif "critical" in impact_lower:
                 impact_sev = 0.95
             elif "high" in impact_lower:
@@ -1616,8 +1628,12 @@ class IngestionPipelineDataset(Dataset):
             try:
                 cvss = float(score_part.split(":", 1)[1])
                 return 1 if cvss >= 7.0 else 0
-            except (ValueError, IndexError):
-                pass
+            except (ValueError, IndexError) as exc:
+                logger.warning(
+                    "[INGESTION] Invalid CVSS impact %r during label derivation; falling back to secondary signals: %s",
+                    impact,
+                    exc,
+                )
 
         # Signal 2: Impact keywords (content-based, not in feature vector)
         if isinstance(impact, str) and impact:
@@ -1868,7 +1884,11 @@ class IngestionPipelineDataset(Dataset):
             try:
                 os.remove(tmp_path)
             except OSError:
-                pass
+                logger.warning(
+                    "[INGESTION] Failed to remove temporary dataset manifest file %s after write error",
+                    tmp_path,
+                    exc_info=True,
+                )
             raise
 
     @staticmethod
@@ -2532,8 +2552,11 @@ def get_per_field_report() -> dict:
     try:
         lib = _load_bridge()
         report["bridge_loaded"] = True
-    except FileNotFoundError:
-        pass
+    except FileNotFoundError as exc:
+        logger.warning(
+            "[INGESTION] Bridge DLL unavailable for readiness report: %s",
+            exc,
+        )
     except Exception:
         report["bridge_loaded"] = False
 

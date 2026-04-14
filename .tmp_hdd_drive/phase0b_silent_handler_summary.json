@@ -1,0 +1,93 @@
+{
+  "total_hits": 22,
+  "scopes": {
+    "tests": 17,
+    "production": 5
+  },
+  "categories": {
+    "tests-only / intentionally suppressing in tests": 17,
+    "likely bug / error masking": 5
+  },
+  "file_counts": {
+    "backend/tests/test_coverage_boost11.py": 2,
+    "backend/tests/test_coverage_boost12.py": 1,
+    "backend/tests/test_coverage_boost7_real.py": 2,
+    "backend/tests/test_coverage_boost9.py": 5,
+    "backend/tests/test_coverage_boost_2.py": 1,
+    "backend/tests/test_coverage_zero_modules.py": 2,
+    "backend/tests/test_governance_guards.py": 1,
+    "backend/tests/test_production_readiness.py": 1,
+    "backend/tests/test_scope_normalization.py": 1,
+    "impl_v1/governance/evolution_test.py": 1,
+    "scripts/ci_security_scan.py": 1,
+    "scripts/fast_bridge_ingest.py": 1,
+    "scripts/ingestion_bootstrap.py": 1,
+    "scripts/migrate_pt_to_safetensors.py": 1,
+    "scripts/remediation_scan.py": 1
+  },
+  "training_controller_hits": 0,
+  "top_production_files": [
+    {
+      "path": "scripts/ci_security_scan.py",
+      "count": 1,
+      "categories": {
+        "likely bug / error masking": 1
+      }
+    },
+    {
+      "path": "scripts/fast_bridge_ingest.py",
+      "count": 1,
+      "categories": {
+        "likely bug / error masking": 1
+      }
+    },
+    {
+      "path": "scripts/ingestion_bootstrap.py",
+      "count": 1,
+      "categories": {
+        "likely bug / error masking": 1
+      }
+    },
+    {
+      "path": "scripts/migrate_pt_to_safetensors.py",
+      "count": 1,
+      "categories": {
+        "likely bug / error masking": 1
+      }
+    },
+    {
+      "path": "scripts/remediation_scan.py",
+      "count": 1,
+      "categories": {
+        "likely bug / error masking": 1
+      }
+    }
+  ],
+  "recommended_batches": [
+    {
+      "name": "Batch 1 - top production files with highest operational value",
+      "files": [
+        "scripts/ci_security_scan.py",
+        "scripts/fast_bridge_ingest.py",
+        "scripts/ingestion_bootstrap.py",
+        "scripts/migrate_pt_to_safetensors.py",
+        "scripts/remediation_scan.py"
+      ]
+    },
+    {
+      "name": "Batch 3 - tests-only suppressions after production cleanup",
+      "files": [
+        "backend/tests/test_coverage_boost11.py",
+        "backend/tests/test_coverage_boost12.py",
+        "backend/tests/test_coverage_boost7_real.py",
+        "backend/tests/test_coverage_boost9.py",
+        "backend/tests/test_coverage_boost_2.py",
+        "backend/tests/test_coverage_zero_modules.py",
+        "backend/tests/test_governance_guards.py",
+        "backend/tests/test_production_readiness.py",
+        "backend/tests/test_scope_normalization.py",
+        "impl_v1/governance/evolution_test.py"
+      ]
+    }
+  ]
+}

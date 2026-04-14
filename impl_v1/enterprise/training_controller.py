@@ -23,8 +23,12 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 import json
+import logging
 import os
 import threading
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -85,7 +89,18 @@ class TrainingController:
                 self.mode = TrainingMode(data.get("mode", "safe_idle"))
                 self.last_checkpoint = data.get("last_checkpoint")
             except Exception:
-                pass
+                self.mode = TrainingMode.SAFE_IDLE
+                self.is_running = False
+                self.current_epoch = 0
+                self.total_epochs = 0
+                self.last_checkpoint = None
+                self.started_at = None
+                self.stopped_at = None
+                logger.warning(
+                    "Failed to load training controller state from %s; using safe defaults",
+                    self.STATE_FILE,
+                    exc_info=True,
+                )
     
     def _save_state(self) -> None:
         """Save state to file."""

@@ -15,6 +15,10 @@ from typing import Dict, Tuple, Optional
 from datetime import datetime
 from pathlib import Path
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -64,8 +68,13 @@ class FinalGateController:
                         passed=status["passed"],
                         details=status["details"],
                     )
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[FINAL_GATE] Failed to load gate state from %s; resetting to empty state: %s",
+                    self.STATE_FILE,
+                    exc,
+                )
+                self.gates = {}
     
     def _save_state(self) -> None:
         """Save gate state to file."""

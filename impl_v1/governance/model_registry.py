@@ -12,6 +12,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import json
 import hashlib
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -56,7 +60,12 @@ class ModelRegistry:
                 for model_id, entry in data.get("models", {}).items():
                     self.models[model_id] = ModelEntry(**entry)
             except Exception:
-                pass
+                self.models.clear()
+                logger.exception(
+                    "Failed to load model registry from %s",
+                    self.REGISTRY_FILE,
+                )
+                raise
     
     def _save_registry(self) -> None:
         """Save registry to file."""

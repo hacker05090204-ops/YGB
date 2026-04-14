@@ -67,6 +67,12 @@ _PAGE_CACHE: Dict[str, tuple[float, Any]] = {}
 _ADMIN_STATS_CACHE: Dict[str, Any] = {"checked_at": 0.0, "value": None}
 _READ_ENGINE_CACHE_LOCK = threading.Lock()
 _READ_ENGINE_CACHE: Dict[str, HDDEngine] = {}
+_STORAGE_COMPONENT_SAFE_CHARS = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
+)
+_STORAGE_FILENAME_SAFE_CHARS = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
+)
 
 
 @dataclass(frozen=True)
@@ -105,6 +111,40 @@ def _normalize_root(root: Any) -> str:
     if not raw_root:
         return ""
     return os.path.normcase(os.path.normpath(raw_root))
+
+
+def sanitize_storage_path_component(
+    value: Any,
+    *,
+    field_name: str,
+    allow_dots: bool = False,
+    required: bool = True,
+) -> str:
+    """Validate user-controlled storage path components before passing them downstream."""
+    normalized = str(value or "").strip()
+    if not normalized:
+        if required:
+            raise ValueError(f"{field_name} is required")
+        return ""
+
+    if len(normalized) > 128:
+        raise ValueError(f"{field_name} exceeds maximum length")
+    if normalized in {".", ".."}:
+        raise ValueError(f"{field_name} contains an unsafe path reference")
+    if any(sep in normalized for sep in ("/", "\\")):
+        raise ValueError(f"{field_name} must not contain path separators")
+    if ".." in normalized:
+        raise ValueError(f"{field_name} must not contain traversal sequences")
+
+    allowed_chars = (
+        _STORAGE_FILENAME_SAFE_CHARS if allow_dots else _STORAGE_COMPONENT_SAFE_CHARS
+    )
+    if not all(char in allowed_chars for char in normalized):
+        raise ValueError(f"{field_name} contains unsupported characters")
+    if allow_dots and normalized.startswith("."):
+        raise ValueError(f"{field_name} must not begin with '.'")
+
+    return normalized
 
 
 def _safe_storage_topology(active_root: Optional[str] = None) -> Dict[str, Any]:
@@ -1531,15 +1571,54 @@ def store_video(
     user_id: str, session_id: str, data: bytes, filename: str = "video.webm"
 ):
     """Store a video."""
+    try:
+        safe_user_id = sanitize_storage_path_component(user_id, field_name="user_id")
+        safe_session_id = sanitize_storage_path_component(
+            session_id,
+            field_name="session_id",
+        )
+        safe_filename = sanitize_storage_path_component(
+            filename,
+            field_name="filename",
+            allow_dots=True,
+        )
+    except ValueError as exc:
+        logger.warning("Rejected unsafe video storage request: %s", exc)
+        return {"success": False, "reason": str(exc)}
+
     if _video_streamer:
-        return _video_streamer.store_video(user_id, session_id, data, filename)
+        return _video_streamer.store_video(
+            safe_user_id,
+            safe_session_id,
+            data,
+            safe_filename,
+        )
     return {"success": False, "reason": "Video streamer not initialized"}
 
 
 def get_video_stream_token(user_id: str, session_id: str, filename: str = "video.webm"):
     """Get a signed streaming token."""
+    try:
+        safe_user_id = sanitize_storage_path_component(user_id, field_name="user_id")
+        safe_session_id = sanitize_storage_path_component(
+            session_id,
+            field_name="session_id",
+        )
+        safe_filename = sanitize_storage_path_component(
+            filename,
+            field_name="filename",
+            allow_dots=True,
+        )
+    except ValueError as exc:
+        logger.warning("Rejected unsafe video token request: %s", exc)
+        return {"error": str(exc)}
+
     if _video_streamer:
-        token = _video_streamer.generate_stream_token(user_id, session_id, filename)
+        token = _video_streamer.generate_stream_token(
+            safe_user_id,
+            safe_session_id,
+            safe_filename,
+        )
         return {"token": token} if token else {"error": "Video not found"}
     return {"error": "Not initialized"}
 
@@ -1553,6 +1632,18 @@ def stream_video(token: str, range_start: int = 0, range_end: int = None):
 
 def list_videos(user_id: str = None):
     """List videos."""
+    safe_user_id = None
+    if user_id is not None:
+        try:
+            safe_user_id = sanitize_storage_path_component(
+                user_id,
+                field_name="user_id",
+                required=False,
+            )
+        except ValueError as exc:
+            logger.warning("Rejected unsafe video listing request: %s", exc)
+            return []
+
     if _video_streamer:
-        return _video_streamer.list_videos(user_id)
+        return _video_streamer.list_videos(safe_user_id)
     return []

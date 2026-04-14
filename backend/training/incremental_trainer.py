@@ -39,6 +39,7 @@ from backend.training.model_thresholds import (
 )
 from backend.training.safetensors_store import SafetensorsFeatureStore
 from backend.training.state_manager import TrainingMetrics, get_training_state_manager
+from backend.training.rl_feedback import get_reward_buffer
 from backend.training.training_optimizer import (
     EarlyStopping,
     HardNegativeMiner,
@@ -69,6 +70,8 @@ MODEL_INPUT_DIM = 512
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
 _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
 _DEFAULT_COMPAT_FEATURE_EXTRACTOR = extract
+_RL_WEIGHT_OFFSET = 1.0
+_RL_WEIGHT_FLOOR = 0.1
 
 
 class AccuracyThresholds:
@@ -642,6 +645,7 @@ class IncrementalTrainer:
         )
         self._last_balance_report: ClassBalanceReport | None = None
         self._last_metrics_report: MetricsReport | None = None
+        self._reward_buffer = get_reward_buffer()
 
     def _load_training_state(self) -> dict[str, object]:
         if not self.state_path.exists():
@@ -1931,6 +1935,168 @@ class IncrementalTrainer:
             raise ValueError("sample_weights must be strictly positive floats")
         return weight_array
 
+    @staticmethod
+    def _reward_to_sample_weight(reward: float) -> float:
+        reward_value = float(reward)
+        if not math.isfinite(reward_value):
+            raise ValueError("reward-derived sample weights require finite reward values")
+        return float(max(_RL_WEIGHT_FLOOR, _RL_WEIGHT_OFFSET + reward_value))
+
+    @staticmethod
+    def _weight_statistics(weight_values: np.ndarray) -> tuple[float, float, float]:
+        if weight_values.size == 0:
+            return 1.0, 1.0, 1.0
+        return (
+            float(weight_values.mean()),
+            float(weight_values.min()),
+            float(weight_values.max()),
+        )
+
+    def _resolve_native_reward_weight_lookup(
+        self,
+        samples: list[IngestedSample],
+    ) -> dict[str, float] | None:
+        weighted_rewards = self._reward_buffer.get_weighted_signals()
+        total_signals = len(weighted_rewards)
+        if not weighted_rewards:
+            logger.info(
+                "incremental_rl_reward_weights matched_samples=0 total_signals=0 reason=no_reward_signals"
+            )
+            return None
+
+        matched_sample_weights: dict[str, float] = {}
+        matched_reward_values: list[float] = []
+        for sample_id in sorted({sample.sha256_hash for sample in samples}):
+            reward_value = weighted_rewards.get(sample_id)
+            if reward_value is None:
+                continue
+            reward_float = float(reward_value)
+            matched_reward_values.append(reward_float)
+            matched_sample_weights[sample_id] = self._reward_to_sample_weight(reward_float)
+
+        if not matched_sample_weights:
+            logger.info(
+                "incremental_rl_reward_weights matched_samples=0 total_signals=%d reason=no_matching_samples",
+                total_signals,
+            )
+            return None
+
+        reward_values = np.asarray(matched_reward_values, dtype=np.float32)
+        sample_weight_values = np.asarray(
+            list(matched_sample_weights.values()), dtype=np.float32
+        )
+        reward_mean, reward_min, reward_max = self._weight_statistics(reward_values)
+        weight_mean, weight_min, weight_max = self._weight_statistics(
+            sample_weight_values
+        )
+        logger.info(
+            "incremental_rl_reward_weights matched_samples=%d total_signals=%d reward_mean=%.6f reward_min=%.6f reward_max=%.6f weight_mean=%.6f weight_min=%.6f weight_max=%.6f",
+            len(matched_sample_weights),
+            total_signals,
+            reward_mean,
+            reward_min,
+            reward_max,
+            weight_mean,
+            weight_min,
+            weight_max,
+        )
+        return matched_sample_weights
+
+    def _merge_incremental_sample_weight_sources(
+        self,
+        native_reward_weights: dict[str, float] | None,
+        sample_weights: dict[str, float] | list[float] | np.ndarray | None,
+    ) -> dict[str, float] | list[float] | np.ndarray | None:
+        if native_reward_weights is None:
+            return sample_weights
+        if sample_weights is None:
+            return native_reward_weights
+        if isinstance(sample_weights, dict):
+            override_entries = 0
+            changed_overrides = 0
+            merged_weights = dict(native_reward_weights)
+            for raw_key, raw_value in sample_weights.items():
+                key = str(raw_key)
+                value = float(raw_value)
+                native_value = native_reward_weights.get(key)
+                if native_value is not None:
+                    override_entries += 1
+                    if not math.isclose(
+                        value,
+                        float(native_value),
+                        rel_tol=1e-6,
+                        abs_tol=1e-6,
+                    ):
+                        changed_overrides += 1
+                merged_weights[key] = value
+            logger.info(
+                "incremental_sample_weight_sources native_entries=%d external_entries=%d override_entries=%d changed_overrides=%d merge_strategy=external_dict_overrides",
+                len(native_reward_weights),
+                len(sample_weights),
+                override_entries,
+                changed_overrides,
+            )
+            return merged_weights
+
+        try:
+            external_length = len(sample_weights)
+        except TypeError:
+            external_length = -1
+        logger.info(
+            "incremental_sample_weight_sources native_entries=%d external_length=%d merge_strategy=external_sequence_overrides_native",
+            len(native_reward_weights),
+            external_length,
+        )
+        return sample_weights
+
+    def _log_native_reward_weighting(
+        self,
+        *,
+        samples: list[IngestedSample],
+        train_loader: DataLoader,
+        native_reward_weights: dict[str, float] | None,
+        resolved_train_sample_weights: np.ndarray | None,
+    ) -> None:
+        total_train_rows = len(train_loader.dataset)
+        if not native_reward_weights:
+            logger.info(
+                "incremental_rl_weighting matched_samples=0 matched_rows=0 total_train_rows=%d overall_weight_mean=1.000000 overall_weight_min=1.000000 overall_weight_max=1.000000 effective_weight_mean=1.000000 effective_weight_min=1.000000 effective_weight_max=1.000000 reason=no_native_reward_weights",
+                total_train_rows,
+            )
+            return
+
+        dataset = getattr(train_loader, "dataset", None)
+        matched_row_indices: list[int] = []
+        if isinstance(dataset, _StreamingFeatureDataset):
+            for row_index, sample_index in enumerate(dataset.sample_indices):
+                if samples[sample_index].sha256_hash in native_reward_weights:
+                    matched_row_indices.append(row_index)
+
+        overall_weights = (
+            np.asarray(resolved_train_sample_weights, dtype=np.float32)
+            if resolved_train_sample_weights is not None
+            else np.ones(total_train_rows, dtype=np.float32)
+        )
+        matched_weights = (
+            overall_weights[np.asarray(matched_row_indices, dtype=np.int64)]
+            if matched_row_indices
+            else np.empty((0,), dtype=np.float32)
+        )
+        overall_mean, overall_min, overall_max = self._weight_statistics(overall_weights)
+        matched_mean, matched_min, matched_max = self._weight_statistics(matched_weights)
+        logger.info(
+            "incremental_rl_weighting matched_samples=%d matched_rows=%d total_train_rows=%d overall_weight_mean=%.6f overall_weight_min=%.6f overall_weight_max=%.6f effective_weight_mean=%.6f effective_weight_min=%.6f effective_weight_max=%.6f",
+            len(native_reward_weights),
+            len(matched_row_indices),
+            total_train_rows,
+            overall_mean,
+            overall_min,
+            overall_max,
+            matched_mean,
+            matched_min,
+            matched_max,
+        )
+
     def _resolve_train_sample_weights(
         self,
         samples: list[IngestedSample],
@@ -2263,10 +2429,21 @@ class IncrementalTrainer:
             )
         else:
             train_loader, eval_loader = self.build_dataset(samples)
+        native_reward_weights = self._resolve_native_reward_weight_lookup(samples)
+        merged_sample_weights = self._merge_incremental_sample_weight_sources(
+            native_reward_weights,
+            sample_weights,
+        )
         resolved_train_sample_weights = self._resolve_train_sample_weights(
             samples,
             train_loader,
-            sample_weights,
+            merged_sample_weights,
+        )
+        self._log_native_reward_weighting(
+            samples=samples,
+            train_loader=train_loader,
+            native_reward_weights=native_reward_weights,
+            resolved_train_sample_weights=resolved_train_sample_weights,
         )
         optimizer = AdamW(
             self.model.parameters(),
@@ -2303,9 +2480,16 @@ class IncrementalTrainer:
             if amp_enabled
             else None
         )
+        label_smoothing = float(self.optimizer_config.label_smoothing)
+        logger.info(
+            "incremental_label_smoothing_configured epoch=%d label_smoothing=%.6f",
+            epoch_number,
+            label_smoothing,
+        )
         train_criterion = torch.nn.CrossEntropyLoss(
             weight=self._current_class_weight_tensor(),
             reduction="none",
+            label_smoothing=label_smoothing,
         )
         eval_criterion = torch.nn.CrossEntropyLoss()
         previous_state = self._clone_model_state(self.model.state_dict())
@@ -2350,33 +2534,27 @@ class IncrementalTrainer:
         self._accuracy_history.add(snapshot)
 
         from backend.training.runtime_status_validator import (
+            PromotionReadinessError,
             validate_promotion_readiness,
         )
 
-        promotion_ready = validate_promotion_readiness(snapshot)
-        result_status = "COMPLETED"
-
-        if precision < AccuracyThresholds.MIN_PRECISION:
+        governance_error: PromotionReadinessError | None = None
+        promotion_ready = False
+        try:
+            validate_promotion_readiness(snapshot)
+            promotion_ready = True
+            result_status = "COMPLETED"
+        except PromotionReadinessError as exc:
+            governance_error = exc
+            result_status = exc.status
             logger.critical(
-                "precision below minimum threshold: precision=%.4f min_precision=%.4f",
-                precision,
-                AccuracyThresholds.MIN_PRECISION,
-            )
-        if recall < AccuracyThresholds.MIN_RECALL:
-            logger.warning(
-                "recall below minimum threshold: recall=%.4f min_recall=%.4f",
-                recall,
-                AccuracyThresholds.MIN_RECALL,
-            )
-        if f1 < AccuracyThresholds.MIN_F1:
-            result_status = "BLOCKED_LOW_ACCURACY"
-            logger.critical(
-                "final f1 below minimum threshold, blocking promotion: f1=%.4f min_f1=%.4f",
+                "incremental epoch governance hard block: status=%s epoch=%d f1=%.4f precision=%.4f recall=%.4f",
+                exc.status,
+                epoch_number,
                 f1,
-                AccuracyThresholds.MIN_F1,
+                precision,
+                recall,
             )
-        elif not promotion_ready:
-            result_status = "PROMOTION_BLOCKED"
 
         logger.info(
             "incremental_threshold_calibrated",
@@ -2399,6 +2577,15 @@ class IncrementalTrainer:
                 metrics_report.best_class.name,
                 metrics_report.best_class.f1,
             )
+
+        if governance_error is not None:
+            logger.info(
+                "restoring previous model state after governance hard block for epoch=%d",
+                epoch_number,
+            )
+            metrics_registry.increment("training_governance_block", 1.0)
+            self._restore_previous_state(previous_state)
+            raise governance_error
 
         if self._accuracy_history.should_rollback():
             best_snapshot = self._accuracy_history.get_best()

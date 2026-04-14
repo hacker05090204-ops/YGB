@@ -65,6 +65,10 @@ def detect_device() -> DeviceInfo:
                 props = torch.cuda.get_device_properties(0)
                 vram_mb = props.total_memory / (1024 * 1024)
             except Exception:
+                logger.warning(
+                    "[BOOTSTRAP] Failed to query CUDA device properties; defaulting VRAM to 0MB",
+                    exc_info=True,
+                )
                 vram_mb = 0.0
             cuda_ver = torch.version.cuda or ""
 
@@ -78,12 +82,18 @@ def detect_device() -> DeviceInfo:
                 if r.returncode == 0:
                     driver_ver = r.stdout.strip()
             except Exception:
-                pass
+                logger.warning(
+                    "[BOOTSTRAP] Failed to query NVIDIA driver version; continuing without driver metadata",
+                    exc_info=True,
+                )
         elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
             device_type = "mps"
             device_name = "Apple MPS"
     except ImportError:
-        pass
+        logger.warning(
+            "[BOOTSTRAP] PyTorch unavailable during device detection; defaulting to CPU bootstrap mode",
+            exc_info=True,
+        )
 
     info = DeviceInfo(
         device_type=device_type,

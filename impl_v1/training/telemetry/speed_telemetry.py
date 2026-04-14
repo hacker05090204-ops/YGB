@@ -78,7 +78,7 @@ def get_gpu_utilization() -> dict:
         import torch
         if not torch.cuda.is_available():
             return result
-        
+
         result['available'] = True
         result['gpu_count'] = torch.cuda.device_count()
         result['memory_used_mb'] = torch.cuda.memory_allocated() / (1024 * 1024)
@@ -88,10 +88,18 @@ def get_gpu_utilization() -> dict:
         # GPU utilization from memory ratio (approximate)
         if result['memory_total_mb'] > 0:
             result['gpu_util_pct'] = (result['memory_used_mb'] / result['memory_total_mb']) * 100
-        
+
+    except ImportError:
+        logger.warning(
+            "[TELEMETRY] PyTorch unavailable while capturing GPU telemetry; using zeroed GPU metrics",
+            exc_info=True,
+        )
     except Exception:
-        pass
-    
+        logger.warning(
+            "[TELEMETRY] Failed to capture GPU telemetry; using zeroed GPU metrics",
+            exc_info=True,
+        )
+
     return result
 
 

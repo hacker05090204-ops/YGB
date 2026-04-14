@@ -94,7 +94,11 @@ def _atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
             try:
                 tmp_path.unlink(missing_ok=True)
             except Exception:
-                pass
+                logger.warning(
+                    "Failed to clean up temporary JSON file %s after atomic write error",
+                    tmp_path,
+                    exc_info=True,
+                )
         raise
 
 
@@ -119,7 +123,11 @@ def _atomic_write_bytes(path: Path, payload: bytes) -> None:
             try:
                 tmp_path.unlink(missing_ok=True)
             except Exception:
-                pass
+                logger.warning(
+                    "Failed to clean up temporary binary file %s after atomic write error",
+                    tmp_path,
+                    exc_info=True,
+                )
         raise
 
 
@@ -146,7 +154,11 @@ def _atomic_write_torch(path: Path, payload: Any) -> None:
             try:
                 tmp_path.unlink(missing_ok=True)
             except Exception:
-                pass
+                logger.warning(
+                    "Failed to clean up temporary torch artifact %s after atomic write error",
+                    tmp_path,
+                    exc_info=True,
+                )
         raise
 
 
@@ -1075,29 +1087,59 @@ class ProductionTrainingOrchestrator:
         device: str = "cpu",
     ) -> Optional[Dict[str, Any]]:
         import torch
+        from training.safetensors_io import CheckpointIntegrityError
 
         candidates = self._checkpoint_candidates(agent_id, checkpoint_id)
         for candidate in candidates:
-            valid, _ = self.verify_checkpoint(agent_id, candidate)
+            valid, reason = self.verify_checkpoint(agent_id, candidate)
             if not valid:
-                continue
+                raise CheckpointIntegrityError(
+                    f"Checkpoint integrity verification failed for {agent_id}:{candidate}: {reason}"
+                )
 
             checkpoint_dir = self._agent_checkpoint_root(agent_id) / candidate
             metadata = _load_json(checkpoint_dir / "metadata.json", default={})
+            artifact_hashes = metadata.get("artifact_hashes", {}) or {}
+
+            def _load_verified_artifact(path: Path, *, map_location: str):
+                expected_hash = str(artifact_hashes.get(path.name, "") or "").strip().lower()
+                if not expected_hash:
+                    raise CheckpointIntegrityError(
+                        f"Checkpoint artifact hash missing for {agent_id}:{candidate}:{path.name}"
+                    )
+                actual_hash = _sha256_file(path)
+                if actual_hash != expected_hash:
+                    raise CheckpointIntegrityError(
+                        f"Checkpoint artifact hash mismatch for {agent_id}:{candidate}:{path.name}"
+                    )
+                return torch.load(path, map_location=map_location, weights_only=False)
+
             return {
                 "checkpoint_id": candidate,
                 "checkpoint_dir": str(checkpoint_dir),
                 "metadata": metadata,
                 "model_state": load_safetensors(str(checkpoint_dir / "model.safetensors"), device=device),
-                "optimizer_state": torch.load(checkpoint_dir / "optimizer.pt", map_location=device, weights_only=False),
-                "scheduler_state": torch.load(checkpoint_dir / "scheduler.pt", map_location=device, weights_only=False),
+                "optimizer_state": _load_verified_artifact(
+                    checkpoint_dir / "optimizer.pt",
+                    map_location=device,
+                ),
+                "scheduler_state": _load_verified_artifact(
+                    checkpoint_dir / "scheduler.pt",
+                    map_location=device,
+                ),
                 "rng_state": (
-                    torch.load(checkpoint_dir / "rng_state.pt", map_location="cpu", weights_only=False)
+                    _load_verified_artifact(
+                        checkpoint_dir / "rng_state.pt",
+                        map_location="cpu",
+                    )
                     if (checkpoint_dir / "rng_state.pt").exists()
                     else None
                 ),
                 "scaler_state": (
-                    torch.load(checkpoint_dir / "scaler.pt", map_location=device, weights_only=False)
+                    _load_verified_artifact(
+                        checkpoint_dir / "scaler.pt",
+                        map_location=device,
+                    )
                     if (checkpoint_dir / "scaler.pt").exists()
                     else None
                 ),

@@ -1,0 +1,38 @@
+{
+  "data/dedup_index.json": {
+    "path": "data/dedup_index.json",
+    "sha256": "2d6049ad0a7feeac09015090e6488e9b803e8043d59c2c5c9aee8e8db70a9a26",
+    "size_bytes": 66,
+    "indexed_at": "1776108964187103200"
+  },
+  "data/dedup_store.json": {
+    "path": "data/dedup_store.json",
+    "sha256": "77564c4ec6270452586ad300fdca433c81c903a9f588db5a38762e4e34979601",
+    "size_bytes": 150,
+    "indexed_at": "1776108964182945100"
+  },
+  "data/system_status.json": {
+    "path": "data/system_status.json",
+    "sha256": "cac44326deeff65bf96d28f090b08c1c16bac2c9ce2fb7625f54a771d559b558",
+    "size_bytes": 642,
+    "indexed_at": "1776111438258858400"
+  },
+  "checkpoints/baseline_accuracy.json": {
+    "path": "checkpoints/baseline_accuracy.json",
+    "sha256": "11e228c632eeaadbbc9dd65ae21b09651c422271841c90bd9c29b1b4541af46c",
+    "size_bytes": 202,
+    "indexed_at": "1776108964187103200"
+  },
+  "checkpoints/g38_model_checkpoint.safetensors": {
+    "path": "checkpoints/g38_model_checkpoint.safetensors",
+    "sha256": "937156650bfbabccd970f305b0bdcb203b990989ef2714959c649c4923b195ef",
+    "size_bytes": 10402984,
+    "indexed_at": "1776108964394801200"
+  },
+  "checkpoints/training_state.json": {
+    "path": "checkpoints/training_state.json",
+    "sha256": "f71a9fea9c72ab59a9c5ee4a4cfff6f557811b5106b0956b778ac20280a39b96",
+    "size_bytes": 132,
+    "indexed_at": "1776108964181944600"
+  }
+}

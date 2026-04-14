@@ -53,8 +53,8 @@ try:
     lib.bridge_init.restype = ctypes.c_int
     lib.bridge_init()
     print("[BRIDGE] bridge_init() called")
-except AttributeError:
-    pass
+except AttributeError as exc:
+    print(f"[BRIDGE] bridge_init() unavailable ({exc}); continuing without explicit init")
 
 # Initialize persistent bridge state
 bridge_state = get_bridge_state()

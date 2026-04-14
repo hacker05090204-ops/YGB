@@ -55,8 +55,12 @@ def _load_evidence_enforcer():
     if dll.exists():
         try:
             return ctypes.CDLL(str(dll))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "[REPORT_GATE] Failed to load evidence binding enforcer from %s: %s",
+                dll,
+                exc,
+            )
     return None
 
 

@@ -1,0 +1,247 @@
+{
+  "total_hits": 22,
+  "records": [
+    {
+      "path": "backend/tests/test_coverage_boost11.py",
+      "line": 142,
+      "end_line": 143,
+      "match_kind": "except ...: pass",
+      "exception_type": "(ImportError, AttributeError)",
+      "header": "except (ImportError, AttributeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "140:             result = run_tests()\n141:             self.assertTrue(result)\n142:         except (ImportError, AttributeError):\n143:             pass\n144: \n145:     def test_guard_score(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost11.py",
+      "line": 151,
+      "end_line": 152,
+      "match_kind": "except ...: pass",
+      "exception_type": "(ImportError, AttributeError)",
+      "header": "except (ImportError, AttributeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "149:             score = guard.compute_score({})\n150:             self.assertIsNotNone(score)\n151:         except (ImportError, AttributeError):\n152:             pass\n153: \n154: "
+    },
+    {
+      "path": "backend/tests/test_coverage_boost12.py",
+      "line": 109,
+      "end_line": 110,
+      "match_kind": "except ...: pass",
+      "exception_type": "(ImportError, AttributeError)",
+      "header": "except (ImportError, AttributeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "107:             result = run_tests()\n108:             self.assertTrue(result)\n109:         except (ImportError, AttributeError):\n110:             pass\n111: \n112: "
+    },
+    {
+      "path": "backend/tests/test_coverage_boost7_real.py",
+      "line": 490,
+      "end_line": 491,
+      "match_kind": "except ...: pass",
+      "exception_type": "sqlite3.OperationalError",
+      "header": "except sqlite3.OperationalError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "488:             conn.execute(\"CREATE TABLE t (id INT)\")\n489:             conn.close()\n490:         except sqlite3.OperationalError:\n491:             pass  # Expected\n492: \n493:     def test_db_safety_import(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost7_real.py",
+      "line": 503,
+      "end_line": 505,
+      "match_kind": "except ...: pass",
+      "exception_type": "(ImportError, TypeError)",
+      "header": "except (ImportError, TypeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "501:             if result is not None:\n502:                 self.assertIsNotNone(result)\n503:         except (ImportError, TypeError):\n504:             # Module may not expose this function directly\n505:             pass\n506: \n507: "
+    },
+    {
+      "path": "backend/tests/test_coverage_boost9.py",
+      "line": 335,
+      "end_line": 336,
+      "match_kind": "except ...: pass",
+      "exception_type": "ImportError",
+      "header": "except ImportError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "333:             result = format_eta(30)\n334:             self.assertIn(\"s\", result)\n335:         except ImportError:\n336:             pass\n337: \n338:     def test_format_eta_hours(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost9.py",
+      "line": 343,
+      "end_line": 344,
+      "match_kind": "except ...: pass",
+      "exception_type": "ImportError",
+      "header": "except ImportError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "341:             result = format_eta(7200)\n342:             self.assertIn(\"h\", result)\n343:         except ImportError:\n344:             pass\n345: \n346:     def test_training_status_no_file(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost9.py",
+      "line": 352,
+      "end_line": 353,
+      "match_kind": "except ...: pass",
+      "exception_type": "ImportError",
+      "header": "except ImportError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "350:                 result = get_training_status()\n351:             self.assertIn(\"status\", result)\n352:         except ImportError:\n353:             pass\n354: \n355:     def test_training_status_with_data(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost9.py",
+      "line": 367,
+      "end_line": 368,
+      "match_kind": "except ...: pass",
+      "exception_type": "ImportError",
+      "header": "except ImportError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "365:                 result = get_training_status()\n366:             shutil.rmtree(tmp)\n367:         except ImportError:\n368:             pass\n369: \n370: "
+    },
+    {
+      "path": "backend/tests/test_coverage_boost9.py",
+      "line": 387,
+      "end_line": 388,
+      "match_kind": "except ...: pass",
+      "exception_type": "(ImportError, AttributeError)",
+      "header": "except (ImportError, AttributeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "385:             }):\n386:                 result = preflight_check_secrets()\n387:         except (ImportError, AttributeError):\n388:             pass\n389: \n390:     def test_require_auth_missing_header(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_boost_2.py",
+      "line": 328,
+      "end_line": 329,
+      "match_kind": "except ...: pass",
+      "exception_type": "Exception",
+      "header": "except Exception:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "326:         try:\n327:             self.api.register_routes(FakeApp())\n328:         except Exception:\n329:             pass  # Flask not installed is fine\n330: \n331: "
+    },
+    {
+      "path": "backend/tests/test_coverage_zero_modules.py",
+      "line": 506,
+      "end_line": 507,
+      "match_kind": "except ...: pass",
+      "exception_type": "RuntimeError",
+      "header": "except RuntimeError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "504:                 self.assertIsNotNone(restored)\n505:                 self.assertIn(\"report_hash\", restored)\n506:         except RuntimeError:\n507:             pass  # PyCryptodome not installed\n508: \n509:     def test_read_archived_not_found(self):"
+    },
+    {
+      "path": "backend/tests/test_coverage_zero_modules.py",
+      "line": 692,
+      "end_line": 693,
+      "match_kind": "except ...: pass",
+      "exception_type": "ValueError",
+      "header": "except ValueError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "690:                 async with db_transaction(db) as conn:\n691:                     await conn.execute(\"INSERT INTO t VALUES (1)\")\n692:             except ValueError:\n693:                 pass\n694:             return db.calls\n695: "
+    },
+    {
+      "path": "backend/tests/test_governance_guards.py",
+      "line": 118,
+      "end_line": 119,
+      "match_kind": "except ...: pass",
+      "exception_type": "(AttributeError, TypeError)",
+      "header": "except (AttributeError, TypeError):",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "116:         try:\n117:             AutomationEnforcer.CAN_AUTO_SUBMIT = True  # type: ignore\n118:         except (AttributeError, TypeError):\n119:             pass\n120:         # Even if assignment doesn't throw, check the original behavior\n121:         enf = AutomationEnforcer()"
+    },
+    {
+      "path": "backend/tests/test_production_readiness.py",
+      "line": 326,
+      "end_line": 327,
+      "match_kind": "except ...: pass",
+      "exception_type": "OSError",
+      "header": "except OSError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "324:             try:\n325:                 os.unlink(tmp_path)\n326:             except OSError:\n327:                 pass\n328: \n329:     def test_memory_mode_is_explicit_only(self):"
+    },
+    {
+      "path": "backend/tests/test_scope_normalization.py",
+      "line": 95,
+      "end_line": 96,
+      "match_kind": "except ...: pass",
+      "exception_type": "ValueError",
+      "header": "except ValueError:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "93:                     i += 3\n94:                     continue\n95:                 except ValueError:\n96:                     pass\n97:             result.append(s[i])\n98:             i += 1"
+    },
+    {
+      "path": "impl_v1/governance/evolution_test.py",
+      "line": 190,
+      "end_line": 191,
+      "match_kind": "except ...: pass",
+      "exception_type": "Exception",
+      "header": "except Exception:",
+      "scope": "tests",
+      "category": "tests-only / intentionally suppressing in tests",
+      "context": "188:                     if is_detected:\n189:                         detected += 1\n190:                 except Exception:\n191:                     pass\n192:             \n193:             detection_rate = detected / len(scenario.payloads) if scenario.payloads else 0"
+    },
+    {
+      "path": "scripts/ci_security_scan.py",
+      "line": 169,
+      "end_line": 170,
+      "match_kind": "except ...: pass",
+      "exception_type": "Exception",
+      "header": "except Exception:",
+      "scope": "production",
+      "category": "likely bug / error masking",
+      "context": "167:                         \"content\": stripped[:120],\n168:                     })\n169:     except Exception:\n170:         pass\n171:     return violations\n172: "
+    },
+    {
+      "path": "scripts/fast_bridge_ingest.py",
+      "line": 56,
+      "end_line": 57,
+      "match_kind": "except ...: pass",
+      "exception_type": "AttributeError",
+      "header": "except AttributeError:",
+      "scope": "production",
+      "category": "likely bug / error masking",
+      "context": "54:     lib.bridge_init()\n55:     print(\"[BRIDGE] bridge_init() called\")\n56: except AttributeError:\n57:     pass\n58: \n59: # Initialize persistent bridge state"
+    },
+    {
+      "path": "scripts/ingestion_bootstrap.py",
+      "line": 81,
+      "end_line": 82,
+      "match_kind": "except ...: pass",
+      "exception_type": "Exception",
+      "header": "except Exception:",
+      "scope": "production",
+      "category": "likely bug / error masking",
+      "context": "79:                 results = pipeline.search(query)\n80:                 records.extend(results)\n81:             except Exception:\n82:                 pass\n83: \n84:         # Deduplicate by CVE ID"
+    },
+    {
+      "path": "scripts/migrate_pt_to_safetensors.py",
+      "line": 143,
+      "end_line": 144,
+      "match_kind": "except ...: pass",
+      "exception_type": "OSError",
+      "header": "except OSError:",
+      "scope": "production",
+      "category": "likely bug / error masking",
+      "context": "141:                 if os.path.exists(_tmp_st):\n142:                     os.unlink(_tmp_st)\n143:             except OSError:\n144:                 pass\n145:             raise\n146: "
+    },
+    {
+      "path": "scripts/remediation_scan.py",
+      "line": 283,
+      "end_line": 284,
+      "match_kind": "except ...: pass",
+      "exception_type": "Exception",
+      "header": "except Exception:",
+      "scope": "production",
+      "category": "likely bug / error masking",
+      "context": "281:                                         'class': effective_class,\n282:                                     })\n283:             except Exception:\n284:                 pass\n285:     \n286:     # Print summary"
+    }
+  ]
+}

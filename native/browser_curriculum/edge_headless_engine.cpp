@@ -25,7 +25,6 @@
 #include <unordered_set>
 #include <vector>
 
-
 namespace browser_curriculum {
 
 // =========================================================================
@@ -109,7 +108,8 @@ struct EdgeLaunchConfig {
     args.push_back("--disable-background-networking");
     args.push_back("--disable-translate");
     args.push_back("--disable-component-update");
-    args.push_back("--no-sandbox");
+    // Keep the browser sandbox enabled. Requires the standard desktop/session
+    // sandbox primitives provided by the host OS to remain available.
     args.push_back("--inprivate");
     args.push_back("--dump-dom");
 

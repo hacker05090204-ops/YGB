@@ -6,12 +6,14 @@ import os
 import re
 import sys
 import json
+import logging
 
 # Force UTF-8 output on Windows (cp1252 crashes on Unicode arrows/symbols)
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger = logging.getLogger(__name__)
 
 PATTERNS = {
     'mock': re.compile(r'\bmock\b', re.IGNORECASE),
@@ -280,8 +282,9 @@ def scan():
                                         'content': line.strip()[:120],
                                         'class': effective_class,
                                     })
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.error("Failed to scan %s: %s", rel, exc, exc_info=True)
+                raise
     
     # Print summary
     print("=" * 60)
@@ -320,4 +323,3 @@ def scan():
 
 if __name__ == '__main__':
     scan()
-

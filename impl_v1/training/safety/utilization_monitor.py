@@ -70,8 +70,16 @@ class UtilizationMonitor:
                 vram_used = torch.cuda.memory_allocated() / (1024**2)
                 vram_total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
                 gpu_util = (vram_used / vram_total * 100) if vram_total > 0 else 0
+        except ImportError:
+            logger.warning(
+                "[MONITOR] PyTorch unavailable while capturing utilization snapshot; using zero-utilization fallback",
+                exc_info=True,
+            )
         except Exception:
-            pass
+            logger.warning(
+                "[MONITOR] Failed to capture CUDA utilization snapshot; using zero-utilization fallback",
+                exc_info=True,
+            )
 
         vram_pct = (vram_used / vram_total * 100) if vram_total > 0 else 0
 

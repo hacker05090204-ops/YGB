@@ -104,10 +104,10 @@ class TestReportDraftAssistant(unittest.TestCase):
     def test_run_tests(self):
         try:
             from backend.governance.report_draft_assistant import run_tests
-            result = run_tests()
-            self.assertTrue(result)
-        except (ImportError, AttributeError):
-            pass
+        except ImportError as exc:
+            self.skipTest(f"report_draft_assistant.run_tests unavailable: {exc}")
+        result = run_tests()
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":

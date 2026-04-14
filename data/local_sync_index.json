@@ -15,19 +15,19 @@
     "path": "data/dedup_index.json",
     "sha256": "fdeed05af054e07ebdd4703271787299049fe92efbee90170b460c4b62f33130",
     "size_bytes": 549166,
-    "indexed_at": "1776015510943535100"
+    "indexed_at": "1776075248123012600"
   },
   "data/dedup_store.json": {
     "path": "data/dedup_store.json",
-    "sha256": "013d218a7f0a01108d27e50afdb2816d34c44aecc5590bf573867c39b13ad73d",
+    "sha256": "5d3d0e6507727347524eb25ef09adc34825e3073df5a63715f8647267b4f2d88",
     "size_bytes": 549250,
-    "indexed_at": "1776015510917404600"
+    "indexed_at": "1776075248101466200"
   },
   "data/field_state.json": {
     "path": "data/field_state.json",
-    "sha256": "cf42ba6cb5f58e61558862fb7c0686db75f88e9605f2995798079fb33018241c",
+    "sha256": "6afdfc7d9bb79c272ba7d588b9a800be54d54ec3bfa0e68ba5c805e7a7f4bb60",
     "size_bytes": 12157,
-    "indexed_at": "1776015070026774700"
+    "indexed_at": "1776074943470408200"
   },
   "data/g38_model_checkpoint.json": {
     "path": "data/g38_model_checkpoint.json",
@@ -49,9 +49,9 @@
   },
   "data/host_action_ledger.jsonl": {
     "path": "data/host_action_ledger.jsonl",
-    "sha256": "d5d47f036e1ea7e2c6e201c3adc078eedbe4e407dd3355a8745e96336a6da920",
-    "size_bytes": 944173,
-    "indexed_at": "1776015066953734100"
+    "sha256": "5df033bf3fc9f09994f9521309df63879dea468275183ff0a41b219e9de66280",
+    "size_bytes": 981434,
+    "indexed_at": "1776074939589654400"
   },
   "data/ingestion_status.json": {
     "path": "data/ingestion_status.json",
@@ -61,15 +61,15 @@
   },
   "data/phase49_user_store.json": {
     "path": "data/phase49_user_store.json",
-    "sha256": "21e93558f426226cfd9bfc0dea8d0262133db406769fcc11dfeeb99fb592585a",
+    "sha256": "3c2d317900a2ec920e9cf272d3edc452dba6f7b10a04c404565fc24b3a642678",
     "size_bytes": 421,
-    "indexed_at": "1776006768040010000"
+    "indexed_at": "1776112832504803400"
   },
   "data/previous_severities.json": {
     "path": "data/previous_severities.json",
     "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
     "size_bytes": 2,
-    "indexed_at": "1776015510885600400"
+    "indexed_at": "1776075248079544600"
   },
   "data/rl_reward_buffer.json": {
     "path": "data/rl_reward_buffer.json",
@@ -79,27 +79,27 @@
   },
   "data/runtime_status.json": {
     "path": "data/runtime_status.json",
-    "sha256": "a6f42ea2a4e892b07cba41d14b6551ee381518ebffc8c8de00ee370cd0aa1418",
-    "size_bytes": 418,
-    "indexed_at": "1776006759095368600"
+    "sha256": "bd5ff46121289c7ea4d54715e737d51ece92f7f4a3a74308776a35c4a383e511",
+    "size_bytes": 419,
+    "indexed_at": "1776112823266492000"
   },
   "data/scan_state.json": {
     "path": "data/scan_state.json",
-    "sha256": "efe61431e641bb82a18653885b909e8f9b38a4ee8eefa3c91b24b8766aa95cce",
-    "size_bytes": 50,
-    "indexed_at": "1776015137483123600"
+    "sha256": "7b182e5bf28c49fc144977d7bb069f22f45b2c7e8b9580c8d1f14530f9e3d9a2",
+    "size_bytes": 51,
+    "indexed_at": "1776112832470639700"
   },
   "data/sync_status.json": {
     "path": "data/sync_status.json",
-    "sha256": "7778b366305c29c7b875db9e3543557634b8367ac9145e343dd5610a4fa587f1",
-    "size_bytes": 358,
-    "indexed_at": "1776015097154186700"
+    "sha256": "ca75f0d6739de693df102bbcf29511b232142b3b0be896c67db3a8bb20626c8c",
+    "size_bytes": 364,
+    "indexed_at": "1776211085157391700"
   },
   "data/system_status.json": {
     "path": "data/system_status.json",
-    "sha256": "34eb545cef740af8fdfb9fab0d5d5757cf3162e8153cda1c7cb03626f6de23a9",
-    "size_bytes": 845,
-    "indexed_at": "1776015137801219300"
+    "sha256": "1b02b47ca6916b06ed1fb00061ab0dbdd5c8d051d0409c4d5a4548604417f34e",
+    "size_bytes": 842,
+    "indexed_at": "1776109546500537800"
   },
   "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json": {
     "path": "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json",
@@ -121,15 +121,15 @@
   },
   "checkpoints/adaptive_ewc_state.safetensors": {
     "path": "checkpoints/adaptive_ewc_state.safetensors",
-    "sha256": "10ddf73bc633af33f5a9aadcd830bba0c344751acd8f4b301e10c015e6e6cd18",
+    "sha256": "c960f2f55b7dd6f8c7579b92c3e0cfbd193eb830bdb7d99fb06bb0d988fd2602",
     "size_bytes": 20806632,
-    "indexed_at": "1776015372083670000"
+    "indexed_at": "1776075244784002200"
   },
   "checkpoints/adaptive_learning_state.json": {
     "path": "checkpoints/adaptive_learning_state.json",
-    "sha256": "02b3f1da49f9795444fb08b8e5965a20207ec470b78f8d8790c690127442d93c",
-    "size_bytes": 18527,
-    "indexed_at": "1776015494042167300"
+    "sha256": "bee2c42daf3a10626fa89e23be83da1069c11c7c584788b1b28e9cb10ac7d1c2",
+    "size_bytes": 53008,
+    "indexed_at": "1776075305695580800"
   },
   "checkpoints/baseline_accuracy.json": {
     "path": "checkpoints/baseline_accuracy.json",

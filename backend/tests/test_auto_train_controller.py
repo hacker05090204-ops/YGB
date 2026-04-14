@@ -21,6 +21,7 @@ from backend.training.auto_train_controller import (
 )
 from backend.training.incremental_trainer import AccuracySnapshot
 from backend.training.rl_feedback import OutcomeSignal, RLFeedbackCollector, RewardBuffer
+from backend.training.runtime_status_validator import TrainingGovernanceError
 from backend.training.safetensors_store import (
     FEATURE_DIM_METADATA_KEY,
     FEATURE_TENSOR_KEY,
@@ -307,11 +308,39 @@ def test_controller_only_promotes_when_readiness_thresholds_are_met(tmp_path):
         trainer=trainer,
     )
 
-    run = controller.check_and_train()
+    with pytest.raises(TrainingGovernanceError) as excinfo:
+        controller.check_and_train()
 
-    assert run.status == "PROMOTION_BLOCKED"
+    run = controller.get_last_run()
+
+    assert excinfo.value.status == "BLOCKED_LOW_ACCURACY"
+    assert run is not None
+    assert run.status == "BLOCKED_LOW_ACCURACY"
     assert run.promoted is False
     assert controller.get_status()["last_promoted_at"] is None
+
+
+def test_scheduled_loop_re_raises_governance_failures_and_stops(tmp_path):
+    feature_root = tmp_path / "training" / "features_safetensors"
+    trainer = _FakeTrainer(tmp_path, snapshot=_passing_snapshot(), touch_artifacts=False)
+    controller = AutoTrainController(
+        AutoTrainConfig(
+            feature_store_root=feature_root,
+            checkpoints_root=tmp_path / "checkpoints",
+            check_interval_seconds=0.0,
+            min_new_samples=1,
+        ),
+        trainer=trainer,
+    )
+
+    controller.check_and_train = lambda trigger="scheduled": (_ for _ in ()).throw(
+        TrainingGovernanceError("governance blocked", status="PROMOTION_BLOCKED")
+    )
+
+    with pytest.raises(TrainingGovernanceError):
+        controller._run_loop()
+
+    assert controller._stop_event.is_set() is True
 
 
 def test_scheduled_loop_starts_and_stops_cleanly(tmp_path):

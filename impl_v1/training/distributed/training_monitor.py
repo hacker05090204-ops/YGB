@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
+
+
+logger = logging.getLogger(__name__)
 
 
 class DriftType(Enum):
@@ -297,8 +301,16 @@ class TrainingMonitor:
             if torch.cuda.is_available():
                 snapshot.memory_used_mb = round(torch.cuda.memory_allocated(0) / (1024 * 1024), 2)
                 snapshot.memory_total_mb = round(torch.cuda.get_device_properties(0).total_memory / (1024 * 1024), 2)
+        except ImportError:
+            logger.warning(
+                "[TRAIN_MONITOR] PyTorch unavailable while capturing GPU memory metrics; snapshot will omit CUDA data",
+                exc_info=True,
+            )
         except Exception:
-            pass
+            logger.warning(
+                "[TRAIN_MONITOR] Failed to capture GPU memory metrics; snapshot will omit CUDA data",
+                exc_info=True,
+            )
 
         try:
             import pynvml  # type: ignore
@@ -310,8 +322,16 @@ class TrainingMonitor:
             snapshot.utilization_percent = float(util.gpu)
             snapshot.memory_used_mb = round(mem.used / (1024 * 1024), 2)
             snapshot.memory_total_mb = round(mem.total / (1024 * 1024), 2)
+        except ImportError:
+            logger.warning(
+                "[TRAIN_MONITOR] pynvml unavailable while capturing GPU utilization; snapshot will omit NVML data",
+                exc_info=True,
+            )
         except Exception:
-            pass
+            logger.warning(
+                "[TRAIN_MONITOR] Failed to capture NVML GPU telemetry; snapshot will omit NVML data",
+                exc_info=True,
+            )
 
         self.state.gpu.append(snapshot)
         self.state.gpu = self.state.gpu[-200:]

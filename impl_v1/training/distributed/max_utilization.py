@@ -112,5 +112,9 @@ def load_node_utilization() -> Optional[NodeUtilization]:
                 data = json.load(f)
             return NodeUtilization(**data)
         except Exception:
-            pass
+            logger.warning(
+                "[MAX_UTIL] Failed to load node utilization config from %s; ignoring saved state",
+                MAX_UTIL_PATH,
+                exc_info=True,
+            )
     return None

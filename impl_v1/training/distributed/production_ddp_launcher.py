@@ -236,7 +236,11 @@ def run_single_epoch(
             if dist.is_initialized():
                 model = DDP(model, device_ids=[config.rank] if torch.cuda.is_available() else None)
         except Exception:
-            pass
+            logger.warning(
+                "[DDP_LAUNCH] Rank %s failed to wrap model in DistributedDataParallel; continuing without DDP wrapper",
+                config.rank,
+                exc_info=True,
+            )
 
         optimizer = optim.Adam(model.parameters(), lr=0.001)
         criterion = nn.CrossEntropyLoss()

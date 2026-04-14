@@ -85,7 +85,9 @@ class EdgeLaunchConfig:
             "--disable-background-networking",
             "--disable-translate",
             "--disable-component-update",
-            "--no-sandbox",
+            # Intentionally keep the browser sandbox enabled.
+            # Sandbox prerequisites: launch under a normal desktop session with
+            # the default OS user/container restrictions available.
             "--inprivate",
             "--dump-dom",
             url,

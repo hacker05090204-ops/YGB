@@ -113,11 +113,17 @@ class TestImmutableRules:
     def test_constants_cannot_change(self):
         # Attempting to override should not change the class constant
         original = AutomationEnforcer.CAN_AUTO_SUBMIT
+        assignment_error = None
         try:
-            AutomationEnforcer.CAN_AUTO_SUBMIT = True  # type: ignore
-        except (AttributeError, TypeError):
-            pass
-        # Even if assignment doesn't throw, check the original behavior
-        enf = AutomationEnforcer()
-        result = enf.block_submission("test", "RPT-001")
-        assert result == ActionResult.BLOCKED
+            try:
+                AutomationEnforcer.CAN_AUTO_SUBMIT = True  # type: ignore
+            except (AttributeError, TypeError) as exc:
+                assignment_error = exc
+            enf = AutomationEnforcer()
+            result = enf.block_submission("test", "RPT-001")
+            assert result == ActionResult.BLOCKED
+            if assignment_error is not None:
+                assert isinstance(assignment_error, (AttributeError, TypeError))
+        finally:
+            if AutomationEnforcer.CAN_AUTO_SUBMIT is not original:
+                AutomationEnforcer.CAN_AUTO_SUBMIT = original  # type: ignore

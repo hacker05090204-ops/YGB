@@ -1,16 +1,16 @@
 {
   "max_users": 50,
   "users": {
-    "USR-58A282A2C4814DB0": {
+    "USR-65E2B0A5AA494460": {
       "active": true,
       "bounty_count": 0,
-      "created_at": "2026-04-12T15:12:48.039007+00:00",
+      "created_at": "2026-04-13T20:40:32.503258+00:00",
       "current_targets": [],
       "email": null,
-      "last_seen": "2026-04-12T15:12:48.039007+00:00",
+      "last_seen": "2026-04-13T20:40:32.503258+00:00",
       "role": "VIEWER",
       "total_earnings": 0.0,
-      "user_id": "USR-58A282A2C4814DB0",
+      "user_id": "USR-65E2B0A5AA494460",
       "username": "Hunter1"
     }
   }

@@ -18,9 +18,11 @@ import shutil
 import tempfile
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Optional
 
 import numpy as np
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +115,10 @@ def save_model_fp16(
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
         except OSError:
-            pass
+            logger.warning(
+                f"[MODEL_VER] Failed to remove temporary weights file {tmp_path} after save failure",
+                exc_info=True,
+            )
         raise
 
     # Compute file hash for integrity
@@ -150,7 +155,10 @@ def save_model_fp16(
             if os.path.exists(tmp_meta_path):
                 os.unlink(tmp_meta_path)
         except OSError:
-            pass
+            logger.warning(
+                f"[MODEL_VER] Failed to remove temporary metadata file {tmp_meta_path} after save failure",
+                exc_info=True,
+            )
         raise
 
     # Create ZIP archive
@@ -201,8 +209,9 @@ def load_model_weights(
     # Prefer .safetensors
     st_path = os.path.join(version_dir, WEIGHTS_FILENAME)
     if os.path.exists(st_path):
-        from safetensors.torch import load_file as st_load_file
-        tensors = st_load_file(st_path, device=device)
+        from training.safetensors_io import load_safetensors
+
+        tensors = load_safetensors(st_path, device=device)
         logger.info(f"[MODEL_VER] Loaded safetensors: {version_id}")
         return tensors
 
@@ -210,6 +219,8 @@ def load_model_weights(
     pt_path = os.path.join(version_dir, LEGACY_WEIGHTS_FILENAME)
     if os.path.exists(pt_path):
         import torch
+
+        HardenedCheckpointManager._require_verified_file_hash(Path(pt_path))
         logger.warning(
             f"[MODEL_VER] Loading legacy .pt for {version_id}. "
             f"Run migrate_pt_to_safetensors.py to upgrade."

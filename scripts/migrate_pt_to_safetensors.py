@@ -22,6 +22,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
+
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
@@ -99,6 +101,7 @@ def convert_single(pt_path: str, dry_run: bool) -> Optional[Dict]:
             return entry
 
         # Load state dict
+        HardenedCheckpointManager._require_verified_file_hash(Path(pt_path))
         state_dict = torch.load(pt_path, map_location="cpu", weights_only=True)
 
         # Ensure all values are tensors (safetensors requires this)
@@ -140,8 +143,13 @@ def convert_single(pt_path: str, dry_run: bool) -> Optional[Dict]:
             try:
                 if os.path.exists(_tmp_st):
                     os.unlink(_tmp_st)
-            except OSError:
-                pass
+            except OSError as cleanup_exc:
+                logger.warning(
+                    "  ⚠ Failed to remove temporary safetensors file %s: %s",
+                    _tmp_st,
+                    cleanup_exc,
+                    exc_info=True,
+                )
             raise
 
         # Verify

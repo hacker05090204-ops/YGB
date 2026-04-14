@@ -483,26 +483,26 @@ class TestDBSafetyRealSQLite(unittest.TestCase):
     def test_connection_to_nonexistent_dir(self):
         """Test DB connection failure."""
         bad_path = os.path.join(self.tmp, "nonexistent", "deep", "db.sqlite")
-        try:
+        with self.assertRaises(sqlite3.OperationalError):
             conn = sqlite3.connect(bad_path)
-            conn.execute("CREATE TABLE t (id INT)")
-            conn.close()
-        except sqlite3.OperationalError:
-            pass  # Expected
+            try:
+                conn.execute("CREATE TABLE t (id INT)")
+            finally:
+                conn.close()
 
     def test_db_safety_import(self):
         """Test db_safety module can be imported and used."""
         try:
-            from backend.api.db_safety import safe_db_execute
-            # If function exists, test it with real DB
-            result = safe_db_execute(
-                self.db_path, "SELECT * FROM items WHERE id = ?", (1,)
-            )
-            if result is not None:
-                self.assertIsNotNone(result)
-        except (ImportError, TypeError):
-            # Module may not expose this function directly
-            pass
+            from backend.api import db_safety
+        except ImportError as exc:
+            self.skipTest(f"backend.api.db_safety unavailable: {exc}")
+        safe_db_execute = getattr(db_safety, "safe_db_execute", None)
+        if safe_db_execute is None:
+            self.skipTest("db_safety.safe_db_execute unavailable")
+        result = safe_db_execute(
+            self.db_path, "SELECT * FROM items WHERE id = ?", (1,)
+        )
+        self.assertIsNotNone(result)
 
 
 # ---------------------------------------------------------------------------

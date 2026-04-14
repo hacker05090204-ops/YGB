@@ -353,8 +353,9 @@ def recover_from_cloud() -> dict:
     Downloads manifest → decrypts → downloads files by priority.
     """
     from backend.sync.gdrive_backup import (
-        _decrypt_data, _decompress_data,
+        BackupIntegrityError,
         GDRIVE_ENABLED, STAGING_DIR,
+        restore_staged_backup_file,
     )
 
     if not GDRIVE_ENABLED:
@@ -397,10 +398,8 @@ def recover_from_cloud() -> dict:
         # Find and decrypt manifest
         manifest_enc = dl_dir / "manifest.json.enc"
         if manifest_enc.exists():
-            data = manifest_enc.read_bytes()
-            decrypted = _decrypt_data(data)
-            decompressed = _decompress_data(decrypted)
-            manifest = json.loads(decompressed.decode("utf-8"))
+            manifest_bytes, _manifest_meta = restore_staged_backup_file(manifest_enc)
+            manifest = json.loads(manifest_bytes.decode("utf-8"))
             logger.info(
                 "Manifest recovered: %d files",
                 len(manifest.get("files", {})),
@@ -420,12 +419,12 @@ def recover_from_cloud() -> dict:
             if enc_file.suffix != ".enc" or enc_file.name == "manifest.json.enc":
                 continue
             try:
-                data = enc_file.read_bytes()
-                decrypted = _decrypt_data(data)
-                decompressed = _decompress_data(decrypted)
-
-                # Reconstruct original path from filename
-                original_name = enc_file.stem.replace(".enc", "").replace("__", "/")
+                decompressed, meta = restore_staged_backup_file(enc_file)
+                original_name = str(meta.get("original_path", "") or "").replace("\\", "/").lstrip("/")
+                if not original_name:
+                    raise BackupIntegrityError(
+                        f"Backup sidecar missing original_path for {enc_file.name}"
+                    )
                 dest = SYNC_ROOT / original_name
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(decompressed)

@@ -29,6 +29,9 @@ from typing import Optional, List, Tuple, Dict, Any
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from pathlib import Path
+
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 
 logger = logging.getLogger("ygb.moe")
 
@@ -93,6 +96,8 @@ class MoEConfig:
     n_experts: int = 23           # number of specialist experts
     top_k: int = 2               # experts activated per token
     expert_hidden_mult: int = 4  # FFN hidden = d_model * this
+    expert_hidden_dim: int = 0   # optional explicit per-expert hidden width override
+    expert_depth: int = 1        # classifier expert depth: base block + residual expansions
     gate_noise: float = 1.0      # noise scale for noisy gating
     aux_loss_coeff: float = 0.01 # load-balance auxiliary loss weight
 
@@ -732,6 +737,7 @@ class ExpertOffloader:
     def load_expert_shard(self, expert_idx: int, shard_dir: str) -> None:
         """Load a single expert from disk."""
         path = os.path.join(shard_dir, f"expert_{expert_idx:02d}_{EXPERT_FIELDS[expert_idx]}.pt")
+        HardenedCheckpointManager._require_verified_file_hash(Path(path))
         state_dict = torch.load(path, map_location=self.gpu_device, weights_only=True)
         self.moe_layer.experts[expert_idx].load_state_dict(state_dict)
 

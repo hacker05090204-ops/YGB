@@ -17,6 +17,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import json
 import hashlib
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -64,7 +68,11 @@ class EmergencyOverrideManager:
                 if data.get("current_request"):
                     self.current_request = OverrideRequest(**data["current_request"])
             except Exception:
-                pass
+                logger.exception(
+                    "Failed to load emergency override state from %s",
+                    self.OVERRIDE_FILE,
+                )
+                raise
     
     def _save_state(self) -> None:
         """Save override state."""
@@ -235,7 +243,7 @@ class EmergencyOverrideManager:
         cutoff = datetime.now() - self.MISUSE_WINDOW
         
         with open(self.AUDIT_LOG, "r") as f:
-            for line in f:
+            for line_number, line in enumerate(f, start=1):
                 try:
                     entry = json.loads(line)
                     if entry.get("action") != "override_approved":
@@ -246,9 +254,14 @@ class EmergencyOverrideManager:
                     approved_at = datetime.fromisoformat(timestamp)
                     if approved_at >= cutoff:
                         recent_overrides += 1
-                except Exception:
-                    pass
-        
+                except (AttributeError, TypeError, ValueError) as exc:
+                    logger.warning(
+                        "Skipping malformed override audit entry in %s at line %d: %s",
+                        self.AUDIT_LOG,
+                        line_number,
+                        exc,
+                    )
+
         if recent_overrides > self.MISUSE_THRESHOLD:
             issues.append(
                 f"High override frequency: {recent_overrides} approvals in the last "

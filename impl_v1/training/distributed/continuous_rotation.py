@@ -121,14 +121,23 @@ class ContinuousRotation:
                     try:
                         reg_ok = regression_fn(entry.field_name, acc)
                     except Exception:
-                        pass
+                        logger.warning(
+                            "[ROTATION] Regression check failed for %s; marking field as not frozen",
+                            entry.field_name,
+                            exc_info=True,
+                        )
+                        reg_ok = False
 
                 # Backup
                 if backup_fn:
                     try:
                         backup_fn(entry.field_name)
                     except Exception:
-                        pass
+                        logger.warning(
+                            "[ROTATION] Backup failed for %s; continuing without backup",
+                            entry.field_name,
+                            exc_info=True,
+                        )
 
                 self.complete_field(entry.field_name, acc, frozen=reg_ok)
                 trained += 1

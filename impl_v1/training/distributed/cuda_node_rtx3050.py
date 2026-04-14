@@ -494,7 +494,11 @@ class RTX3050Follower:
                 from torch.nn.parallel import DistributedDataParallel as DDP
                 model = DDP(model, device_ids=[self.RANK])
         except Exception:
-            pass
+            self.errors.append("DistributedDataParallel model wrapping failed")
+            logger.warning(
+                "[RTX3050] DistributedDataParallel wrapping failed; continuing with local model execution",
+                exc_info=True,
+            )
 
         optimizer = optim.Adam(model.parameters(), lr=self.lr)
         criterion = nn.CrossEntropyLoss()

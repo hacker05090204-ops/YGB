@@ -78,8 +78,13 @@ def ingest_from_cve_pipeline(lib, max_samples: int = 0) -> int:
             try:
                 results = pipeline.search(query)
                 records.extend(results)
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[CVE] Query %r failed during pipeline search: %s",
+                    query,
+                    exc,
+                    exc_info=True,
+                )
 
         # Deduplicate by CVE ID
         seen = set()
@@ -333,4 +338,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

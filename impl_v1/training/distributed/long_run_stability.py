@@ -103,7 +103,10 @@ class LongRunStabilizer:
                     if torch.cuda.is_available():
                         torch.cuda.empty_cache()
                 except ImportError:
-                    pass
+                    logger.warning(
+                        "[STABILITY] PyTorch unavailable; skipping GPU cache clear during maintenance",
+                        exc_info=True,
+                    )
             actions.append(MaintenanceAction(
                 action="cache_clear", success=True,
                 detail="GPU cache cleared",

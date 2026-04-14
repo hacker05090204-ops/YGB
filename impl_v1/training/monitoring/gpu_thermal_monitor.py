@@ -16,6 +16,10 @@ from pathlib import Path
 from enum import Enum
 import time
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -96,7 +100,17 @@ class GPUThermalMonitor:
                 throttled=throttled,
                 state=state,
             )
+        except ImportError:
+            logger.warning(
+                "[THERMAL] PyTorch unavailable while reading GPU status; returning unavailable GPU status",
+                exc_info=True,
+            )
+            return self._unavailable_status(gpu_id)
         except Exception:
+            logger.warning(
+                "[THERMAL] Failed to read GPU status; returning unavailable GPU status",
+                exc_info=True,
+            )
             return self._unavailable_status(gpu_id)
     
     def _get_temperature(self, gpu_id: int) -> Optional[float]:
@@ -112,8 +126,16 @@ class GPUThermalMonitor:
             )
             if result.returncode == 0:
                 return float(result.stdout.strip())
+        except FileNotFoundError:
+            logger.debug(
+                "[THERMAL] nvidia-smi unavailable; GPU temperature sensor data is not available",
+                exc_info=True,
+            )
         except Exception:
-            pass
+            logger.warning(
+                "[THERMAL] Failed to query GPU temperature; continuing without sensor data",
+                exc_info=True,
+            )
         return None  # Sensor unavailable — no fake fallback
     
     def _unavailable_status(self, gpu_id: int) -> GPUStatus:

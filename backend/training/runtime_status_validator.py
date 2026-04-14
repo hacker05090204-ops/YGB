@@ -10,9 +10,45 @@ from typing import TYPE_CHECKING
 DEFAULT_RUNTIME_STATUS_PATH = Path("data/runtime_status.json")
 IncrementalTrainer = None
 logger = logging.getLogger("ygb.training.runtime_status_validator")
+MIN_PROMOTION_F1 = 0.75
+MIN_PROMOTION_PRECISION = 0.70
+MIN_PROMOTION_RECALL = 0.65
 
 if TYPE_CHECKING:
     from backend.training.incremental_trainer import AccuracySnapshot
+
+
+class TrainingGovernanceError(RuntimeError):
+    """Raised when a governance gate blocks training or promotion."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: str = "FAILED",
+        reasons: list[str] | tuple[str, ...] | None = None,
+    ) -> None:
+        self.status = str(status or "FAILED")
+        self.reasons = tuple(str(reason) for reason in (reasons or ()))
+        super().__init__(message)
+
+
+class PromotionReadinessError(TrainingGovernanceError):
+    """Raised when promotion readiness thresholds are not met."""
+
+    def __init__(self, snapshot: "AccuracySnapshot", failed_reasons: list[str]) -> None:
+        self.snapshot = snapshot
+        self.failed_reasons = tuple(str(reason) for reason in failed_reasons)
+        status = (
+            "BLOCKED_LOW_ACCURACY"
+            if snapshot.f1 < MIN_PROMOTION_F1
+            else "PROMOTION_BLOCKED"
+        )
+        super().__init__(
+            "promotion readiness failed: " + "; ".join(self.failed_reasons),
+            status=status,
+            reasons=self.failed_reasons,
+        )
 
 
 def _utc_now() -> str:
@@ -27,26 +63,41 @@ def _atomic_write_json(path: Path, payload: dict[str, object]) -> None:
 
 
 def validate_promotion_readiness(snapshot: "AccuracySnapshot") -> bool:
-    ready = True
-    if snapshot.f1 < 0.75:
+    failed_reasons: list[str] = []
+    if snapshot.f1 < MIN_PROMOTION_F1:
         logger.warning(
             "promotion readiness failed: f1=%.4f < min_f1=0.7500",
             snapshot.f1,
         )
-        ready = False
-    if snapshot.precision < 0.70:
+        failed_reasons.append(
+            f"f1={snapshot.f1:.4f} < min_f1={MIN_PROMOTION_F1:.4f}"
+        )
+    if snapshot.precision < MIN_PROMOTION_PRECISION:
         logger.warning(
             "promotion readiness failed: precision=%.4f < min_precision=0.7000",
             snapshot.precision,
         )
-        ready = False
-    if snapshot.recall < 0.65:
+        failed_reasons.append(
+            "precision="
+            f"{snapshot.precision:.4f} < min_precision={MIN_PROMOTION_PRECISION:.4f}"
+        )
+    if snapshot.recall < MIN_PROMOTION_RECALL:
         logger.warning(
             "promotion readiness failed: recall=%.4f < min_recall=0.6500",
             snapshot.recall,
         )
-        ready = False
-    return ready
+        failed_reasons.append(
+            f"recall={snapshot.recall:.4f} < min_recall={MIN_PROMOTION_RECALL:.4f}"
+        )
+    if failed_reasons:
+        error = PromotionReadinessError(snapshot, failed_reasons)
+        logger.error(
+            "promotion readiness hard block: status=%s reasons=%s",
+            error.status,
+            "; ".join(error.failed_reasons),
+        )
+        raise error
+    return True
 
 
 def validate_precision_breach_status(

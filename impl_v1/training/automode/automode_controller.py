@@ -17,6 +17,10 @@ from typing import Dict, Tuple, Optional
 from datetime import datetime
 from pathlib import Path
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -59,8 +63,12 @@ class AutoModeController:
                     data = json.load(f)
                 return AutoModeState(**data)
             except Exception:
-                pass
-        
+                logger.warning(
+                    "[AUTO_MODE] Failed to load persisted state from %s; using locked defaults",
+                    self.STATE_FILE,
+                    exc_info=True,
+                )
+
         return AutoModeState(
             unlocked=False,
             reason="Not yet evaluated",

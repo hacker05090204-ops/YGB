@@ -127,7 +127,14 @@ function Stop-PortListener {
 }
 
 # -- LOAD .env BEFORE validation or process startup --
-Import-DotEnv -Path (Join-Path $root ".env")
+$rootEnvPath = Join-Path $root ".env"
+$benchmarkEnvPath = Join-Path $root ".env.benchmark"
+if (Test-Path $rootEnvPath) {
+    Import-DotEnv -Path $rootEnvPath
+} elseif (Test-Path $benchmarkEnvPath) {
+    Write-Host "Using benchmark environment file .env.benchmark"
+    Import-DotEnv -Path $benchmarkEnvPath
+}
 Import-DotEnv -Path (Join-Path $root "frontend\.env.local")
 
 $tailscaleAutoConnect = Get-BoolEnv -Name "YGB_TAILSCALE_AUTO_CONNECT"
@@ -194,7 +201,7 @@ foreach ($v in $requiredVars) {
 }
 if ($missing.Count -gt 0) {
     Write-Warning "MISSING required env vars: $($missing -join ', ')"
-    Write-Warning "Copy .env.example to .env and fill in values. See docs/ENV_SETUP.md"
+    Write-Warning "Copy .env.example to .env and fill in values, or create .env.benchmark for benchmark startup. See docs/ENV_SETUP.md"
     throw "Missing required environment variables: $($missing -join ', '). Backend startup aborted before launch."
 }
 
@@ -202,9 +209,11 @@ if ($missing.Count -gt 0) {
 if ($LanShare) {
     $shareName = "SharedDrive"
     $shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
-    if (-not (Test-Path "D:\")) {
-        Write-Host "D: drive not found - skipping share creation."
-    } else {
+    if (-not (Test-Path "C:\ygb_storage")) {
+        Write-Host "C:\ygb_storage not found - creating directory."
+        New-Item -ItemType Directory -Path "C:\ygb_storage" -Force | Out-Null
+    }
+    if (Test-Path "C:\ygb_storage") {
         $needsRepair = $false
         if ($shareExists) {
             $shareAccess = @(Get-SmbShareAccess -Name $shareName -ErrorAction SilentlyContinue)

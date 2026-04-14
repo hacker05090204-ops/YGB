@@ -15,6 +15,10 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from pathlib import Path
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -100,8 +104,12 @@ class IncidentReportGenerator:
         if metrics_file.exists():
             try:
                 return json.loads(metrics_file.read_text())
-            except (json.JSONDecodeError, OSError):
-                pass
+            except (json.JSONDecodeError, OSError) as exc:
+                logger.warning(
+                    "[INCIDENT] Failed to load scan metrics from %s; using empty metrics: %s",
+                    metrics_file,
+                    exc,
+                )
         return {}
     
     def _generate_recommendations(self, incident_type: str) -> List[str]:

@@ -392,7 +392,10 @@ class ClusterAuthority:
                         timed_out.append(nid)
                         info['alive'] = False
                 except Exception:
-                    pass
+                    logger.error(
+                        f"[HEARTBEAT] Failed to parse heartbeat for {nid[:16]}...: {last_hb!r}",
+                        exc_info=True,
+                    )
 
             if timed_out:
                 alive = sum(

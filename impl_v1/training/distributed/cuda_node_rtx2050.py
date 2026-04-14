@@ -336,7 +336,11 @@ class RTX2050Node:
         try:
             torch.use_deterministic_algorithms(True)
         except Exception:
-            pass
+            self.errors.append("torch deterministic algorithms could not be enabled")
+            logger.warning(
+                "[RTX2050] Could not enable torch deterministic algorithms; continuing with best-effort deterministic settings",
+                exc_info=True,
+            )
 
         logger.info("[RTX2050] Deterministic mode initialized")
 
@@ -369,7 +373,11 @@ class RTX2050Node:
                 from torch.nn.parallel import DistributedDataParallel as DDP
                 model = DDP(model, device_ids=[self.local_rank])
         except Exception:
-            pass
+            self.errors.append("DistributedDataParallel model wrapping failed")
+            logger.warning(
+                "[RTX2050] DistributedDataParallel wrapping failed; continuing with local model execution",
+                exc_info=True,
+            )
 
         optimizer = optim.Adam(model.parameters(), lr=self.lr)
         criterion = nn.CrossEntropyLoss()

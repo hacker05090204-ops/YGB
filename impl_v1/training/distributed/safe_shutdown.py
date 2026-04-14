@@ -134,7 +134,14 @@ class SafeShutdownManager:
                             dead_nodes.append(nid)
                             continue
                     except Exception:
-                        pass
+                        info['alive'] = False
+                        dead_nodes.append(nid)
+                        logger.error(
+                            "[SHUTDOWN] Invalid heartbeat timestamp for node %s; marking node offline",
+                            f"{nid[:16]}...",
+                            exc_info=True,
+                        )
+                        continue
 
                 alive_nodes.append(nid)
 

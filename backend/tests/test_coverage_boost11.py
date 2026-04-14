@@ -137,19 +137,21 @@ class TestRepresentationGuardSelfTest(unittest.TestCase):
     def test_run_tests(self):
         try:
             from backend.governance.representation_guard import run_tests
-            result = run_tests()
-            self.assertTrue(result)
-        except (ImportError, AttributeError):
-            pass
+        except ImportError as exc:
+            self.skipTest(f"representation_guard.run_tests unavailable: {exc}")
+        result = run_tests()
+        self.assertTrue(result)
 
     def test_guard_score(self):
         try:
             from backend.governance.representation_guard import RepresentationGuard
-            guard = RepresentationGuard()
-            score = guard.compute_score({})
-            self.assertIsNotNone(score)
-        except (ImportError, AttributeError):
-            pass
+        except ImportError as exc:
+            self.skipTest(f"RepresentationGuard unavailable: {exc}")
+        guard = RepresentationGuard()
+        if not hasattr(guard, "compute_score"):
+            self.skipTest("RepresentationGuard.compute_score unavailable")
+        score = guard.compute_score({})
+        self.assertIsNotNone(score)
 
 
 if __name__ == "__main__":

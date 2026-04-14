@@ -385,7 +385,7 @@ def post_epoch_audit(
             dll.update_throughput(ctypes.c_double(total_samples / max(1.0, 1.0)))
             result.performance_adjusted = True
     except Exception:
-        pass
+        logger.error("[GOVERNANCE] Performance optimizer update failed", exc_info=True)
 
     # ── 4: C++ auto_ingest_scheduler stats ──
     try:
@@ -396,7 +396,7 @@ def post_epoch_audit(
             if dupes > 0:
                 logger.info(f"[GOVERNANCE] Ingestion: {unique} unique, {dupes} dupes rejected")
     except Exception:
-        pass
+        logger.error("[GOVERNANCE] Auto-ingest scheduler stats retrieval failed", exc_info=True)
 
     return result
 

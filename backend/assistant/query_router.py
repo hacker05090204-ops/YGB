@@ -522,7 +522,8 @@ class ResearchSearchPipeline:
                     edge_binary,
                     "--headless",
                     "--disable-gpu",
-                    "--no-sandbox",
+                    # Keep the browser sandbox enabled. This requires launching
+                    # under the standard OS desktop/session sandbox primitives.
                     "--disable-extensions",
                     "--disable-plugins",
                     "--disable-background-networking",

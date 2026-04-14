@@ -140,8 +140,13 @@ def _update_blacklist(node_ids: List[str]):
         try:
             with open(BLACKLIST_PATH, 'r') as f:
                 blacklist = set(json.load(f))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "[CONSENSUS] Failed to load blacklist from %s; starting from empty blacklist: %s",
+                BLACKLIST_PATH,
+                exc,
+            )
+            blacklist = set()
 
     blacklist.update(node_ids)
 
@@ -156,6 +161,12 @@ def is_blacklisted(node_id: str) -> bool:
         try:
             with open(BLACKLIST_PATH, 'r') as f:
                 return node_id in json.load(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "[CONSENSUS] Failed to read blacklist from %s; treating node %s as not blacklisted: %s",
+                BLACKLIST_PATH,
+                node_id,
+                exc,
+            )
+            return False
     return False

@@ -323,10 +323,7 @@ class TestFieldProgressionAdvanced(unittest.TestCase):
                 def wrapper(fn):
                     return fn
                 return wrapper
-        try:
-            self.api.register_routes(FakeApp())
-        except Exception:
-            pass  # Flask not installed is fine
+        self.api.register_routes(FakeApp())
 
 
 if __name__ == "__main__":

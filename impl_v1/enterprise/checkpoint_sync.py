@@ -16,6 +16,10 @@ from datetime import datetime
 from pathlib import Path
 import json
 import hashlib
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -55,8 +59,13 @@ class CheckpointExchangeProtocol:
                 with open(self.SYNC_LOG, "r") as f:
                     data = json.load(f)
                 self.sync_history = data.get("history", [])
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning(
+                    "[CHECKPOINT_SYNC] Failed to load sync history from %s; resetting history: %s",
+                    self.SYNC_LOG,
+                    exc,
+                )
+                self.sync_history = []
     
     def _save_history(self) -> None:
         """Save sync history."""

@@ -53,6 +53,15 @@ def _atomic_write_text_file(path: Path, payload: str) -> None:
     os.replace(str(temp_path), str(path))
 
 
+def _write_sha256_sidecar(path: Path, sha256: str) -> Path:
+    checksum = str(sha256 or "").strip().lower()
+    if len(checksum) != 64 or any(ch not in "0123456789abcdef" for ch in checksum):
+        raise ValueError(f"invalid SHA-256 checksum for {path}: {sha256!r}")
+    sidecar_path = Path(f"{path}.sha256")
+    _atomic_write_text_file(sidecar_path, f"{checksum}\n")
+    return sidecar_path
+
+
 @dataclass(frozen=True)
 class FeatureShard:
     """Materialized feature shard payload."""
@@ -447,6 +456,7 @@ class CheckpointManager:
         if not isinstance(metadata_payload, dict):
             raise TypeError("metadata must be a dict with JSON-serializable values")
         epoch_value = self._coerce_epoch(metadata_payload.get("epoch", 0))
+        inferred_metadata = self._infer_moe_classifier_metadata(state_dict)
 
         registry = self._load_registry()
         registry_key = self._registry_key(expert_id_value, field_name_value)
@@ -497,6 +507,7 @@ class CheckpointManager:
             val_f1_value,
         )
         checkpoint_metadata = {
+            **inferred_metadata,
             "expert_id": expert_id_value,
             "field_name": field_name_value,
             "epoch": epoch_value,
@@ -504,11 +515,17 @@ class CheckpointManager:
             "created_at": self._timestamp_now(),
             **metadata_payload,
         }
-        self._write_checkpoint(
+        checkpoint_file_hash, tensor_hash = self._write_checkpoint(
             checkpoint_path,
             state_dict,
             metadata=checkpoint_metadata,
         )
+        checkpoint_metadata = {
+            **checkpoint_metadata,
+            "checkpoint_sha256": checkpoint_file_hash,
+            "tensor_hash": tensor_hash,
+            "sha256_sidecar_path": self._serialize_path(Path(f"{checkpoint_path}.sha256")),
+        }
 
         new_record = {
             "checkpoint_path": self._serialize_path(checkpoint_path),
@@ -549,6 +566,8 @@ class CheckpointManager:
                 item["checkpoint_path"] == retained_path for item in retained_records
             ),
             "checkpoint_path": retained_path,
+            "checkpoint_sha256": checkpoint_file_hash,
+            "tensor_hash": tensor_hash,
             "is_best": normalized_entry["best_checkpoint_path"] == retained_path,
             **status,
         }
@@ -579,9 +598,13 @@ class CheckpointManager:
         if not resolved_path.exists():
             raise FileNotFoundError(f"Checkpoint not found: {resolved_path}")
 
-        from safetensors.torch import load_file as load_torch_safetensors_file
+        from impl_v1.training.checkpoints.checkpoint_hardening import (
+            HardenedCheckpointManager,
+        )
+        from training.safetensors_io import load_safetensors
 
-        return load_torch_safetensors_file(str(resolved_path), device=device)
+        HardenedCheckpointManager._require_verified_file_hash(resolved_path)
+        return load_safetensors(str(resolved_path), device=device)
 
     def status(self, expert_id: int, field_name: str) -> dict[str, Any]:
         expert_id_value, field_name_value = self._validate_expert_identity(
@@ -998,27 +1021,21 @@ class CheckpointManager:
         state_dict: dict[str, Any],
         *,
         metadata: dict[str, Any],
-    ) -> None:
-        from safetensors.torch import save_file as save_torch_safetensors_file
+    ) -> tuple[str, str]:
+        from training.safetensors_io import save_safetensors
 
-        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path = Path(f"{checkpoint_path}.tmp")
         metadata_json = json.dumps(metadata, sort_keys=True)
         metadata_payload = {
             CHECKPOINT_METADATA_JSON_KEY: metadata_json,
             LEGACY_CHECKPOINT_METADATA_JSON_KEY: metadata_json,
         }
-        try:
-            save_torch_safetensors_file(
-                state_dict,
-                str(temp_path),
-                metadata=metadata_payload,
-            )
-            os.replace(str(temp_path), str(checkpoint_path))
-        except (OSError, RuntimeError, TypeError, ValueError):
-            if temp_path.exists():
-                temp_path.unlink()
-            raise
+        checkpoint_file_hash, tensor_hash = save_safetensors(
+            state_dict,
+            str(checkpoint_path),
+            metadata=metadata_payload,
+        )
+        _write_sha256_sidecar(checkpoint_path, checkpoint_file_hash)
+        return checkpoint_file_hash, tensor_hash
 
     def _prune_records(
         self,
@@ -1036,6 +1053,46 @@ class CheckpointManager:
             if checkpoint_path.exists():
                 checkpoint_path.unlink()
                 logger.info("Deleted pruned expert checkpoint: %s", checkpoint_path.as_posix())
+            sidecar_path = Path(f"{checkpoint_path}.sha256")
+            if sidecar_path.exists():
+                sidecar_path.unlink()
+
+    @staticmethod
+    def _infer_moe_classifier_metadata(state_dict: dict[str, Any]) -> dict[str, Any]:
+        input_proj = state_dict.get("input_proj.weight")
+        classifier_weight = state_dict.get("classifier.weight")
+        router_weight = state_dict.get("moe.router.w_gate.weight")
+        expert_fc1_weight = state_dict.get("moe.experts.0.fc1.weight")
+        required_tensors = (
+            input_proj,
+            classifier_weight,
+            router_weight,
+            expert_fc1_weight,
+        )
+        if not all(hasattr(tensor, "shape") for tensor in required_tensors):
+            return {}
+
+        depth_indices: list[int] = []
+        depth_prefix = "moe.experts.0.depth_layers."
+        depth_suffix = ".fc1.weight"
+        for key in state_dict:
+            if not key.startswith(depth_prefix) or not key.endswith(depth_suffix):
+                continue
+            index_text = key[len(depth_prefix) : -len(depth_suffix)]
+            if index_text.isdigit():
+                depth_indices.append(int(index_text))
+
+        expert_depth = 1 + (max(depth_indices) + 1 if depth_indices else 0)
+        return {
+            "architecture": "MoEClassifier",
+            "architecture_format": "moe_classifier_expert_v2",
+            "input_dim": int(input_proj.shape[1]),
+            "output_dim": int(classifier_weight.shape[0]),
+            "d_model": int(input_proj.shape[0]),
+            "n_experts": int(router_weight.shape[0]),
+            "expert_hidden_dim": int(expert_fc1_weight.shape[0]),
+            "expert_depth": int(expert_depth),
+        }
 
     @staticmethod
     def _extract_f1(path_or_name: str | Path) -> float | None:

@@ -692,6 +692,9 @@ def get_required_secret(env_name: str, min_length: int = 32) -> str:
     return value
 
 
+_STARTUP_JWT_SECRET = get_required_secret("JWT_SECRET", 32)
+
+
 def preflight_check_secrets() -> None:
     """
     Verify all required secrets are present and not placeholders.
@@ -724,9 +727,9 @@ def preflight_check_secrets() -> None:
     _check_secret("JWT_SECRET", 32)
     _check_secret("YGB_HMAC_SECRET", 32)
     _check_secret("YGB_VIDEO_JWT_SECRET", 32)
-    if _temporary_auth_bypass_requested():
+    if _runtime_is_production() and _temporary_auth_bypass_requested():
         errors.append(
-            "YGB_TEMP_AUTH_BYPASS=true is not allowed in hardened mode. "
+            "YGB_TEMP_AUTH_BYPASS=true is not allowed when YGB_ENV=production. "
             "Set YGB_TEMP_AUTH_BYPASS=false before startup."
         )
 

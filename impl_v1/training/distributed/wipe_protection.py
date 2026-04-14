@@ -14,7 +14,10 @@ import os
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Tuple
+
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 
 logger = logging.getLogger(__name__)
 
@@ -103,10 +106,12 @@ def validate_weight_hash(
     try:
         # Try safetensors first
         if weights_path.endswith('.safetensors'):
-            from safetensors.torch import load_file as st_load_file
-            state_dict = st_load_file(weights_path, device='cpu')
+            from training.safetensors_io import load_safetensors
+
+            state_dict = load_safetensors(weights_path, device='cpu')
         else:
             import torch
+            HardenedCheckpointManager._require_verified_file_hash(Path(weights_path))
             state_dict = torch.load(weights_path, map_location='cpu',
                                     weights_only=True)
 

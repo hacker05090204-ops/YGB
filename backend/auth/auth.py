@@ -31,15 +31,53 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # Removed dotenv loading to prevent accidental secret leaks from .env files.
 
 # JWT config from env
-JWT_SECRET = os.getenv("JWT_SECRET", "")
-if not JWT_SECRET:
-    import warnings
-    warnings.warn(
-        "[AUTH] JWT_SECRET not set. Token operations will fail. "
-        "Set JWT_SECRET environment variable before starting the server.",
-        RuntimeWarning,
-        stacklevel=2,
-    )
+_JWT_PLACEHOLDER_SECRETS = frozenset(
+    {
+        "",
+        "changeme",
+        "secret",
+        "password",
+        "jwt_secret",
+        "your-secret-here",
+        "your_secret_here",
+        "replace-me",
+        "replace_me",
+        "test",
+        "dev",
+        "development",
+        "default",
+    }
+)
+_JWT_PLACEHOLDER_PATTERNS = (
+    "change-me",
+    "change_me",
+    "changeme",
+    "replace-me",
+    "replace_me",
+    "your-secret",
+    "your_secret",
+    "example",
+    "placeholder",
+)
+
+
+def _load_required_jwt_secret(min_length: int = 32) -> str:
+    value = os.getenv("JWT_SECRET", "").strip()
+    normalized = value.lower()
+    if not value or normalized in _JWT_PLACEHOLDER_SECRETS:
+        raise RuntimeError(
+            "JWT_SECRET must be set before startup and must not use a placeholder value"
+        )
+    if any(pattern in normalized for pattern in _JWT_PLACEHOLDER_PATTERNS):
+        raise RuntimeError("JWT_SECRET contains a placeholder value")
+    if len(value) < min_length:
+        raise RuntimeError(
+            f"JWT_SECRET must be at least {min_length} characters long"
+        )
+    return value
+
+
+JWT_SECRET = _load_required_jwt_secret()
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
 

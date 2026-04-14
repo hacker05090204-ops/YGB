@@ -64,8 +64,16 @@ def _discover_manifest_path(explicit_path: str) -> str:
                     Path(root) / "stt" / "stt_manifest.jsonl",
                     Path(root) / "datasets" / "stt_manifest.jsonl",
                 ])
+    except ImportError:
+        logger.warning(
+            "[STT_TRAIN] Storage topology helpers unavailable; using local manifest discovery only",
+            exc_info=True,
+        )
     except Exception:
-        pass
+        logger.warning(
+            "[STT_TRAIN] Failed to query storage topology during manifest discovery; using local manifest discovery only",
+            exc_info=True,
+        )
 
     for path in candidates:
         if path.exists():
@@ -394,6 +402,8 @@ class STTTrainer:
             "global_step": self.global_step,
             "best_val_loss": self.best_val_loss,
         }, path)
+        checkpoint_sha256 = self.checkpoint_manager._compute_hash(Path(path))
+        Path(f"{path}.sha256").write_text(checkpoint_sha256, encoding="utf-8")
         logger.info(f"[STT_TRAIN] Legacy checkpoint saved: {path}")
         return path
 
@@ -402,13 +412,24 @@ class STTTrainer:
         self.checkpoint_manager.wait_for_pending_writes()
 
         if path is not None and os.path.isfile(path):
-            state = torch.load(path, map_location=self.device, weights_only=False)
+            state = self.checkpoint_manager._load_legacy_checkpoint(
+                Path(path),
+                device=self.device,
+            )
             self.model.load_state_dict(state["model_state_dict"])
             if state.get("optimizer_state_dict") is not None:
                 self.optimizer.load_state_dict(state["optimizer_state_dict"])
-            self.global_step = int(state.get("global_step", 0))
-            self.best_val_loss = float(state.get("best_val_loss", float("inf")))
-            logger.info(f"[STT_TRAIN] Loaded legacy checkpoint: {path}")
+            training_state = state.get("training_state", {})
+            self.global_step = int(
+                training_state.get("global_step", state.get("global_step", 0))
+            )
+            self.best_val_loss = float(
+                training_state.get(
+                    "best_val_loss",
+                    state.get("best_val_loss", float("inf")),
+                )
+            )
+            logger.info(f"[STT_TRAIN] Loaded verified legacy checkpoint: {path}")
             return True
 
         payload = self.checkpoint_manager.load_checkpoint(

@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, UTC
 from typing import Any, Dict, Optional, Tuple
 
 from storage_backend import get_storage
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -170,8 +174,13 @@ class TieredCheckpointStorageEngine:
             with open(record["delta_manifest_path"], "r", encoding="utf-8") as handle:
                 delta_payload = json.load(handle)
             base.update(delta_payload.get("delta", {}))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "[TIERED_STORAGE] Failed to hydrate delta manifest for %s from %s; returning parent manifest only: %s",
+                checkpoint_id,
+                record.get("delta_manifest_path", ""),
+                exc,
+            )
         return base
 
     def get_status(self) -> Dict[str, Any]:

@@ -16,8 +16,10 @@ def _tokenize(*values: Any) -> set[str]:
     for value in values:
         if value is None:
             continue
-        if isinstance(value, (dict, list, tuple)):
-            text = json.dumps(value, sort_keys=True)
+        if isinstance(value, bytes):
+            text = json.dumps(_normalize(value), sort_keys=True)
+        elif isinstance(value, (dict, list, tuple)):
+            text = json.dumps(_normalize(value), sort_keys=True)
         else:
             text = str(value)
         tokens.update(_TOKEN_RE.findall(text.lower()))

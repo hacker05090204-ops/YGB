@@ -79,7 +79,10 @@ def _get_device_info() -> dict:
             info['cuda_version'] = torch.version.cuda or "unknown"
             info['vram_total_mb'] = int(props.total_memory / (1024 * 1024))
     except ImportError:
-        pass
+        logger.warning(
+            "[REGISTER] PyTorch unavailable during device detection; registering CPU-only node",
+            exc_info=True,
+        )
 
     return info
 
@@ -181,5 +184,9 @@ def load_state() -> Optional[RegistrationResult]:
                 data = json.load(f)
             return RegistrationResult(**data)
         except Exception:
-            pass
+            logger.warning(
+                "[REGISTER] Failed to load cluster state from %s; ignoring saved state",
+                CLUSTER_STATE_PATH,
+                exc_info=True,
+            )
     return None

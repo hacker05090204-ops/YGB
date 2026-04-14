@@ -166,7 +166,10 @@ class NodeDropoutDetector:
                             if self.on_dropout:
                                 self.on_dropout(dropout)
                     except Exception:
-                        pass
+                        logger.error(
+                            f"[FAILURE] Failed to parse heartbeat for {nid[:16]}...: {last_hb!r}",
+                            exc_info=True,
+                        )
 
             self._stop.wait(self.check_interval)
 

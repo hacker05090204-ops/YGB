@@ -80,7 +80,10 @@ def init_deterministic_ddp(
     try:
         torch.use_deterministic_algorithms(True)
     except Exception:
-        pass
+        logger.warning(
+            "[DDP] Failed to enable deterministic algorithms; continuing with partial determinism safeguards",
+            exc_info=True,
+        )
 
     backend = "nccl" if torch.cuda.is_available() else "gloo"
 
@@ -144,7 +147,11 @@ def _add_to_blacklist(node_ids: List[str]):
             with open(BLACKLIST_PATH, 'r') as f:
                 blacklist = set(json.load(f))
         except Exception:
-            pass
+            logger.error(
+                f"[DDP] Failed to load existing blacklist from {BLACKLIST_PATH}; rebuilding from current node ids",
+                exc_info=True,
+            )
+            blacklist = set()
 
     blacklist.update(node_ids)
 
@@ -163,7 +170,11 @@ def is_blacklisted(node_id: str) -> bool:
                 blacklist = json.load(f)
             return node_id in blacklist
         except Exception:
-            pass
+            logger.error(
+                f"[DDP] Failed to read blacklist from {BLACKLIST_PATH}; failing closed for {node_id[:16]}...",
+                exc_info=True,
+            )
+            return True
     return False
 
 
@@ -171,7 +182,13 @@ def cleanup_ddp():
     """Clean up distributed process group."""
     try:
         import torch.distributed as dist
+    except ImportError:
+        logger.warning("[DDP] torch.distributed unavailable during cleanup; skipping teardown")
+        return
+
+    try:
         if dist.is_initialized():
             dist.destroy_process_group()
     except Exception:
-        pass
+        logger.error("[DDP] Failed to destroy process group", exc_info=True)
+        raise

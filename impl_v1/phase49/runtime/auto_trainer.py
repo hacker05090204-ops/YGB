@@ -42,6 +42,7 @@ import hashlib
 import json
 import tempfile
 import numpy as np
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Tuple, Dict, Any
@@ -71,6 +72,7 @@ from .trainer_state_helpers import (
     write_worker_status,
 )
 from .trainer_checkpoint_helpers import (
+    _sha256_file,
     archive_legacy_checkpoint,
     build_checkpoint_metadata,
     checkpoint_paths_for,
@@ -116,6 +118,9 @@ from impl_v1.phase49.governors.g37_pytorch_backend import (
     DeviceType,
     PYTORCH_AVAILABLE,
 )
+from impl_v1.training.checkpoints.checkpoint_hardening import (
+    HardenedCheckpointManager,
+)
 from training_core.scheduler import validate_execution
 
 # Try importing torch for GPU enforcement
@@ -142,6 +147,8 @@ except ImportError:
     SAFETENSORS_AVAILABLE = False
     load_safetensors_file = None
     save_safetensors_file = None
+
+from training.safetensors_io import CheckpointIntegrityError, load_safetensors
 
 # Training profile: deterministic (default) or fast
 _TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
@@ -1070,13 +1077,23 @@ class AutoTrainer:
                 try:
                     if not SAFETENSORS_AVAILABLE or load_safetensors_file is None:
                         raise RuntimeError("safetensors package not available")
-                    model_state = load_safetensors_file(
-                        self._checkpoint_path, device="cpu"
-                    )
-                    self._gpu_model.load_state_dict(model_state)
+                    model_state = load_safetensors(self._checkpoint_path, device="cpu")
                     ckpt_meta = self._load_checkpoint_metadata(
                         self._checkpoint_meta_path or ""
                     )
+                    expected_file_sha256 = str(
+                        ckpt_meta.get("file_sha256", "") or ""
+                    ).strip().lower()
+                    actual_file_sha256 = _sha256_file(self._checkpoint_path)
+                    if not expected_file_sha256:
+                        raise CheckpointIntegrityError(
+                            f"Checkpoint metadata missing file_sha256 for {self._checkpoint_path}"
+                        )
+                    if actual_file_sha256 != expected_file_sha256:
+                        raise CheckpointIntegrityError(
+                            f"Checkpoint SHA-256 mismatch for {self._checkpoint_path}: expected={expected_file_sha256[:16]}..., got={actual_file_sha256[:16]}..."
+                        )
+                    self._gpu_model.load_state_dict(model_state)
                     self._epoch = int(ckpt_meta.get("epoch", 0) or 0)
                     self._last_accuracy = float(ckpt_meta.get("accuracy", 0.0) or 0.0)
                     self._last_holdout_accuracy = float(
@@ -1096,48 +1113,70 @@ class AutoTrainer:
                         f"Loaded safetensors checkpoint: epoch={self._epoch}, "
                         f"accuracy={self._last_accuracy:.2%}, loss={self._last_loss:.4f}"
                     )
+                except CheckpointIntegrityError:
+                    raise
                 except Exception as e:
                     logger.warning(f"Could not load checkpoint, starting fresh: {e}")
             elif os.path.exists(legacy_checkpoint_path):
                 try:
-                    ckpt = torch.load(
-                        legacy_checkpoint_path,
-                        map_location=self._gpu_device,
-                        weights_only=True,
+                    ckpt = HardenedCheckpointManager._load_legacy_checkpoint(
+                        Path(legacy_checkpoint_path),
+                        device=str(self._gpu_device),
+                    )
+                    training_state = (
+                        ckpt.get("training_state", {})
+                        if isinstance(ckpt, dict)
+                        else {}
                     )
                     model_state = (
                         ckpt.get("model_state") or ckpt.get("model_state_dict") or ckpt
                     )
                     self._gpu_model.load_state_dict(model_state)
-                    if isinstance(ckpt, dict) and "optimizer_state" in ckpt:
-                        self._gpu_optimizer.load_state_dict(ckpt["optimizer_state"])
-                    if isinstance(ckpt, dict) and "scheduler_state" in ckpt:
-                        self._gpu_scheduler.load_state_dict(ckpt["scheduler_state"])
+                    if isinstance(ckpt, dict) and ckpt.get("optimizer_state_dict") is not None:
+                        self._gpu_optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+                    if isinstance(ckpt, dict) and ckpt.get("scheduler_state_dict") is not None:
+                        self._gpu_scheduler.load_state_dict(ckpt["scheduler_state_dict"])
                     self._epoch = (
-                        int(ckpt.get("epoch", 0) or 0) if isinstance(ckpt, dict) else 0
+                        int(
+                            training_state.get("epoch", ckpt.get("epoch", 0)) or 0
+                        )
+                        if isinstance(ckpt, dict)
+                        else 0
                     )
                     self._last_accuracy = (
-                        float(ckpt.get("accuracy", 0.0) or 0.0)
+                        float(
+                            training_state.get("accuracy", ckpt.get("accuracy", 0.0))
+                            or 0.0
+                        )
                         if isinstance(ckpt, dict)
                         else 0.0
                     )
                     self._last_holdout_accuracy = (
                         float(
-                            ckpt.get("holdout_accuracy", self._last_accuracy)
+                            training_state.get(
+                                "holdout_accuracy",
+                                ckpt.get("holdout_accuracy", self._last_accuracy),
+                            )
                             or self._last_accuracy
                         )
                         if isinstance(ckpt, dict)
                         else self._last_accuracy
                     )
                     self._last_loss = (
-                        float(ckpt.get("loss", 0.0) or 0.0)
+                        float(
+                            training_state.get("loss", ckpt.get("loss", 0.0)) or 0.0
+                        )
                         if isinstance(ckpt, dict)
                         else 0.0
                     )
                     self._real_samples_processed = (
                         int(
-                            ckpt.get(
-                                "real_samples_processed", self._real_samples_processed
+                            training_state.get(
+                                "real_samples_processed",
+                                ckpt.get(
+                                    "real_samples_processed",
+                                    self._real_samples_processed,
+                                ),
                             )
                             or 0
                         )
@@ -1173,6 +1212,8 @@ class AutoTrainer:
                             "Migrated legacy checkpoint to safetensors: %s",
                             self._checkpoint_path,
                         )
+                except CheckpointIntegrityError:
+                    raise
                 except Exception as e:
                     logger.warning(
                         f"Could not load legacy checkpoint, starting fresh: {e}"

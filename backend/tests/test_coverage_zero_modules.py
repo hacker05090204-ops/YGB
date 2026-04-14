@@ -491,20 +491,22 @@ class TestAuditArchive(unittest.TestCase):
                 self.assertIn("pycryptodome", str(e))
 
     def test_archive_and_read(self):
-        try:
-            from backend.governance.audit_archive import archive_report, read_archived_report
-            tmpdir = tempfile.mkdtemp()
+        from backend.governance.audit_archive import archive_report, read_archived_report
+        with tempfile.TemporaryDirectory() as tmpdir:
             with patch("backend.governance.audit_archive.ARCHIVE_DIR", os.path.join(tmpdir, "archived")), \
                  patch("backend.governance.audit_archive.CONFIG_DIR", tmpdir), \
                  patch("backend.governance.audit_archive.ARCHIVE_KEY_PATH", os.path.join(tmpdir, "key.key")):
                 report = {"target_id": "tgt", "severity": "high", "status": "closed"}
-                path = archive_report(report, "RPT-001")
+                try:
+                    path = archive_report(report, "RPT-001")
+                except RuntimeError as exc:
+                    if "pycryptodome" not in str(exc).lower():
+                        raise
+                    self.skipTest(f"PyCryptodome unavailable: {exc}")
                 self.assertTrue(os.path.exists(path))
                 restored = read_archived_report("RPT-001")
                 self.assertIsNotNone(restored)
                 self.assertIn("report_hash", restored)
-        except RuntimeError:
-            pass  # PyCryptodome not installed
 
     def test_read_archived_not_found(self):
         from backend.governance.audit_archive import read_archived_report
@@ -686,11 +688,14 @@ class TestDBSafety(unittest.TestCase):
 
         async def run():
             db = FakeDB()
+            caught = None
             try:
                 async with db_transaction(db) as conn:
                     await conn.execute("INSERT INTO t VALUES (1)")
-            except ValueError:
-                pass
+            except ValueError as exc:
+                caught = exc
+            self.assertIsNotNone(caught)
+            self.assertEqual(str(caught), "Insert failed")
             return db.calls
 
         calls = asyncio.get_event_loop().run_until_complete(run())

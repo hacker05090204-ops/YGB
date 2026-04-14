@@ -24,6 +24,8 @@ from typing import Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 from pathlib import Path
 
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
+
 # Optional imports with graceful fallback
 try:
     import torch
@@ -242,6 +244,8 @@ def save_checkpoint_with_rng(
     }
     
     torch.save(checkpoint, filepath)
+    checkpoint_sha256 = HardenedCheckpointManager._compute_hash(filepath)
+    Path(f"{filepath}.sha256").write_text(checkpoint_sha256, encoding="utf-8")
     
     return checkpoint_hash
 
@@ -256,7 +260,11 @@ def load_checkpoint_with_rng(filepath: Path) -> DeterministicCheckpoint:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for deterministic checkpoints")
 
-    checkpoint = torch.load(filepath, map_location="cpu", weights_only=True)
+    checkpoint = HardenedCheckpointManager._load_torch_artifact(
+        filepath,
+        device="cpu",
+        expected_sha256=None,
+    )
     rng_states = _deserialize_rng_states(checkpoint["rng_states"])
     
     # Restore RNG states

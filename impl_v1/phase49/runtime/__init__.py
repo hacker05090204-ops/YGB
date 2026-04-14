@@ -9,16 +9,16 @@ from .idle_detector import (
     set_scan_active,
 )
 
-from .auto_trainer import (
-    AutoTrainer,
-    TrainingState,
-    TrainingEvent,
-    get_auto_trainer,
-    start_auto_training,
-    stop_auto_training,
-    start_continuous_training,
-    stop_continuous_training,
-)
+_AUTO_TRAINER_EXPORTS = {
+    "AutoTrainer",
+    "TrainingState",
+    "TrainingEvent",
+    "get_auto_trainer",
+    "start_auto_training",
+    "stop_auto_training",
+    "start_continuous_training",
+    "stop_continuous_training",
+}
 
 __all__ = [
     # Idle detection
@@ -37,3 +37,15 @@ __all__ = [
     "start_continuous_training",
     "stop_continuous_training",
 ]
+
+
+def __getattr__(name: str):
+    if name in _AUTO_TRAINER_EXPORTS:
+        from . import auto_trainer as auto_trainer_module
+
+        return getattr(auto_trainer_module, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | _AUTO_TRAINER_EXPORTS)

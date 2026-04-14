@@ -181,23 +181,35 @@ class EvolutionTestHarness:
         
         for scenario in scenarios:
             detected = 0
+            errors = 0
+            error_samples = []
             
             for payload in scenario.payloads:
                 try:
                     is_detected, confidence = scanner_func(payload)
                     if is_detected:
                         detected += 1
-                except Exception:
-                    pass
+                except Exception as exc:
+                    errors += 1
+                    if len(error_samples) < 5:
+                        error_samples.append({
+                            "payload": payload,
+                            "error": f"{type(exc).__name__}: {exc}",
+                        })
             
             detection_rate = detected / len(scenario.payloads) if scenario.payloads else 0
             
             results[scenario.category] = {
                 "detection_rate": round(detection_rate, 4),
                 "expected": scenario.expected_detection_rate,
-                "passed": detection_rate >= scenario.expected_detection_rate * 0.9,
+                "passed": (
+                    detection_rate >= scenario.expected_detection_rate * 0.9
+                    and errors == 0
+                ),
                 "detected": detected,
                 "total": len(scenario.payloads),
+                "errors": errors,
+                "error_samples": error_samples,
             }
         
         self.last_test_date = datetime.now()

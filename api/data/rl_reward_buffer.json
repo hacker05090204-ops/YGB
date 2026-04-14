@@ -1,0 +1,552 @@
+[
+  {
+    "cve_id": "CVE-2008-0015",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "67e0fea2b22529d22825015a284eef334b8a6099beaea5f53d3bf7e5aad976a9",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2012-1854",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2017-7921",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "5fa3360b9c30a0a8ffdbdec5ab00316bc40d8b4121b5bdb75bc421a0f79112f5",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2020-7796",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "c4d432973a53a391ed5b3bdef5ebc252acc67ac59882429d665060bd3949fb24",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2020-9715",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2021-22054",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "0abb2c34e6af51e6eb678673ff18245f2b5dea723c42ddb3165db08e99fe5c44",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2021-22175",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "dec4a997f916743f7ab3eb091176fb30dee64cafdeff221496a8f815cffdce13",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2021-22681",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "244fe72d10eded4159d924bfa79ce15310c3a61827f241c904bf0796c2b0ca04",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2021-30952",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "11c9c5315c3aff16dacd8a3de3ecf6c12b20f260d53945b7b5efb7115914e270",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2022-20775",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "30c789e0dcf82592deb1ce5785740f535f2e10fca044d318c91fb87ba1ec96c8",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2023-21529",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2023-36424",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2023-41974",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "e0b59c8e32eb1bed63bf01c4acd6df3ca3d60a29dc330f980052b146823f90df",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2023-43000",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "ecaa1d98b0f109193137a6a0c2a30cd1f0b0ad735460d31ded89f32038bfb447",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2024-43468",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "3643fe2f16b1aae7dcde712a75229707809d3ed724b680d4d3768a437ecb64a8",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2024-7694",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "a4df485b55cd4a587f4c672580fc7c3ac9f0893277693455f5542c4a23d2688e",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-15556",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "a935ed3a86daa978a5300a15933420e10482496d254a230ce28bc05822f186ab",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-26399",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "d7801df897c58bfa3b4bb72ac82a9b5f49b6c9d878f4159010d8dc7eb52ccf33",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-31277",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "5e91c94cd6e8f5b003468ea6c55a6ef944f4ac83cd9a8f72e48d226eeb9cd84c",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-32432",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "5de703363fa237660f19e41e70fd89d4217af0b51a439618e2b44e713bd668cf",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-40536",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "02aa0e2e0edfa7bde52fb4b7a3efcf37285adfebec016a641d01e87789015d0c",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-43510",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "61a56087f9e2e09119cdda59727bbf5fcb1d15286aedb90beb3e161f343ecc13",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-43520",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "6889cb147f86f69b75cc99aeba9b04b8f8bf529320fe3fb8a0283d7817714427",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-47813",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "56aa724951d0c50df6177c51939be06f2bfa8d943fcb03bd1616cb2ef8763f18",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-49113",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "4e289dc0d0dfdec6e189717e56d5c64001b21bf299556b3a575698ffac3f1ee6",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-53521",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "25e20c271331f74dd194502d3b7311a72d81c8c2171a6514048d7c5a18951483",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-54068",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "b160ab612e5438ef77ff449543fded69a1faf1616a1b64a8451243999793981f",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-60710",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-66376",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "8f37d1b582e1c3645f171f9b30f337c4eba8b1609d46c79fca55743fff56d4c3",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-68461",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "c5a05d9c2a7375e9f8d1f552750a5cca10907425d22ab474732f6f832329f37d",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2025-68613",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "7f4f8371b6ce62dfb24516289bb4315cfa07a4cf9d47f8185d91583c978c9535",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-1340",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-1603",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "0472aecc0dc62939ff7f2bb996799535a7c5930938e01a7ebddd9fb0385ccf0e",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-1731",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "466fa830606d403e03731a0fe3a7c1edcb06adbb3879a6670bf3098017a3e34a",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-20127",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "2cca79da8bd5bace40797fb1151365eb4b193cb1d0b01f0e2f7b52200f5d1f52",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-20131",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "1c5ecd266d4d26b9ed53341cb7be08a637d508ea7fe5162844b04c5b1a4816cd",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-20700",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "b0432f9c73b197b08272381383755996567098aaf38a426f1788b7994144a047",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-20963",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "d71e3485ae9886de64b34d9cd6e5ba63c88bdab7249cf24e9619c03a56980246",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-21385",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "f16fa70eda6b795f1205dea4de8bf61525abe8717d982bc7da32940106096987",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-21513",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "808445182a07a9cc293acc2a0cf9b807b239df5257fda98083588b51f293e04b",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-21525",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "b6348b42d97d835626c5d74553d5ead5a6b89008e6ceb4fd6d9ca798eb515b86",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-21643",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-22719",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "45d7a245e0292376b25c4319ece8997317e7cf06acea3f608a8eb62f25ffc891",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-22769",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "e94e3f3880b2f2f73430e6e5b3405d5cb73bb47ac69a5d258d63928d78eaf4b7",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-2441",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "bc0be7c05798b904c3e2369672b00ec4e6b6a726e7cd792b6da017f3feacbe58",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-25108",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "12649f6c5d3795cfbcbe76306622a7530488c8e74a4a840c07fcdd247783e140",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-3055",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-33017",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "561550735edb5ec972ac97f1696f57bdf390fe9481036f4ba6b226910c3d0852",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-33634",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "ad082cd12bd1d612d35c57a751e1a0784f3d0bcffdfcd8ce4f9decb94a761ba6",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-34621",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-3502",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-35616",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-3909",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "754d3609f5fbe0f93df94bb51a5e10402214841a0539db35c1b072007193b7c5",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-3910",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "8a1f08843582edddcb0ddfd4a4b36b151891383adae9b52fc70debaee5b82ea3",
+    "source": "cisa_kev"
+  },
+  {
+    "cve_id": "CVE-2026-5281",
+    "metadata": {},
+    "observed_at": "2026-04-13T21:28:25.485979+00:00",
+    "outcome": "kev_exploit_confirmed",
+    "predicted_severity": "CRITICAL",
+    "reward": 1.0,
+    "sample_id": "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96",
+    "source": "cisa_kev"
+  }
+]

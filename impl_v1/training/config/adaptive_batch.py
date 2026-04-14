@@ -71,6 +71,10 @@ def _get_vram_usage() -> Tuple[float, float, float]:
         pct = (used / total * 100) if total > 0 else 0
         return used, total, pct
     except Exception:
+        logger.warning(
+            "[BATCH] Failed to query VRAM usage; using zero-utilization fallback",
+            exc_info=True,
+        )
         return 0.0, 0.0, 0.0
 
 
@@ -166,7 +170,10 @@ def _run_warmup(
                 import torch
                 torch.cuda.empty_cache()
             except Exception:
-                pass
+                logger.warning(
+                    "[BATCH] Failed to clear CUDA cache after OOM",
+                    exc_info=True,
+                )
             return False, 100.0, 0.0
         raise
 
@@ -276,5 +283,9 @@ def load_batch_config(path: str = BATCH_CONFIG_PATH) -> int:
                 data = json.load(f)
             return data.get('optimal_batch_size', 1024)
         except Exception:
-            pass
+            logger.warning(
+                "[BATCH] Failed to load adaptive batch config from %s; using default batch size 1024",
+                path,
+                exc_info=True,
+            )
     return 1024

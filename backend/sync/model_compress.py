@@ -23,6 +23,8 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
+from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
+
 logger = logging.getLogger("ygb.sync.compress")
 
 SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
@@ -130,6 +132,7 @@ def _export_to_onnx(model_path: Path, onnx_path: Path) -> bool:
                 return False
         else:
             # Try loading as regular PyTorch checkpoint
+            HardenedCheckpointManager._require_verified_file_hash(model_path)
             model = torch.load(str(model_path), map_location="cpu", weights_only=True)
             if hasattr(model, "eval"):
                 model.eval()

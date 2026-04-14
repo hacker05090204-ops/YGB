@@ -13,6 +13,7 @@ Cloud backup is async and NEVER blocks the main sync cycle.
 """
 
 import json
+import hashlib
 import logging
 import os
 import shutil
@@ -56,6 +57,10 @@ class EncryptionRequiredError(RuntimeError):
     """Raised when backup encryption is mandatory but unavailable."""
 
 
+class BackupIntegrityError(RuntimeError):
+    """Raised when staged or downloaded backup integrity verification fails."""
+
+
 def _encryption_required() -> bool:
     configured = os.getenv("YGB_REQUIRE_ENCRYPTION")
     if configured is None:
@@ -78,6 +83,41 @@ def _pending_payload_files() -> list[Path]:
 
 def _sidecar_for_payload(payload: Path) -> Path:
     return PENDING_DIR / f"{payload.stem}.meta.json"
+
+
+def _sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _normalize_relative_path(relative_path: str) -> str:
+    normalized = str(relative_path or "").replace("\\", "/").strip()
+    return normalized.lstrip("/")
+
+
+def _build_sync_identity(relative_path: str, original_sha256: str) -> str:
+    normalized_path = _normalize_relative_path(relative_path)
+    return hashlib.sha256(
+        f"{normalized_path}|{original_sha256}".encode("utf-8")
+    ).hexdigest()
+
+
+def _build_staged_stem(relative_path: str, sync_identity: str) -> str:
+    safe_name = _normalize_relative_path(relative_path).replace("/", "__") or "root"
+    if len(safe_name) > 80:
+        safe_name = safe_name[-80:]
+    return f"{safe_name}__{sync_identity}"
+
+
+def _load_sidecar_metadata(sidecar_path: Path) -> dict:
+    try:
+        payload = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise BackupIntegrityError(f"Backup sidecar missing: {sidecar_path}") from exc
+    except json.JSONDecodeError as exc:
+        raise BackupIntegrityError(f"Backup sidecar unreadable: {sidecar_path}") from exc
+    if not isinstance(payload, dict):
+        raise BackupIntegrityError(f"Backup sidecar schema invalid: {sidecar_path}")
+    return payload
 
 
 def _move_uploaded_payload(payload: Path) -> None:
@@ -180,6 +220,24 @@ def _decrypt_data(data: bytes) -> bytes:
         return data
 
 
+def _decrypt_data_strict(data: bytes) -> bytes:
+    if not ENCRYPTION_KEY:
+        raise BackupIntegrityError(
+            "Encrypted backup cannot be restored without YGB_BACKUP_ENCRYPTION_KEY"
+        )
+    try:
+        from cryptography.fernet import Fernet
+    except ImportError as exc:
+        raise BackupIntegrityError(
+            "cryptography is required to restore encrypted backups"
+        ) from exc
+
+    try:
+        return Fernet(ENCRYPTION_KEY.encode("utf-8")).decrypt(data)
+    except Exception as exc:
+        raise BackupIntegrityError(f"Encrypted backup decryption failed: {exc}") from exc
+
+
 def _compress_data(data: bytes) -> bytes:
     """Compress with zstd level 3."""
     try:
@@ -205,6 +263,59 @@ def _decompress_data(data: bytes) -> bytes:
             return data  # Already uncompressed
 
 
+def _decompress_data_strict(data: bytes) -> bytes:
+    try:
+        import zstandard as zstd
+
+        return zstd.ZstdDecompressor().decompress(data)
+    except Exception as zstd_exc:
+        try:
+            import gzip
+
+            return gzip.decompress(data)
+        except Exception as gzip_exc:
+            raise BackupIntegrityError(
+                f"Compressed backup decompression failed: {zstd_exc}; {gzip_exc}"
+            ) from gzip_exc
+
+
+def restore_staged_backup_file(
+    payload_path: Path,
+    *,
+    sidecar_path: Optional[Path] = None,
+) -> tuple[bytes, dict]:
+    metadata_path = sidecar_path or _sidecar_for_payload(payload_path)
+    meta = _load_sidecar_metadata(metadata_path)
+
+    payload_bytes = payload_path.read_bytes()
+    staged_sha256 = str(meta.get("staged_sha256", "") or "").strip().lower()
+    if not staged_sha256:
+        raise BackupIntegrityError(f"Backup sidecar missing staged_sha256: {metadata_path}")
+    if _sha256_bytes(payload_bytes) != staged_sha256:
+        raise BackupIntegrityError(f"Staged backup hash mismatch for {payload_path}")
+
+    restored = payload_bytes
+    if bool(meta.get("encrypted", False)):
+        restored = _decrypt_data_strict(restored)
+    if bool(meta.get("compressed", False)):
+        restored = _decompress_data_strict(restored)
+
+    original_sha256 = str(meta.get("original_sha256", "") or "").strip().lower()
+    if not original_sha256:
+        raise BackupIntegrityError(f"Backup sidecar missing original_sha256: {metadata_path}")
+    if _sha256_bytes(restored) != original_sha256:
+        raise BackupIntegrityError(f"Restored backup hash mismatch for {payload_path}")
+
+    expected_identity = _build_sync_identity(
+        str(meta.get("original_path", "") or ""),
+        original_sha256,
+    )
+    if str(meta.get("sync_identity", "") or "") != expected_identity:
+        raise BackupIntegrityError(f"Backup sidecar sync identity mismatch: {metadata_path}")
+
+    return restored, meta
+
+
 def stage_file_for_upload(
     file_path: Path,
     relative_path: str,
@@ -221,29 +332,42 @@ def stage_file_for_upload(
             raise EncryptionRequiredError(
                 "Cannot backup without encryption. Encryption is required."
             )
-        data = file_path.read_bytes()
+        original_path = _normalize_relative_path(relative_path)
+        original_data = file_path.read_bytes()
+        original_sha256 = _sha256_bytes(original_data)
+        sync_identity = _build_sync_identity(original_path, original_sha256)
+        data = original_data
         if compress:
             data = _compress_data(data)
         if encrypt:
             data = _encrypt_data(data)
 
-        safe_name = relative_path.replace("/", "__").replace("\\", "__")
-        staged = PENDING_DIR / f"{safe_name}.enc"
+        staged_stem = _build_staged_stem(original_path, sync_identity)
+        staged = PENDING_DIR / f"{staged_stem}.enc"
         staged.write_bytes(data)
 
         # Write metadata sidecar
         meta = {
-            "original_path": relative_path,
+            "original_path": original_path,
             "original_size": file_path.stat().st_size,
+            "original_sha256": original_sha256,
+            "sync_identity": sync_identity,
+            "payload_name": staged.name,
             "staged_size": len(data),
+            "staged_sha256": _sha256_bytes(data),
             "compressed": compress,
             "encrypted": encrypt,
             "staged_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         }
-        meta_path = PENDING_DIR / f"{safe_name}.meta.json"
+        meta_path = _sidecar_for_payload(staged)
         meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
-        logger.info("Staged for GDrive: %s (%.1f KB)", relative_path, len(data) / 1024)
+        logger.info(
+            "Staged for GDrive: %s identity=%s (%.1f KB)",
+            original_path,
+            sync_identity[:16],
+            len(data) / 1024,
+        )
         return staged
     except EncryptionRequiredError:
         raise
@@ -258,16 +382,48 @@ def upload_manifest_to_gdrive():
         return False
     if not MANIFEST_PATH.exists():
         return False
-
-    data = MANIFEST_PATH.read_bytes()
-    compressed = _compress_data(data)
-    encrypted = _encrypt_data(compressed)
-
-    staged = PENDING_DIR / "manifest.json.enc"
-    _ensure_dirs()
-    staged.write_bytes(encrypted)
-    logger.info("Manifest staged for GDrive upload (%.1f KB)", len(encrypted) / 1024)
+    staged = stage_file_for_upload(
+        MANIFEST_PATH,
+        "manifest.json",
+        compress=True,
+        encrypt=True,
+    )
+    if staged is None:
+        return False
+    logger.info("Manifest staged for GDrive upload: %s", staged.name)
     return _upload_pending_files()
+
+
+def _rclone_remote_file_exists(name: str) -> bool:
+    import subprocess
+
+    if not _rclone_available():
+        return False
+
+    def _run_check() -> bool:
+        result = subprocess.run(
+            [
+                "rclone",
+                "lsf",
+                GDRIVE_REMOTE,
+                "--files-only",
+                "--include",
+                name,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr[:500] or f"rclone exit {result.returncode}")
+        matches = {line.strip() for line in (result.stdout or "").splitlines() if line.strip()}
+        return name in matches
+
+    try:
+        return bool(_call_with_retry(_run_check, label=f"rclone remote lookup {name}"))
+    except Exception as exc:
+        logger.warning("rclone duplicate check failed for %s: %s", name, exc)
+        return False
 
 
 def _upload_with_rclone() -> bool:
@@ -280,6 +436,22 @@ def _upload_with_rclone() -> bool:
         logger.warning("rclone not installed — skipping cloud upload")
         return False
     try:
+        remaining_payloads: list[Path] = []
+        for payload in payloads:
+            sidecar = _sidecar_for_payload(payload)
+            if not sidecar.exists():
+                raise BackupIntegrityError(f"Backup sidecar missing for payload {payload.name}")
+            payload_exists = _rclone_remote_file_exists(payload.name)
+            sidecar_exists = _rclone_remote_file_exists(sidecar.name)
+            if payload_exists and sidecar_exists:
+                logger.info("Skipping GDrive upload for existing backup identity: %s", payload.name)
+                _move_uploaded_payload(payload)
+                continue
+            remaining_payloads.append(payload)
+
+        if not remaining_payloads:
+            return True
+
         def _run_copy():
             result = subprocess.run(
                 [
@@ -287,6 +459,7 @@ def _upload_with_rclone() -> bool:
                     str(PENDING_DIR),
                     GDRIVE_REMOTE,
                     "--include", "*.enc",
+                    "--include", "*.meta.json",
                     "--progress",
                     "--transfers", "4",
                 ],
@@ -297,10 +470,10 @@ def _upload_with_rclone() -> bool:
             return result
 
         _call_with_retry(_run_copy, label="rclone upload")
-        for payload in payloads:
+        for payload in remaining_payloads:
             if payload.exists():
                 _move_uploaded_payload(payload)
-        logger.info("rclone upload complete (%d files)", len(payloads))
+        logger.info("rclone upload complete (%d files)", len(remaining_payloads))
         return True
     except Exception as e:
         logger.error("rclone error: %s", e)
@@ -350,26 +523,19 @@ def _upload_with_sdk() -> bool:
             return str(matches[0].get("id", "") or "") or None
 
         uploaded = 0
-        for f in payloads:
+
+        def _upload_named_file(local_path: Path) -> None:
             media = MediaFileUpload(
-                str(f),
+                str(local_path),
                 resumable=True,
                 chunksize=GDRIVE_SDK_CHUNK_BYTES,
             )
-            existing_id = _find_existing_file_id(f.name)
             file_metadata = {
-                "name": f.name,
+                "name": local_path.name,
                 "parents": [GDRIVE_FOLDER_ID] if GDRIVE_FOLDER_ID else [],
             }
 
-            def _upload_one():
-                if existing_id:
-                    return service.files().update(
-                        fileId=existing_id,
-                        media_body=media,
-                        fields="id",
-                        supportsAllDrives=True,
-                    ).execute()
+            def _create_file():
                 return service.files().create(
                     body=file_metadata,
                     media_body=media,
@@ -377,7 +543,26 @@ def _upload_with_sdk() -> bool:
                     supportsAllDrives=True,
                 ).execute()
 
-            _call_with_retry(_upload_one, label=f"gdrive sdk upload {f.name}")
+            _call_with_retry(_create_file, label=f"gdrive sdk upload {local_path.name}")
+
+        for f in payloads:
+            sidecar = _sidecar_for_payload(f)
+            if not sidecar.exists():
+                raise BackupIntegrityError(f"Backup sidecar missing for payload {f.name}")
+
+            existing_payload_id = _find_existing_file_id(f.name)
+            existing_sidecar_id = _find_existing_file_id(sidecar.name)
+            if existing_payload_id and existing_sidecar_id:
+                logger.info("Skipping SDK upload for existing backup identity: %s", f.name)
+                if f.exists():
+                    _move_uploaded_payload(f)
+                uploaded += 1
+                continue
+
+            if not existing_payload_id:
+                _upload_named_file(f)
+            if not existing_sidecar_id:
+                _upload_named_file(sidecar)
             if f.exists():
                 _move_uploaded_payload(f)
             uploaded += 1

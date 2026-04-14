@@ -321,10 +321,8 @@ class TestSessionDurabilityDefault(unittest.TestCase):
             os.environ.pop("REVOCATION_FILE_PATH", None)
             from backend.auth.revocation_store import reset_store
             reset_store()
-            try:
+            if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
-            except OSError:
-                pass
 
     def test_memory_mode_is_explicit_only(self):
         """Memory mode should only activate with explicit env var."""

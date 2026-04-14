@@ -9,6 +9,9 @@ import numpy as np
 import torch
 
 
+DEFAULT_LABEL_SMOOTHING = 0.1
+
+
 @dataclass(frozen=True)
 class TrainingOptimiserConfig:
     learning_rate: float = 3e-4
@@ -27,6 +30,7 @@ class TrainingOptimiserConfig:
     hard_negative_min_count: int = 1
     hard_negative_max_count: int = 32
     hard_negative_weight: float = 2.0
+    label_smoothing: float = DEFAULT_LABEL_SMOOTHING
 
     def __post_init__(self) -> None:
         if self.learning_rate < 0.0:
@@ -57,6 +61,8 @@ class TrainingOptimiserConfig:
             raise ValueError("hard_negative_max_count must be at least 1")
         if self.hard_negative_weight < 1.0:
             raise ValueError("hard_negative_weight must be at least 1.0")
+        if not 0.0 <= self.label_smoothing <= 1.0:
+            raise ValueError("label_smoothing must be between 0 and 1")
 
     def resolved_warmup_steps(self, total_steps: int) -> int:
         if total_steps <= 0:

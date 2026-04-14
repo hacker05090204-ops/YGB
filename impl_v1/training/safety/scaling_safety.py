@@ -72,7 +72,10 @@ def verify_scaling_determinism(
         try:
             torch.use_deterministic_algorithms(True)
         except Exception:
-            pass
+            logger.warning(
+                "[SAFETY] Could not enable deterministic algorithms for scaling validation; continuing with best-effort determinism",
+                exc_info=True,
+            )
 
         X = torch.from_numpy(X_np).to(device)
         y = torch.from_numpy(y_np).to(device)

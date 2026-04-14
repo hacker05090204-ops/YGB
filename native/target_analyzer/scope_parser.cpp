@@ -187,9 +187,12 @@ public:
         std::memcpy(e.domain, trimmed, dlen);
         e.domain[dlen] = '\0';
         std::strncpy(e.path, slash, MAX_PATH_LEN - 1);
+        e.path[MAX_PATH_LEN - 1] = '\0';
       } else {
         std::strncpy(e.domain, trimmed, MAX_DOMAIN - 1);
-        std::strcpy(e.path, "/");
+        e.domain[MAX_DOMAIN - 1] = '\0';
+        e.path[0] = '/';
+        e.path[1] = '\0';
       }
 
       result.entry_count++;

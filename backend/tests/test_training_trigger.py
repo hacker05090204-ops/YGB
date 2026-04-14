@@ -33,6 +33,7 @@ from backend.training.training_optimizer import (
     HardNegativeMiner,
     WarmupCosineScheduler,
 )
+from backend.training.runtime_status_validator import PromotionReadinessError
 
 
 class FakeStateManager:
@@ -713,6 +714,18 @@ def test_incremental_trainer_run_epoch_cpu_branches(monkeypatch, tmp_path):
     monkeypatch.setattr("backend.training.incremental_trainer.precision_score", lambda *args, **kwargs: 0.8)
     monkeypatch.setattr("backend.training.incremental_trainer.recall_score", lambda *args, **kwargs: 0.8)
     monkeypatch.setattr("backend.training.incremental_trainer.f1_score", lambda *args, **kwargs: 0.8)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.calibrate_positive_threshold",
+        lambda labels, probabilities, fallback_threshold=0.5: {
+            "threshold": float(fallback_threshold),
+            "predictions": [1 if index % 2 == 0 else 0 for index in range(len(labels))],
+            "accuracy": 0.8,
+            "precision": 0.8,
+            "recall": 0.8,
+            "f1": 0.8,
+            "strategy": "cpu_branch_passes_governance",
+        },
+    )
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
     trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(60)]
@@ -752,6 +765,18 @@ def test_incremental_trainer_run_epoch_cuda_scaler_branch(monkeypatch, tmp_path)
     monkeypatch.setattr("backend.training.incremental_trainer.precision_score", lambda *args, **kwargs: 0.85)
     monkeypatch.setattr("backend.training.incremental_trainer.recall_score", lambda *args, **kwargs: 0.85)
     monkeypatch.setattr("backend.training.incremental_trainer.f1_score", lambda *args, **kwargs: 0.85)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.calibrate_positive_threshold",
+        lambda labels, probabilities, fallback_threshold=0.5: {
+            "threshold": float(fallback_threshold),
+            "predictions": [1 if index % 2 == 0 else 0 for index in range(len(labels))],
+            "accuracy": 0.85,
+            "precision": 0.85,
+            "recall": 0.85,
+            "f1": 0.85,
+            "strategy": "cuda_branch_passes_governance",
+        },
+    )
     monkeypatch.setattr("backend.training.incremental_trainer.torch.cuda.amp.GradScaler", lambda *args, **kwargs: FakeScaler())
     monkeypatch.setattr("backend.training.incremental_trainer.torch.cuda.amp.autocast", lambda *args, **kwargs: nullcontext())
     monkeypatch.setattr(torch.Tensor, "to", lambda self, *args, **kwargs: self, raising=False)
@@ -974,10 +999,10 @@ def test_incremental_trainer_circuit_breaker_rolls_back(monkeypatch, tmp_path):
         lambda labels, probabilities, fallback_threshold=0.5: {
             "threshold": float(fallback_threshold),
             "predictions": [0 for _ in labels],
-            "accuracy": 0.0,
-            "precision": 0.0,
-            "recall": 0.0,
-            "f1": 0.0,
+            "accuracy": 0.89,
+            "precision": 0.8,
+            "recall": 0.8,
+            "f1": 0.8,
             "strategy": "forced_rollback_for_test",
         },
     )
@@ -1005,18 +1030,18 @@ def test_incremental_trainer_rolls_back_when_f1_drops_more_than_threshold(monkey
     metric_templates = [
         {
             "threshold": 0.5,
-            "accuracy": 0.80,
-            "precision": 0.80,
-            "recall": 0.80,
-            "f1": 0.80,
+            "accuracy": 0.82,
+            "precision": 0.82,
+            "recall": 0.82,
+            "f1": 0.82,
             "strategy": "epoch_one",
         },
         {
             "threshold": 0.5,
             "accuracy": 0.79,
             "precision": 0.78,
-            "recall": 0.64,
-            "f1": 0.70,
+            "recall": 0.75,
+            "f1": 0.76,
             "strategy": "epoch_two",
         },
     ]
@@ -1057,7 +1082,7 @@ def test_incremental_trainer_rolls_back_when_f1_drops_more_than_threshold(monkey
     assert second_result.rollback is True
     assert rollback_calls == ["rollback"]
     assert metrics_registry.get_counter("training_rollback") == 1.0
-    assert trainer.get_accuracy_history()[-1].f1 == pytest.approx(0.70)
+    assert trainer.get_accuracy_history()[-1].f1 == pytest.approx(0.76)
 
 
 def test_incremental_trainer_blocks_promotion_when_f1_below_threshold(monkeypatch, tmp_path):
@@ -1092,13 +1117,10 @@ def test_incremental_trainer_blocks_promotion_when_f1_below_threshold(monkeypatc
     )
     trainer.load_new_samples = lambda: _quality_gate_samples(100)
 
-    result = trainer.run_incremental_epoch()
-    payload = json.loads(baseline_path.read_text(encoding="utf-8"))
+    with pytest.raises(PromotionReadinessError) as excinfo:
+        trainer.run_incremental_epoch()
 
-    assert result.status == "BLOCKED_LOW_ACCURACY"
-    assert result.rollback is False
-    assert payload["checkpoint_f1"] == pytest.approx(0.0)
-    assert payload["baseline_accuracy"] == pytest.approx(0.0)
+    assert excinfo.value.status == "BLOCKED_LOW_ACCURACY"
 
 
 def test_incremental_trainer_early_stopping(monkeypatch, tmp_path):

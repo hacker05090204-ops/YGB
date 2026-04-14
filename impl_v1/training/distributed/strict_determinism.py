@@ -73,6 +73,10 @@ def enforce_local_determinism() -> DeterminismConfig:
         torch.use_deterministic_algorithms(True)
         det_algos = True
     except Exception:
+        logger.warning(
+            "[DETERMINISM] Failed to enable deterministic algorithms locally; continuing with explicit CUDA/cuDNN settings only",
+            exc_info=True,
+        )
         det_algos = False
 
     # CUBLAS workspace
@@ -122,7 +126,12 @@ def collect_node_config(node_id: str) -> DeterminismConfig:
                 if result.returncode == 0:
                     driver_ver = result.stdout.strip().split('\n')[0]
             except Exception:
-                pass
+                logger.warning(
+                    "[DETERMINISM] Failed to query driver version for node %s; continuing without driver-version validation",
+                    node_id,
+                    exc_info=True,
+                )
+                driver_ver = ""
 
         return DeterminismConfig(
             node_id=node_id,
