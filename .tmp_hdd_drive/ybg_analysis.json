@@ -1,0 +1,25 @@
+{
+  "checks": {
+    "test_baseline": "UNKNOWN",
+    "moe_in_controller": false,
+    "moe_module_exists": true,
+    "bare_excepts": "ERROR",
+    "moe_files": [
+      "expert.py",
+      "moe_architecture.py",
+      "router.py",
+      "__init__.py"
+    ],
+    "scrapers": [
+      "cisa_scraper",
+      "exploitdb_scraper",
+      "github_advisory_scraper",
+      "msrc_scraper",
+      "nvd_scraper",
+      "osv_scraper",
+      "redhat_scraper",
+      "snyk_scraper",
+      "vulnrichment_scraper"
+    ]
+  }
+}
