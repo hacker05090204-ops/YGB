@@ -1,1203 +1,412 @@
-from __future__ import annotations
+"""Registry of all 83 vulnerability fields that YBG tests.
+No external tools — pure observation and pattern analysis."""
+from dataclasses import dataclass
+from typing import List
 
-import argparse
-import json
-from collections import Counter, defaultdict
-from typing import Any, Sequence
+@dataclass
+class VulnField:
+    field_id: str
+    name: str
+    category: str
+    description: str
+    severity_typical: str
+    expert_id: int        # which MoE expert handles this (0-22)
+    test_patterns: List[str]   # observation patterns (no active scanning)
+    cwe_ids: List[str] = None  # Related CWE IDs
 
-# Mirror of the expert ordering used by the Phase 49 MoE stack.
-# Kept local here so the Phase 6 CLI stays lightweight and does not depend on
-# optional training/runtime packages.
-EXPERT_FIELDS: tuple[str, ...] = (
-    "web_vulns",
-    "api_testing",
-    "mobile_apk",
-    "cloud_misconfig",
-    "blockchain",
-    "iot",
-    "hardware",
-    "firmware",
-    "ssrf",
-    "rce",
-    "xss",
-    "sqli",
-    "auth_bypass",
-    "idor",
-    "graphql_abuse",
-    "rest_attacks",
-    "csrf",
-    "file_upload",
-    "deserialization",
-    "privilege_escalation",
-    "cryptography",
-    "subdomain_takeover",
-    "race_condition",
-)
-
-EXPERT_INDEX: dict[str, int] = {
-    expert_name: expert_id for expert_id, expert_name in enumerate(EXPERT_FIELDS)
-}
-SEVERITY_ORDER: tuple[str, ...] = ("critical", "high", "medium", "low")
-_VALID_SEVERITIES = set(SEVERITY_ORDER)
-
-
-def _spec(
-    slug: str,
-    title: str,
-    description: str,
-    severity: str,
-    expert_name: str,
-    *test_patterns: str,
-) -> dict[str, Any]:
-    return {
-        "slug": slug,
-        "title": title,
-        "description": description,
-        "severity": severity,
-        "expert_name": expert_name,
-        "test_patterns": tuple(test_patterns),
-    }
-
-
-_CATEGORY_SPECS: tuple[tuple[str, tuple[dict[str, Any], ...]], ...] = (
-    (
-        "client_side",
-        (
-            _spec(
-                "dom_xss_reflected",
-                "DOM XSS reflected sink",
-                "Untrusted browser-controlled data reaches dangerous DOM sinks without sanitization.",
-                "high",
-                "xss",
-                "innerHTML",
-                "location.hash",
-                "document.write",
-            ),
-            _spec(
-                "stored_xss_widget",
-                "Stored XSS in reusable widget",
-                "Persistent markup injection executes when shared widgets, comments, or previews are rendered.",
-                "critical",
-                "xss",
-                "comment preview",
-                "rich text editor",
-                "stored payload replay",
-            ),
-            _spec(
-                "client_template_injection",
-                "Client-side template injection",
-                "Client templating features render attacker-controlled expressions or trusted HTML fragments.",
-                "high",
-                "web_vulns",
-                "triple braces",
-                "v-html",
-                "template expression execution",
-            ),
-            _spec(
-                "csrf_token_bypass",
-                "CSRF token validation bypass",
-                "State-changing browser requests succeed when token binding or origin verification can be bypassed.",
-                "high",
-                "csrf",
-                "missing csrf token",
-                "state-changing GET",
-                "same-site lax exception",
-            ),
-            _spec(
-                "clickjacking_ui_redress",
-                "Clickjacking and UI redress",
-                "Sensitive actions remain frameable or visually overlaid in a way that coerces unintended clicks.",
-                "medium",
-                "web_vulns",
-                "X-Frame-Options absent",
-                "frame-ancestors wildcard",
-                "hidden overlay",
-            ),
-            _spec(
-                "open_redirect_chain",
-                "Open redirect chaining",
-                "Navigation endpoints allow controlled redirect targets that can be chained into phishing or token theft.",
-                "medium",
-                "web_vulns",
-                "redirect_uri",
-                "continue=",
-                "next=",
-            ),
-            _spec(
-                "postmessage_origin_trust",
-                "postMessage origin trust failure",
-                "Cross-window messaging accepts attacker-controlled origins or wildcard trust boundaries.",
-                "high",
-                "web_vulns",
-                "window.postMessage",
-                "origin == *",
-                "message event trust",
-            ),
-        ),
-    ),
-    (
-        "api_business_logic",
-        (
-            _spec(
-                "graphql_introspection_leak",
-                "GraphQL introspection leak",
-                "GraphQL schema discovery remains enabled in production and reveals privileged attack surface.",
-                "medium",
-                "graphql_abuse",
-                "__schema",
-                "introspection enabled",
-                "graphiql exposed",
-            ),
-            _spec(
-                "graphql_batching_bypass",
-                "GraphQL batching bypass",
-                "Batching and alias abuse evade intended request cost or authorization limits.",
-                "high",
-                "graphql_abuse",
-                "batched queries",
-                "alias fan-out",
-                "depth limit bypass",
-            ),
-            _spec(
-                "rest_rate_limit_bypass",
-                "REST rate-limit bypass",
-                "API throttling can be bypassed through header spoofing, token spray, or route fan-out.",
-                "high",
-                "rest_attacks",
-                "X-Forwarded-For rotation",
-                "endpoint fan-out",
-                "token spray",
-            ),
-            _spec(
-                "business_logic_price_tampering",
-                "Business logic price tampering",
-                "Server-side purchase validation trusts client-provided pricing, quantity, or discount state.",
-                "critical",
-                "api_testing",
-                "negative quantity",
-                "client-side price",
-                "coupon stacking",
-            ),
-            _spec(
-                "webhook_signature_bypass",
-                "Webhook signature bypass",
-                "Inbound webhook handling accepts forged events because integrity checks can be skipped or confused.",
-                "high",
-                "api_testing",
-                "missing HMAC validation",
-                "algorithm confusion",
-                "unsigned webhook",
-            ),
-            _spec(
-                "mass_assignment_override",
-                "Mass assignment override",
-                "Hidden or privileged object properties can be overwritten through unrestricted API binding.",
-                "high",
-                "rest_attacks",
-                "is_admin",
-                "role field",
-                "hidden JSON property",
-            ),
-            _spec(
-                "api_version_shadow_route",
-                "Shadow API version route",
-                "Legacy or undocumented API versions expose weaker validation and stale business rules.",
-                "medium",
-                "api_testing",
-                "/v1/legacy",
-                "undocumented endpoint",
-                "stale OpenAPI",
-            ),
-        ),
-    ),
-    (
-        "mobile_security",
-        (
-            _spec(
-                "android_exported_activity",
-                "Android exported activity abuse",
-                "Exported components can be invoked externally to access privileged application flows.",
-                "high",
-                "mobile_apk",
-                "exported=true",
-                "deep link abuse",
-                "implicit intent",
-            ),
-            _spec(
-                "insecure_webview_bridge",
-                "Insecure WebView bridge",
-                "Mobile WebView bridges expose privileged native actions to untrusted content.",
-                "high",
-                "mobile_apk",
-                "addJavascriptInterface",
-                "file:// access",
-                "mixed content",
-            ),
-            _spec(
-                "mobile_certificate_pinning_bypass",
-                "Mobile certificate pinning bypass",
-                "Transport trust accepts user-controlled roots, debug trust managers, or disabled pin checks.",
-                "high",
-                "mobile_apk",
-                "trust manager override",
-                "debug pin set",
-                "user CA accepted",
-            ),
-            _spec(
-                "local_storage_token_leak",
-                "Local storage token leak",
-                "Bearer tokens or session secrets are persisted insecurely on the device.",
-                "medium",
-                "mobile_apk",
-                "shared prefs token",
-                "sqlite cache",
-                "world-readable file",
-            ),
-            _spec(
-                "biometric_fallback_abuse",
-                "Biometric fallback abuse",
-                "Fallback flows after biometric failure downgrade to weaker or replayable device credentials.",
-                "high",
-                "auth_bypass",
-                "device credential fallback",
-                "weak fallback PIN",
-                "insecure prompt reuse",
-            ),
-            _spec(
-                "mobile_deeplink_auth_bypass",
-                "Mobile deep link auth bypass",
-                "Custom schemes or app links permit attacker-controlled login completion or callback interception.",
-                "critical",
-                "auth_bypass",
-                "app link wildcard",
-                "auth callback spoofing",
-                "custom scheme hijack",
-            ),
-            _spec(
-                "exposed_debug_component",
-                "Exposed debug component",
-                "Debug-only activities, menus, or hidden administration surfaces remain reachable in production builds.",
-                "medium",
-                "mobile_apk",
-                "debuggable flag",
-                "test activity",
-                "hidden admin screen",
-            ),
-        ),
-    ),
-    (
-        "cloud_security",
-        (
-            _spec(
-                "public_object_storage",
-                "Public object storage exposure",
-                "Object storage permissions permit public listing or download of sensitive assets.",
-                "critical",
-                "cloud_misconfig",
-                "public-read bucket",
-                "anonymous listing",
-                "signed URL overexposure",
-            ),
-            _spec(
-                "iam_privilege_chain",
-                "IAM privilege chaining",
-                "Cloud role configuration permits chained escalation through overly broad identity permissions.",
-                "critical",
-                "privilege_escalation",
-                "passRole",
-                "wildcard action",
-                "assume role chain",
-            ),
-            _spec(
-                "metadata_ssrf_pivot",
-                "Metadata SSRF pivot",
-                "Server-side fetch behavior can reach cloud instance metadata or internal credential endpoints.",
-                "critical",
-                "ssrf",
-                "169.254.169.254",
-                "IMDSv1",
-                "metadata proxy",
-            ),
-            _spec(
-                "container_escape_surface",
-                "Container escape surface",
-                "Container runtime or orchestration settings expose host-level escape primitives.",
-                "high",
-                "privilege_escalation",
-                "privileged container",
-                "hostPID",
-                "docker socket mount",
-            ),
-            _spec(
-                "exposed_control_plane_api",
-                "Exposed control-plane API",
-                "Administrative cloud, cluster, or orchestration APIs are reachable without intended network restrictions.",
-                "high",
-                "cloud_misconfig",
-                "kubelet anonymous auth",
-                "dashboard open",
-                "etcd exposed",
-            ),
-            _spec(
-                "ci_cd_secret_sprawl",
-                "CI/CD secret sprawl",
-                "Build and deployment systems leak secrets through logs, artifacts, or poorly scoped environment variables.",
-                "high",
-                "cloud_misconfig",
-                "plaintext secret variable",
-                "build log secret",
-                "artifact credential leak",
-            ),
-            _spec(
-                "serverless_event_injection",
-                "Serverless event injection",
-                "Event-driven compute trusts unvalidated messages, queue payloads, or replayed execution context.",
-                "high",
-                "api_testing",
-                "unsanitized event payload",
-                "queue replay",
-                "step function trust",
-            ),
-        ),
-    ),
-    (
-        "identity_access",
-        (
-            _spec(
-                "idor_account_takeover",
-                "IDOR-driven account takeover",
-                "Predictable object references expose direct access to another user's sensitive account actions.",
-                "critical",
-                "idor",
-                "predictable user_id",
-                "sequential object key",
-                "missing owner check",
-            ),
-            _spec(
-                "sso_relaystate_abuse",
-                "SSO relay state abuse",
-                "Single sign-on flows trust attacker-controlled relay or redirect state without adequate validation.",
-                "high",
-                "auth_bypass",
-                "unsigned relaystate",
-                "ACS mismatch",
-                "IdP initiated flow abuse",
-            ),
-            _spec(
-                "password_reset_poisoning",
-                "Password reset poisoning",
-                "Reset links or reset recipients are influenced by attacker-controlled request metadata.",
-                "critical",
-                "auth_bypass",
-                "host header poisoning",
-                "poisoned reset link",
-                "email parameter override",
-            ),
-            _spec(
-                "oauth_scope_escalation",
-                "OAuth scope escalation",
-                "OAuth clients or authorization servers grant more capability than intended after parameter tampering.",
-                "high",
-                "privilege_escalation",
-                "scope parameter tampering",
-                "incremental auth abuse",
-                "stale consent",
-            ),
-            _spec(
-                "session_fixation_reuse",
-                "Session fixation and reuse",
-                "Session identifiers are not rotated safely across privilege boundaries or login state transitions.",
-                "high",
-                "auth_bypass",
-                "pre-auth session token",
-                "no rotation on login",
-                "remember me reuse",
-            ),
-            _spec(
-                "tenant_boundary_break",
-                "Tenant boundary break",
-                "Multi-tenant authorization trusts client-controlled identifiers or stale tenancy routing metadata.",
-                "critical",
-                "idor",
-                "tenant_id tampering",
-                "org switch header",
-                "cross-tenant record access",
-            ),
-            _spec(
-                "role_cache_invalidation_gap",
-                "Role cache invalidation gap",
-                "Access revocation lags behind cached role or permission state long enough to be exploitable.",
-                "medium",
-                "privilege_escalation",
-                "stale RBAC cache",
-                "JWT role drift",
-                "delayed permission revoke",
-            ),
-        ),
-    ),
-    (
-        "injection",
-        (
-            _spec(
-                "sql_injection_blind",
-                "Blind SQL injection",
-                "Database queries incorporate attacker input in a way that supports boolean or time-based exfiltration.",
-                "critical",
-                "sqli",
-                "sleep()",
-                "boolean condition",
-                "ORDER BY probe",
-            ),
-            _spec(
-                "nosql_operator_injection",
-                "NoSQL operator injection",
-                "Untrusted structured input is interpreted as query operators rather than literal values.",
-                "high",
-                "sqli",
-                "$ne",
-                "$where",
-                "regex operator",
-            ),
-            _spec(
-                "command_injection_pipeline",
-                "Command injection in processing pipeline",
-                "Application workflows concatenate attacker-controlled input into shell commands or subprocess invocations.",
-                "critical",
-                "rce",
-                "shell metacharacters",
-                "command chaining",
-                "environment expansion",
-            ),
-            _spec(
-                "server_template_injection",
-                "Server-side template injection",
-                "Server-side rendering accepts templates or expressions that execute arbitrary logic.",
-                "critical",
-                "rce",
-                "{{7*7}}",
-                "template error leak",
-                "sandbox escape",
-            ),
-            _spec(
-                "ldap_xpath_injection",
-                "LDAP and XPath injection",
-                "Directory and XML query construction embeds untrusted expressions without proper encoding.",
-                "medium",
-                "web_vulns",
-                "*)(uid=*",
-                "//user[1]",
-                "filter concatenation",
-            ),
-            _spec(
-                "insecure_deserialization_rce",
-                "Insecure deserialization RCE",
-                "Serialized attacker input is materialized into executable object graphs or gadget chains.",
-                "critical",
-                "deserialization",
-                "pickle loads",
-                "readObject",
-                "gadget chain",
-            ),
-            _spec(
-                "expression_language_injection",
-                "Expression language injection",
-                "Dynamic expression features allow arbitrary evaluation in server-side business logic.",
-                "high",
-                "rce",
-                "${}",
-                "SpEL",
-                "OGNL",
-            ),
-        ),
-    ),
-    (
-        "file_data",
-        (
-            _spec(
-                "unrestricted_file_upload",
-                "Unrestricted file upload",
-                "Upload validation permits attacker-controlled executable or polyglot files to reach dangerous storage or execution paths.",
-                "critical",
-                "file_upload",
-                "extension bypass",
-                "MIME confusion",
-                "polyglot file",
-            ),
-            _spec(
-                "archive_traversal_zip_slip",
-                "Archive traversal (Zip Slip)",
-                "Archive extraction logic writes attacker-chosen paths outside the intended destination root.",
-                "high",
-                "file_upload",
-                "../ in zip",
-                "tar symlink",
-                "extraction root escape",
-            ),
-            _spec(
-                "xml_external_entity",
-                "XML external entity processing",
-                "XML parsing supports external entity resolution and local or remote resource access.",
-                "high",
-                "web_vulns",
-                "<!DOCTYPE",
-                "SYSTEM identifier",
-                "file:///etc/passwd",
-            ),
-            _spec(
-                "csv_formula_injection",
-                "CSV formula injection",
-                "Exported spreadsheets contain attacker input that executes spreadsheet formulas on open.",
-                "medium",
-                "file_upload",
-                "=cmd|",
-                "+SUM",
-                "spreadsheet export",
-            ),
-            _spec(
-                "image_parser_memory_corruption",
-                "Image parser memory corruption surface",
-                "Media handling routes malformed images into native decoders with crash or corruption potential.",
-                "high",
-                "file_upload",
-                "malformed EXIF",
-                "image magic mismatch",
-                "decoder crash",
-            ),
-            _spec(
-                "backup_export_data_leak",
-                "Backup export data leak",
-                "Automated export or backup files are disclosed without adequate authorization or secrecy controls.",
-                "medium",
-                "web_vulns",
-                "/backup.zip",
-                "export endpoint",
-                "unsigned download",
-            ),
-            _spec(
-                "schema_poisoning_import",
-                "Schema poisoning during import",
-                "Structured imports load attacker-controlled schemas, plugins, or YAML into dangerous runtime paths.",
-                "high",
-                "deserialization",
-                "unsafe YAML load",
-                "schema plugin execution",
-                "import hook",
-            ),
-        ),
-    ),
-    (
-        "cryptography",
-        (
-            _spec(
-                "jwt_alg_confusion",
-                "JWT algorithm confusion",
-                "JWT verification accepts unsafe algorithms or attacker-controlled key interpretation paths.",
-                "critical",
-                "cryptography",
-                "alg=none",
-                "RSA/HMAC swap",
-                "kid injection",
-            ),
-            _spec(
-                "weak_password_hashing",
-                "Weak password hashing",
-                "Credential storage relies on outdated or under-configured password hashing mechanisms.",
-                "high",
-                "cryptography",
-                "md5",
-                "unsalted sha1",
-                "low bcrypt cost",
-            ),
-            _spec(
-                "insecure_random_token",
-                "Insecure random token generation",
-                "Security tokens derive from predictable, low-entropy, or attacker-influenced randomness.",
-                "high",
-                "cryptography",
-                "predictable seed",
-                "Math.random",
-                "time-based token",
-            ),
-            _spec(
-                "key_rotation_gap",
-                "Key rotation gap",
-                "Cryptographic key management fails to retire stale keys or bind issued artifacts to key versions.",
-                "medium",
-                "cryptography",
-                "stale signing key",
-                "no key version",
-                "revoked key reuse",
-            ),
-            _spec(
-                "padding_oracle_surface",
-                "Padding oracle surface",
-                "Distinct decryption behaviors expose padding oracle attacks against encrypted content.",
-                "high",
-                "cryptography",
-                "distinct decrypt errors",
-                "CBC padding",
-                "byte-by-byte oracle",
-            ),
-            _spec(
-                "hardcoded_secret_material",
-                "Hardcoded secret material",
-                "Static credentials, private keys, or shared secrets are embedded in source, builds, or mobile artifacts.",
-                "medium",
-                "cryptography",
-                "API_KEY=",
-                "private key in repo",
-                "mobile secret constant",
-            ),
-            _spec(
-                "signature_verification_bypass",
-                "Signature verification bypass",
-                "Signed artifacts are trusted without strict signature verification or trusted chain enforcement.",
-                "critical",
-                "cryptography",
-                "missing verify()",
-                "trust untrusted cert",
-                "detached signature ignored",
-            ),
-        ),
-    ),
-    (
-        "blockchain_security",
-        (
-            _spec(
-                "smart_contract_reentrancy",
-                "Smart contract reentrancy",
-                "External calls occur before critical state updates and allow repeated draining of contract state.",
-                "critical",
-                "blockchain",
-                "external call before state update",
-                "fallback loop",
-                "withdraw reentry",
-            ),
-            _spec(
-                "oracle_manipulation_window",
-                "Oracle manipulation window",
-                "On-chain pricing depends on manipulable or stale external value feeds.",
-                "high",
-                "blockchain",
-                "low liquidity pair",
-                "TWAP gap",
-                "stale oracle round",
-            ),
-            _spec(
-                "access_control_modifier_gap",
-                "Modifier-based access control gap",
-                "Critical smart contract functions lack proper owner, role, or initializer protection.",
-                "critical",
-                "blockchain",
-                "onlyOwner missing",
-                "initializer open",
-                "role check omission",
-            ),
-            _spec(
-                "bridge_replay_attack",
-                "Bridge replay attack",
-                "Cross-chain verification allows replayed proofs, messages, or nonces to execute more than once.",
-                "critical",
-                "blockchain",
-                "nonce reuse",
-                "chain id missing",
-                "duplicate proof",
-            ),
-            _spec(
-                "unsafe_delegatecall_usage",
-                "Unsafe delegatecall usage",
-                "Delegatecall patterns trust attacker-controlled destinations or storage layouts.",
-                "high",
-                "blockchain",
-                "delegatecall to user input",
-                "library address swap",
-                "storage collision",
-            ),
-            _spec(
-                "tx_origin_authentication",
-                "tx.origin authentication misuse",
-                "Authorization decisions rely on tx.origin instead of resilient caller context.",
-                "high",
-                "blockchain",
-                "tx.origin",
-                "phishing contract",
-                "proxy auth confusion",
-            ),
-            _spec(
-                "integer_rounding_drain",
-                "Integer rounding drain",
-                "Fixed-point arithmetic or rounding gaps leak funds or value over repeated transactions.",
-                "medium",
-                "blockchain",
-                "precision loss",
-                "floor division",
-                "fee dust drain",
-            ),
-        ),
-    ),
-    (
-        "iot_firmware",
-        (
-            _spec(
-                "default_device_credentials",
-                "Default device credentials",
-                "Fielded devices retain vendor-default administrative access methods.",
-                "critical",
-                "iot",
-                "admin/admin",
-                "telnet enabled",
-                "default password reuse",
-            ),
-            _spec(
-                "unsigned_firmware_update",
-                "Unsigned firmware update",
-                "Firmware update flows accept unauthenticated or downgradeable images.",
-                "critical",
-                "firmware",
-                "no signature check",
-                "update over HTTP",
-                "rollback accepted",
-            ),
-            _spec(
-                "uart_console_exposure",
-                "UART console exposure",
-                "Accessible hardware debug interfaces expose boot interaction or shell access.",
-                "high",
-                "hardware",
-                "exposed headers",
-                "boot log shell",
-                "serial unlock",
-            ),
-            _spec(
-                "insecure_ble_pairing",
-                "Insecure BLE pairing",
-                "Bluetooth pairing and bonding rely on weak association or static secrets.",
-                "medium",
-                "iot",
-                "Just Works pairing",
-                "no MITM",
-                "static passkey",
-            ),
-            _spec(
-                "ota_manifest_tampering",
-                "OTA manifest tampering",
-                "Update manifests and update metadata can be altered without being rejected.",
-                "high",
-                "firmware",
-                "update manifest unsigned",
-                "hash mismatch ignored",
-                "version rollback",
-            ),
-            _spec(
-                "sensor_trust_spoofing",
-                "Sensor trust spoofing",
-                "Hardware or field calibration trust can be spoofed to mislead downstream device decisions.",
-                "medium",
-                "hardware",
-                "spoofed GPIO",
-                "fake sensor feed",
-                "calibration bypass",
-            ),
-            _spec(
-                "fieldbus_command_injection",
-                "Fieldbus command injection",
-                "Industrial or embedded control buses accept unauthorized write or spoofed control frames.",
-                "high",
-                "iot",
-                "Modbus write abuse",
-                "CAN frame spoofing",
-                "unauthenticated command",
-            ),
-        ),
-    ),
-    (
-        "infrastructure",
-        (
-            _spec(
-                "subdomain_takeover_dangling_dns",
-                "Subdomain takeover via dangling DNS",
-                "Dangling DNS or unclaimed third-party hosting lets attackers claim trusted subdomains.",
-                "high",
-                "subdomain_takeover",
-                "dangling CNAME",
-                "unclaimed SaaS",
-                "NXDOMAIN proof",
-            ),
-            _spec(
-                "dns_zone_transfer_leak",
-                "DNS zone transfer leak",
-                "Authoritative DNS configuration exposes internal naming data through unrestricted AXFR.",
-                "medium",
-                "subdomain_takeover",
-                "AXFR allowed",
-                "misconfigured NS",
-                "host inventory leak",
-            ),
-            _spec(
-                "internal_proxy_ssrf",
-                "Internal proxy SSRF",
-                "Fetch helpers, redirect chains, or protocol smuggling route requests into internal services.",
-                "critical",
-                "ssrf",
-                "gopher payload",
-                "protocol smuggling",
-                "internal redirect abuse",
-            ),
-            _spec(
-                "origin_service_exposure",
-                "Origin service exposure",
-                "Backend origin services remain reachable directly outside the intended CDN or edge controls.",
-                "high",
-                "cloud_misconfig",
-                "bypass CDN",
-                "origin IP leaked",
-                "direct host access",
-            ),
-            _spec(
-                "mail_domain_spoofing",
-                "Mail domain spoofing",
-                "Mail infrastructure policy gaps allow spoofed mail to inherit trusted domain identity.",
-                "medium",
-                "web_vulns",
-                "SPF softfail",
-                "DMARC none",
-                "subdomain mail host",
-            ),
-            _spec(
-                "edge_cache_poisoning",
-                "Edge cache poisoning",
-                "Shared caches accept attacker-controlled variants that poison later victim responses.",
-                "high",
-                "rest_attacks",
-                "header normalization",
-                "unkeyed query param",
-                "vary confusion",
-            ),
-            _spec(
-                "exposed_admin_interface",
-                "Exposed administrative interface",
-                "Management panels, consoles, or ports are reachable without intended network isolation.",
-                "high",
-                "cloud_misconfig",
-                "default admin path",
-                "VPN bypass",
-                "management port open",
-            ),
-        ),
-    ),
-    (
-        "concurrency_integrity",
-        (
-            _spec(
-                "coupon_race_double_spend",
-                "Coupon race double spend",
-                "Parallel redemption flows permit the same discount or credit to be consumed more than once.",
-                "high",
-                "race_condition",
-                "parallel redemption",
-                "no row lock",
-                "stale balance",
-            ),
-            _spec(
-                "inventory_reservation_bypass",
-                "Inventory reservation bypass",
-                "Concurrent ordering paths oversell or bypass intended reservation guarantees.",
-                "high",
-                "race_condition",
-                "check-then-act",
-                "concurrent checkout",
-                "oversell",
-            ),
-            _spec(
-                "webhook_replay_idempotency_gap",
-                "Webhook replay idempotency gap",
-                "Asynchronous event processing accepts duplicate deliveries without resilient replay protection.",
-                "medium",
-                "rest_attacks",
-                "missing idempotency key",
-                "event replay",
-                "duplicate charge",
-            ),
-            _spec(
-                "job_queue_claim_collision",
-                "Job queue claim collision",
-                "Distributed workers claim the same work item because queue ownership is not enforced atomically.",
-                "medium",
-                "race_condition",
-                "non-atomic claim",
-                "duplicate worker execution",
-                "stale lock",
-            ),
-            _spec(
-                "privilege_cache_race",
-                "Privilege cache race",
-                "Authorization caches and delayed state propagation create a window for stale privileges.",
-                "high",
-                "privilege_escalation",
-                "async revoke delay",
-                "stale session privilege",
-                "eventual consistency",
-            ),
-            _spec(
-                "payment_state_desync",
-                "Payment state desynchronization",
-                "Async payment flows accept inconsistent callback ordering or double-settlement conditions.",
-                "critical",
-                "race_condition",
-                "async callback order",
-                "double capture",
-                "partial refund mismatch",
-            ),
-            _spec(
-                "distributed_lock_bypass",
-                "Distributed lock bypass",
-                "Cluster coordination relies on weak lock expiry or missing fencing semantics.",
-                "high",
-                "race_condition",
-                "Redis lock expiry",
-                "clock skew",
-                "missing fencing token",
-            ),
-        ),
-    ),
-)
-
-
-def _labelize(identifier: str) -> str:
-    return identifier.replace("_", " ").title()
-
-
-def _copy_field(field: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "id": field["id"],
-        "slug": field["slug"],
-        "title": field["title"],
-        "category": field["category"],
-        "description": field["description"],
-        "severity": field["severity"],
-        "expert_id": field["expert_id"],
-        "expert_name": field["expert_name"],
-        "test_patterns": tuple(field["test_patterns"]),
-    }
-
-
-def _build_registry() -> tuple[dict[str, Any], ...]:
-    registry: list[dict[str, Any]] = []
-    seen_slugs: set[str] = set()
-
-    for category, fields in _CATEGORY_SPECS:
-        for spec in fields:
-            slug = str(spec["slug"])
-            if slug in seen_slugs:
-                raise ValueError(f"Duplicate field slug detected: {slug}")
-
-            severity = str(spec["severity"]).strip().lower()
-            if severity not in _VALID_SEVERITIES:
-                raise ValueError(f"Invalid severity for {slug}: {severity}")
-
-            expert_name = str(spec["expert_name"]).strip()
-            if expert_name not in EXPERT_INDEX:
-                raise KeyError(f"Unknown expert mapping for {slug}: {expert_name}")
-
-            test_patterns = tuple(str(pattern) for pattern in spec["test_patterns"])
-            if not test_patterns:
-                raise ValueError(f"Field {slug} must define at least one test pattern")
-
-            registry.append(
-                {
-                    "id": len(registry),
-                    "slug": slug,
-                    "title": str(spec["title"]),
-                    "category": category,
-                    "description": str(spec["description"]),
-                    "severity": severity,
-                    "expert_id": EXPERT_INDEX[expert_name],
-                    "expert_name": expert_name,
-                    "test_patterns": test_patterns,
-                }
-            )
-            seen_slugs.add(slug)
-
-    if len(registry) < 80:
-        raise ValueError(f"Phase 6 requires at least 80 fields, found {len(registry)}")
-
-    return tuple(registry)
-
-
-FIELD_REGISTRY: tuple[dict[str, Any], ...] = _build_registry()
-TOTAL_FIELDS: int = len(FIELD_REGISTRY)
-FIELD_BY_ID: dict[int, dict[str, Any]] = {field["id"]: field for field in FIELD_REGISTRY}
-FIELD_BY_SLUG: dict[str, dict[str, Any]] = {field["slug"]: field for field in FIELD_REGISTRY}
-
-_fields_by_expert: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-_fields_by_category: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-for _field in FIELD_REGISTRY:
-    _fields_by_expert[_field["expert_name"]].append(_field)
-    _fields_by_category[_field["category"]].append(_field)
-
-FIELDS_BY_EXPERT: dict[str, tuple[dict[str, Any], ...]] = {
-    expert_name: tuple(fields)
-    for expert_name, fields in sorted(_fields_by_expert.items(), key=lambda item: EXPERT_INDEX[item[0]])
-}
-FIELDS_BY_CATEGORY: dict[str, tuple[dict[str, Any], ...]] = {
-    category: tuple(fields) for category, fields in sorted(_fields_by_category.items())
-}
-
-
-def list_fields() -> tuple[dict[str, Any], ...]:
-    return tuple(_copy_field(field) for field in FIELD_REGISTRY)
-
-
-def get_field_by_id(field_id: int | str) -> dict[str, Any]:
-    try:
-        normalized_id = int(field_id)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"field_id must be an integer-like value, got {field_id!r}") from exc
-
-    if normalized_id not in FIELD_BY_ID:
-        raise KeyError(f"Unknown field_id={normalized_id}")
-    return _copy_field(FIELD_BY_ID[normalized_id])
-
-
-def get_field_by_slug(slug: str) -> dict[str, Any]:
-    normalized_slug = str(slug or "").strip()
-    if not normalized_slug:
-        raise ValueError("slug is required")
-    if normalized_slug not in FIELD_BY_SLUG:
-        raise KeyError(f"Unknown field slug: {normalized_slug}")
-    return _copy_field(FIELD_BY_SLUG[normalized_slug])
-
-
-def _resolve_expert(expert: int | str) -> tuple[int, str]:
-    if isinstance(expert, int):
-        if expert < 0 or expert >= len(EXPERT_FIELDS):
-            raise KeyError(f"Unknown expert_id={expert}")
-        return expert, EXPERT_FIELDS[expert]
-
-    expert_text = str(expert or "").strip()
-    if not expert_text:
-        raise ValueError("expert is required")
-    if expert_text.isdigit():
-        return _resolve_expert(int(expert_text))
-    if expert_text not in EXPERT_INDEX:
-        raise KeyError(f"Unknown expert name: {expert_text}")
-    return EXPERT_INDEX[expert_text], expert_text
-
-
-def get_fields_for_expert(expert: int | str) -> tuple[dict[str, Any], ...]:
-    _, expert_name = _resolve_expert(expert)
-    return tuple(_copy_field(field) for field in FIELDS_BY_EXPERT.get(expert_name, ()))
-
-
-def get_fields_for_category(category: str) -> tuple[dict[str, Any], ...]:
-    category_name = str(category or "").strip()
-    if not category_name:
-        raise ValueError("category is required")
-    return tuple(_copy_field(field) for field in FIELDS_BY_CATEGORY.get(category_name, ()))
-
-
-def get_category_distribution() -> dict[str, int]:
-    counter = Counter(field["category"] for field in FIELD_REGISTRY)
-    return {category: counter[category] for category in sorted(counter)}
-
-
-def get_severity_distribution() -> dict[str, int]:
-    counter = Counter(field["severity"] for field in FIELD_REGISTRY)
-    return {severity: counter[severity] for severity in SEVERITY_ORDER if counter.get(severity, 0)}
-
-
-def build_summary() -> dict[str, Any]:
-    return {
-        "total_fields": TOTAL_FIELDS,
-        "experts_total": len(EXPERT_FIELDS),
-        "experts_covered": len({field["expert_name"] for field in FIELD_REGISTRY}),
-        "category_distribution": get_category_distribution(),
-        "severity_distribution": get_severity_distribution(),
-    }
-
-
-def render_report() -> str:
-    summary = build_summary()
-    lines = [
-        "Phase 6 Field Registry Report",
-        "============================",
-        f"Total fields: {summary['total_fields']}",
-        f"Experts covered: {summary['experts_covered']} / {summary['experts_total']}",
-        "Category distribution:",
-    ]
-
-    for category, count in summary["category_distribution"].items():
-        lines.append(f"- {_labelize(category)}: {count}")
-
-    lines.append("Severity distribution:")
-    for severity, count in summary["severity_distribution"].items():
-        lines.append(f"- {severity.title()}: {count}")
-    return "\n".join(lines)
-
-
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Phase 6 static vulnerability field registry")
-    parser.add_argument("--json", action="store_true", help="Emit JSON instead of the text report")
-    parser.add_argument("--field-id", type=int, help="Look up a single field by numeric id")
-    parser.add_argument("--field-slug", help="Look up a single field by slug")
-    parser.add_argument("--expert", help="List fields assigned to an expert id or expert name")
-    parser.add_argument("--category", help="List fields assigned to a category")
-    return parser
-
-
-def main(argv: Sequence[str] | None = None) -> int:
-    parser = _build_parser()
-    args = parser.parse_args(argv)
-
-    if args.field_id is not None:
-        payload: Any = get_field_by_id(args.field_id)
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    if args.field_slug:
-        payload = get_field_by_slug(args.field_slug)
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    if args.expert:
-        payload = get_fields_for_expert(args.expert)
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    if args.category:
-        payload = get_fields_for_category(args.category)
-        print(json.dumps(payload, indent=2, sort_keys=True))
-        return 0
-
-    if args.json:
-        print(json.dumps(build_summary(), indent=2, sort_keys=True))
-        return 0
-
-    print(render_report())
-    return 0
-
-
-__all__ = [
-    "EXPERT_FIELDS",
-    "EXPERT_INDEX",
-    "FIELD_REGISTRY",
-    "TOTAL_FIELDS",
-    "FIELD_BY_ID",
-    "FIELD_BY_SLUG",
-    "FIELDS_BY_EXPERT",
-    "FIELDS_BY_CATEGORY",
-    "list_fields",
-    "get_field_by_id",
-    "get_field_by_slug",
-    "get_fields_for_expert",
-    "get_fields_for_category",
-    "get_category_distribution",
-    "get_severity_distribution",
-    "build_summary",
-    "render_report",
-    "main",
+# Web & Application Security (1-15)
+WEB_APP_FIELDS = [
+    VulnField("xss_reflected", "Reflected XSS", "web",
+             "Input reflected in DOM without encoding", "HIGH", 0,
+             ["param_in_response", "no_encoding", "script_tag"],
+             ["CWE-79"]),
+    VulnField("xss_stored", "Stored XSS", "web",
+             "Payload persisted server-side", "CRITICAL", 0,
+             ["storage_in_db", "render_unescaped", "persistent"],
+             ["CWE-79"]),
+    VulnField("xss_dom", "DOM-Based XSS", "web",
+             "Client-side sink manipulation", "HIGH", 0,
+             ["document.write", "innerHTML", "eval"],
+             ["CWE-79"]),
+    VulnField("sqli_error", "Error-Based SQLi", "web",
+             "SQL errors in response", "CRITICAL", 1,
+             ["sql_error_msg", "syntax_error", "database_error"],
+             ["CWE-89"]),
+    VulnField("sqli_blind", "Blind SQLi", "web",
+             "Boolean/time-based inference", "CRITICAL", 1,
+             ["response_diff", "time_delay", "conditional_response"],
+             ["CWE-89"]),
+    VulnField("sqli_union", "Union-Based SQLi", "web",
+             "UNION SELECT data extraction", "CRITICAL", 1,
+             ["union_allowed", "column_match", "data_extraction"],
+             ["CWE-89"]),
+    VulnField("csrf", "CSRF", "web",
+             "Cross-site request forgery", "MEDIUM", 2,
+             ["no_csrf_token", "samesite_missing", "state_param_missing"],
+             ["CWE-352"]),
+    VulnField("ssrf", "SSRF", "web",
+             "Server-side request forgery", "HIGH", 2,
+             ["url_param", "internal_redirect", "metadata_access"],
+             ["CWE-918"]),
+    VulnField("idor", "IDOR", "web",
+             "Insecure direct object reference", "HIGH", 3,
+             ["predictable_id", "no_authz_check", "sequential_id"],
+             ["CWE-639"]),
+    VulnField("open_redirect", "Open Redirect", "web",
+             "Unvalidated URL redirect", "MEDIUM", 3,
+             ["redirect_param", "external_url", "url_validation_missing"],
+             ["CWE-601"]),
+    VulnField("path_traversal", "Path Traversal", "web",
+             "Directory traversal", "HIGH", 3,
+             ["../", "file_param", "path_manipulation"],
+             ["CWE-22"]),
+    VulnField("lfi", "LFI", "web",
+             "Local file inclusion", "CRITICAL", 3,
+             ["include_param", "php_filter", "file_read"],
+             ["CWE-98"]),
+    VulnField("rfi", "RFI", "web",
+             "Remote file inclusion", "CRITICAL", 3,
+             ["include_param", "remote_url", "code_execution"],
+             ["CWE-98"]),
+    VulnField("xxe", "XXE", "web",
+             "XML external entity", "CRITICAL", 4,
+             ["xml_input", "dtd_allowed", "entity_expansion"],
+             ["CWE-611"]),
+    VulnField("ssti", "SSTI", "web",
+             "Server-side template injection", "CRITICAL", 4,
+             ["template_param", "math_eval", "code_execution"],
+             ["CWE-94"]),
 ]
 
+# Mobile & Client Security (16-25)
+MOBILE_FIELDS = [
+    VulnField("android_app", "Android Application Security", "mobile",
+             "Android app vulnerabilities", "HIGH", 7,
+             ["apk_analysis", "manifest_check", "intent_filter"],
+             ["CWE-927"]),
+    VulnField("ios_app", "iOS Application Security", "mobile",
+             "iOS app vulnerabilities", "HIGH", 8,
+             ["ipa_analysis", "plist_check", "keychain_usage"],
+             ["CWE-919"]),
+    VulnField("mobile_api", "Mobile API Security", "mobile",
+             "Mobile-specific API issues", "HIGH", 5,
+             ["api_key_hardcoded", "insecure_transport", "cert_pinning_missing"],
+             ["CWE-295"]),
+    VulnField("webview", "WebView Security", "mobile",
+             "WebView JS injection", "HIGH", 7,
+             ["addjavascriptinterface", "file_access", "js_enabled"],
+             ["CWE-749"]),
+    VulnField("cert_pinning", "Certificate Pinning", "mobile",
+             "Transport security", "MEDIUM", 8,
+             ["pinning_missing", "tls_validation_disabled"],
+             ["CWE-295"]),
+    VulnField("local_storage", "Local Storage & Data Protection", "mobile",
+             "Insecure data storage", "MEDIUM", 7,
+             ["external_storage", "world_readable", "unencrypted_data"],
+             ["CWE-312"]),
+    VulnField("biometric_auth", "Biometric & Device Authentication", "mobile",
+             "Weak biometric implementation", "MEDIUM", 8,
+             ["fallback_weak", "no_crypto_binding"],
+             ["CWE-287"]),
+    VulnField("deep_link", "Deep Link & App Link Security", "mobile",
+             "Deep link hijacking", "MEDIUM", 7,
+             ["intent_hijacking", "url_scheme_weak"],
+             ["CWE-939"]),
+    VulnField("reverse_eng", "Reverse Engineering Protection", "mobile",
+             "Lack of code protection", "LOW", 8,
+             ["no_obfuscation", "debug_enabled", "root_detection_missing"],
+             ["CWE-656"]),
+    VulnField("code_obfuscation", "Code Obfuscation & Tamper Detection", "mobile",
+             "Weak anti-tampering", "LOW", 8,
+             ["no_integrity_check", "signature_validation_missing"],
+             ["CWE-494"]),
+]
+
+# Cloud & Infrastructure Security (26-40)
+CLOUD_FIELDS = [
+    VulnField("cloud_misconfig", "Cloud Misconfiguration", "cloud",
+             "Cloud resource misconfiguration", "CRITICAL", 9,
+             ["public_bucket", "open_security_group", "default_creds"],
+             ["CWE-16"]),
+    VulnField("iam_access", "IAM & Access Control", "cloud",
+             "Overprivileged roles", "CRITICAL", 9,
+             ["star_action", "admin_policy", "wildcard_resource"],
+             ["CWE-269"]),
+    VulnField("storage_bucket", "Storage Bucket Security", "cloud",
+             "Public S3/blob containers", "HIGH", 9,
+             ["list_bucket", "public_acl", "anonymous_access"],
+             ["CWE-732"]),
+    VulnField("serverless", "Serverless Security", "cloud",
+             "Lambda/function vulnerabilities", "HIGH", 10,
+             ["function_injection", "env_var_leak", "excessive_permissions"],
+             ["CWE-94"]),
+    VulnField("container_k8s", "Container & Kubernetes Security", "cloud",
+             "Container escape, K8s misconfig", "CRITICAL", 10,
+             ["privileged_container", "host_network", "rbac_weak"],
+             ["CWE-250"]),
+    VulnField("metadata_ssrf", "Metadata Service Security (SSRF)", "cloud",
+             "IMDSv1 access", "CRITICAL", 9,
+             ["169.254.169.254", "metadata_endpoint", "imdsv1"],
+             ["CWE-918"]),
+    VulnField("network_sec", "Network Security", "cloud",
+             "Network segmentation issues", "HIGH", 10,
+             ["open_ports", "no_firewall", "flat_network"],
+             ["CWE-923"]),
+    VulnField("firewall_waf", "Firewall & WAF Security", "cloud",
+             "WAF bypass", "MEDIUM", 10,
+             ["waf_bypass", "rule_evasion", "rate_limit_missing"],
+             ["CWE-693"]),
+    VulnField("dns_domain", "DNS & Domain Security", "cloud",
+             "DNS hijacking, subdomain takeover", "HIGH", 10,
+             ["dangling_cname", "zone_transfer", "dnssec_missing"],
+             ["CWE-350"]),
+    VulnField("cert_mgmt", "Certificate Management", "cloud",
+             "Expired/weak certificates", "MEDIUM", 10,
+             ["cert_expired", "weak_cipher", "self_signed"],
+             ["CWE-295"]),
+    VulnField("secrets_mgmt", "Secrets Management", "cloud",
+             "Hardcoded secrets", "CRITICAL", 9,
+             ["api_key_in_code", "password_in_config", "token_in_git"],
+             ["CWE-798"]),
+    VulnField("logging_audit", "Logging & Audit Security", "cloud",
+             "Insufficient logging", "MEDIUM", 10,
+             ["no_audit_log", "log_tampering", "sensitive_data_logged"],
+             ["CWE-778"]),
+    VulnField("backup_dr", "Backup & Disaster Recovery Security", "cloud",
+             "Insecure backups", "MEDIUM", 10,
+             ["unencrypted_backup", "public_snapshot", "no_retention"],
+             ["CWE-311"]),
+    VulnField("multi_tenant", "Multi-Tenant Security", "cloud",
+             "Tenant isolation failure", "CRITICAL", 10,
+             ["tenant_leak", "shared_resource", "isolation_bypass"],
+             ["CWE-653"]),
+    VulnField("edge_cdn", "Edge & CDN Security", "cloud",
+             "CDN cache poisoning", "MEDIUM", 10,
+             ["cache_key_weak", "vary_missing", "cache_deception"],
+             ["CWE-444"]),
+]
+
+# Network & Protocol Security (41-50)
+NETWORK_FIELDS = [
+    VulnField("network_protocol", "Network Protocol Security", "network",
+             "Protocol-level vulnerabilities", "HIGH", 13,
+             ["protocol_downgrade", "mitm_possible", "plaintext_protocol"],
+             ["CWE-757"]),
+    VulnField("encryption_crypto", "Encryption & Cryptography", "network",
+             "Weak cryptography", "HIGH", 16,
+             ["weak_cipher", "ecb_mode", "hardcoded_key"],
+             ["CWE-327"]),
+    VulnField("tls_ssl", "TLS / SSL Security", "network",
+             "TLS misconfigurations", "HIGH", 16,
+             ["sslv3_enabled", "weak_cipher_suite", "no_forward_secrecy"],
+             ["CWE-326"]),
+    VulnField("http_headers", "HTTP Security Headers", "network",
+             "Missing security headers", "MEDIUM", 17,
+             ["no_hsts", "no_csp", "x_frame_options_missing"],
+             ["CWE-693"]),
+    VulnField("cors_sop", "CORS & Same-Origin Policy", "network",
+             "CORS misconfiguration", "HIGH", 17,
+             ["origin_wildcard", "credentials_allowed", "null_origin"],
+             ["CWE-942"]),
+    VulnField("clickjacking", "Clickjacking & UI Redress", "network",
+             "Missing X-Frame-Options", "MEDIUM", 17,
+             ["no_frame_options", "iframe_allowed", "ui_redress"],
+             ["CWE-1021"]),
+    VulnField("open_redirects", "Open Redirects", "network",
+             "Unvalidated redirects", "MEDIUM", 3,
+             ["redirect_param", "url_validation_weak"],
+             ["CWE-601"]),
+    VulnField("host_header", "Host Header Attacks", "network",
+             "Host header injection", "MEDIUM", 18,
+             ["host_in_response", "password_reset_link", "cache_poisoning"],
+             ["CWE-644"]),
+    VulnField("cache_poisoning", "Cache Poisoning", "network",
+             "Unkeyed input cached", "HIGH", 18,
+             ["x_host_cached", "vary_missing", "cache_key_weak"],
+             ["CWE-444"]),
+    VulnField("http_smuggling", "HTTP Smuggling", "network",
+             "Request smuggling", "CRITICAL", 17,
+             ["te_cl_conflict", "chunked_encoding", "cl_te_desync"],
+             ["CWE-444"]),
+]
+
+# Specialized & Emerging Fields (51-83)
+SPECIALIZED_FIELDS = [
+    VulnField("blockchain_sc", "Blockchain & Smart Contract Security", "blockchain",
+             "Smart contract vulnerabilities", "CRITICAL", 11,
+             ["reentrancy", "integer_overflow", "access_control_missing"],
+             ["CWE-841"]),
+    VulnField("iot_firmware", "IoT & Firmware Security", "iot",
+             "Firmware vulnerabilities", "CRITICAL", 12,
+             ["hardcoded_creds", "backdoor", "insecure_update"],
+             ["CWE-798"]),
+    VulnField("hardware_sec", "Hardware Security", "hardware",
+             "Hardware-level vulnerabilities", "HIGH", 12,
+             ["jtag_exposed", "debug_interface", "side_channel"],
+             ["CWE-1300"]),
+    VulnField("embedded_device", "Embedded Device Security", "iot",
+             "Embedded system vulnerabilities", "HIGH", 12,
+             ["uart_exposed", "firmware_extraction", "memory_dump"],
+             ["CWE-1191"]),
+    VulnField("scada_ics", "SCADA / ICS Security", "iot",
+             "Industrial control system vulnerabilities", "CRITICAL", 12,
+             ["modbus_exposed", "plc_access", "hmi_weak_auth"],
+             ["CWE-1188"]),
+    VulnField("ai_ml_model", "AI / ML Model Security", "ai",
+             "Model vulnerabilities", "HIGH", 14,
+             ["model_theft", "adversarial_input", "data_poisoning"],
+             ["CWE-1395"]),
+    VulnField("prompt_injection", "Prompt Injection & LLM Security", "ai",
+             "LLM prompt injection", "HIGH", 14,
+             ["system_prompt_leak", "jailbreak", "indirect_injection"],
+             ["CWE-94"]),
+    VulnField("data_poisoning", "Data Poisoning & Model Theft", "ai",
+             "Training data manipulation", "HIGH", 14,
+             ["backdoor_trigger", "model_extraction", "membership_inference"],
+             ["CWE-1395"]),
+    VulnField("zero_day", "Zero-Day & Novel Attack Vectors", "general",
+             "Unknown vulnerabilities", "CRITICAL", 22,
+             ["novel_pattern", "unknown_signature", "new_technique"],
+             ["CWE-nomap"]),
+    VulnField("race_condition", "Race Conditions", "web",
+             "TOCTOU vulnerabilities", "HIGH", 18,
+             ["concurrent_request", "double_spend", "state_race"],
+             ["CWE-362"]),
+    VulnField("toctou", "Time-of-Check to Time-of-Use (TOCTOU)", "web",
+             "TOCTOU race conditions", "HIGH", 18,
+             ["check_use_gap", "file_race", "symlink_race"],
+             ["CWE-367"]),
+    VulnField("deserialization", "Deserialization Attacks", "web",
+             "Unsafe deserialization", "CRITICAL", 13,
+             ["pickle_loads", "yaml_load", "java_serialize"],
+             ["CWE-502"]),
+    VulnField("xxe_xml", "XXE & XML Security", "web",
+             "XML vulnerabilities", "CRITICAL", 4,
+             ["xml_entity", "dtd_processing", "billion_laughs"],
+             ["CWE-611"]),
+    VulnField("graphql_sec", "GraphQL Security", "api",
+             "GraphQL vulnerabilities", "HIGH", 6,
+             ["introspection_enabled", "nested_query", "batch_attack"],
+             ["CWE-1284"]),
+    VulnField("nosql_injection", "NoSQL Injection", "web",
+             "MongoDB/Redis injection", "HIGH", 19,
+             ["$where_query", "operator_injection", "json_injection"],
+             ["CWE-943"]),
+    VulnField("ldap_injection", "LDAP & Directory Injection", "web",
+             "LDAP query injection", "HIGH", 19,
+             ["ldap_filter", "star_injection", "parenthesis_bypass"],
+             ["CWE-90"]),
+    VulnField("xpath_injection", "XPath Injection", "web",
+             "XPath query injection", "HIGH", 19,
+             ["xpath_query", "xml_auth", "boolean_bypass"],
+             ["CWE-643"]),
+    VulnField("email_injection", "Email Header Injection", "web",
+             "CRLF in email header", "MEDIUM", 19,
+             ["mail_header", "crlf_inject", "bcc_injection"],
+             ["CWE-93"]),
+    VulnField("subdomain_takeover", "Subdomain Takeover", "web",
+             "Dangling DNS", "HIGH", 17,
+             ["cname_no_target", "404_on_service", "dns_orphan"],
+             ["CWE-350"]),
+    VulnField("dependency_confusion", "Dependency Confusion", "supply_chain",
+             "Typosquatting deps", "HIGH", 15,
+             ["internal_pkg_public", "version_override", "namespace_collision"],
+             ["CWE-1357"]),
+    VulnField("prototype_pollution", "Prototype Pollution", "web",
+             "JS prototype chain", "HIGH", 4,
+             ["__proto__", "constructor", "object_merge"],
+             ["CWE-1321"]),
+    VulnField("mass_assignment", "Mass Assignment", "api",
+             "Unfiltered object properties", "HIGH", 5,
+             ["extra_fields_accepted", "role_escalation", "hidden_field"],
+             ["CWE-915"]),
+    VulnField("idor_advanced", "Insecure Direct Object Reference (IDOR)", "web",
+             "Advanced IDOR patterns", "HIGH", 3,
+             ["uuid_predictable", "hash_collision", "reference_leak"],
+             ["CWE-639"]),
+    VulnField("privilege_escalation", "Privilege Escalation", "auth",
+             "Vertical/horizontal privilege escalation", "CRITICAL", 14,
+             ["role_bypass", "sudo_misconfiguration", "capability_abuse"],
+             ["CWE-269"]),
+    VulnField("account_takeover", "Account Takeover", "auth",
+             "Account compromise", "CRITICAL", 14,
+             ["session_fixation", "credential_stuffing", "token_theft"],
+             ["CWE-640"]),
+    VulnField("password_reset", "Password Reset & Recovery Flaws", "auth",
+             "Weak password reset", "HIGH", 14,
+             ["sequential_token", "long_expiry", "token_reuse"],
+             ["CWE-640"]),
+    VulnField("oauth_sso", "OAuth & SSO Flaws", "auth",
+             "OAuth/SAML vulnerabilities", "HIGH", 14,
+             ["state_param_missing", "redirect_uri_weak", "token_leak"],
+             ["CWE-1390"]),
+    VulnField("webhook_sec", "Webhook Security", "api",
+             "Webhook vulnerabilities", "MEDIUM", 6,
+             ["no_signature_validation", "replay_attack", "ssrf_via_webhook"],
+             ["CWE-345"]),
+    VulnField("api_gateway", "API Gateway & Microservice Security", "api",
+             "Gateway/microservice issues", "HIGH", 6,
+             ["auth_bypass", "rate_limit_missing", "service_mesh_weak"],
+             ["CWE-306"]),
+    VulnField("logging_telemetry", "Logging & Telemetry Security", "general",
+             "Log injection, sensitive data in logs", "MEDIUM", 20,
+             ["log_injection", "pii_in_logs", "log_tampering"],
+             ["CWE-117"]),
+    VulnField("privacy_leakage", "Privacy & Data Leakage", "general",
+             "PII exposure", "HIGH", 20,
+             ["pii_exposed", "gdpr_violation", "data_minimization_missing"],
+             ["CWE-359"]),
+    VulnField("compliance_regulatory", "Compliance & Regulatory Security", "general",
+             "Compliance violations", "MEDIUM", 20,
+             ["hipaa_violation", "pci_dss_fail", "sox_non_compliant"],
+             ["CWE-nomap"]),
+    VulnField("physical_security", "Physical Security", "physical",
+             "Physical access vulnerabilities", "MEDIUM", 21,
+             ["usb_attack", "physical_access", "badge_cloning"],
+             ["CWE-1263"]),
+]
+
+# Combine all fields
+ALL_FIELDS = (
+    WEB_APP_FIELDS +
+    MOBILE_FIELDS +
+    CLOUD_FIELDS +
+    NETWORK_FIELDS +
+    SPECIALIZED_FIELDS
+)
+
+FIELD_COUNT = len(ALL_FIELDS)
+
+def get_fields_for_expert(expert_id: int) -> List[VulnField]:
+    """Get all fields handled by a specific expert."""
+    return [f for f in ALL_FIELDS if f.expert_id == expert_id]
+
+def get_field_by_id(field_id: str) -> VulnField:
+    """Get a specific field by ID."""
+    return next((f for f in ALL_FIELDS if f.field_id == field_id), None)
+
+def get_fields_by_category(category: str) -> List[VulnField]:
+    """Get all fields in a category."""
+    return [f for f in ALL_FIELDS if f.category == category]
+
+def get_field_categories() -> List[str]:
+    """Get all unique categories."""
+    return sorted(set(f.category for f in ALL_FIELDS))
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    print(f"Total vulnerability fields: {FIELD_COUNT}")
+    print(f"\nFields by category:")
+    from collections import Counter
+    cats = Counter(f.category for f in ALL_FIELDS)
+    for cat, count in sorted(cats.items()):
+        print(f"  {cat}: {count} fields")
+    
+    print(f"\nFields by expert:")
+    for expert_id in range(23):
+        fields = get_fields_for_expert(expert_id)
+        if fields:
+            print(f"  Expert {expert_id}: {len(fields)} fields")
+            for f in fields[:3]:
+                print(f"    - {f.name}")
+            if len(fields) > 3:
+                print(f"    ... and {len(fields)-3} more")
