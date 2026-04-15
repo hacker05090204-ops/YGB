@@ -1,15 +1,13 @@
 {
   "checks": {
     "test_baseline": "UNKNOWN",
-    "moe_in_controller": false,
-    "moe_module_exists": true,
-    "bare_excepts": "ERROR",
-    "moe_files": [
-      "expert.py",
-      "moe_architecture.py",
-      "router.py",
-      "__init__.py"
-    ],
+    "moe_in_controller": true,
+    "model_params": 1207467013,
+    "model_class": "MoEClassifier",
+    "bare_excepts": 0,
+    "expert_queue_error": "'str' object has no attribute 'status'",
+    "per_expert_checkpoints": 0,
+    "global_checkpoints": 1,
     "scrapers": [
       "cisa_scraper",
       "exploitdb_scraper",
@@ -21,5 +19,14 @@
       "snyk_scraper",
       "vulnrichment_scraper"
     ]
+  },
+  "wiring": {
+    "RL\u2192trainer": "WIRED (3/3)",
+    "EWC\u2192trainer": "WIRED (2/3)",
+    "ClassBalancer\u2192trainer": "WIRED (2/2)"
+  },
+  "security": {
+    "bypass_exists": true,
+    "bypass_prod_gated": true
   }
 }

@@ -21,7 +21,7 @@ for root, dirs, files in os.walk('.'):
             try:
                 lines = len(Path(os.path.join(root,f)).read_text(encoding='utf-8', errors='ignore').splitlines())
                 total_lines += lines
-            except: 
+            except (OSError, UnicodeDecodeError, PermissionError): 
                 pass
 
 print(f'Total files: {total_files}')

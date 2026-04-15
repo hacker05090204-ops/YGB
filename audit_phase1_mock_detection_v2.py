@@ -44,7 +44,7 @@ for severity, patterns in PATTERNS.items():
                 for i, line in enumerate(content.splitlines(), 1):
                     if pattern in line:
                         hits.append(f'{py_file}:{i}:{line.strip()[:80]}')
-            except:
+            except (OSError, UnicodeDecodeError, PermissionError):
                 pass
         
         if hits:

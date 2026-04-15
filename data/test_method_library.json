@@ -1,0 +1,122 @@
+{
+  "xss_basic": {
+    "method_id": "xss_basic",
+    "name": "Basic XSS Probe",
+    "description": "Inject <script>alert(1)</script> variations",
+    "field": "xss",
+    "success_count": 0,
+    "failure_count": 4,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "2026-04-15T21:36:37.208446+00:00",
+    "effectiveness_score": 0.0
+  },
+  "sqli_error": {
+    "method_id": "sqli_error",
+    "name": "SQLi Error-Based",
+    "description": "Inject single quote and observe error responses",
+    "field": "sqli",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "ssrf_loopback": {
+    "method_id": "ssrf_loopback",
+    "name": "SSRF Loopback Probe",
+    "description": "Test URL parameters with http://127.0.0.1 payloads",
+    "field": "ssrf",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "idor_seq": {
+    "method_id": "idor_seq",
+    "name": "IDOR Sequential Probe",
+    "description": "Test ID parameters by incrementing/decrementing values",
+    "field": "idor",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "auth_jwt": {
+    "method_id": "auth_jwt",
+    "name": "JWT Weakness Detection",
+    "description": "Test JWT algorithm confusion and none algorithm",
+    "field": "auth",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "rce_cmd": {
+    "method_id": "rce_cmd",
+    "name": "Command Injection",
+    "description": "Test command injection via shell metacharacters",
+    "field": "rce",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "xxe_basic": {
+    "method_id": "xxe_basic",
+    "name": "XXE Basic",
+    "description": "Test XML external entity injection",
+    "field": "xxe",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "csrf_basic": {
+    "method_id": "csrf_basic",
+    "name": "CSRF Token Check",
+    "description": "Test for missing CSRF tokens",
+    "field": "csrf",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "",
+    "invented_by": "human",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "xss_encode_1fa0": {
+    "method_id": "xss_encode_1fa0",
+    "name": "XSS with encoding bypass",
+    "description": "Try HTML entity, URL, unicode encodings of XSS payload",
+    "field": "xss",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "2026-04-15T21:36:37.206876+00:00",
+    "invented_by": "self_reflection",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  },
+  "xss_encode_7c0a": {
+    "method_id": "xss_encode_7c0a",
+    "name": "XSS with encoding bypass",
+    "description": "Try HTML entity, URL, unicode encodings of XSS payload",
+    "field": "xss",
+    "success_count": 0,
+    "failure_count": 0,
+    "invented_at": "2026-04-15T21:36:37.210044+00:00",
+    "invented_by": "self_reflection",
+    "last_used": "",
+    "effectiveness_score": 0.0
+  }
+}
