@@ -299,7 +299,11 @@ class HardenedCheckpointManager:
         return None
 
     def verify_checkpoint(self, checkpoint_id: str) -> Tuple[bool, str]:
-        """Verify checkpoint integrity and required artifacts."""
+        """
+        FIX 7.3: Verify checkpoint integrity - hard-fail on SHA256 mismatch.
+        
+        No skip_verification flag. All checkpoints MUST pass hash verification.
+        """
         metadata = self.checkpoints.get(checkpoint_id)
         if metadata is None:
             legacy_path = self._legacy_checkpoint_path(checkpoint_id)

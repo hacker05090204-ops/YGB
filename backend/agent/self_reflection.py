@@ -1,662 +1,537 @@
+"""
+Self-reflection loop for vulnerability-method evolution.
+
+This module now supports both the older runtime-oriented API and the newer
+Phase-19 test-facing persistence/reporting API.
+"""
+
 from __future__ import annotations
 
 import json
-import os
-import re
-from dataclasses import dataclass, field
+import logging
+import time
+import uuid
+from collections import Counter
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from hashlib import sha1
 from pathlib import Path
-from typing import Any, Callable
-from uuid import uuid4
+from typing import Any, Optional
+
+logger = logging.getLogger("ygb.self_reflection")
+
+FAILURE_THRESHOLD = 3
+REFLECTION_INTERVAL = 300
+DEFAULT_LIBRARY_ROOT = Path("data")
 
 
-def _utc_now() -> str:
+def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _normalize_text(value: object, *, field_name: str) -> str:
-    normalized = str(value or "").strip()
-    if not normalized:
-        raise ValueError(f"{field_name}_required")
-    return normalized
-
-
-def _json_safe(value: Any) -> Any:
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    if isinstance(value, Path):
-        return str(value)
-    if isinstance(value, dict):
-        return {str(key): _json_safe(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple, set, frozenset)):
-        return [_json_safe(item) for item in value]
-    return str(value)
-
-
-def _atomic_write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = path.with_suffix(f"{path.suffix}.tmp")
-    tmp_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-    os.replace(tmp_path, path)
-
-
-def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as handle:
-        handle.write(json.dumps(payload, sort_keys=True))
-        handle.write("\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-
-
-def _read_jsonl(path: Path, loader: Callable[[dict[str, Any]], Any]) -> list[Any]:
-    if not path.exists():
-        return []
-    records: list[Any] = []
-    with open(path, "r", encoding="utf-8") as handle:
-        for line_number, raw_line in enumerate(handle, start=1):
-            line = raw_line.strip()
-            if not line:
-                continue
-            try:
-                payload = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(
-                    f"invalid_jsonl:{path}:{line_number}:{exc.msg}"
-                ) from exc
-            if not isinstance(payload, dict):
-                raise ValueError(f"jsonl_record_must_be_mapping:{path}:{line_number}")
-            records.append(loader(payload))
-    return records
-
-
-def _slugify(value: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
-    return slug or "adaptive_method"
-
-
-@dataclass(frozen=True)
+@dataclass
 class MethodRecord:
+    """A persisted vulnerability-detection method record."""
+
     method_id: str
     name: str
-    attack_family: str
-    failure_pattern: str
-    reasoning: str
-    steps: tuple[str, ...]
-    invented_by: str
-    created_at: str
-    source_failure_count: int = 0
-    tags: tuple[str, ...] = field(default_factory=tuple)
+    description: str
+    field: str
+    success_count: int = 0
+    failure_count: int = 0
+    invented_at: str = ""
+    invented_by: str = "human"
+    last_used: str = ""
+    effectiveness_score: float = 0.0
     metadata: dict[str, Any] = field(default_factory=dict)
+    attack_family: str = ""
+    failure_pattern: str = ""
+    source_failure_count: int = 0
 
-    def to_payload(self) -> dict[str, Any]:
-        return {
-            "method_id": self.method_id,
-            "name": self.name,
-            "attack_family": self.attack_family,
-            "failure_pattern": self.failure_pattern,
-            "reasoning": self.reasoning,
-            "steps": list(self.steps),
-            "invented_by": self.invented_by,
-            "created_at": self.created_at,
-            "source_failure_count": int(self.source_failure_count),
-            "tags": list(self.tags),
-            "metadata": _json_safe(self.metadata),
-        }
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
     @classmethod
-    def from_payload(cls, payload: dict[str, Any]) -> "MethodRecord":
+    def from_dict(cls, payload: dict[str, Any]) -> "MethodRecord":
         return cls(
-            method_id=_normalize_text(payload.get("method_id"), field_name="method_id"),
-            name=_normalize_text(payload.get("name"), field_name="name"),
-            attack_family=_normalize_text(
-                payload.get("attack_family"),
-                field_name="attack_family",
-            ),
-            failure_pattern=_normalize_text(
-                payload.get("failure_pattern"),
-                field_name="failure_pattern",
-            ),
-            reasoning=_normalize_text(payload.get("reasoning"), field_name="reasoning"),
-            steps=tuple(str(item) for item in payload.get("steps", ()) if str(item).strip()),
-            invented_by=_normalize_text(payload.get("invented_by"), field_name="invented_by"),
-            created_at=_normalize_text(payload.get("created_at"), field_name="created_at"),
+            method_id=str(payload.get("method_id", "")),
+            name=str(payload.get("name", "")),
+            description=str(payload.get("description", "")),
+            field=str(payload.get("field", "")),
+            success_count=int(payload.get("success_count", 0) or 0),
+            failure_count=int(payload.get("failure_count", 0) or 0),
+            invented_at=str(payload.get("invented_at", "")),
+            invented_by=str(payload.get("invented_by", "human")),
+            last_used=str(payload.get("last_used", "")),
+            effectiveness_score=float(payload.get("effectiveness_score", 0.0) or 0.0),
+            metadata=dict(payload.get("metadata", {}) or {}),
+            attack_family=str(payload.get("attack_family", "") or ""),
+            failure_pattern=str(payload.get("failure_pattern", "") or ""),
             source_failure_count=int(payload.get("source_failure_count", 0) or 0),
-            tags=tuple(str(item) for item in payload.get("tags", ()) if str(item).strip()),
-            metadata=dict(_json_safe(payload.get("metadata", {})) or {}),
         )
+
+
+VulnMethod = MethodRecord
 
 
 @dataclass(frozen=True)
 class FailureObservation:
-    observation_id: str
+    method_id: str
     attack_family: str
     failure_pattern: str
     reason: str
+    context: dict[str, Any]
+    timestamp: str
     count_for_pattern: int
-    observed_at: str
-    context: dict[str, Any] = field(default_factory=dict)
-
-    def to_payload(self) -> dict[str, Any]:
-        return {
-            "observation_id": self.observation_id,
-            "attack_family": self.attack_family,
-            "failure_pattern": self.failure_pattern,
-            "reason": self.reason,
-            "count_for_pattern": int(self.count_for_pattern),
-            "observed_at": self.observed_at,
-            "context": _json_safe(self.context),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: dict[str, Any]) -> "FailureObservation":
-        return cls(
-            observation_id=_normalize_text(
-                payload.get("observation_id"),
-                field_name="observation_id",
-            ),
-            attack_family=_normalize_text(
-                payload.get("attack_family"),
-                field_name="attack_family",
-            ),
-            failure_pattern=_normalize_text(
-                payload.get("failure_pattern"),
-                field_name="failure_pattern",
-            ),
-            reason=str(payload.get("reason", "") or "").strip(),
-            count_for_pattern=int(payload.get("count_for_pattern", 0) or 0),
-            observed_at=_normalize_text(
-                payload.get("observed_at"),
-                field_name="observed_at",
-            ),
-            context=dict(_json_safe(payload.get("context", {})) or {}),
-        )
 
 
 @dataclass(frozen=True)
 class ReflectionEvent:
     event_id: str
     event_type: str
-    attack_family: str
-    failure_pattern: str
-    reasoning: str
-    failure_count: int
-    occurred_at: str
-    invented_method_id: str | None = None
-
-    def to_payload(self) -> dict[str, Any]:
-        return {
-            "event_id": self.event_id,
-            "event_type": self.event_type,
-            "attack_family": self.attack_family,
-            "failure_pattern": self.failure_pattern,
-            "reasoning": self.reasoning,
-            "failure_count": int(self.failure_count),
-            "occurred_at": self.occurred_at,
-            "invented_method_id": self.invented_method_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: dict[str, Any]) -> "ReflectionEvent":
-        invented_method_id = str(payload.get("invented_method_id", "") or "").strip() or None
-        return cls(
-            event_id=_normalize_text(payload.get("event_id"), field_name="event_id"),
-            event_type=_normalize_text(payload.get("event_type"), field_name="event_type"),
-            attack_family=_normalize_text(
-                payload.get("attack_family"),
-                field_name="attack_family",
-            ),
-            failure_pattern=_normalize_text(
-                payload.get("failure_pattern"),
-                field_name="failure_pattern",
-            ),
-            reasoning=_normalize_text(payload.get("reasoning"), field_name="reasoning"),
-            failure_count=int(payload.get("failure_count", 0) or 0),
-            occurred_at=_normalize_text(payload.get("occurred_at"), field_name="occurred_at"),
-            invented_method_id=invented_method_id,
-        )
+    trigger: str
+    field: str
+    failed_method: str
+    failure_patterns: tuple[str, ...]
+    new_method_proposed: Optional[str]
+    invented_method_id: str = ""
+    reasoning: str = ""
+    timestamp: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class MethodLibrary:
-    DEFAULT_ROOT = Path("secure_data") / "self_reflection"
+    """Persistent library of seed and self-invented methods."""
+
+    SEED_METHODS = (
+        MethodRecord(
+            "xss_basic",
+            "Basic XSS Probe",
+            "Inject basic reflected/stored XSS payload variations.",
+            "xss",
+            attack_family="xss_basic",
+        ),
+        MethodRecord(
+            "sqli_error",
+            "SQLi Error-Based",
+            "Inject quote-based payloads and inspect database errors.",
+            "sqli",
+            attack_family="sqli_error",
+        ),
+        MethodRecord(
+            "ssrf_loopback",
+            "SSRF Loopback Probe",
+            "Test URL parameters with localhost and RFC1918 targets.",
+            "ssrf",
+            attack_family="ssrf_loopback",
+        ),
+        MethodRecord(
+            "idor_seq",
+            "IDOR Sequential Probe",
+            "Test predictable identifier increments/decrements.",
+            "idor",
+            attack_family="idor_seq",
+        ),
+        MethodRecord(
+            "auth_jwt",
+            "JWT Weakness Detection",
+            "Test algorithm confusion and unsafe token handling.",
+            "auth",
+            attack_family="auth_jwt",
+        ),
+        MethodRecord(
+            "rce_cmd",
+            "Command Injection Probe",
+            "Test shell metacharacter execution paths.",
+            "rce",
+            attack_family="rce_cmd",
+        ),
+        MethodRecord(
+            "path_traversal",
+            "Path Traversal Probe",
+            "Test traversal payloads and path normalization gaps.",
+            "path_traversal",
+            attack_family="path_traversal",
+        ),
+        MethodRecord(
+            "xxe_basic",
+            "XXE Basic Probe",
+            "Test XML entity expansion and external entity handling.",
+            "xxe",
+            attack_family="xxe_basic",
+        ),
+    )
 
     def __init__(
         self,
-        root: str | os.PathLike[str] = DEFAULT_ROOT,
-        *,
-        library_filename: str = "method_library.json",
+        root: Path | str | None = None,
+        library_path: Path | str | None = None,
     ) -> None:
-        self.root = Path(root)
-        self.root.mkdir(parents=True, exist_ok=True)
-        self.library_path = self.root / library_filename
-        self._methods = self._load_methods()
-
-    def _load_methods(self) -> list[MethodRecord]:
-        if not self.library_path.exists():
-            return []
-        try:
-            payload = json.loads(self.library_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"invalid_method_library_json:{self.library_path}:{exc.msg}") from exc
-        if isinstance(payload, list):
-            methods_payload = payload
-        elif isinstance(payload, dict):
-            methods_payload = payload.get("methods", [])
-        else:
-            raise ValueError(f"invalid_method_library_payload:{self.library_path}")
-        if not isinstance(methods_payload, list):
-            raise ValueError(f"invalid_method_library_methods:{self.library_path}")
-        return [MethodRecord.from_payload(item) for item in methods_payload]
-
-    def _persist(self) -> None:
-        payload = {
-            "version": 1,
-            "updated_at": _utc_now(),
-            "methods": [method.to_payload() for method in self._methods],
+        self.root = Path(root) if root is not None else DEFAULT_LIBRARY_ROOT
+        self._path = Path(library_path) if library_path is not None else self.root / "method_library.json"
+        self._methods: dict[str, MethodRecord] = {
+            record.method_id: MethodRecord.from_dict(record.to_dict())
+            for record in self.SEED_METHODS
         }
-        _atomic_write_json(self.library_path, payload)
+        self._load()
 
-    @property
-    def methods(self) -> tuple[MethodRecord, ...]:
-        return tuple(self._methods)
+    def _load(self) -> None:
+        if not self._path.exists():
+            return
+        try:
+            payload = json.loads(self._path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            logger.error("Failed to load method library: %s", exc)
+            return
 
-    def __iter__(self):
-        return iter(self._methods)
+        if isinstance(payload, dict) and "methods" in payload:
+            entries = payload.get("methods", [])
+        elif isinstance(payload, dict):
+            entries = list(payload.values())
+        elif isinstance(payload, list):
+            entries = payload
+        else:
+            entries = []
 
-    def __len__(self) -> int:
-        return len(self._methods)
+        for raw_entry in entries:
+            if not isinstance(raw_entry, dict):
+                continue
+            record = MethodRecord.from_dict(raw_entry)
+            self._methods[record.method_id] = record
 
-    def add_method(self, method: MethodRecord) -> MethodRecord:
-        if not isinstance(method, MethodRecord):
-            raise TypeError("method_must_be_method_record")
-        replaced = False
-        updated_methods: list[MethodRecord] = []
-        for existing in self._methods:
-            if existing.method_id == method.method_id:
-                updated_methods.append(method)
-                replaced = True
-            else:
-                updated_methods.append(existing)
-        if not replaced:
-            updated_methods.append(method)
-        self._methods = updated_methods
-        self._persist()
-        return method
+    def _save(self) -> None:
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        invented = [
+            method.to_dict()
+            for method in self.list_methods(invented_by="self_reflection")
+        ]
+        self._path.write_text(
+            json.dumps({"methods": invented}, indent=2),
+            encoding="utf-8",
+        )
 
-    def get_method(self, method_id: str) -> MethodRecord | None:
-        normalized_method_id = _normalize_text(method_id, field_name="method_id")
-        for method in self._methods:
-            if method.method_id == normalized_method_id:
-                return method
-        return None
+    def record_outcome(self, method_id: str, success: bool) -> None:
+        method = self._methods.get(method_id)
+        if method is None:
+            logger.warning("Unknown method: %s", method_id)
+            return
+        if success:
+            method.success_count += 1
+        else:
+            method.failure_count += 1
+        method.last_used = _utcnow_iso()
+        total = method.success_count + method.failure_count
+        method.effectiveness_score = method.success_count / total if total else 0.0
+        if method.invented_by == "self_reflection":
+            self._save()
 
-    def list_methods(
-        self,
-        *,
-        attack_family: str | None = None,
-        invented_by: str | None = None,
-    ) -> list[MethodRecord]:
-        methods = list(self._methods)
-        if attack_family is not None:
-            normalized_attack_family = _normalize_text(
-                attack_family,
-                field_name="attack_family",
-            ).lower()
-            methods = [
-                method
-                for method in methods
-                if method.attack_family.lower() == normalized_attack_family
-            ]
+    def add_invented_method(self, method: MethodRecord) -> None:
+        self._methods[method.method_id] = method
+        self._save()
+        logger.info("New method invented: %s for field %s", method.name, method.field)
+
+    def get_method(self, method_id: str) -> Optional[MethodRecord]:
+        return self._methods.get(method_id)
+
+    def get_all_methods(self) -> list[MethodRecord]:
+        return self.list_methods()
+
+    def list_methods(self, invented_by: str | None = None) -> list[MethodRecord]:
+        methods = list(self._methods.values())
         if invented_by is not None:
-            normalized_invented_by = _normalize_text(
-                invented_by,
-                field_name="invented_by",
-            ).lower()
-            methods = [
-                method
-                for method in methods
-                if method.invented_by.lower() == normalized_invented_by
-            ]
-        return methods
+            methods = [method for method in methods if method.invented_by == invented_by]
+        return sorted(
+            methods,
+            key=lambda method: (
+                method.invented_at or "",
+                method.method_id,
+            ),
+        )
 
-    def find_for_pattern(self, attack_family: str, failure_pattern: str) -> list[MethodRecord]:
-        normalized_attack_family = _normalize_text(
-            attack_family,
-            field_name="attack_family",
-        ).lower()
-        normalized_failure_pattern = _normalize_text(
-            failure_pattern,
-            field_name="failure_pattern",
-        ).lower()
+    def get_best_methods(self, field: str, n: int = 5) -> list[MethodRecord]:
+        field_methods = [method for method in self._methods.values() if method.field == field]
+        return sorted(
+            field_methods,
+            key=lambda method: (method.effectiveness_score, method.success_count, -method.failure_count),
+            reverse=True,
+        )[:n]
+
+    def get_failing_methods(
+        self,
+        field: str,
+        *,
+        threshold: int = FAILURE_THRESHOLD,
+    ) -> list[MethodRecord]:
         return [
             method
-            for method in self._methods
-            if method.attack_family.lower() == normalized_attack_family
-            and method.failure_pattern.lower() == normalized_failure_pattern
+            for method in self._methods.values()
+            if (method.field == field or method.method_id == field or method.attack_family == field)
+            and method.failure_count >= threshold
+            and method.failure_count >= max(1, method.success_count + 1)
         ]
 
 
 class SelfReflectionEngine:
-    DEFAULT_INVENTION_THRESHOLD = 4
+    """Monitor repeated failures and invent alternative methods."""
 
     def __init__(
         self,
-        method_library: MethodLibrary,
+        library: MethodLibrary | None = None,
+        reflection_log_path: Path | str | None = None,
         *,
-        root: str | os.PathLike[str] | None = None,
-        invention_threshold: int = DEFAULT_INVENTION_THRESHOLD,
+        method_library: MethodLibrary | None = None,
+        invention_threshold: int = FAILURE_THRESHOLD,
     ) -> None:
-        if not isinstance(method_library, MethodLibrary):
-            raise TypeError("method_library_must_be_method_library")
-        self.method_library = method_library
-        self.root = Path(root) if root is not None else method_library.root
-        self.root.mkdir(parents=True, exist_ok=True)
-        self.failure_log_path = self.root / "failure_observations.jsonl"
-        self.failure_state_path = self.root / "failure_state.json"
-        self.reflection_log_path = self.root / "reflection_events.jsonl"
-        self.invention_threshold = int(invention_threshold)
-        if self.invention_threshold < 1:
-            raise ValueError("invention_threshold_must_be_positive")
-        self._failure_state = self._load_failure_state()
+        self._library = method_library or library or MethodLibrary()
+        self.invention_threshold = max(1, int(invention_threshold))
+        self._log_path = Path(reflection_log_path) if reflection_log_path is not None else self._library.root / "reflection_log.jsonl"
+        self._failure_summary: dict[str, dict[str, Any]] = {}
+        self._failure_observations: list[FailureObservation] = []
+        self._reflection_events: list[ReflectionEvent] = []
+        self._last_reflection = 0.0
 
-    @staticmethod
-    def build_failure_key(attack_family: str, failure_pattern: str) -> str:
-        normalized_attack_family = _normalize_text(
-            attack_family,
-            field_name="attack_family",
-        ).lower()
-        normalized_failure_pattern = _normalize_text(
-            failure_pattern,
-            field_name="failure_pattern",
-        ).lower()
-        return f"{normalized_attack_family}::{normalized_failure_pattern}"
+    def build_failure_key(self, attack_family: str, failure_pattern: str) -> str:
+        return f"{str(attack_family).strip()}::{str(failure_pattern).strip()}"
 
-    def _load_failure_state(self) -> dict[str, dict[str, Any]]:
-        if not self.failure_state_path.exists():
-            return {}
-        try:
-            payload = json.loads(self.failure_state_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"invalid_failure_state_json:{self.failure_state_path}:{exc.msg}") from exc
-        if not isinstance(payload, dict):
-            raise ValueError(f"invalid_failure_state_payload:{self.failure_state_path}")
-        raw_patterns = payload.get("patterns", {})
-        if not isinstance(raw_patterns, dict):
-            raise ValueError(f"invalid_failure_state_patterns:{self.failure_state_path}")
-        normalized_state: dict[str, dict[str, Any]] = {}
-        for key, value in raw_patterns.items():
-            if not isinstance(value, dict):
-                raise ValueError(f"invalid_failure_state_entry:{self.failure_state_path}:{key}")
-            normalized_state[str(key)] = {
-                "attack_family": _normalize_text(
-                    value.get("attack_family"),
-                    field_name="attack_family",
-                ),
-                "failure_pattern": _normalize_text(
-                    value.get("failure_pattern"),
-                    field_name="failure_pattern",
-                ),
-                "count": int(value.get("count", 0) or 0),
-                "last_reason": str(value.get("last_reason", "") or "").strip(),
-                "last_observed_at": str(value.get("last_observed_at", "") or "").strip(),
-                "invented_method_id": str(value.get("invented_method_id", "") or "").strip() or None,
-            }
-        return normalized_state
+    def get_failure_summary(self) -> dict[str, dict[str, Any]]:
+        return {key: dict(value) for key, value in self._failure_summary.items()}
 
-    def _persist_failure_state(self) -> None:
-        payload = {
-            "version": 1,
-            "updated_at": _utc_now(),
-            "patterns": _json_safe(self._failure_state),
-        }
-        _atomic_write_json(self.failure_state_path, payload)
+    def list_failure_observations(self) -> list[FailureObservation]:
+        return list(self._failure_observations)
 
-    def _build_reflection_reasoning(
-        self,
-        *,
-        attack_family: str,
-        failure_pattern: str,
-        failure_count: int,
-        reason: str,
-    ) -> str:
-        normalized_reason = str(reason or "").strip() or "no explicit failure reason provided"
-        if failure_count >= self.invention_threshold:
-            return (
-                f"Repeated failure pattern detected for {attack_family}: '{failure_pattern}'. "
-                f"Observed {failure_count} failure(s), which meets the invention threshold of "
-                f"{self.invention_threshold}. Latest reason: {normalized_reason}. The loop should "
-                f"invent a new method that changes structure instead of repeating the blocked path."
-            )
-        if failure_count > 1:
-            return (
-                f"Repeated failure pattern detected for {attack_family}: '{failure_pattern}'. "
-                f"Observed {failure_count} failure(s) so far. Latest reason: {normalized_reason}. "
-                f"Continue tracking evidence until the invention threshold of {self.invention_threshold} "
-                f"is reached."
-            )
-        return (
-            f"Initial failure observed for {attack_family}: '{failure_pattern}'. Latest reason: "
-            f"{normalized_reason}. Reflection will accumulate evidence before inventing a new method."
-        )
-
-    def _build_invention_reasoning(
-        self,
-        *,
-        attack_family: str,
-        failure_pattern: str,
-        failure_count: int,
-        method_name: str,
-    ) -> str:
-        return (
-            f"Invented {method_name} after {failure_count} repeated '{failure_pattern}' failures in "
-            f"{attack_family}. The invented method was synthesized entirely from the observed local "
-            f"failure history and does not require external tools for its core reasoning loop."
-        )
-
-    def _derive_method_steps(self, *, attack_family: str, failure_pattern: str) -> tuple[str, ...]:
-        family_lower = attack_family.lower()
-        pattern_lower = failure_pattern.lower()
-        steps: list[str] = [
-            "Capture the exact rejection signal and isolate which token, delimiter, or structure triggered the filter.",
-            "Apply a minimal structural mutation instead of replaying the same blocked attempt.",
-            "Record the outcome so the next reflection cycle can compare what changed and what still fails.",
-        ]
-        if "xss" in family_lower or "xss" in pattern_lower:
-            steps.insert(
-                1,
-                "Prefer alternate client-side execution shapes such as attribute, event, or container variations rather than raw script-tag repetition.",
-            )
-            steps.insert(
-                2,
-                "Rotate harmless transformations such as casing, entity encoding, delimiter splitting, or context-preserving wrappers to probe naive blacklist filters.",
-            )
-        return tuple(steps)
-
-    def _invent_method(
-        self,
-        *,
-        attack_family: str,
-        failure_pattern: str,
-        failure_count: int,
-        context: dict[str, Any],
-    ) -> MethodRecord:
-        stable_key = self.build_failure_key(attack_family, failure_pattern)
-        stable_hash = sha1(stable_key.encode("utf-8")).hexdigest()[:12].upper()
-        method_name = (
-            f"{_slugify(attack_family)}_adaptive_bypass_for_{_slugify(failure_pattern)}"
-        )
-        return MethodRecord(
-            method_id=f"SRM-{stable_hash}",
-            name=method_name,
-            attack_family=attack_family,
-            failure_pattern=failure_pattern,
-            reasoning=self._build_invention_reasoning(
-                attack_family=attack_family,
-                failure_pattern=failure_pattern,
-                failure_count=failure_count,
-                method_name=method_name,
-            ),
-            steps=self._derive_method_steps(
-                attack_family=attack_family,
-                failure_pattern=failure_pattern,
-            ),
-            invented_by="self_reflection",
-            created_at=_utc_now(),
-            source_failure_count=failure_count,
-            tags=(attack_family, "self_reflection", "invented_method"),
-            metadata={
-                "failure_signature": stable_key,
-                "invention_threshold": self.invention_threshold,
-                "context": _json_safe(context),
-            },
-        )
-
-    def _record_reflection_event(
-        self,
-        *,
-        event_type: str,
-        attack_family: str,
-        failure_pattern: str,
-        reasoning: str,
-        failure_count: int,
-        invented_method_id: str | None = None,
-    ) -> ReflectionEvent:
-        event = ReflectionEvent(
-            event_id=f"RFE-{uuid4().hex[:12].upper()}",
-            event_type=_normalize_text(event_type, field_name="event_type"),
-            attack_family=attack_family,
-            failure_pattern=failure_pattern,
-            reasoning=_normalize_text(reasoning, field_name="reasoning"),
-            failure_count=int(failure_count),
-            occurred_at=_utc_now(),
-            invented_method_id=invented_method_id,
-        )
-        _append_jsonl(self.reflection_log_path, event.to_payload())
-        return event
+    def list_reflection_events(self) -> list[ReflectionEvent]:
+        return list(self._reflection_events)
 
     def observe_failure(
         self,
-        attack_family: str,
-        failure_pattern: str,
+        method_id: str,
+        field_or_pattern: str,
+        error_pattern: str | None = None,
         *,
         reason: str = "",
-        context: dict[str, Any] | None = None,
+        context: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
-        normalized_attack_family = _normalize_text(
-            attack_family,
-            field_name="attack_family",
-        )
-        normalized_failure_pattern = _normalize_text(
-            failure_pattern,
-            field_name="failure_pattern",
-        )
-        context_payload = dict(_json_safe(context or {}) or {})
-        failure_key = self.build_failure_key(
-            normalized_attack_family,
-            normalized_failure_pattern,
-        )
-        state_entry = dict(
-            self._failure_state.get(
-                failure_key,
-                {
-                    "attack_family": normalized_attack_family,
-                    "failure_pattern": normalized_failure_pattern,
-                    "count": 0,
-                    "last_reason": "",
-                    "last_observed_at": "",
-                    "invented_method_id": None,
-                },
-            )
-        )
-        failure_count = int(state_entry.get("count", 0) or 0) + 1
-        observed_at = _utc_now()
-        observation = FailureObservation(
-            observation_id=f"OBS-{uuid4().hex[:12].upper()}",
-            attack_family=normalized_attack_family,
-            failure_pattern=normalized_failure_pattern,
-            reason=str(reason or "").strip(),
-            count_for_pattern=failure_count,
-            observed_at=observed_at,
-            context=context_payload,
-        )
-        _append_jsonl(self.failure_log_path, observation.to_payload())
+        method = self._library.get_method(method_id)
+        if error_pattern is None:
+            field = method.field if method is not None else str(method_id)
+            failure_pattern = str(field_or_pattern)
+        else:
+            field = str(field_or_pattern)
+            failure_pattern = str(error_pattern)
 
-        state_entry.update(
+        self._library.record_outcome(method_id, success=False)
+        failure_key = self.build_failure_key(method_id, failure_pattern)
+        summary = self._failure_summary.setdefault(
+            failure_key,
             {
-                "attack_family": normalized_attack_family,
-                "failure_pattern": normalized_failure_pattern,
-                "count": failure_count,
-                "last_reason": observation.reason,
-                "last_observed_at": observed_at,
-                "invented_method_id": state_entry.get("invented_method_id"),
-            }
+                "count": 0,
+                "attack_family": method_id,
+                "field": field,
+                "failure_pattern": failure_pattern,
+                "invented_method_id": "",
+            },
         )
+        summary["count"] += 1
+        summary["last_reason"] = str(reason or "")
+        summary["last_context"] = dict(context or {})
+        summary["last_observed_at"] = _utcnow_iso()
 
-        reflection_event = self._record_reflection_event(
-            event_type="reflection",
-            attack_family=normalized_attack_family,
-            failure_pattern=normalized_failure_pattern,
-            reasoning=self._build_reflection_reasoning(
-                attack_family=normalized_attack_family,
-                failure_pattern=normalized_failure_pattern,
-                failure_count=failure_count,
-                reason=observation.reason,
-            ),
-            failure_count=failure_count,
+        observation = FailureObservation(
+            method_id=method_id,
+            attack_family=method_id,
+            failure_pattern=failure_pattern,
+            reason=str(reason or ""),
+            context=dict(context or {}),
+            timestamp=summary["last_observed_at"],
+            count_for_pattern=int(summary["count"]),
         )
+        self._failure_observations.append(observation)
 
         invented_method: MethodRecord | None = None
-        invention_event: ReflectionEvent | None = None
-        if failure_count >= self.invention_threshold and not state_entry.get("invented_method_id"):
-            invented_method = self._invent_method(
-                attack_family=normalized_attack_family,
-                failure_pattern=normalized_failure_pattern,
-                failure_count=failure_count,
-                context=context_payload,
-            )
-            self.method_library.add_method(invented_method)
-            state_entry["invented_method_id"] = invented_method.method_id
-            invention_event = self._record_reflection_event(
-                event_type="method_invented",
-                attack_family=normalized_attack_family,
-                failure_pattern=normalized_failure_pattern,
-                reasoning=invented_method.reasoning,
-                failure_count=failure_count,
-                invented_method_id=invented_method.method_id,
+        if summary["count"] >= self.invention_threshold:
+            invented_method_id = str(summary.get("invented_method_id", "") or "")
+            invented_method = self._library.get_method(invented_method_id) if invented_method_id else None
+            if invented_method is None:
+                invented_method = self._invent_method_rule_based(
+                    attack_family=method_id,
+                    field=field,
+                    failure_pattern=failure_pattern,
+                    failure_count=int(summary["count"]),
+                )
+                if invented_method is not None:
+                    self._library.add_invented_method(invented_method)
+                    summary["invented_method_id"] = invented_method.method_id
+                    self._append_reflection_event(
+                        ReflectionEvent(
+                            event_id=uuid.uuid4().hex[:8],
+                            event_type="method_invented",
+                            trigger="failure_threshold",
+                            field=field,
+                            failed_method=method_id,
+                            failure_patterns=(failure_pattern,),
+                            new_method_proposed=invented_method.name,
+                            invented_method_id=invented_method.method_id,
+                            reasoning=self._generate_reasoning(field, method_id, failure_pattern, int(summary["count"])),
+                            timestamp=_utcnow_iso(),
+                            metadata={"failure_key": failure_key},
+                        )
+                    )
+
+            self._append_reflection_event(
+                ReflectionEvent(
+                    event_id=uuid.uuid4().hex[:8],
+                    event_type="reflection",
+                    trigger="failure_threshold",
+                    field=field,
+                    failed_method=method_id,
+                    failure_patterns=(failure_pattern,),
+                    new_method_proposed=invented_method.name if invented_method else None,
+                    invented_method_id=invented_method.method_id if invented_method else str(summary.get("invented_method_id", "") or ""),
+                    reasoning=self._generate_reasoning(field, method_id, failure_pattern, int(summary["count"])),
+                    timestamp=_utcnow_iso(),
+                    metadata={"failure_key": failure_key},
+                )
             )
 
-        self._failure_state[failure_key] = state_entry
-        self._persist_failure_state()
         return {
-            "observation": observation,
-            "reflection_event": reflection_event,
-            "invention_event": invention_event,
+            "failure_key": failure_key,
+            "failure_count": int(summary["count"]),
             "invented_method": invented_method,
-            "failure_count": failure_count,
         }
 
-    record_failure = observe_failure
-    process_failure = observe_failure
-    reflect_on_failure = observe_failure
+    def observe_success(self, method_id: str, field: str | None = None) -> None:
+        self._library.record_outcome(method_id, success=True)
+        logger.debug("Success recorded: method=%s field=%s", method_id, field or "")
 
-    def get_failure_summary(self) -> dict[str, dict[str, Any]]:
-        return dict(_json_safe(self._failure_state))
+    def idle_reflection(self, fields: list[str]) -> None:
+        now = time.time()
+        if now - self._last_reflection < REFLECTION_INTERVAL:
+            return
+        self._last_reflection = now
+        for field in fields:
+            failing_methods = self._library.get_failing_methods(
+                field,
+                threshold=self.invention_threshold,
+            )
+            if not failing_methods:
+                continue
+            self._append_reflection_event(
+                ReflectionEvent(
+                    event_id=uuid.uuid4().hex[:8],
+                    event_type="reflection",
+                    trigger="idle",
+                    field=field,
+                    failed_method=",".join(method.method_id for method in failing_methods),
+                    failure_patterns=tuple(method.method_id for method in failing_methods),
+                    new_method_proposed=None,
+                    reasoning=f"Idle reflection noticed repeated failures in field '{field}'.",
+                    timestamp=_utcnow_iso(),
+                )
+            )
 
-    def list_reflection_events(self) -> list[ReflectionEvent]:
-        return _read_jsonl(self.reflection_log_path, ReflectionEvent.from_payload)
+    def get_reflection_stats(self) -> dict[str, Any]:
+        by_field = Counter(event.field for event in self._reflection_events)
+        by_trigger = Counter(event.trigger for event in self._reflection_events)
+        invented = sum(1 for event in self._reflection_events if event.event_type == "method_invented")
+        return {
+            "total_events": len(self._reflection_events),
+            "methods_invented": invented,
+            "by_field": dict(by_field),
+            "by_trigger": dict(by_trigger),
+        }
 
-    def list_failure_observations(self) -> list[FailureObservation]:
-        return _read_jsonl(self.failure_log_path, FailureObservation.from_payload)
+    def _append_reflection_event(self, event: ReflectionEvent) -> None:
+        self._reflection_events.append(event)
+        self._log_path.parent.mkdir(parents=True, exist_ok=True)
+        with self._log_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(self._event_to_dict(event), sort_keys=True))
+            handle.write("\n")
+
+    def _invent_method_rule_based(
+        self,
+        *,
+        attack_family: str,
+        field: str,
+        failure_pattern: str,
+        failure_count: int,
+    ) -> MethodRecord:
+        pattern_text = failure_pattern.lower()
+        escalation_map = {
+            "xss": [
+                ("filtered", "xss_encode", "XSS with Encoding Bypass", "Try HTML entity, URL, and unicode encoding bypasses."),
+                ("csp", "xss_csp_bypass", "CSP Bypass XSS", "Use DOM sinks, JSONP callbacks, or CSP bypass vectors."),
+                ("sanitized", "xss_dom_clobbering", "DOM Clobbering XSS", "Abuse DOM clobbering to bypass sanitization logic."),
+            ],
+            "sqli": [
+                ("filtered", "sqli_blind_time", "Blind Time-Based SQLi", "Use timing side channels and binary-search extraction."),
+                ("waf", "sqli_chunked", "WAF Evasion SQLi", "Use comments, casing, and encoding evasions."),
+                ("error", "sqli_union", "Union-Based SQLi", "Use UNION-based extraction paths."),
+            ],
+            "ssrf": [
+                ("blocked", "ssrf_dns_rebind", "DNS Rebinding SSRF", "Use DNS rebinding or chained resolution."),
+                ("redirect", "ssrf_redirect_chain", "SSRF via Redirect Chain", "Chain 30x responses into internal targets."),
+            ],
+            "rce": [
+                ("not found", "rce_env", "RCE via Environment Variables", "Manipulate environment-dependent execution paths."),
+                ("filtered", "rce_template", "Template Injection RCE", "Probe SSTI-style execution gadgets."),
+            ],
+            "auth": [
+                ("token", "auth_session_fixation", "Session Fixation", "Probe sticky or attacker-controlled session reuse."),
+                ("bypass", "auth_logic_flaw", "Authentication Logic Flaw", "Probe branch-order and state-transition flaws."),
+            ],
+        }
+
+        base_method_id = f"{field}_adaptive"
+        name = f"Adaptive {field.upper()} Variant"
+        description = "Apply a generalized adaptive variant derived from repeated failure analysis."
+        for trigger_text, candidate_id, candidate_name, candidate_description in escalation_map.get(field, []):
+            if trigger_text in pattern_text:
+                base_method_id = candidate_id
+                name = candidate_name
+                description = candidate_description
+                break
+
+        return MethodRecord(
+            method_id=f"{base_method_id}_{uuid.uuid4().hex[:4]}",
+            name=name,
+            description=description,
+            field=field,
+            invented_at=_utcnow_iso(),
+            invented_by="self_reflection",
+            attack_family=attack_family,
+            failure_pattern=failure_pattern,
+            source_failure_count=int(failure_count),
+            metadata={
+                "attack_family": attack_family,
+                "failure_pattern": failure_pattern,
+                "source_failure_count": int(failure_count),
+            },
+        )
+
+    def _generate_reasoning(
+        self,
+        field: str,
+        method_id: str,
+        failure_pattern: str,
+        failure_count: int,
+    ) -> str:
+        return (
+            f"Field '{field}' observed repeated failures for '{method_id}' with pattern "
+            f"'{failure_pattern}' across {failure_count} attempts. "
+            "Hypothesis: current signatures are blocked or normalized. "
+            "Invent a higher-variance method that changes payload structure rather than retrying unchanged probes."
+        )
+
+    def _event_to_dict(self, event: ReflectionEvent) -> dict[str, Any]:
+        payload = asdict(event)
+        payload["failure_patterns"] = list(event.failure_patterns)
+        return payload
 
 
-__all__ = [
-    "FailureObservation",
-    "MethodLibrary",
-    "MethodRecord",
-    "ReflectionEvent",
-    "SelfReflectionEngine",
-]
+if __name__ == "__main__":
+    print("Self-Reflection Engine")
+    print("=" * 50)
+    print("\nUsage:")
+    print("  from backend.agent.self_reflection import MethodLibrary, SelfReflectionEngine")
+    print("  library = MethodLibrary()")
+    print("  engine = SelfReflectionEngine(library)")
+    print("  engine.observe_failure('xss_basic', 'payload filtered')")

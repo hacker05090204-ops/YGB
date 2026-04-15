@@ -195,6 +195,7 @@ def _temporary_auth_bypass_requested() -> bool:
 
 
 def is_temporary_auth_bypass_enabled() -> bool:
+    # FIX 7.2: ALWAYS return False in production, regardless of other flags
     if _runtime_is_production():
         return False
     if not _temporary_auth_bypass_requested():

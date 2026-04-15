@@ -87,7 +87,7 @@ def _shared_oauth_candidate_files(provider: str = "github") -> list[_Path]:
     filenames = [f"{normalized}_oauth.env", "oauth.env"]
 
     for root in (
-        os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        os.getenv("YGB_HDD_ROOT", "C:/ygb_hdd"),
         os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
     ):
         if not root:
@@ -203,7 +203,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import platform as _plat
 
 if _plat.system() == "Windows":
-    os.environ.setdefault("YGB_HDD_ROOT", "D:/ygb_hdd")
+    os.environ.setdefault("YGB_HDD_ROOT", "C:/ygb_hdd")
     os.environ.setdefault("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
 
 # Import HDD storage bridge (replaces SQLite database module)

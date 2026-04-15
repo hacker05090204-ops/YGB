@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [BACKUP] %(message)s
 logger = logging.getLogger("db_backup")
 
 SSD_DB = os.environ.get("DATABASE_URL", "sqlite:///C:/ygb_data/ygb.db").replace("sqlite:///", "")
-HDD_DB = os.environ.get("DATABASE_BACKUP_PATH", "D:/ygb_data/ygb.db")
+HDD_DB = os.environ.get("DATABASE_BACKUP_PATH", "C:/ygb_data_backup/ygb.db")
 
 
 def backup_now() -> dict:

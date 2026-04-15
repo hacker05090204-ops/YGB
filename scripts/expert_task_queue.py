@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import logging
 import os
@@ -32,6 +33,15 @@ _ALLOWED_STATUSES = {
 }
 
 logger = logging.getLogger(__name__)
+
+
+def _is_lock_contention_error(exc: OSError) -> bool:
+    err_no = getattr(exc, "errno", None)
+    win_error = getattr(exc, "winerror", None)
+    return bool(
+        err_no in {errno.EACCES, errno.EAGAIN}
+        or win_error in {33}  # ERROR_LOCK_VIOLATION
+    )
 
 
 def _resolve_status_path(status_path: Path | str) -> Path:
@@ -151,7 +161,14 @@ class _FileLock:
 
                     fcntl.flock(self._handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
                 return self
-            except (BlockingIOError, OSError):
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(f"Timed out acquiring queue lock: {self.lock_path}")
+                time.sleep(self.poll_interval)
+                self._handle.seek(0)
+            except OSError as exc:
+                if not _is_lock_contention_error(exc):
+                    raise
                 if time.monotonic() >= deadline:
                     raise TimeoutError(f"Timed out acquiring queue lock: {self.lock_path}")
                 time.sleep(self.poll_interval)
@@ -428,15 +445,20 @@ def release_expert(
         if record is None:
             raise KeyError(f"Unknown expert_id={expert_id}")
 
-        claimed_by = record.get("claimed_by")
-        if (
-            worker_id is not None
-            and str(record.get("status", "")).upper() == STATUS_CLAIMED
-            and claimed_by not in {None, worker_id}
-        ):
-            raise RuntimeError(
-                f"expert_id={expert_id} is claimed by {claimed_by}, not {worker_id}"
-            )
+        status_value = str(record.get("status", "") or "").upper()
+        claimed_by = str(record.get("claimed_by") or "").strip()
+        if worker_id is not None:
+            worker_text = str(worker_id).strip()
+            if not worker_text:
+                raise ValueError("worker_id must be non-empty when provided")
+            if status_value != STATUS_CLAIMED:
+                raise RuntimeError(
+                    f"expert_id={expert_id} is not actively claimed; current status={status_value or STATUS_AVAILABLE}"
+                )
+            if claimed_by != worker_text:
+                raise RuntimeError(
+                    f"expert_id={expert_id} is claimed by {claimed_by or '-'}, not {worker_text}"
+                )
 
         val_f1_value = _to_float(val_f1)
         val_precision_value = _to_float(val_precision)

@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
-PRIMARY_PATH = Path(os.environ.get("YGB_STORAGE_PRIMARY", "D:\\"))
+PRIMARY_PATH = Path(os.environ.get("YGB_STORAGE_PRIMARY", "C:\\ygb_storage"))
 GDRIVE_FOLDER_ID = os.environ.get("YGB_GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDS_PATH = os.environ.get("YGB_GDRIVE_CREDS_PATH", "")
 STORAGE_MODE = os.environ.get("YGB_STORAGE_MODE", "auto").lower()

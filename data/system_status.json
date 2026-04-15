@@ -1,7 +1,7 @@
 {
   "gpu": {
     "available": true,
-    "memory_used_mb": 0,
+    "memory_used_mb": 385,
     "utilization_pct": 0.0
   },
   "ingestion": {
@@ -17,11 +17,11 @@
       "nvd"
     ]
   },
-  "last_updated": "2026-04-13T19:45:46.274440+00:00",
+  "last_updated": "2026-04-15T18:00:41.422241+00:00",
   "schema_version": 2,
   "sync": {
-    "files_synced_last_cycle": 0,
-    "last_sync_time": "2026-04-13T19:40:54.540342+00:00",
+    "files_synced_last_cycle": 3,
+    "last_sync_time": "2026-04-15T18:00:08.345913+00:00",
     "peers_connected": 0
   },
   "training": {

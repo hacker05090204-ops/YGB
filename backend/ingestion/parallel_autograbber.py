@@ -187,6 +187,63 @@ _DEFAULT_EXPERT_ROUTE = ExpertRoute(
 )
 
 
+class FieldRouter:
+    """Expert routing based on CVE content analysis with 23-expert field mapping."""
+
+    ROUTING_KEYWORDS: dict[int, tuple[str, ...]] = {
+        0: ("general", "triage", "unknown", "unclassified"),
+        1: ("sql injection", "sqli", "union select", "blind sql", "database error", "cwe-89"),
+        2: ("cross site scripting", "xss", "script injection", "dom-based xss", "stored xss", "reflected xss"),
+        3: ("remote code execution", "rce", "command injection", "arbitrary code execution", "code exec"),
+        4: ("authentication bypass", "authorization bypass", "auth bypass", "account takeover", "privilege escalation"),
+        5: ("server-side request forgery", "server side request forgery", "ssrf"),
+        6: ("cross-site request forgery", "cross site request forgery", "csrf", "xsrf"),
+        7: ("file upload", "multipart upload", "unrestricted upload", "arbitrary file upload"),
+        8: ("graphql", "introspection", "resolver abuse", "graphql injection"),
+        9: ("aws", "azure", "gcp", "cloud misconfig", "storage bucket", "s3 bucket", "cloud storage"),
+        10: ("android", "ios", "mobile", "apk", "mobile app", "mobile application"),
+        11: ("idor", "insecure direct object reference", "object reference"),
+        12: ("deserialization", "unsafe deserialization", "pickle", "yaml deserialization"),
+        13: ("rest", "rest api", "api endpoint", "api abuse"),
+        14: ("web application", "web app", "web vulnerability", "http"),
+        15: ("api testing", "api security", "api vulnerability"),
+        16: ("blockchain", "smart contract", "cryptocurrency", "ethereum", "solidity"),
+        17: ("iot", "internet of things", "embedded device", "iot device"),
+        18: ("hardware", "hardware vulnerability", "physical access"),
+        19: ("firmware", "firmware vulnerability", "embedded firmware"),
+        20: ("cryptography", "encryption", "weak cipher", "crypto", "hash collision"),
+        21: ("subdomain takeover", "subdomain", "dns takeover", "cname"),
+        22: ("race condition", "time-of-check", "toctou", "concurrent access"),
+    }
+
+    @classmethod
+    def route(cls, sample: dict[str, object]) -> int:
+        """Route sample to expert_id (0-22) based on CVE content."""
+        description = str(sample.get("description", "") or "").lower()
+        title = str(sample.get("title", "") or "").lower()
+        tags = sample.get("tags", [])
+        
+        haystack = " ".join([
+            description,
+            title,
+            " ".join(str(tag).lower() for tag in (tags if isinstance(tags, (list, tuple)) else []))
+        ])
+        
+        if not haystack.strip():
+            return 0
+        
+        best_expert = 0
+        best_score = 0
+        
+        for expert_id, keywords in cls.ROUTING_KEYWORDS.items():
+            score = sum(1 for keyword in keywords if keyword in haystack)
+            if score > best_score:
+                best_score = score
+                best_expert = expert_id
+        
+        return best_expert
+
+
 def route_vulnerability_text_to_expert(
     text: str,
     *,
@@ -780,6 +837,7 @@ def phase8_smoke_gate(
 __all__ = [
     "DEFAULT_SOURCE_NAMES",
     "ExpertRoute",
+    "FieldRouter",
     "ParallelAutoGrabber",
     "ParallelAutoGrabberConfig",
     "ParallelGrabberCycleResult",

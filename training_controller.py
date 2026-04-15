@@ -1411,7 +1411,7 @@ def phase5_post_training(
 
         backup_dir = os.path.join("secure_data", "cloud_backups")
         mgr = CloudBackupManager(backup_dir)
-        mgr.add_target(CloudTarget("nas_local", "nas", "D:\\archive"))
+        mgr.add_target(CloudTarget("nas_local", "nas", "C:\\ygb_archive"))
         mgr.add_target(CloudTarget("gdrive_1", "google_drive", "/YGB_backup"))
         mgr.add_target(CloudTarget("gdrive_2", "google_drive", "/YGB_backup_2"))
 

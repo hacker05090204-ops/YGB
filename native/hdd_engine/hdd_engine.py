@@ -57,7 +57,7 @@ if not logger.handlers:
 
 # Default HDD root — MUST be on HDD, never SSD
 if platform.system() == "Windows":
-    DEFAULT_HDD_ROOT = "D:/ygb_hdd"
+    DEFAULT_HDD_ROOT = "C:/ygb_hdd"
 else:
     DEFAULT_HDD_ROOT = "/mnt/hdd/ygb"
 

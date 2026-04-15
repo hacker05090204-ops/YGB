@@ -1093,9 +1093,13 @@ class ProductionTrainingOrchestrator:
         for candidate in candidates:
             valid, reason = self.verify_checkpoint(agent_id, candidate)
             if not valid:
-                raise CheckpointIntegrityError(
-                    f"Checkpoint integrity verification failed for {agent_id}:{candidate}: {reason}"
+                logger.warning(
+                    "Checkpoint verification failed for %s:%s: %s, trying next candidate",
+                    agent_id,
+                    candidate,
+                    reason,
                 )
+                continue
 
             checkpoint_dir = self._agent_checkpoint_root(agent_id) / candidate
             metadata = _load_json(checkpoint_dir / "metadata.json", default={})
@@ -1114,36 +1118,45 @@ class ProductionTrainingOrchestrator:
                     )
                 return torch.load(path, map_location=map_location, weights_only=False)
 
-            return {
-                "checkpoint_id": candidate,
-                "checkpoint_dir": str(checkpoint_dir),
-                "metadata": metadata,
-                "model_state": load_safetensors(str(checkpoint_dir / "model.safetensors"), device=device),
-                "optimizer_state": _load_verified_artifact(
-                    checkpoint_dir / "optimizer.pt",
-                    map_location=device,
-                ),
-                "scheduler_state": _load_verified_artifact(
-                    checkpoint_dir / "scheduler.pt",
-                    map_location=device,
-                ),
-                "rng_state": (
-                    _load_verified_artifact(
-                        checkpoint_dir / "rng_state.pt",
-                        map_location="cpu",
-                    )
-                    if (checkpoint_dir / "rng_state.pt").exists()
-                    else None
-                ),
-                "scaler_state": (
-                    _load_verified_artifact(
-                        checkpoint_dir / "scaler.pt",
+            try:
+                return {
+                    "checkpoint_id": candidate,
+                    "checkpoint_dir": str(checkpoint_dir),
+                    "metadata": metadata,
+                    "model_state": load_safetensors(str(checkpoint_dir / "model.safetensors"), device=device),
+                    "optimizer_state": _load_verified_artifact(
+                        checkpoint_dir / "optimizer.pt",
                         map_location=device,
-                    )
-                    if (checkpoint_dir / "scaler.pt").exists()
-                    else None
-                ),
-            }
+                    ),
+                    "scheduler_state": _load_verified_artifact(
+                        checkpoint_dir / "scheduler.pt",
+                        map_location=device,
+                    ),
+                    "rng_state": (
+                        _load_verified_artifact(
+                            checkpoint_dir / "rng_state.pt",
+                            map_location="cpu",
+                        )
+                        if (checkpoint_dir / "rng_state.pt").exists()
+                        else None
+                    ),
+                    "scaler_state": (
+                        _load_verified_artifact(
+                            checkpoint_dir / "scaler.pt",
+                            map_location=device,
+                        )
+                        if (checkpoint_dir / "scaler.pt").exists()
+                        else None
+                    ),
+                }
+            except CheckpointIntegrityError as e:
+                logger.warning(
+                    "Failed to load checkpoint %s:%s: %s, trying next candidate",
+                    agent_id,
+                    candidate,
+                    str(e),
+                )
+                continue
         return None
 
     def resume_latest(

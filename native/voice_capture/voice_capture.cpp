@@ -22,7 +22,6 @@
 #include <cstring>
 #include <mutex>
 
-
 /* ========================================================================= */
 /* Internal State                                                             */
 /* ========================================================================= */
@@ -198,7 +197,11 @@ VC_API int capture_get_audio_chunk(char *buffer, int max_len) {
     return 0;
 
   int to_copy = (g_audio_bytes < max_len) ? g_audio_bytes : max_len;
-  memcpy(buffer, g_audio_buffer, to_copy);
+  if (to_copy > 0 && to_copy <= max_len && to_copy <= MAX_CHUNK_BYTES) {
+    memcpy(buffer, g_audio_buffer, to_copy);
+  } else {
+    return 0; // Bounds check failed
+  }
 
   return to_copy;
 }
@@ -221,8 +224,12 @@ VC_API int capture_get_mode(char *buffer, int max_len) {
   int len = (int)strlen(mode);
   if (len >= max_len)
     len = max_len - 1;
-  memcpy(buffer, mode, len);
-  buffer[len] = '\0';
+  if (len > 0 && len < max_len) {
+    memcpy(buffer, mode, len);
+    buffer[len] = '\0';
+  } else {
+    return -1; // Bounds check failed
+  }
   return len;
 }
 
@@ -250,8 +257,12 @@ VC_API int capture_feed_audio(const char *pcm16_data, int data_len) {
   {
     std::lock_guard<std::mutex> lock(g_buffer_mutex);
     int to_store = (data_len < MAX_CHUNK_BYTES) ? data_len : MAX_CHUNK_BYTES;
-    memcpy(g_audio_buffer, pcm16_data, to_store);
-    g_audio_bytes = to_store;
+    if (to_store > 0 && to_store <= MAX_CHUNK_BYTES && to_store <= data_len) {
+      memcpy(g_audio_buffer, pcm16_data, to_store);
+      g_audio_bytes = to_store;
+    } else {
+      return -1; // Bounds check failed
+    }
   }
 
   return 0;

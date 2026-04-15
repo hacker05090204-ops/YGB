@@ -15,6 +15,7 @@ ZERO mock users. ZERO bypass tokens. ZERO hardcoded credentials.
 import os
 import sys
 import time
+import warnings
 import hashlib
 import hmac
 import secrets
@@ -64,6 +65,12 @@ _JWT_PLACEHOLDER_PATTERNS = (
 def _load_required_jwt_secret(min_length: int = 32) -> str:
     value = os.getenv("JWT_SECRET", "").strip()
     normalized = value.lower()
+    if not value:
+        warnings.warn(
+            "JWT_SECRET is empty; startup will fail until a strong secret is configured",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     if not value or normalized in _JWT_PLACEHOLDER_SECRETS:
         raise RuntimeError(
             "JWT_SECRET must be set before startup and must not use a placeholder value"

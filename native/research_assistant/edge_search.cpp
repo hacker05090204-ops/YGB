@@ -108,8 +108,12 @@ static bool is_domain_allowed(const char *url) {
     return false;
 
   char domain[256];
-  memcpy(domain, start, domain_len);
-  domain[domain_len] = '\0';
+  if (domain_len > 0 && domain_len < 256) {
+    memcpy(domain, start, domain_len);
+    domain[domain_len] = '\0';
+  } else {
+    return false; // Bounds check failed
+  }
 
   // Convert to lowercase
   for (int i = 0; i < domain_len; i++) {
@@ -306,8 +310,12 @@ public:
           pipe);
       if (n == 0)
         break;
-      memcpy(resp.raw_html + resp.html_length, buf, n);
-      resp.html_length += (int)n;
+      if (resp.html_length + n <= MAX_RESPONSE_BYTES - 1) {
+        memcpy(resp.raw_html + resp.html_length, buf, n);
+        resp.html_length += (int)n;
+      } else {
+        break; // Prevent buffer overflow
+      }
     }
     resp.raw_html[resp.html_length] = '\0';
 
@@ -410,8 +418,10 @@ public:
 
       if (resp.status == SearchStatus::OK && resp.html_length > 0) {
         sources[i].fetched = true;
-        memcpy(sources[i].raw_html, resp.raw_html, resp.html_length);
-        sources[i].html_length = resp.html_length;
+        if (resp.html_length > 0 && resp.html_length <= MAX_RESPONSE_BYTES) {
+          memcpy(sources[i].raw_html, resp.raw_html, resp.html_length);
+          sources[i].html_length = resp.html_length;
+        }
         extract_terms_from_html(sources[i].raw_html, sources[i].html_length,
                                 sources[i].key_terms, &sources[i].term_count);
         fetched_count++;

@@ -93,9 +93,9 @@ class ReportIntegrityStatus:
 
 def can_integrity_skip_verification() -> bool:
     """
-    Guard: Can we skip integrity verification?
+    FIX 7.3: Guard - Can we skip integrity verification?
     
-    ANSWER: NEVER.
+    ANSWER: NEVER. Hard-fail on SHA256 mismatch, no skip_verification flag.
     """
     return False
 

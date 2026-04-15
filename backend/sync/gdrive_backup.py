@@ -24,7 +24,7 @@ from typing import Optional
 
 logger = logging.getLogger("ygb.sync.gdrive")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "C:\\ygb_storage"))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 STAGING_DIR = SYNC_ROOT / "ygb_gdrive_staging"
@@ -95,6 +95,12 @@ def _normalize_relative_path(relative_path: str) -> str:
 
 
 def _build_sync_identity(relative_path: str, original_sha256: str) -> str:
+    """
+    FIX 7.5: Use sha256+path as unique key for GDrive sync.
+    
+    This ensures content-hash based deduplication and prevents
+    duplicate uploads of the same content.
+    """
     normalized_path = _normalize_relative_path(relative_path)
     return hashlib.sha256(
         f"{normalized_path}|{original_sha256}".encode("utf-8")
@@ -284,6 +290,14 @@ def restore_staged_backup_file(
     *,
     sidecar_path: Optional[Path] = None,
 ) -> tuple[bytes, dict]:
+    """
+    FIX 7.5: Verify hash after download to ensure integrity.
+    
+    This function validates:
+    1. Staged payload hash matches sidecar
+    2. Decrypted/decompressed content hash matches original
+    3. Sync identity is correctly derived from path+hash
+    """
     metadata_path = sidecar_path or _sidecar_for_payload(payload_path)
     meta = _load_sidecar_metadata(metadata_path)
 

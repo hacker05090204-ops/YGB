@@ -147,6 +147,29 @@ def sanitize_storage_path_component(
     return normalized
 
 
+def _sanitize_path(base_path: Path, user_path: str) -> Path:
+    """
+    FIX 7.4: Sanitize user-supplied paths to prevent traversal attacks.
+    
+    Raises ValueError if path traversal is detected.
+    """
+    if not user_path or not str(user_path).strip():
+        raise ValueError("Path cannot be empty")
+    
+    # Normalize and resolve the path
+    try:
+        resolved = (base_path / user_path).resolve()
+        base_resolved = base_path.resolve()
+        
+        # Ensure resolved path is within base_path
+        if not str(resolved).startswith(str(base_resolved)):
+            raise ValueError(f"Path traversal detected: {user_path}")
+        
+        return resolved
+    except (ValueError, OSError) as exc:
+        raise ValueError(f"Invalid path: {user_path}") from exc
+
+
 def _safe_storage_topology(active_root: Optional[str] = None) -> Dict[str, Any]:
     topology = {
         "primary_root": os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),

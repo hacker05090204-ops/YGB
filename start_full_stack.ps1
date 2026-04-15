@@ -248,7 +248,7 @@ if ($LanShare) {
             Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
                 '-NoProfile', '-Command',
                 "if (-not (Get-SmbShare -Name '$shareName' -ErrorAction SilentlyContinue)) { " +
-                "New-SmbShare -Name '$shareName' -Path 'D:\' -ReadAccess '$env:USERNAME' -FolderEnumerationMode AccessBased -Description 'YGB NAS'; " +
+                "New-SmbShare -Name '$shareName' -Path 'C:\ygb_storage' -ReadAccess '$env:USERNAME' -FolderEnumerationMode AccessBased -Description 'YGB NAS'; " +
                 "} " +
                 "Revoke-SmbShareAccess -Name '$shareName' -AccountName 'Everyone' -Force -ErrorAction SilentlyContinue; " +
                 "Revoke-SmbShareAccess -Name '$shareName' -AccountName 'ANONYMOUS LOGON' -Force -ErrorAction SilentlyContinue; " +

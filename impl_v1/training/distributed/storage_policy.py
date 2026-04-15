@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # Default paths
 SSD_ROOT = "C:\\"
-NAS_ROOT = "D:\\"
+NAS_ROOT = "C:\\ygb_storage"
 FREE_SPACE_MIN_GB = 10.0
 
 

@@ -13,21 +13,21 @@
   },
   "data/dedup_index.json": {
     "path": "data/dedup_index.json",
-    "sha256": "fdeed05af054e07ebdd4703271787299049fe92efbee90170b460c4b62f33130",
-    "size_bytes": 549166,
-    "indexed_at": "1776075248123012600"
+    "sha256": "6b46962da729244b15c6940770661f8962dc7f41d447fc0c095d72fdee51bac8",
+    "size_bytes": 554844,
+    "indexed_at": "1776276393861697800"
   },
   "data/dedup_store.json": {
     "path": "data/dedup_store.json",
-    "sha256": "5d3d0e6507727347524eb25ef09adc34825e3073df5a63715f8647267b4f2d88",
-    "size_bytes": 549250,
-    "indexed_at": "1776075248101466200"
+    "sha256": "95903107c98a3801976ff15745f5056afbc8dd3a53ba2da8181e94584a5f1bf1",
+    "size_bytes": 554928,
+    "indexed_at": "1776276393847599300"
   },
   "data/field_state.json": {
     "path": "data/field_state.json",
-    "sha256": "6afdfc7d9bb79c272ba7d588b9a800be54d54ec3bfa0e68ba5c805e7a7f4bb60",
+    "sha256": "a6d091d5ea6f8984596bece0721ff778bd1fc3bee00a5d652bbc5c9d2dfeb674",
     "size_bytes": 12157,
-    "indexed_at": "1776074943470408200"
+    "indexed_at": "1776275975478928900"
   },
   "data/g38_model_checkpoint.json": {
     "path": "data/g38_model_checkpoint.json",
@@ -49,9 +49,9 @@
   },
   "data/host_action_ledger.jsonl": {
     "path": "data/host_action_ledger.jsonl",
-    "sha256": "5df033bf3fc9f09994f9521309df63879dea468275183ff0a41b219e9de66280",
-    "size_bytes": 981434,
-    "indexed_at": "1776074939589654400"
+    "sha256": "f4c57d6231fbc39ceab56852c1c2b41835d05885a3c298aef14b4ad7531dcf31",
+    "size_bytes": 1013371,
+    "indexed_at": "1776275971971379200"
   },
   "data/ingestion_status.json": {
     "path": "data/ingestion_status.json",
@@ -69,7 +69,7 @@
     "path": "data/previous_severities.json",
     "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
     "size_bytes": 2,
-    "indexed_at": "1776075248079544600"
+    "indexed_at": "1776276393834642100"
   },
   "data/rl_reward_buffer.json": {
     "path": "data/rl_reward_buffer.json",
@@ -85,21 +85,21 @@
   },
   "data/scan_state.json": {
     "path": "data/scan_state.json",
-    "sha256": "7b182e5bf28c49fc144977d7bb069f22f45b2c7e8b9580c8d1f14530f9e3d9a2",
-    "size_bytes": 51,
-    "indexed_at": "1776112832470639700"
+    "sha256": "f937efcedac76b7f3b74e8b991585cf874b6332f39c1a30ae3b5ac41fa107b71",
+    "size_bytes": 50,
+    "indexed_at": "1776276041226943400"
   },
   "data/sync_status.json": {
     "path": "data/sync_status.json",
-    "sha256": "ca75f0d6739de693df102bbcf29511b232142b3b0be896c67db3a8bb20626c8c",
+    "sha256": "d03d4f8cbcf83115fbcb2816e8bd9ed45130e67af37c3b76bf48d5816e3c342a",
     "size_bytes": 364,
-    "indexed_at": "1776211085157391700"
+    "indexed_at": "1776276008347532600"
   },
   "data/system_status.json": {
     "path": "data/system_status.json",
-    "sha256": "1b02b47ca6916b06ed1fb00061ab0dbdd5c8d051d0409c4d5a4548604417f34e",
-    "size_bytes": 842,
-    "indexed_at": "1776109546500537800"
+    "sha256": "56a0b7839281bc17600080b31eac72d21bdbafd09833db1cbf283697a569dc22",
+    "size_bytes": 844,
+    "indexed_at": "1776276041550619900"
   },
   "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json": {
     "path": "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json",
@@ -121,15 +121,15 @@
   },
   "checkpoints/adaptive_ewc_state.safetensors": {
     "path": "checkpoints/adaptive_ewc_state.safetensors",
-    "sha256": "c960f2f55b7dd6f8c7579b92c3e0cfbd193eb830bdb7d99fb06bb0d988fd2602",
+    "sha256": "cdfc3b0b8e18853801fbc390e3c72529fd095a0a20f0a4b73fae2a0e1dec3c4c",
     "size_bytes": 20806632,
-    "indexed_at": "1776075244784002200"
+    "indexed_at": "1776276275440479800"
   },
   "checkpoints/adaptive_learning_state.json": {
     "path": "checkpoints/adaptive_learning_state.json",
-    "sha256": "bee2c42daf3a10626fa89e23be83da1069c11c7c584788b1b28e9cb10ac7d1c2",
-    "size_bytes": 53008,
-    "indexed_at": "1776075305695580800"
+    "sha256": "e8d68ffb4f179ed9acd7ddad1ecd2b705ec303e21d684e38024755a0d22e95e7",
+    "size_bytes": 75376,
+    "indexed_at": "1776276336117107400"
   },
   "checkpoints/baseline_accuracy.json": {
     "path": "checkpoints/baseline_accuracy.json",
@@ -262,6 +262,18 @@
     "sha256": "f049e18a69231715c2d6620e0d281cbdff1712a5f4eee6953dc4da9dca119d69",
     "size_bytes": 1704,
     "indexed_at": "1775601187352137600"
+  },
+  "training/features_safetensors/082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827.descriptions.jsonl": {
+    "path": "training/features_safetensors/082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827.descriptions.jsonl",
+    "sha256": "0e235e694dcef6341a9ddf6f4e94b648c9a718ba699274d8935ceb8d14d9242b",
+    "size_bytes": 706,
+    "indexed_at": "1776274575669759200"
+  },
+  "training/features_safetensors/082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827.safetensors": {
+    "path": "training/features_safetensors/082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827.safetensors",
+    "sha256": "3223e204f5bce2eaf4b9668d2cd77722f8091fb493177cd565346b1861b7a5db",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575669255700"
   },
   "training/features_safetensors/084244444d99fba9fb0e186cf46cfa80e6e4d61eba9419ff739d422343d3b6c4.safetensors": {
     "path": "training/features_safetensors/084244444d99fba9fb0e186cf46cfa80e6e4d61eba9419ff739d422343d3b6c4.safetensors",
@@ -449,6 +461,18 @@
     "size_bytes": 1696,
     "indexed_at": "1775601185935728700"
   },
+  "training/features_safetensors/19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4.descriptions.jsonl": {
+    "path": "training/features_safetensors/19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4.descriptions.jsonl",
+    "sha256": "b8ea808debe578a4df4a6217f6b9afb2a36bbcc29df8645e14bb9cfd3ffcb7f5",
+    "size_bytes": 683,
+    "indexed_at": "1776274575498949900"
+  },
+  "training/features_safetensors/19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4.safetensors": {
+    "path": "training/features_safetensors/19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4.safetensors",
+    "sha256": "9ff7b64db3fa71d478942ca9eaa530a8006747eaeda02c4aa46f980505de13fe",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575497954700"
+  },
   "training/features_safetensors/1b2437622b70ee9082b8c9d2a3ae1a1d0f47c8882b57e83c02331f751a462ecf.safetensors": {
     "path": "training/features_safetensors/1b2437622b70ee9082b8c9d2a3ae1a1d0f47c8882b57e83c02331f751a462ecf.safetensors",
     "sha256": "9db70d8be1b981bd29a1693685b630c284ac55e2ef49ae866a56b37368731f4a",
@@ -563,6 +587,18 @@
     "size_bytes": 1704,
     "indexed_at": "1776012366729755500"
   },
+  "training/features_safetensors/2b02098fd17e6d1d8f00a8a5fa9e8f06f4dedc36b1ad1cfee69d9fa8c7237104.descriptions.jsonl": {
+    "path": "training/features_safetensors/2b02098fd17e6d1d8f00a8a5fa9e8f06f4dedc36b1ad1cfee69d9fa8c7237104.descriptions.jsonl",
+    "sha256": "a0ae6e2056828441cf5663758f0c3d7935698588bf767a13657bb035b69265e5",
+    "size_bytes": 1239,
+    "indexed_at": "1776274576401564400"
+  },
+  "training/features_safetensors/2b02098fd17e6d1d8f00a8a5fa9e8f06f4dedc36b1ad1cfee69d9fa8c7237104.safetensors": {
+    "path": "training/features_safetensors/2b02098fd17e6d1d8f00a8a5fa9e8f06f4dedc36b1ad1cfee69d9fa8c7237104.safetensors",
+    "sha256": "647dd3c3432c6f8f4e1c202652827e44dd7bcf1e79894f24c5d4a5cece61fd86",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576400566500"
+  },
   "training/features_safetensors/2b75ad1fa2eb91099041353ef064952b7ff01cfd6e73e7a5c8e579243c17b138.safetensors": {
     "path": "training/features_safetensors/2b75ad1fa2eb91099041353ef064952b7ff01cfd6e73e7a5c8e579243c17b138.safetensors",
     "sha256": "dae53dbc5288bdd54299feffd588042883c511b238029f830731a169289efe5c",
@@ -646,6 +682,18 @@
     "sha256": "7206bbf1c6962d9f35d37e156290380d97324be6a6640ba499ce312dcc91f04c",
     "size_bytes": 1704,
     "indexed_at": "1776012367044843700"
+  },
+  "training/features_safetensors/33988780dad0933c60da1771c12e20a225324ae71b78eadf4d845adeaf3237eb.descriptions.jsonl": {
+    "path": "training/features_safetensors/33988780dad0933c60da1771c12e20a225324ae71b78eadf4d845adeaf3237eb.descriptions.jsonl",
+    "sha256": "b7505e979af0e8eacd6d3c326dd8ae13d3e2e97aeb1e204315bf859850593175",
+    "size_bytes": 2538,
+    "indexed_at": "1776274576333232700"
+  },
+  "training/features_safetensors/33988780dad0933c60da1771c12e20a225324ae71b78eadf4d845adeaf3237eb.safetensors": {
+    "path": "training/features_safetensors/33988780dad0933c60da1771c12e20a225324ae71b78eadf4d845adeaf3237eb.safetensors",
+    "sha256": "a10620175782858f98e86306378326911099b125f4b3be2a9f69759fd6807f05",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576331727400"
   },
   "training/features_safetensors/35cec7b7a68ac7cecc26351f96ae75da87fa9a26210edeab885087a2d7f65a3d.safetensors": {
     "path": "training/features_safetensors/35cec7b7a68ac7cecc26351f96ae75da87fa9a26210edeab885087a2d7f65a3d.safetensors",
@@ -748,6 +796,18 @@
     "sha256": "c558b3d5d069aa5dcee95772e2fc74911927fc52d68e832c3ba04a07b0ba6734",
     "size_bytes": 1704,
     "indexed_at": "1775601184149350100"
+  },
+  "training/features_safetensors/3f504ac3cd54b2ff0e59fb5f6a376dc3164e06b349a16a37610528360a1c1ca1.descriptions.jsonl": {
+    "path": "training/features_safetensors/3f504ac3cd54b2ff0e59fb5f6a376dc3164e06b349a16a37610528360a1c1ca1.descriptions.jsonl",
+    "sha256": "33fa289affe7fd41e2163063c43fed0af3b4d1974e25eb6b05d9366550cb3198",
+    "size_bytes": 1553,
+    "indexed_at": "1776274576202287900"
+  },
+  "training/features_safetensors/3f504ac3cd54b2ff0e59fb5f6a376dc3164e06b349a16a37610528360a1c1ca1.safetensors": {
+    "path": "training/features_safetensors/3f504ac3cd54b2ff0e59fb5f6a376dc3164e06b349a16a37610528360a1c1ca1.safetensors",
+    "sha256": "2cbc60605bf26b075c3529e16db4baf65590e7bfe64c2fc1442885c5fd95a9b1",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576201289100"
   },
   "training/features_safetensors/3fc72f39fc914bc4160a3dbda94680cb62bab21999a100f4a00866209e19dd59.safetensors": {
     "path": "training/features_safetensors/3fc72f39fc914bc4160a3dbda94680cb62bab21999a100f4a00866209e19dd59.safetensors",
@@ -1073,6 +1133,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775624575815039100"
   },
+  "training/features_safetensors/5b86377d464a7ec6f40870fcaed60fc5d1e529747125ad074305406babb8d50b.descriptions.jsonl": {
+    "path": "training/features_safetensors/5b86377d464a7ec6f40870fcaed60fc5d1e529747125ad074305406babb8d50b.descriptions.jsonl",
+    "sha256": "99cf23668bec16426e9cbbba4526f00636d8f8234d1ceb777543d031a251964d",
+    "size_bytes": 7137,
+    "indexed_at": "1776274576047205200"
+  },
+  "training/features_safetensors/5b86377d464a7ec6f40870fcaed60fc5d1e529747125ad074305406babb8d50b.safetensors": {
+    "path": "training/features_safetensors/5b86377d464a7ec6f40870fcaed60fc5d1e529747125ad074305406babb8d50b.safetensors",
+    "sha256": "28e85eb4fb08cd4aee72ace11ceba3b6568c07f1f0c8c91ed4bd8d0657685d7f",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576046137300"
+  },
   "training/features_safetensors/5ba7e913d6001978e0beb48faeef7a1f06144249cc9b787b6e88d4e7517af3c9.safetensors": {
     "path": "training/features_safetensors/5ba7e913d6001978e0beb48faeef7a1f06144249cc9b787b6e88d4e7517af3c9.safetensors",
     "sha256": "ceb2d800046de4b39684ca79413d0b52d16d498835695db99010569ba83b6c8f",
@@ -1132,6 +1204,30 @@
     "sha256": "82590f94d6702f5152e7428c93c40cb742e627efa0865a4ac01861819daf1465",
     "size_bytes": 1704,
     "indexed_at": "1775601186675243300"
+  },
+  "training/features_safetensors/6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685.descriptions.jsonl": {
+    "path": "training/features_safetensors/6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685.descriptions.jsonl",
+    "sha256": "7da65197b123e0b4523f7fd3ebcb34a683678bacd024b1780883ed6a8528df2b",
+    "size_bytes": 739,
+    "indexed_at": "1776274575533269400"
+  },
+  "training/features_safetensors/6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685.safetensors": {
+    "path": "training/features_safetensors/6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685.safetensors",
+    "sha256": "8d3c76d9f7bf7893b7292af837a5bbbecad5a95127d2013d1afe4782ff637d08",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575531763800"
+  },
+  "training/features_safetensors/636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45.descriptions.jsonl": {
+    "path": "training/features_safetensors/636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45.descriptions.jsonl",
+    "sha256": "25388d3c8d3715c72eff8dadc49cf6aaa3c33bcc79e590b50a5972e93c4b533e",
+    "size_bytes": 668,
+    "indexed_at": "1776274575598910800"
+  },
+  "training/features_safetensors/636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45.safetensors": {
+    "path": "training/features_safetensors/636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45.safetensors",
+    "sha256": "469bba3bb09fa4db02a145681e480048b63a5b58963af8e1000da42efcc43a41",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575597911100"
   },
   "training/features_safetensors/64859c28885aa231adfec6677a505985a5202d82cbb648b14c22e857dfd9a71e.safetensors": {
     "path": "training/features_safetensors/64859c28885aa231adfec6677a505985a5202d82cbb648b14c22e857dfd9a71e.safetensors",
@@ -1499,6 +1595,18 @@
     "size_bytes": 1712,
     "indexed_at": "1775601181093317300"
   },
+  "training/features_safetensors/9023a7548a9f09f8b224c10e7cb2aa5b28838e856efbc8db57aaf53b64229702.descriptions.jsonl": {
+    "path": "training/features_safetensors/9023a7548a9f09f8b224c10e7cb2aa5b28838e856efbc8db57aaf53b64229702.descriptions.jsonl",
+    "sha256": "75b2253f6fafa8d90850cf313e127be7739046a41cf4e1e7d4a01e279c940e05",
+    "size_bytes": 1028,
+    "indexed_at": "1776274576368486400"
+  },
+  "training/features_safetensors/9023a7548a9f09f8b224c10e7cb2aa5b28838e856efbc8db57aaf53b64229702.safetensors": {
+    "path": "training/features_safetensors/9023a7548a9f09f8b224c10e7cb2aa5b28838e856efbc8db57aaf53b64229702.safetensors",
+    "sha256": "3db3a96e6f95f6d3dc8fb88954552ffab5171bc22a1ab38bc918c9bae9a50834",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576366975400"
+  },
   "training/features_safetensors/904f1399c7d85b19b285f25dacc821914a0a4cbc2a524979830ef420dd16b1af.safetensors": {
     "path": "training/features_safetensors/904f1399c7d85b19b285f25dacc821914a0a4cbc2a524979830ef420dd16b1af.safetensors",
     "sha256": "cedb158cf67606a3ef21e8087cc6295e2f0e86208d6b454622d031c065eb6ec3",
@@ -1589,6 +1697,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775601186484076900"
   },
+  "training/features_safetensors/9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122.descriptions.jsonl": {
+    "path": "training/features_safetensors/9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122.descriptions.jsonl",
+    "sha256": "7e37f7cf7b7cc6ba38540c5409b24524a49624f4d423cd4be8773ae05b695c73",
+    "size_bytes": 751,
+    "indexed_at": "1776274575425075200"
+  },
+  "training/features_safetensors/9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122.safetensors": {
+    "path": "training/features_safetensors/9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122.safetensors",
+    "sha256": "6bb22f2dfc106371e42b5cf43d93e464e7b2665f8b28aeabe0b38de7a472d3aa",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575424229600"
+  },
   "training/features_safetensors/9c481e01bf67e2566c4bacbdebd0c165cc3174d115ba1fe47dc60f0e5f2d0723.safetensors": {
     "path": "training/features_safetensors/9c481e01bf67e2566c4bacbdebd0c165cc3174d115ba1fe47dc60f0e5f2d0723.safetensors",
     "sha256": "8db6bb0bf117064a5527ea954481f4313fa61ec2352a3c96658e3e545dd49e6b",
@@ -1649,6 +1769,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775601186319815400"
   },
+  "training/features_safetensors/a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315.descriptions.jsonl": {
+    "path": "training/features_safetensors/a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315.descriptions.jsonl",
+    "sha256": "17afd8ae31e501c61a8db3c6172698cfec6b57d70fff60d031f739a4cda1d94c",
+    "size_bytes": 783,
+    "indexed_at": "1776274575634471400"
+  },
+  "training/features_safetensors/a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315.safetensors": {
+    "path": "training/features_safetensors/a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315.safetensors",
+    "sha256": "4bae6973354a572b2feaab36eef0e5fa27d303bcec4d31a544277944403a1bc4",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575633428000"
+  },
   "training/features_safetensors/a0ca9ed75c0efcc1e459667d2e77d8d8db04300f0156b8fc44bec6d1f4adf704.safetensors": {
     "path": "training/features_safetensors/a0ca9ed75c0efcc1e459667d2e77d8d8db04300f0156b8fc44bec6d1f4adf704.safetensors",
     "sha256": "f9b62822cd37897f6b5322af7551b0e45b2a2f7dafedcf90196bb802f6eee510",
@@ -1672,6 +1804,18 @@
     "sha256": "61e86014ae08b0cc34c7bae6b146dd27640545c2090e28e4c33d74d28137c0ce",
     "size_bytes": 1704,
     "indexed_at": "1775770092247399900"
+  },
+  "training/features_safetensors/a1e775c29c99be5c9a8ee13b303cf1592170c4104fabbca5a9e5920ab4454061.descriptions.jsonl": {
+    "path": "training/features_safetensors/a1e775c29c99be5c9a8ee13b303cf1592170c4104fabbca5a9e5920ab4454061.descriptions.jsonl",
+    "sha256": "f98675fa3e0890ef623fa32c672799e9ff7dd9cd7aece5f89eaed3a0eb200894",
+    "size_bytes": 4265,
+    "indexed_at": "1776274576002837900"
+  },
+  "training/features_safetensors/a1e775c29c99be5c9a8ee13b303cf1592170c4104fabbca5a9e5920ab4454061.safetensors": {
+    "path": "training/features_safetensors/a1e775c29c99be5c9a8ee13b303cf1592170c4104fabbca5a9e5920ab4454061.safetensors",
+    "sha256": "5396daa5218edfab3f52af644220cc2262f1d5e050e2fedbd8530e82675bc71d",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576001832600"
   },
   "training/features_safetensors/a3bc822ca882f511dd0c873507afa2491adc69fc5a49f6d699035b09b969e5cf.safetensors": {
     "path": "training/features_safetensors/a3bc822ca882f511dd0c873507afa2491adc69fc5a49f6d699035b09b969e5cf.safetensors",
@@ -1913,6 +2057,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775770092345767500"
   },
+  "training/features_safetensors/b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb.descriptions.jsonl": {
+    "path": "training/features_safetensors/b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb.descriptions.jsonl",
+    "sha256": "7a5783593b01cb234825e5c1be983af4cc6b0684e1e93eb66f56f6d729fef429",
+    "size_bytes": 739,
+    "indexed_at": "1776274575565006900"
+  },
+  "training/features_safetensors/b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb.safetensors": {
+    "path": "training/features_safetensors/b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb.safetensors",
+    "sha256": "f895b950c40faaf979cf307506aa0f9fa2fd19dc2c9bebed4ef8fb290caec972",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575562858500"
+  },
   "training/features_safetensors/b790bc10fa853f62169d5771d154786f27a01051006bf8bf12b6cb02151194e8.safetensors": {
     "path": "training/features_safetensors/b790bc10fa853f62169d5771d154786f27a01051006bf8bf12b6cb02151194e8.safetensors",
     "sha256": "ab4d805488a329e7377538dec106a22eb26f9123099f42dbedcbb89a26392a26",
@@ -2129,6 +2285,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775624575256469200"
   },
+  "training/features_safetensors/d6c824f46b1e735b5680dbe1fd1fcd1d5339f4878a4daacb57e379ec0b4778d7.descriptions.jsonl": {
+    "path": "training/features_safetensors/d6c824f46b1e735b5680dbe1fd1fcd1d5339f4878a4daacb57e379ec0b4778d7.descriptions.jsonl",
+    "sha256": "8867a1474442f1230ca3e417f0353a37e2b3f14f6778090b43f408a0d2d7fa98",
+    "size_bytes": 4320,
+    "indexed_at": "1776274575962153000"
+  },
+  "training/features_safetensors/d6c824f46b1e735b5680dbe1fd1fcd1d5339f4878a4daacb57e379ec0b4778d7.safetensors": {
+    "path": "training/features_safetensors/d6c824f46b1e735b5680dbe1fd1fcd1d5339f4878a4daacb57e379ec0b4778d7.safetensors",
+    "sha256": "8552200ed1845592a51ae8d92392a0c6218dfd20a087231f8eef651f86cb1613",
+    "size_bytes": 1704,
+    "indexed_at": "1776274575961644000"
+  },
   "training/features_safetensors/d71e3485ae9886de64b34d9cd6e5ba63c88bdab7249cf24e9619c03a56980246.safetensors": {
     "path": "training/features_safetensors/d71e3485ae9886de64b34d9cd6e5ba63c88bdab7249cf24e9619c03a56980246.safetensors",
     "sha256": "2be0a10c3c191c46fff91e76f2a3a0c9bd0a11cbb3b9a07bcfa116169403f1d4",
@@ -2285,6 +2453,18 @@
     "size_bytes": 1712,
     "indexed_at": "1775601182372504700"
   },
+  "training/features_safetensors/e9a869bf754e7602afd09968cce840f19d9c9b6ee7acb9ebdb272e3c570134bd.descriptions.jsonl": {
+    "path": "training/features_safetensors/e9a869bf754e7602afd09968cce840f19d9c9b6ee7acb9ebdb272e3c570134bd.descriptions.jsonl",
+    "sha256": "fef28429053911db4c158c04719aabab4cbe171b55e08ef4709c47dddc0f4f76",
+    "size_bytes": 2085,
+    "indexed_at": "1776274576166709400"
+  },
+  "training/features_safetensors/e9a869bf754e7602afd09968cce840f19d9c9b6ee7acb9ebdb272e3c570134bd.safetensors": {
+    "path": "training/features_safetensors/e9a869bf754e7602afd09968cce840f19d9c9b6ee7acb9ebdb272e3c570134bd.safetensors",
+    "sha256": "02b474a08a36b2d409bc4c0fa0890a2f4075beccb55a8ac1da1197142f3455f2",
+    "size_bytes": 1704,
+    "indexed_at": "1776274576166709400"
+  },
   "training/features_safetensors/ea00c8f6d9d499b1c79349a3e5a9ecd2c037f2802367a1694dc3d5a27f7da423.safetensors": {
     "path": "training/features_safetensors/ea00c8f6d9d499b1c79349a3e5a9ecd2c037f2802367a1694dc3d5a27f7da423.safetensors",
     "sha256": "c1f26471399c04272f7498fa0edd0b6cb94461f299301b847060bec7220b4ee3",
@@ -2357,6 +2537,18 @@
     "size_bytes": 1704,
     "indexed_at": "1775601186767316200"
   },
+  "training/features_safetensors/ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27.descriptions.jsonl": {
+    "path": "training/features_safetensors/ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27.descriptions.jsonl",
+    "sha256": "b493c4021b8ea57cdf44f7c144994161d621657ddad2f5f5d730be88afac7429",
+    "size_bytes": 813,
+    "indexed_at": "1776274575386389200"
+  },
+  "training/features_safetensors/ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27.safetensors": {
+    "path": "training/features_safetensors/ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27.safetensors",
+    "sha256": "87e29c6372a08f845ea88ff1a15bf5aac709eee771d9d924957e92d89e542158",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575385390900"
+  },
   "training/features_safetensors/f0f765cbaac03fce1315690e0ae57c97b0b805f0d2cd399a45b303e5440d4a15.safetensors": {
     "path": "training/features_safetensors/f0f765cbaac03fce1315690e0ae57c97b0b805f0d2cd399a45b303e5440d4a15.safetensors",
     "sha256": "f9fc2ecfea6f88dc4af5bdfe8b10a59bcb858637393d93eb5cd5768267beadc6",
@@ -2386,6 +2578,18 @@
     "sha256": "a9cf8ad3a365f7340398a470a47818ad202afcd050dac1c2d1e91695e2656647",
     "size_bytes": 1712,
     "indexed_at": "1775601182338578100"
+  },
+  "training/features_safetensors/f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7.descriptions.jsonl": {
+    "path": "training/features_safetensors/f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7.descriptions.jsonl",
+    "sha256": "455d27e228a41189c875cc51c4258f5d09ad2c7a14251400ab2c4f8cd7c7b9f9",
+    "size_bytes": 756,
+    "indexed_at": "1776274575462978700"
+  },
+  "training/features_safetensors/f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7.safetensors": {
+    "path": "training/features_safetensors/f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7.safetensors",
+    "sha256": "96eb62955eb25eadad3665ee8d2ff212a996b14f5b22c855286b67b090fdf171",
+    "size_bytes": 1712,
+    "indexed_at": "1776274575461413600"
   },
   "training/features_safetensors/f72e56f5ada8e7f9052415d1760bed5a50012350f60bc7d532e82f9772d24212.safetensors": {
     "path": "training/features_safetensors/f72e56f5ada8e7f9052415d1760bed5a50012350f60bc7d532e82f9772d24212.safetensors",
@@ -2440,5 +2644,17 @@
     "sha256": "b037dae44b2e353e8b152ed8fb9ce30925b9c2af6f95356f748fb7bc9e578165",
     "size_bytes": 1704,
     "indexed_at": "1775601185243944400"
+  },
+  "training/features_safetensors/fff3bad8f9dcd3a2ebdee7ca8aca389e7a16e68dade3e6a00e7bf2309a3c0ca4.descriptions.jsonl": {
+    "path": "training/features_safetensors/fff3bad8f9dcd3a2ebdee7ca8aca389e7a16e68dade3e6a00e7bf2309a3c0ca4.descriptions.jsonl",
+    "sha256": "ab0cf1527a6ca0100016d22b6b0d71ac07c6fbacdf8751c49a095e5c3d93a685",
+    "size_bytes": 3622,
+    "indexed_at": "1776274575855261700"
+  },
+  "training/features_safetensors/fff3bad8f9dcd3a2ebdee7ca8aca389e7a16e68dade3e6a00e7bf2309a3c0ca4.safetensors": {
+    "path": "training/features_safetensors/fff3bad8f9dcd3a2ebdee7ca8aca389e7a16e68dade3e6a00e7bf2309a3c0ca4.safetensors",
+    "sha256": "c67a390a26d845fbbf74551c720c91b8d58c15974db47f2456734245ef2c0b5b",
+    "size_bytes": 1704,
+    "indexed_at": "1776274575854254500"
   }
 }

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import torch
 import torch.nn as nn
 
@@ -66,11 +68,19 @@ class SingleExpert(nn.Module):
         self.dropout = nn.Dropout(float(dropout))
         self.fc2 = nn.Linear(self.hidden_dim, self.input_dim)
         
-        # Transformer encoder for deep processing (130M params target)
-        if self.n_layers > 0 and self.hidden_dim >= 512:
+        # Transformer encoder for deep processing (enabled only within a safe d_model range)
+        # Very large hidden dimensions are used to meet the >100M parameter gate via the
+        # feed-forward path; enabling Transformer self-attention at those sizes is
+        # prohibitively expensive on CPU memory.
+        max_transformer_hidden_dim = 4096
+        if self.n_layers > 0 and 512 <= self.hidden_dim <= max_transformer_hidden_dim:
+            effective_n_heads = self.n_heads
+            if self.hidden_dim % effective_n_heads != 0:
+                effective_n_heads = max(1, math.gcd(self.hidden_dim, effective_n_heads))
+
             encoder_layer = nn.TransformerEncoderLayer(
                 d_model=self.hidden_dim,
-                nhead=self.n_heads,
+                nhead=effective_n_heads,
                 dim_feedforward=self.hidden_dim * 4,
                 dropout=dropout,
                 batch_first=True,
@@ -80,9 +90,11 @@ class SingleExpert(nn.Module):
                 encoder_layer,
                 num_layers=self.n_layers,
             )
+            self.transformer_n_heads = int(effective_n_heads)
             self.use_transformer = True
         else:
             self.transformer = None
+            self.transformer_n_heads = 0
             self.use_transformer = False
         
         self.depth_layers = nn.ModuleList(

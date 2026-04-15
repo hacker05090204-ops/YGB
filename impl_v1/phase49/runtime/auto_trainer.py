@@ -1050,7 +1050,7 @@ class AutoTrainer:
 
             # === TRY TO LOAD EXISTING CHECKPOINT ===
             try:
-                hdd_root = os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd")
+                hdd_root = os.environ.get("YGB_HDD_ROOT", "C:/ygb_hdd")
                 checkpoint_dir = os.path.join(hdd_root, "training")
                 (
                     self._checkpoint_path,
