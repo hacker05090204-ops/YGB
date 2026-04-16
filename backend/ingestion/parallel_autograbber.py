@@ -284,9 +284,35 @@ class ParallelAutoGrabber(AutoGrabber):
 
     def __init__(
         self,
-        config: ParallelAutoGrabberConfig | AutoGrabberConfig,
+        config: ParallelAutoGrabberConfig | AutoGrabberConfig | None = None,
+        *,
+        sources: Sequence[str] | None = None,
+        cycle_interval_seconds: int = 3600,
+        quality_threshold: float = 0.4,
+        max_per_cycle: int = 500,
+        dedup_enabled: bool = True,
+        max_workers: int | None = None,
     ) -> None:
-        resolved_config = self._coerce_parallel_config(config)
+        if config is None:
+            resolved_config = ParallelAutoGrabberConfig(
+                sources=list(sources or ["nvd"]),
+                cycle_interval_seconds=cycle_interval_seconds,
+                quality_threshold=quality_threshold,
+                max_per_cycle=max_per_cycle,
+                dedup_enabled=dedup_enabled,
+                max_workers=max_workers,
+            )
+        else:
+            resolved_config = self._coerce_parallel_config(config)
+            if max_workers is not None and resolved_config.max_workers != max_workers:
+                resolved_config = ParallelAutoGrabberConfig(
+                    sources=list(resolved_config.sources),
+                    cycle_interval_seconds=resolved_config.cycle_interval_seconds,
+                    quality_threshold=resolved_config.quality_threshold,
+                    max_per_cycle=resolved_config.max_per_cycle,
+                    dedup_enabled=resolved_config.dedup_enabled,
+                    max_workers=max_workers,
+                )
         super().__init__(resolved_config)
         self.config: ParallelAutoGrabberConfig = resolved_config
 
