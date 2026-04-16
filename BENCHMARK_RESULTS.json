@@ -1,7 +1,7 @@
 {
   "AuthorityLock.verify_all_locked()": {
     "status": "PASS",
-    "elapsed_s": 0.004,
+    "elapsed_s": 0.005,
     "result": {
       "verify_result": {
         "all_locked": true,
@@ -29,7 +29,7 @@
   },
   "CVE Ingestion Accuracy Probe": {
     "status": "PASS",
-    "elapsed_s": 0.475,
+    "elapsed_s": 0.619,
     "result": {
       "total": 5,
       "passed": 5,
@@ -89,7 +89,7 @@
   },
   "MoE Smoke Test": {
     "status": "PASS",
-    "elapsed_s": 8.589,
+    "elapsed_s": 10.698,
     "result": {
       "expert_fields_count": 23,
       "config_n_experts": 23,
@@ -101,17 +101,17 @@
         64,
         32000
       ],
-      "ce_loss": 10.50173282623291,
-      "aux_loss": 4.600653171539307,
-      "total_loss": 10.547739028930664,
-      "grad_norm": 6.415277626996142,
+      "ce_loss": 10.445932388305664,
+      "aux_loss": 4.8339972496032715,
+      "total_loss": 10.494272232055664,
+      "grad_norm": 6.54472373503912,
       "vram_mb": 4095,
       "expert_budget": 23
     }
   },
   "Expert Queue Status": {
     "status": "PASS",
-    "elapsed_s": 0.011,
+    "elapsed_s": 0.014,
     "result": {
       "schema_version": 1,
       "updated_at": "2026-04-12T17:02:34Z",
@@ -127,15 +127,25 @@
   },
   "Feature Dimension Check": {
     "status": "PASS",
-    "elapsed_s": 0.015,
+    "elapsed_s": 0.018,
     "result": {
       "configured_feature_dim": 256,
       "expected_from_constant": 256,
-      "shards_found": 366,
+      "shards_found": 384,
       "shards_checked": 5,
       "verified_count": 5,
       "all_dimensions_match": true,
       "shard_details": [
+        {
+          "name": "00126f6a71af4c69665b294b6f8ea6c434a04416fe68346e63e04fb9d0ad0e4a",
+          "shape": [
+            1,
+            256
+          ],
+          "feature_dim": 256,
+          "expected_dim": 256,
+          "matches": true
+        },
         {
           "name": "0066230c4f9c6c3a1a4276a8555871db77d60b5efd08800ccf962040342e6ef9",
           "shape": [
@@ -155,49 +165,39 @@
           "feature_dim": 256,
           "expected_dim": 256,
           "matches": true
-        },
-        {
-          "name": "02aa0e2e0edfa7bde52fb4b7a3efcf37285adfebec016a641d01e87789015d0c",
-          "shape": [
-            1,
-            256
-          ],
-          "feature_dim": 256,
-          "expected_dim": 256,
-          "matches": true
         }
       ]
     }
   },
   "Live Server /healthz": {
     "status": "PASS",
-    "elapsed_s": 0.016,
+    "elapsed_s": 0.007,
     "result": {
       "server_available": true,
       "url": "http://127.0.0.1:8000/healthz",
       "status_code": 200,
-      "response_time_ms": 15.58,
+      "response_time_ms": 7.02,
       "response": {
         "status": "alive",
-        "uptime_s": 52.8,
-        "boot_time": 1776355576.989715
+        "uptime_s": 176.2,
+        "boot_time": 1776364578.0827324
       }
     }
   },
   "Concurrent Stress Test": {
     "status": "PASS",
-    "elapsed_s": 0.039,
+    "elapsed_s": 0.061,
     "result": {
       "server_available": true,
       "url": "http://127.0.0.1:8000/healthz",
       "total_requests": 20,
       "successful": 20,
       "failed": 0,
-      "total_time_s": 0.039,
-      "avg_time_ms": 12.22,
-      "min_time_ms": 4.75,
-      "max_time_ms": 23.92,
-      "requests_per_second": 515.91
+      "total_time_s": 0.06,
+      "avg_time_ms": 21.92,
+      "min_time_ms": 6.32,
+      "max_time_ms": 31.43,
+      "requests_per_second": 331.33
     }
   }
 }
