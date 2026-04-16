@@ -1,7 +1,7 @@
 {
   "AuthorityLock.verify_all_locked()": {
     "status": "PASS",
-    "elapsed_s": 0.003,
+    "elapsed_s": 0.004,
     "result": {
       "verify_result": {
         "all_locked": true,
@@ -29,7 +29,7 @@
   },
   "CVE Ingestion Accuracy Probe": {
     "status": "PASS",
-    "elapsed_s": 0.449,
+    "elapsed_s": 0.475,
     "result": {
       "total": 5,
       "passed": 5,
@@ -89,7 +89,7 @@
   },
   "MoE Smoke Test": {
     "status": "PASS",
-    "elapsed_s": 9.069,
+    "elapsed_s": 8.589,
     "result": {
       "expert_fields_count": 23,
       "config_n_experts": 23,
@@ -101,17 +101,17 @@
         64,
         32000
       ],
-      "ce_loss": 10.534210205078125,
-      "aux_loss": 4.7884907722473145,
-      "total_loss": 10.5820951461792,
-      "grad_norm": 6.407519061029001,
+      "ce_loss": 10.50173282623291,
+      "aux_loss": 4.600653171539307,
+      "total_loss": 10.547739028930664,
+      "grad_norm": 6.415277626996142,
       "vram_mb": 4095,
       "expert_budget": 23
     }
   },
   "Expert Queue Status": {
     "status": "PASS",
-    "elapsed_s": 0.017,
+    "elapsed_s": 0.011,
     "result": {
       "schema_version": 1,
       "updated_at": "2026-04-12T17:02:34Z",
@@ -127,11 +127,11 @@
   },
   "Feature Dimension Check": {
     "status": "PASS",
-    "elapsed_s": 0.03,
+    "elapsed_s": 0.015,
     "result": {
       "configured_feature_dim": 256,
       "expected_from_constant": 256,
-      "shards_found": 348,
+      "shards_found": 366,
       "shards_checked": 5,
       "verified_count": 5,
       "all_dimensions_match": true,
@@ -171,33 +171,33 @@
   },
   "Live Server /healthz": {
     "status": "PASS",
-    "elapsed_s": 0.01,
+    "elapsed_s": 0.016,
     "result": {
       "server_available": true,
       "url": "http://127.0.0.1:8000/healthz",
       "status_code": 200,
-      "response_time_ms": 10.16,
+      "response_time_ms": 15.58,
       "response": {
         "status": "alive",
-        "uptime_s": 59.8,
-        "boot_time": 1776111437.525668
+        "uptime_s": 52.8,
+        "boot_time": 1776355576.989715
       }
     }
   },
   "Concurrent Stress Test": {
     "status": "PASS",
-    "elapsed_s": 0.042,
+    "elapsed_s": 0.039,
     "result": {
       "server_available": true,
       "url": "http://127.0.0.1:8000/healthz",
       "total_requests": 20,
       "successful": 20,
       "failed": 0,
-      "total_time_s": 0.042,
-      "avg_time_ms": 11.96,
-      "min_time_ms": 4.87,
-      "max_time_ms": 21.89,
-      "requests_per_second": 476.21
+      "total_time_s": 0.039,
+      "avg_time_ms": 12.22,
+      "min_time_ms": 4.75,
+      "max_time_ms": 23.92,
+      "requests_per_second": 515.91
     }
   }
 }
