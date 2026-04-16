@@ -1,0 +1,100 @@
+{
+  "import_tests": {
+    "training_controller": "PASS",
+    "backend.training.incremental_trainer": "PASS",
+    "backend.training.auto_train_controller": "PASS",
+    "backend.training.safetensors_store": "PASS",
+    "backend.training.data_purity": "PASS",
+    "backend.training.rl_feedback": "PASS",
+    "backend.training.adaptive_learner": "PASS",
+    "backend.training.training_optimizer": "PASS",
+    "backend.training.class_balancer": "PASS",
+    "backend.training.metrics_tracker": "PASS",
+    "backend.training.compression_engine": "PASS",
+    "backend.training.deep_rl_agent": "PASS",
+    "impl_v1.phase49.moe": "PASS",
+    "backend.ingestion.autograbber": "PASS",
+    "backend.ingestion.industrial_autograbber": "MISSING: No module named 'backend.ingestion.industrial_autograbber'",
+    "backend.ingestion.normalizer": "PASS",
+    "backend.ingestion.dedup": "PASS",
+    "backend.ingestion.scrapers.nvd_scraper": "PASS",
+    "backend.ingestion.scrapers.cisa_scraper": "PASS",
+    "backend.ingestion.scrapers.osv_scraper": "PASS",
+    "backend.ingestion.scrapers.github_advisory_scraper": "PASS",
+    "backend.ingestion.scrapers.exploit_db_scraper": "MISSING: No module named 'backend.ingestion.scrapers.exploit_db_scrap",
+    "backend.ingestion.scrapers.vendor_advisory_scraper": "MISSING: No module named 'backend.ingestion.scrapers.vendor_advisory_",
+    "backend.ingestion.scrapers.snyk_scraper": "PASS",
+    "backend.ingestion.scrapers.vulnrichment_scraper": "PASS",
+    "backend.ingestion.parallel_autograbber": "PASS",
+    "backend.api.system_status": "PASS",
+    "backend.api.runtime_api": "PASS",
+    "backend.api.report_generator": "PASS",
+    "backend.sync.sync_engine": "PASS",
+    "backend.sync.peer_transport": "PASS",
+    "backend.auth.auth_guard": "PASS",
+    "backend.governance.authority_lock": "PASS",
+    "backend.governance.approval_ledger": "PASS",
+    "backend.tasks.industrial_agent": "PASS",
+    "backend.assistant.voice_runtime": "PASS",
+    "backend.assistant.query_router": "PASS",
+    "backend.reporting.report_engine": "PASS",
+    "backend.evidence.video_recorder": "PASS",
+    "scripts.expert_task_queue": "PASS",
+    "scripts.device_manager": "PASS",
+    "backend.distributed.expert_distributor": "MISSING: No module named 'backend.distributed'",
+    "backend.agent.self_reflection": "IMPORT_ERROR: cannot import name 'FailureObservation' from 'backend.agent.",
+    "backend.testing.field_registry": "PASS",
+    "backend.voice.production_voice": "PASS"
+  },
+  "wiring_checks": {},
+  "functional_tests": {
+    "MoE: importable": {
+      "status": "ERROR",
+      "error": "TypeError: MoEClassifier.__init__() missing 1 required positional argument: 'config'",
+      "ms": 0.0
+    },
+    "MoE: param count > 100M": {
+      "status": "ERROR",
+      "error": "TypeError: MoEClassifier.__init__() missing 1 required positional argument: 'config'",
+      "ms": 0.0
+    },
+    "MoE: forward pass works": {
+      "status": "ERROR",
+      "error": "TypeError: MoEClassifier.__init__() missing 1 required positional argument: 'config'",
+      "ms": 0.0
+    },
+    "MoE: 23 experts exist": {
+      "status": "ERROR",
+      "error": "TypeError: MoEClassifier.__init__() missing 1 required positional argument: 'config'",
+      "ms": 0.0
+    },
+    "DataPurity: rejects short desc": {
+      "status": "ERROR",
+      "error": "TypeError: DataPurityEnforcer.enforce() missing 1 required positional argument: 'sample'",
+      "ms": 0.0
+    },
+    "DataPurity: accepts good sample": {
+      "status": "ERROR",
+      "error": "TypeError: DataPurityEnforcer.enforce() missing 1 required positional argument: 'sample'",
+      "ms": 0.0
+    },
+    "ExpertQueue: 23 experts": {
+      "status": "FAIL",
+      "error": "Expected 23, got 3",
+      "ms": 2.6
+    },
+    "Authority lock: all_locked=True": {
+      "status": "PASS",
+      "ms": 0.0
+    },
+    "FieldRegistry: 80+ fields defined": {
+      "status": "PASS",
+      "ms": 0.0
+    },
+    "FieldRegistry: all 23 experts have fields": {
+      "status": "PASS",
+      "ms": 0.0
+    }
+  },
+  "critical_findings": []
+}

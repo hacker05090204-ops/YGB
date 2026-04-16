@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""Phase 1: Mock/Fake/Simulated Data Detection"""
 import subprocess
 from pathlib import Path
 
@@ -89,6 +91,8 @@ for severity, patterns in PATTERNS.items():
                 for h in hits[:2]:
                     print(f'    {h.strip()[:100]}')
                 category_hits.extend(hits)
+        except subprocess.TimeoutExpired:
+            print(f'  [TIMEOUT] {pattern}')
         except Exception as e:
             print(f'  [ERROR] {pattern}: {e}')
     results[severity] = len(category_hits)

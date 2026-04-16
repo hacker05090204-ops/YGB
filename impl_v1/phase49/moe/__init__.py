@@ -24,6 +24,9 @@ from .moe_architecture import (
     run_smoke_test,
 )
 from .router import MoERouter, NoisyTopKGate
+from .simple_moe import SimpleMoEClassifier
+from .simple_expert import SimpleExpert130M, count_params
+from .simple_router import SimpleRouter
 
 
 logger = logging.getLogger("ygb.moe")
@@ -154,6 +157,10 @@ __all__ = [
     "MoELayer",
     "MoEBugClassifier",
     "MoEClassifier",
+    "SimpleMoEClassifier",
+    "SimpleExpert130M",
+    "SimpleRouter",
+    "count_params",
     "SingleExpert",
     "MoERouter",
     "NoisyTopKGate",
