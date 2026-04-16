@@ -76,6 +76,34 @@ def _compute_file_hash(file_path: Path, algorithm: str = "sha256") -> str:
     return hasher.hexdigest()
 
 
+def _metadata_sidecar_paths(payload_path: Path) -> tuple[Path, ...]:
+    """Return preferred and legacy metadata sidecar locations for a payload."""
+    preferred = payload_path.with_suffix(".meta.json")
+    legacy = Path(str(payload_path) + ".meta.json")
+    if preferred == legacy:
+        return (preferred,)
+    return (preferred, legacy)
+
+
+def _write_metadata_sidecars(payload_path: Path, metadata: dict[str, Any]) -> Path:
+    """Write metadata to the preferred sidecar path and a legacy compatibility path."""
+    sidecars = _metadata_sidecar_paths(payload_path)
+    for sidecar_path in sidecars:
+        with open(sidecar_path, "w", encoding="utf-8") as handle:
+            json.dump(metadata, handle, indent=2)
+    return sidecars[0]
+
+
+def _load_metadata_sidecar(payload_path: Path) -> tuple[dict[str, Any], Path | None]:
+    """Load metadata from the preferred or legacy sidecar path."""
+    for sidecar_path in _metadata_sidecar_paths(payload_path):
+        if not sidecar_path.exists():
+            continue
+        with open(sidecar_path, "r", encoding="utf-8") as handle:
+            return json.load(handle), sidecar_path
+    return {}, None
+
+
 def _get_compressor(algorithm: CompressionAlgorithm):
     """Get compression module for specified algorithm."""
     if algorithm == "zstd":
@@ -178,7 +206,7 @@ def compress_file(
     )
     
     # Store metadata
-    meta = metadata or {}
+    meta = dict(metadata or {})
     meta.update({
         "algorithm": actual_algorithm,  # Store actual algorithm used
         "requested_algorithm": algorithm,  # Store what was requested
@@ -188,10 +216,15 @@ def compress_file(
         "original_hash": original_hash,
         "compressed_hash": compressed_hash,
     })
-    
-    meta_path = Path(str(output_path) + ".meta.json")
-    with open(meta_path, "w") as f:
-        json.dump(meta, f, indent=2)
+
+    meta.setdefault("original_path", str(input_path))
+    meta.setdefault("original_bytes", original_size)
+    meta.setdefault("original_sha256", original_hash)
+    meta["compressed_bytes"] = compressed_size
+    meta["compressed_sha256"] = compressed_hash
+    meta["compression"] = actual_algorithm
+
+    _write_metadata_sidecars(output_path, meta)
     
     result = CompressionResult(
         algorithm=actual_algorithm,  # Use actual algorithm
@@ -246,10 +279,8 @@ def decompress_file(
         raise FileNotFoundError(f"Compressed file not found: {input_path}")
     
     # Load metadata
-    meta_path = Path(str(input_path) + ".meta.json")
-    if meta_path.exists():
-        with open(meta_path, "r") as f:
-            metadata = json.load(f)
+    metadata, _ = _load_metadata_sidecar(input_path)
+    if metadata:
         algorithm = metadata.get("algorithm", "zstd")
         original_hash = metadata.get("original_hash", "")
         original_size = metadata.get("original_size", 0)
@@ -469,6 +500,8 @@ class ZeroLossCompressor:
         """
         input_path = Path(input_path)
         output_path = Path(output_path)
+        original_input_bytes = input_path.stat().st_size
+        original_input_sha256 = _compute_file_hash(input_path)
         
         # If use_bf16, convert tensors first
         if use_bf16:
@@ -478,7 +511,7 @@ class ZeroLossCompressor:
                 import tempfile
                 
                 # Load checkpoint
-                state_dict = load_file(input_path)
+                state_dict = load_file(str(input_path))
                 
                 # Convert FP32 to BF16
                 converted = {}
@@ -489,48 +522,87 @@ class ZeroLossCompressor:
                         converted[key] = tensor
                 
                 # Save converted checkpoint to temp file
-                with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
-                    tmp_path = Path(tmp.name)
-                    save_file(converted, tmp_path)
-                
-                # Compress the converted checkpoint
-                result = compress_file(tmp_path, output_path, algorithm, level)
-                
-                # Clean up temp file
-                tmp_path.unlink()
+                tmp_path: Path | None = None
+                try:
+                    with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as tmp:
+                        tmp_path = Path(tmp.name)
+                    save_file(converted, str(tmp_path))
+
+                    # Compress the converted checkpoint
+                    result = compress_file(
+                        tmp_path,
+                        output_path,
+                        algorithm,
+                        level,
+                        metadata={
+                            "original_path": str(input_path),
+                            "original_bytes": original_input_bytes,
+                            "original_sha256": original_input_sha256,
+                            "use_bf16": True,
+                        },
+                    )
+                finally:
+                    if tmp_path is not None:
+                        tmp_path.unlink(missing_ok=True)
                 
                 return {
-                    "original_bytes": input_path.stat().st_size,
+                    "original_bytes": original_input_bytes,
                     "compressed_bytes": result.compressed_size,
-                    "ratio": input_path.stat().st_size / result.compressed_size,
-                    "original_sha256": _compute_file_hash(input_path),
+                    "ratio": original_input_bytes / result.compressed_size,
+                    "original_sha256": original_input_sha256,
                     "compressed_sha256": result.compressed_hash,
                     "use_bf16": True,
-                    "compression": algorithm,
+                    "compression": result.algorithm,
                 }
                 
             except ImportError:
                 logger.warning("safetensors/torch not available, skipping BF16 conversion")
         
         # Standard compression without BF16
-        result = compress_file(input_path, output_path, algorithm, level)
+        result = compress_file(
+            input_path,
+            output_path,
+            algorithm,
+            level,
+            metadata={
+                "original_path": str(input_path),
+                "original_bytes": original_input_bytes,
+                "original_sha256": original_input_sha256,
+                "use_bf16": False,
+            },
+        )
         return {
             "original_bytes": result.original_size,
             "compressed_bytes": result.compressed_size,
             "ratio": result.compression_ratio,
-            "original_sha256": result.original_hash,
+            "original_sha256": original_input_sha256,
             "compressed_sha256": result.compressed_hash,
             "use_bf16": False,
-            "compression": algorithm,
+            "compression": result.algorithm,
         }
     
     @staticmethod
     def decompress_checkpoint(
         input_path: Path | str,
         output_path: Path | str,
+        restore_fp32: bool = False,
     ) -> dict[str, Any]:
         """Decompress a checkpoint file."""
         result = decompress_file(input_path, output_path)
+        if restore_fp32 and bool(result.metadata.get("use_bf16")):
+            try:
+                from safetensors.torch import load_file, save_file
+                import torch
+
+                output_path = Path(output_path)
+                state_dict = load_file(str(output_path))
+                restored = {
+                    key: tensor.to(torch.float32) if tensor.dtype == torch.bfloat16 else tensor
+                    for key, tensor in state_dict.items()
+                }
+                save_file(restored, str(output_path))
+            except ImportError:
+                logger.warning("safetensors/torch not available, cannot restore FP32 tensors")
         return {
             "original_bytes": result.original_size,
             "decompressed_bytes": result.decompressed_size,
@@ -554,32 +626,103 @@ class ZeroLossCompressor:
         with tempfile.TemporaryDirectory() as tmpdir:
             temp_path = Path(tmpdir) / "decompressed"
             result = decompress_file(compressed_path, temp_path, verify=True)
-            
-            # Compare hashes
             original_hash = _compute_file_hash(original_path)
-            verified = result.decompressed_hash == original_hash
+            mismatch_count = 0
+
+            if bool(result.metadata.get("use_bf16")):
+                try:
+                    from safetensors.torch import load_file
+                    import torch
+
+                    original_tensors = load_file(str(original_path))
+                    decompressed_tensors = load_file(str(temp_path))
+                    if set(original_tensors.keys()) != set(decompressed_tensors.keys()):
+                        mismatch_count += abs(
+                            len(set(original_tensors.keys()) ^ set(decompressed_tensors.keys()))
+                        )
+                    for key in set(original_tensors.keys()) & set(decompressed_tensors.keys()):
+                        original_tensor = original_tensors[key]
+                        decompressed_tensor = decompressed_tensors[key]
+                        if (
+                            decompressed_tensor.dtype == torch.bfloat16
+                            and original_tensor.dtype == torch.float32
+                        ):
+                            original_tensor = original_tensor.to(torch.bfloat16)
+                        if original_tensor.dtype != decompressed_tensor.dtype:
+                            mismatch_count += 1
+                            continue
+                        if original_tensor.dtype.is_floating_point:
+                            max_diff = (
+                                original_tensor.float() - decompressed_tensor.float()
+                            ).abs().max().item()
+                            if max_diff >= 1e-6:
+                                mismatch_count += 1
+                        elif not torch.equal(original_tensor, decompressed_tensor):
+                            mismatch_count += 1
+                    verified = mismatch_count == 0
+                except ImportError:
+                    verified = bool(result.hash_verified)
+                    mismatch_count = 0 if verified else 1
+            else:
+                verified = result.decompressed_hash == original_hash
+                mismatch_count = 0 if verified else 1
             
             return {
                 "verified": verified,
                 "original_sha256": original_hash,
                 "decompressed_sha256": result.decompressed_hash,
-                "mismatch_count": 0 if verified else 1,
+                "mismatch_count": mismatch_count,
             }
     
     @staticmethod
     def compress_directory(
         input_dir: Path | str,
         output_path: Path | str | None = None,
-        algorithm: CompressionAlgorithm = "zstd",
+        algorithm: CompressionAlgorithm = "lz4",
         level: int | None = None,
     ) -> dict[str, Any]:
         """Compress an entire directory."""
-        result = compress_checkpoint(input_dir, output_path, algorithm, level)
+        input_dir = Path(input_dir)
+        output_dir = Path(output_path) if output_path is not None else input_dir / "compressed"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        files = sorted(path for path in input_dir.glob("*.safetensors") if path.is_file())
+        processed = len(files)
+        succeeded = 0
+        total_original = 0
+        total_compressed = 0
+
+        extension = {
+            "zstd": ".zstd",
+            "lz4": ".lz4",
+            "gzip": ".gz",
+            "none": ".bin",
+        }.get(algorithm, ".compressed")
+
+        for file_path in files:
+            output_file = output_dir / f"{file_path.stem}{extension}"
+            stats = ZeroLossCompressor.compress_checkpoint(
+                file_path,
+                output_file,
+                use_bf16=True,
+                algorithm=algorithm,
+                level=level,
+            )
+            succeeded += 1
+            total_original += int(stats["original_bytes"])
+            total_compressed += int(stats["compressed_bytes"])
+
+        overall_ratio = total_original / total_compressed if total_compressed > 0 else 1.0
         return {
-            "original_bytes": result.original_size,
-            "compressed_bytes": result.compressed_size,
-            "ratio": result.compression_ratio,
-            "files_compressed": 1,  # tar archive counts as 1
+            "files_processed": processed,
+            "files_succeeded": succeeded,
+            "files_failed": processed - succeeded,
+            "original_bytes": total_original,
+            "compressed_bytes": total_compressed,
+            "ratio": overall_ratio,
+            "overall_ratio": overall_ratio,
+            "total_original_mb": total_original // (1024 * 1024),
+            "total_compressed_mb": total_compressed // (1024 * 1024),
         }
 
 
@@ -642,6 +785,9 @@ class DeltaCompressor:
                 "base_bytes": base_size,
                 "new_bytes": new_size,
                 "delta_bytes": delta_size,
+                "base_size_mb": base_size / (1024 * 1024),
+                "new_size_mb": new_size / (1024 * 1024),
+                "delta_size_mb": delta_size / (1024 * 1024),
                 "ratio": ratio,
                 "changed_tensors": len(changed_tensors),
                 "unchanged_tensors": unchanged_count,
@@ -655,6 +801,9 @@ class DeltaCompressor:
                 "base_bytes": base_path.stat().st_size,
                 "new_bytes": result.original_size,
                 "delta_bytes": result.compressed_size,
+                "base_size_mb": base_path.stat().st_size / (1024 * 1024),
+                "new_size_mb": result.original_size / (1024 * 1024),
+                "delta_size_mb": result.compressed_size / (1024 * 1024),
                 "ratio": result.compression_ratio,
                 "changed_tensors": -1,
                 "unchanged_tensors": -1,

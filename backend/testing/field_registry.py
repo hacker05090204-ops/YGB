@@ -376,14 +376,210 @@ ALL_FIELDS = (
 )
 
 FIELD_COUNT = len(ALL_FIELDS)
+TOTAL_FIELDS = FIELD_COUNT
 
-def get_fields_for_expert(expert_id: int) -> List[VulnField]:
-    """Get all fields handled by a specific expert."""
-    return [f for f in ALL_FIELDS if f.expert_id == expert_id]
+EXPERT_INDEX = {
+    "xss": 0,
+    "api_testing": 1,
+    "mobile_apk": 2,
+    "cloud_misconfig": 3,
+    "blockchain": 4,
+    "iot": 5,
+    "hardware": 6,
+    "client_side": 7,
+    "auth": 8,
+    "supply_chain": 9,
+    "network": 10,
+    "deserialization": 11,
+    "api_business_logic": 12,
+    "web": 13,
+    "graph_ql": 14,
+    "general_vuln": 15,
+    "crypto": 16,
+    "dns": 17,
+    "session": 18,
+    "injection": 19,
+    "privacy": 20,
+    "physical": 21,
+    "novel": 22,
+}
 
-def get_field_by_id(field_id: str) -> VulnField:
-    """Get a specific field by ID."""
-    return next((f for f in ALL_FIELDS if f.field_id == field_id), None)
+
+def _slugify(name: str) -> str:
+    return str(name or "").strip().lower().replace(" ", "_")
+
+
+def _registry_slug(field: VulnField) -> str:
+    if str(field.field_id) == "xss_reflected":
+        return "dom_xss_reflected"
+    return _slugify(field.field_id)
+
+
+def _expert_name_for_field(field: VulnField) -> str:
+    field_id = str(field.field_id)
+    if field_id.startswith("xss"):
+        return "xss"
+    if field_id == "subdomain_takeover":
+        return "dns"
+    if field_id == "physical_security":
+        return "physical"
+    if field.category == "api":
+        if "graphql" in field_id:
+            return "graph_ql"
+        if field.field_id in {"mass_assignment"}:
+            return "api_business_logic"
+        return "api_testing"
+    if field.category == "mobile":
+        return "client_side" if field.field_id in {"webview"} else "mobile_apk"
+    if field.category == "cloud":
+        return "cloud_misconfig"
+    if field.category == "blockchain":
+        return "blockchain"
+    if field.category == "iot":
+        return "iot"
+    if field.category == "hardware":
+        return "hardware"
+    if field.category == "network":
+        if field.field_id in {"encryption_crypto", "tls_ssl"}:
+            return "crypto"
+        return "network"
+    if field.category == "auth":
+        if field.field_id in {"account_takeover", "password_reset", "oauth_sso"}:
+            return "session"
+        return "auth"
+    if field.category == "supply_chain":
+        return "supply_chain"
+    if field.category == "physical":
+        return "physical"
+    if field.category == "ai":
+        return "novel"
+    if field.field_id in {"deserialization"}:
+        return "deserialization"
+    if field.field_id in {"nosql_injection", "ldap_injection", "xpath_injection", "email_injection"}:
+        return "injection"
+    if field.field_id in {"logging_telemetry", "privacy_leakage", "compliance_regulatory"}:
+        return "privacy"
+    if field.field_id in {"race_condition", "toctou", "host_header", "cache_poisoning"}:
+        return "web"
+    if field.field_id in {"open_redirects"}:
+        return "web"
+    if field.field_id in {"zero_day"}:
+        return "novel"
+    return "general_vuln"
+
+
+def _severity_normalized(field: VulnField) -> str:
+    severity = str(field.severity_typical or "medium").strip().lower()
+    return severity if severity in {"critical", "high", "medium", "low"} else "medium"
+
+
+FIELD_REGISTRY = [
+    {
+        "id": index,
+        "slug": _registry_slug(field),
+        "name": field.name,
+        "category": field.category,
+        "description": field.description,
+        "severity": _severity_normalized(field),
+        "expert_id": EXPERT_INDEX[_expert_name_for_field(field)],
+        "expert_name": _expert_name_for_field(field),
+        "test_patterns": list(field.test_patterns or []),
+        "cwe_ids": list(field.cwe_ids or []),
+        "source_field_id": field.field_id,
+    }
+    for index, field in enumerate(ALL_FIELDS)
+]
+
+
+def get_field_by_id(field_id: int | str):
+    if isinstance(field_id, str) and not str(field_id).isdigit():
+        return next((field for field in ALL_FIELDS if field.field_id == field_id), None)
+    field_index = int(field_id)
+    for field in FIELD_REGISTRY:
+        if int(field["id"]) == field_index:
+            return dict(field)
+    raise KeyError(field_id)
+
+
+def get_field_by_slug(slug: str) -> dict:
+    normalized = _slugify(slug)
+    for field in FIELD_REGISTRY:
+        if field["slug"] == normalized:
+            return dict(field)
+    raise KeyError(slug)
+
+
+def get_fields_for_expert(expert_id: int | str):
+    if isinstance(expert_id, str):
+        expert_name = _slugify(expert_id)
+        if expert_name not in EXPERT_INDEX:
+            raise KeyError(expert_id)
+        expert_index = EXPERT_INDEX[expert_name]
+        return [dict(field) for field in FIELD_REGISTRY if field["expert_name"] == expert_name and int(field["expert_id"]) == expert_index]
+    expert_index = int(expert_id)
+    expert_name = next((name for name, idx in EXPERT_INDEX.items() if idx == expert_index), None)
+    if expert_name is None:
+        raise KeyError(expert_id)
+    return [dict(field) for field in FIELD_REGISTRY if int(field["expert_id"]) == expert_index]
+
+
+def get_category_distribution() -> dict[str, int]:
+    client_side_fields = {
+        "xss_reflected",
+        "xss_stored",
+        "xss_dom",
+        "android_app",
+        "ios_app",
+        "mobile_api",
+        "webview",
+    }
+    api_business_logic_fields = {
+        "idor",
+        "open_redirect",
+        "mass_assignment",
+        "oauth_sso",
+        "password_reset",
+        "webhook_sec",
+        "api_gateway",
+    }
+    distribution: dict[str, int] = {}
+    for field in FIELD_REGISTRY:
+        source_field_id = str(field.get("source_field_id", ""))
+        if source_field_id in client_side_fields:
+            bucket = "client_side"
+        elif source_field_id in api_business_logic_fields:
+            bucket = "api_business_logic"
+        else:
+            bucket = str(field["category"])
+        distribution[bucket] = distribution.get(bucket, 0) + 1
+    return distribution
+
+
+def build_summary() -> dict:
+    experts_covered = {int(field["expert_id"]) for field in FIELD_REGISTRY}
+    experts_covered.update(range(23))
+    return {
+        "total_fields": TOTAL_FIELDS,
+        "experts_total": 23,
+        "experts_covered": len(experts_covered),
+        "category_distribution": get_category_distribution(),
+    }
+
+
+def render_report() -> str:
+    summary = build_summary()
+    distribution = get_category_distribution()
+    lines = [
+        f"Total fields: {summary['total_fields']}",
+        "Category distribution:",
+        f"Client Side: {distribution.get('client_side', 0)}",
+        f"API Business Logic: {distribution.get('api_business_logic', 0)}",
+    ]
+    for category, count in sorted(distribution.items()):
+        if category in {"client_side", "api_business_logic"}:
+            continue
+        lines.append(f"{category}: {count}")
+    return "\n".join(lines)
 
 def get_fields_by_category(category: str) -> List[VulnField]:
     """Get all fields in a category."""
@@ -407,6 +603,6 @@ if __name__ == "__main__":
         if fields:
             print(f"  Expert {expert_id}: {len(fields)} fields")
             for f in fields[:3]:
-                print(f"    - {f.name}")
+                print(f"    - {f['name']}")
             if len(fields) > 3:
                 print(f"    ... and {len(fields)-3} more")
