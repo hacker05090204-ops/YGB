@@ -1,0 +1,17 @@
+======================================================================
+STEP 4: SCRAPER REALITY TEST
+======================================================================
+  LIVE  NVD 2.0: 1548ms (1 items in response)
+  LIVE  CISA KEV: 1342ms (1569 items in response)
+  400   OSV API: bad request — check URL format
+  LIVE  GitHub Adv: 844ms (0 items in response)
+  404  ExploitDB: unexpected status
+  LIVE  MSRC: 2029ms (186 items in response)
+  404  Red Hat: unexpected status
+  410  Snyk npm: unexpected status
+  404  VulnRichment: unexpected status
+
+SOURCES REACHABLE: 4/9
+REAL CVEs IN RESPONSES: 1756
+DATA PIPELINE VIABILITY: 44%
+WARNING: Less than 6/9 sources reachable — autograbber will have limited data

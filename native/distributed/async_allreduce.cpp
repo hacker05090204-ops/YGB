@@ -17,9 +17,35 @@
 #include <cstdlib>
 #include <cstring>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
+#if defined(__has_include)
+#if __has_include(<cuda_runtime.h>)
+#include <cuda_runtime.h>
+#define YGB_HAS_CUDA_RUNTIME 1
+#else
+#define YGB_HAS_CUDA_RUNTIME 0
+#endif
+#if __has_include(<nccl.h>)
+#include <nccl.h>
+#define YGB_HAS_NCCL 1
+#else
+#define YGB_HAS_NCCL 0
+#endif
+#else
+#define YGB_HAS_CUDA_RUNTIME 0
+#define YGB_HAS_NCCL 0
+#endif
+
+#if !YGB_HAS_CUDA_RUNTIME
+using cudaStream_t = void *;
+#endif
+
+#if !YGB_HAS_NCCL
+using ncclComm_t = void *;
+#endif
 
 // ============================================================================
 // CONFIGURATION
@@ -60,9 +86,20 @@ struct BucketManager {
   bool initialized;
   int straggler_timeout_ms;
   int degraded_nodes; // Count of nodes that timed out
+  ncclComm_t nccl_comm;
+  cudaStream_t cuda_stream;
+  bool nccl_bound;
+  char last_error[256];
 };
 
 static BucketManager g_manager = {};
+
+static void set_last_error(const char *message) {
+  std::snprintf(g_manager.last_error, sizeof(g_manager.last_error), "%s",
+                message != nullptr ? message : "unknown async_allreduce error");
+}
+
+static void clear_last_error() { g_manager.last_error[0] = '\0'; }
 
 // ============================================================================
 // C API
@@ -101,6 +138,10 @@ int async_allreduce_init(int world_size, int rank, int bucket_mb,
   g_manager.buckets_reduced.store(0);
   g_manager.degraded_nodes = 0;
   g_manager.initialized = true;
+  g_manager.nccl_comm = nullptr;
+  g_manager.cuda_stream = nullptr;
+  g_manager.nccl_bound = false;
+  clear_last_error();
 
   memset(g_manager.buckets, 0, sizeof(g_manager.buckets));
 
@@ -111,6 +152,47 @@ int async_allreduce_init(int world_size, int rank, int bucket_mb,
 
   return 0;
 }
+
+/**
+ * Bind NCCL communicator and CUDA stream handles supplied by the caller.
+ *
+ * @param comm    Opaque ncclComm_t pointer provided by the runtime
+ * @param stream  Opaque cudaStream_t pointer provided by the runtime
+ * @return 0 on success, negative on failure
+ */
+int async_allreduce_bind_nccl(void *comm, void *stream) {
+  std::lock_guard<std::mutex> lock(g_manager.mtx);
+
+  if (!g_manager.initialized) {
+    set_last_error(
+        "async_allreduce_bind_nccl called before async_allreduce_init");
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -1;
+  }
+
+#if YGB_HAS_NCCL && YGB_HAS_CUDA_RUNTIME
+  if (comm == nullptr || stream == nullptr) {
+    set_last_error(
+        "NCCL communicator/stream binding failed: null handle supplied");
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -2;
+  }
+  g_manager.nccl_comm = reinterpret_cast<ncclComm_t>(comm);
+  g_manager.cuda_stream = reinterpret_cast<cudaStream_t>(stream);
+  g_manager.nccl_bound = true;
+  clear_last_error();
+  return 0;
+#else
+  (void)comm;
+  (void)stream;
+  set_last_error("NCCL/CUDA runtime support is unavailable. Rebuild with "
+                 "nccl.h and cuda_runtime.h; fake local scaling is forbidden.");
+  std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+  return -3;
+#endif
+}
+
+const char *async_allreduce_last_error() { return g_manager.last_error; }
 
 /**
  * Register a gradient bucket.
@@ -152,13 +234,18 @@ int async_allreduce_register_bucket(float *data, int64_t num_elements) {
 /**
  * Mark a bucket as ready (backward pass has filled it).
  *
- * In a real implementation, this triggers async NCCL all-reduce.
- * Here we simulate the overlapped communication.
+ * This triggers a real NCCL all-reduce when NCCL/CUDA handles are bound.
+ * If the runtime has not supplied NCCL handles, this function fails closed.
  *
  * @param bucket_id  Bucket to mark ready
  * @return 0 on success
  */
 int async_allreduce_mark_ready(int bucket_id) {
+  if (!g_manager.initialized) {
+    set_last_error("async_allreduce_mark_ready called before initialization");
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -1;
+  }
   if (bucket_id < 0 || bucket_id >= g_manager.num_buckets) {
     return -1;
   }
@@ -167,17 +254,48 @@ int async_allreduce_mark_ready(int bucket_id) {
   b.ready = true;
   g_manager.buckets_ready.fetch_add(1);
 
-  // Simulate overlapped all-reduce:
-  // In production, this would launch ncclAllReduce async
   auto t0 = std::chrono::steady_clock::now();
 
-  // Simulate: average gradients across world_size
-  if (b.data != nullptr && g_manager.world_size > 1) {
-    float scale = 1.0f / static_cast<float>(g_manager.world_size);
-    for (int64_t i = 0; i < b.num_elements; i++) {
-      b.data[i] *= scale;
-    }
+#if YGB_HAS_NCCL && YGB_HAS_CUDA_RUNTIME
+  if (!g_manager.nccl_bound || g_manager.nccl_comm == nullptr ||
+      g_manager.cuda_stream == nullptr) {
+    set_last_error("NCCL communicator/stream not bound. Refusing to perform "
+                   "fake local all-reduce.");
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -2;
   }
+  if (b.data == nullptr || b.num_elements <= 0) {
+    set_last_error(
+        "Bucket data is null or empty; cannot perform ncclAllReduce");
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -3;
+  }
+
+  ncclResult_t result = ncclAllReduce(
+      b.data, b.data, static_cast<size_t>(b.num_elements), ncclFloat, ncclSum,
+      g_manager.nccl_comm, g_manager.cuda_stream);
+  if (result != ncclSuccess) {
+    std::snprintf(g_manager.last_error, sizeof(g_manager.last_error),
+                  "ncclAllReduce failed: %s", ncclGetErrorString(result));
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -4;
+  }
+
+  cudaError_t sync_result = cudaStreamSynchronize(g_manager.cuda_stream);
+  if (sync_result != cudaSuccess) {
+    std::snprintf(g_manager.last_error, sizeof(g_manager.last_error),
+                  "cudaStreamSynchronize failed: %s",
+                  cudaGetErrorString(sync_result));
+    std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+    return -5;
+  }
+#else
+  set_last_error(
+      "NCCL not available. Rebuild with CUDA/NCCL support or disable "
+      "distributed async all-reduce; fake local scaling is forbidden.");
+  std::fprintf(stderr, "[ASYNC_AR] %s\n", g_manager.last_error);
+  return -6;
+#endif
 
   auto t1 = std::chrono::steady_clock::now();
   b.allreduce_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
@@ -192,6 +310,7 @@ int async_allreduce_mark_ready(int bucket_id) {
 
   b.reduced = true;
   g_manager.buckets_reduced.fetch_add(1);
+  clear_last_error();
 
   return 0;
 }
@@ -259,6 +378,7 @@ void async_allreduce_reset() {
   g_manager.buckets_ready.store(0);
   g_manager.buckets_reduced.store(0);
   g_manager.degraded_nodes = 0;
+  clear_last_error();
 }
 
 /**
@@ -268,6 +388,10 @@ void async_allreduce_cleanup() {
   std::lock_guard<std::mutex> lock(g_manager.mtx);
   g_manager.initialized = false;
   g_manager.num_buckets = 0;
+  g_manager.nccl_comm = nullptr;
+  g_manager.cuda_stream = nullptr;
+  g_manager.nccl_bound = false;
+  clear_last_error();
   fprintf(stdout, "[ASYNC_AR] Cleaned up\n");
 }
 

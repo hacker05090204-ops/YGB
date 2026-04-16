@@ -72,6 +72,10 @@ run_cpp_tests
 *.gcov
 *.safetensors.tmp
 *.descriptions.jsonl.tmp
+native/**/*.dll
+native/**/*.so
+native/**/*.dylib
+data/audit_pool_test.sqlite
 
 # Service account keys
 secure_data/

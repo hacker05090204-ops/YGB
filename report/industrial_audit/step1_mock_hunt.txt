@@ -1,0 +1,35 @@
+======================================================================
+STEP 1: MOCK DATA HUNT
+======================================================================
+
+--- CRITICAL: Fake/Mock Data in Production ---
+  [  1 files] "torch.randn("
+    impl_v1/phase49/moe/moe_architecture.py:953: features = torch.randn(32, 256, device=device)  # batch of 32, 256-dim features
+  [  1 files] "random.random()"
+    backend/reliability/circuit_breaker.py:339: delay *= 0.5 + random.random()
+  [  3 files] "random.uniform("
+    training/validation/drift_simulation.py:174: novel[:n_inject, 128:192] = np.random.uniform(0.2, 0.8, (n_inject, 64))
+    training/validation/hardened_trainer.py:301: novel[:n_inject, 128:192] = np.random.uniform(0.2, 0.8, (n_inject, 64))
+    training/validation/root_cause_analysis.py:183: novel[:n_inject] = np.random.uniform(0.3, 0.7, (n_inject, D))
+  [  3 files] "simulated_result"
+    impl_v1/phase38/browser_engine.py:148: simulated_result=False,
+    impl_v1/phase38/browser_engine.py:160: simulated_result=False,
+    impl_v1/phase38/browser_engine.py:182: simulated_result=executed,
+  [  1 files] "FAKE"
+    HUMANOID_HUNTER/evidence/evidence_engine.py:10: EVIDENCE MAY BE FAKE.
+  [  5 files] "SIMULATED"
+    api/server.py:1771: ("PLANNED", "SIMULATE"): "SIMULATED",
+    api/server.py:1772: ("SIMULATED", "REQUEST_APPROVAL"): "AWAIT_HUMAN",
+    api/server.py:1779: ("SIMULATED", "ABORT"): "STOPPED",
+
+--- WARNING: Incomplete/Bypass Patterns ---
+  [  5 hits] "raise NotImplementedError"
+    api/phase_runner.py:682: raise NotImplementedError(
+    api/phase_runner.py:695: raise NotImplementedError(
+
+--- C++ Critical Issues ---
+
+SUMMARY:
+  Critical mock/fake patterns: 14 production files affected
+  Warning patterns: 5 hits
+  ACTION: Every critical pattern must be removed before production

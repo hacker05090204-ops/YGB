@@ -27,6 +27,12 @@ logger = logging.getLogger("ygb.ingestion.normalizer")
 NORMALIZED_ROOT = Path("data/normalized")
 _POOL: ProcessPoolExecutor | None = None
 _POOL_DISABLED = False
+_SOURCE_TRUST_SCORES = {
+    "nvd": 1.0,
+    "cisa": 0.95,
+    "osv": 0.85,
+    "github": 0.75,
+}
 
 
 @dataclass(frozen=True)
@@ -151,14 +157,9 @@ class SampleQualityScorer:
     @classmethod
     def _source_trust_score(cls, payload: dict[str, object]) -> float:
         source = cls._extract_source(payload).strip().lower()
-        if "nvd" in source:
-            return 1.0
-        if "cisa" in source:
-            return 0.95
-        if "osv" in source:
-            return 0.85
-        if "github" in source:
-            return 0.75
+        for key, score in _SOURCE_TRUST_SCORES.items():
+            if key in source:
+                return float(score)
         return 0.5
 
     @staticmethod

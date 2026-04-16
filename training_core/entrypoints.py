@@ -75,8 +75,8 @@ def run_leader_ddp_main(config: Optional[Any] = None):
         return run_controller_pipeline()
 
     mapped = TrainingControllerConfig(
-        leader_node=getattr(config, "leader_node", "RTX2050"),
-        follower_node=getattr(config, "follower_node", "RTX3050"),
+        leader_node=getattr(config, "leader_node", "AUTO_DETECT"),
+        follower_node=getattr(config, "follower_node", "AUTO_DETECT"),
         rank=getattr(config, "rank", 0),
         world_size=getattr(config, "world_size", 2),
         backend=getattr(config, "backend", "nccl"),

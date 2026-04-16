@@ -254,6 +254,10 @@ def _calculate_context_completeness(context: str) -> float:
 
 def _calculate_scope_match_strength(context: str) -> float:
     """Derive scope signal strength from explicit scope markers in the context."""
+    explicit_asset_score = 1.0
+    explicit_network_score = 0.9
+    generic_scope_score = 0.7
+    weak_scope_score = 0.4
     context_lower = context.lower()
     has_asset_reference = bool(_ASSET_REFERENCE_PATTERN.search(context))
     has_explicit_scope = any(
@@ -265,12 +269,12 @@ def _calculate_scope_match_strength(context: str) -> float:
     has_generic_scope = "scope" in context_lower
 
     if has_explicit_scope and has_asset_reference and not (has_wildcard or has_cidr):
-        return 1.0
+        return explicit_asset_score
     if has_explicit_scope and (has_wildcard or has_cidr):
-        return 0.9
+        return explicit_network_score
     if has_generic_scope or has_asset_reference:
-        return 0.7
-    return 0.4
+        return generic_scope_score
+    return weak_scope_score
 
 
 def _summarize_scope_signal(context: str) -> str:

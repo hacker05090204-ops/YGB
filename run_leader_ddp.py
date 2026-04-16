@@ -33,8 +33,8 @@ MASTER_ADDR = os.getenv("YGB_DDP_ADDR", "127.0.0.1")
 
 @dataclass
 class LeaderDDPConfig:
-    leader_node: str = "RTX2050"
-    follower_node: str = "RTX3050"
+    leader_node: str = "AUTO_DETECT"
+    follower_node: str = "AUTO_DETECT"
     rank: int = 0
     world_size: int = 2
     backend: str = "nccl"

@@ -189,12 +189,31 @@ def _write_safetensors_checkpoint(
 
 def _build_configured_model(
     *,
-    config: TrainingControllerConfig,
-    total_samples: int,
-    effective_hidden_dim: int,
-    device,
-    nn_module,
+    config: Optional[TrainingControllerConfig] = None,
+    total_samples: Optional[int] = None,
+    effective_hidden_dim: Optional[int] = None,
+    device=None,
+    nn_module=None,
 ):
+    convenience_mode = all(
+        value is None
+        for value in (config, total_samples, effective_hidden_dim, device, nn_module)
+    )
+    if config is None:
+        config = TrainingControllerConfig()
+    if total_samples is None:
+        total_samples = max(int(getattr(config, "num_samples", 0) or 0), 10_000)
+    if effective_hidden_dim is None:
+        effective_hidden_dim = int(getattr(config, "hidden_dim", 256) or 256)
+    if device is None or nn_module is None:
+        import torch
+        import torch.nn as resolved_nn
+
+        if device is None:
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if nn_module is None:
+            nn_module = resolved_nn
+
     if _refresh_use_moe():
         from impl_v1.phase49.moe import EXPERT_FIELDS, MoEClassifier, MoEConfig
 
@@ -253,7 +272,7 @@ def _build_configured_model(
             f"{model_parameter_count:,}",
             enforced_dropout_experts,
         )
-        return model, moe_config.d_model
+        return model if convenience_mode else (model, moe_config.d_model)
 
     from impl_v1.phase49.governors.g37_pytorch_backend import (
         BugClassifier,
@@ -273,7 +292,7 @@ def _build_configured_model(
     model = BugClassifier(legacy_config).to(device)
     model.requires_unused_parameter_detection = False
     logger.warning("  YGB_USE_MOE=false — using legacy BugClassifier fallback")
-    return model, effective_hidden_dim
+    return model if convenience_mode else (model, effective_hidden_dim)
 
 
 def _resolve_selected_checkpoint_meta(
@@ -1500,9 +1519,10 @@ def phase5_post_training(
 def main(config: Optional[TrainingControllerConfig] = None):
     """Execute full 5-phase training controller."""
     config = config or TrainingControllerConfig()
+    runtime_device_name = os.getenv("YGB_DEVICE_NAME", "AUTO-DETECT")
 
     logger.info("╔══════════════════════════════════════════════════╗")
-    logger.info("║  TRAINING CONTROLLER — RTX2050 LEADER           ║")
+    logger.info(f"║  TRAINING CONTROLLER — {runtime_device_name[:24]:<24}║")
     logger.info("║  Real data only. Resumable checkpointing.       ║")
     logger.info("╚══════════════════════════════════════════════════╝")
 

@@ -13,17 +13,17 @@
   },
   "source_mix": {},
   "strict_real_mode": true,
-  "updated_at": "2026-04-15T17:36:17.175233+00:00",
-  "ingestion_manifest_hash": "24fe6c896353e8ad",
+  "updated_at": "2026-04-16T22:01:07.376714+00:00",
+  "ingestion_manifest_hash": "14a09fbda8ba3f0a",
   "worker_stats": {
     "total_ingested": 0,
-    "total_dropped": 18,
+    "total_dropped": 14,
     "total_deduped": 0
   },
   "sample_count": 129411,
-  "dataset_hash": "24fe6c896353e8ad",
+  "dataset_hash": "14a09fbda8ba3f0a",
   "signed_by": "f23d19936b0de6de8db931770553aa3daa4604c95e9a327588bb2988b3f5f213",
   "version": "1.0",
-  "created_at": "2026-04-15T17:36:17.175233+00:00",
-  "signature_hash": "821542fa2468619fbdbdb01e1424c0cd7f54595c96ba28613ea9fef8c7634a0c"
+  "created_at": "2026-04-16T22:01:07.376714+00:00",
+  "signature_hash": "514d48d9027f2306e78de168677ad8de4f61d98a14dc8f40d7d73c9787d8764c"
 }

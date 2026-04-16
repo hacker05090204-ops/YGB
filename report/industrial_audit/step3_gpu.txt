@@ -1,0 +1,33 @@
+======================================================================
+STEP 3: GPU UTILIZATION AUDIT
+======================================================================
+
+--- GPU Usage in Training Files ---
+  GPU REFS training_controller.py: ['.to(device)']
+  GPU REFS backend/training/incremental_trainer.py: ['cuda', 'device', 'GradScaler', 'autocast']
+  NO GPU   backend/training/auto_train_controller.py — may be CPU-only!
+  NO GPU   impl_v1/phase49/moe/__init__.py — may be CPU-only!
+
+--- CPU Fallback Patterns (should be minimal) ---
+  [  4] "device="cpu""
+    backend/training/adaptive_learner.py:438: tensors = load_safetensors(str(self.state_path), device="cpu")
+    training_controller.py:381: state_dict = st_load(source_model_path, device="cpu")
+  [ 26] ".cpu()"
+    backend/training/adaptive_learner.py:369: name: tensor.detach().cpu() / float(sample_count)
+    backend/training/adaptive_learner.py:373: name: parameter.detach().cpu().clone()
+
+--- Parallel Execution Check ---
+  ThreadPoolExecutor: FOUND (9 refs)
+  ProcessPoolExecutor: FOUND (6 refs)
+  asyncio.gather: FOUND (2 refs)
+  torch.multiprocessing: FOUND (1 refs)
+  DistributedDataParallel: FOUND (10 refs)
+  DDP: FOUND (199 refs)
+  NCCL: FOUND (70 refs)
+  ncclAllReduce: FOUND (3 refs)
+
+--- Live GPU Test ---
+  GPU matmul throughput: 1141 GFLOPS
+  GPU device: NVIDIA GeForce RTX 2050
+  GPU memory allocated: 0.02GB
+  GPU memory total: 4.3GB

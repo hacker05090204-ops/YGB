@@ -15,10 +15,11 @@ import os
 import uuid
 import json
 import aiosqlite
+from contextlib import asynccontextmanager
 from functools import lru_cache
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict, List, Any
+from typing import Optional, Dict, List, Any, AsyncIterator
 
 
 logger = logging.getLogger(__name__)
@@ -35,8 +36,9 @@ _raw_url = os.getenv("DATABASE_URL", "sqlite:///D:/ygb_data/ygb.db")
 # Strip sqlite:/// prefix if present
 DB_PATH = _raw_url.replace("sqlite:///", "").replace("sqlite://", "")
 
-# Connection pool (single connection with WAL mode for concurrency)
-_db: Optional[aiosqlite.Connection] = None
+# SQLite connection-pool controls.
+_POOL_SIZE = 10
+_pool_semaphore = asyncio.Semaphore(_POOL_SIZE)
 
 
 def _now_iso() -> str:
@@ -47,19 +49,23 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-async def _get_db() -> aiosqlite.Connection:
-    """Get or create the database connection."""
-    global _db
-    if _db is None:
-        # Ensure directory exists
-        db_dir = Path(DB_PATH).parent
-        db_dir.mkdir(parents=True, exist_ok=True)
+async def _configure_connection(conn: aiosqlite.Connection) -> None:
+    conn.row_factory = aiosqlite.Row
+    await conn.execute("PRAGMA journal_mode=WAL")
+    await conn.execute("PRAGMA foreign_keys=ON")
+    await conn.execute("PRAGMA busy_timeout=30000")
 
-        _db = await aiosqlite.connect(DB_PATH)
-        _db.row_factory = aiosqlite.Row
-        await _db.execute("PRAGMA journal_mode=WAL")
-        await _db.execute("PRAGMA foreign_keys=ON")
-    return _db
+
+@asynccontextmanager
+async def get_db() -> AsyncIterator[aiosqlite.Connection]:
+    """Yield a pooled SQLite connection for the duration of one operation."""
+    db_dir = Path(DB_PATH).parent
+    db_dir.mkdir(parents=True, exist_ok=True)
+
+    async with _pool_semaphore:
+        async with aiosqlite.connect(DB_PATH) as conn:
+            await _configure_connection(conn)
+            yield conn
 
 
 # =============================================================================
@@ -163,18 +169,15 @@ CREATE TABLE IF NOT EXISTS bounties (
 
 async def init_database():
     """Initialize database and create tables."""
-    db = await _get_db()
-    await db.executescript(SCHEMA_SQL)
-    await db.commit()
+    async with get_db() as db:
+        await db.executescript(SCHEMA_SQL)
+        await db.commit()
     print(f"[OK] SQLite database initialized at: {DB_PATH}")
 
 
 async def close_pool():
-    """Close the database connection."""
-    global _db
-    if _db is not None:
-        await _db.close()
-        _db = None
+    """Compatibility hook for older callers expecting a pool shutdown."""
+    _clear_read_caches()
 
 
 # =============================================================================
@@ -190,17 +193,23 @@ def _row_to_dict(row) -> Dict[str, Any]:
 
 async def _fetch_all(query: str, params: tuple = ()) -> List[Dict[str, Any]]:
     """Execute a query and return all rows as dicts."""
-    db = await _get_db()
-    cursor = await db.execute(query, params)
-    rows = await cursor.fetchall()
+    async with get_db() as db:
+        cursor = await db.execute(query, params)
+        try:
+            rows = await cursor.fetchall()
+        finally:
+            await cursor.close()
     return [_row_to_dict(r) for r in rows]
 
 
 async def _fetch_one(query: str, params: tuple = ()) -> Optional[Dict[str, Any]]:
     """Execute a query and return one row as dict."""
-    db = await _get_db()
-    cursor = await db.execute(query, params)
-    row = await cursor.fetchone()
+    async with get_db() as db:
+        cursor = await db.execute(query, params)
+        try:
+            row = await cursor.fetchone()
+        finally:
+            await cursor.close()
     return _row_to_dict(row) if row else None
 
 
@@ -223,9 +232,9 @@ def _clear_read_caches():
 
 async def _execute(query: str, params: tuple = ()):
     """Execute a write query."""
-    db = await _get_db()
-    await db.execute(query, params)
-    await db.commit()
+    async with get_db() as db:
+        await db.execute(query, params)
+        await db.commit()
     _clear_read_caches()
 
 

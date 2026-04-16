@@ -31,7 +31,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, NoReturn
 
 import numpy as np
 
@@ -42,6 +42,15 @@ _IS_PRODUCTION = (
     os.environ.get("YGB_ENV", "").lower() == "production"
     or os.environ.get("YGB_PRODUCTION", "0") == "1"
 )
+
+
+def _raise_missing_governance_dependency(exc: ImportError, dependency_name: str) -> NoReturn:
+    module_name = getattr(exc, "name", None) or dependency_name
+    raise RuntimeError(
+        f"Governance check requires {module_name}. "
+        f"Cannot proceed without required module '{dependency_name}'. "
+        "Install it or this check cannot be satisfied."
+    ) from exc
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -149,10 +158,8 @@ def pre_training_gate(
             if scan.violations_found > 0:
                 return False, f"{scan.violations_found} mock data violations"
             return True, f"0 violations in {scan.files_scanned} files"
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "mock_data_scanner REQUIRED but not importable in production"
-            return True, "scanner not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.mock_data_scanner")
     _check("Mock Data Scanner", _mock_scan)
 
     # ── Check 2: Dataset quality gate ──
@@ -163,10 +170,8 @@ def pre_training_gate(
             if report.passed:
                 return True, f"entropy={report.entropy:.2f}"
             return False, report.rejection_reason
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "dataset_quality_gate REQUIRED but not importable in production"
-            return True, "quality gate not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.dataset_quality_gate")
     _check("Dataset Quality Gate", _quality_gate)
 
     # ── Check 3: Label consistency validator ──
@@ -177,10 +182,8 @@ def pre_training_gate(
             if valid.passed:
                 return True, f"KL={valid.kl_divergence:.4f}"
             return False, valid.rejection_reason
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "label_consistency_validator REQUIRED but not importable in production"
-            return True, "label validator not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.data.label_consistency_validator")
     _check("Label Consistency", _label_check)
 
     # ── Check 4: Dataset balance controller ──
@@ -192,10 +195,8 @@ def pre_training_gate(
             if analysis.balanced:
                 return True, f"ratio={analysis.max_ratio:.2f}"
             return False, f"imbalanced: ratio={analysis.max_ratio:.2f}"
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "dataset_balance_controller REQUIRED but not importable in production"
-            return True, "balance controller not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.data.dataset_balance_controller")
     _check("Dataset Balance", _balance_check)
 
     # ── Check 5: Semantic quality gate (3-epoch sanity) ──
@@ -206,10 +207,8 @@ def pre_training_gate(
             if sanity.passed:
                 return True, f"loss {sanity.epoch_losses[0]:.3f}→{sanity.epoch_losses[-1]:.3f}"
             return False, sanity.rejection_reason
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "semantic_quality_gate REQUIRED but not importable in production"
-            return True, "sanity gate not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.data.semantic_quality_gate")
     _check("Semantic Quality (3-epoch)", _sanity_check)
 
     # ── Check 6: Ingestion policy ──
@@ -221,10 +220,8 @@ def pre_training_gate(
             if decision.allowed:
                 return True, "all 3 gates passed"
             return False, decision.rejection_reason
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "ingestion_policy REQUIRED but not importable in production"
-            return True, "ingestion policy not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.data.ingestion_policy")
     _check("Ingestion Policy", _ingestion_check)
 
     # ── Check 7: C++ signal strength validator ──
@@ -255,10 +252,8 @@ def pre_training_gate(
             if audit.passed:
                 return True, f"source={source_id} verified"
             return False, audit.rejection_reason
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "data_source_audit REQUIRED but not importable in production"
-            return True, "audit not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.data.data_source_audit")
     _check("Data Source Audit", _audit_check)
 
     # ── Check 9: Overfit guard (baseline) ──
@@ -269,10 +264,8 @@ def pre_training_gate(
             if not risk.high_risk:
                 return True, f"risk={risk.risk_score:.2f}"
             return False, f"overfitting risk: {risk.reason}"
-        except ImportError:
-            if _IS_PRODUCTION:
-                return False, "overfit_guard REQUIRED but not importable in production"
-            return True, "overfit guard not available (skip)"
+        except ImportError as exc:
+            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.overfit_guard")
     _check("Overfit Guard", _overfit_check)
 
     # ── Verdict ──
@@ -426,10 +419,8 @@ def verify_report(
         result = validate_report(report, replay_hashes, confidence)
         if not result.passed:
             return False, f"Report validation failed: {result.rejection_reason}"
-    except ImportError:
-        if _IS_PRODUCTION:
-            return False, "report_validation_gate REQUIRED but not importable in production"
-        pass  # Dev mode: skip if not available
+    except ImportError as exc:
+        _raise_missing_governance_dependency(exc, "impl_v1.training.data.report_validation_gate")
 
     # ── C++ deterministic exploit verification ──
     dee = _load_dll("deterministic_exploit_engine")
