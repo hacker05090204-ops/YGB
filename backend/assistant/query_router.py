@@ -27,6 +27,7 @@ from uuid import uuid4
 
 from backend.cve.anti_hallucination import (
     REFUSAL_TEXT,
+    GroundingValidator,
     get_anti_hallucination_validator,
 )
 
@@ -353,6 +354,10 @@ class ResearchSearchPipeline:
     )
 
     def __init__(self) -> None:
+        self._anti_hallucination_validator = get_anti_hallucination_validator()
+        self._grounding_validator: GroundingValidator = (
+            self._anti_hallucination_validator.get_grounding_validator()
+        )
         self._last_fetch_used_http_fallback = False
         self._last_fetch_reason = ""
 
@@ -404,7 +409,7 @@ class ResearchSearchPipeline:
         retrieved_at: str,
         evidence_store: Dict[str, Any],
     ) -> Dict[str, Any]:
-        validator = get_anti_hallucination_validator()
+        validator = self._anti_hallucination_validator
         normalized_query = str(query_text or "").strip()
         normalized_result = str(result or "").strip()
         normalized_source = str(source or "").strip()
@@ -451,7 +456,7 @@ class ResearchSearchPipeline:
                 "confidence": confidence,
             },
         )
-        grounding_check = validator.validate_response_grounding(
+        grounding_check = self._grounding_validator.validate(
             normalized_result,
             evidence_store,
         )

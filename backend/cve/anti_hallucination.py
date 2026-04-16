@@ -425,6 +425,10 @@ class AntiHallucinationValidator:
     ) -> GroundingCheckResult:
         return self._grounding_validator.validate(response_text, evidence_store)
 
+    def get_grounding_validator(self) -> GroundingValidator:
+        """Expose the shared grounding validator used by the anti-hallucination pipeline."""
+        return self._grounding_validator
+
     def get_hallucination_stats(self) -> Dict[str, Any]:
         return self._grounding_validator.get_stats()
 
