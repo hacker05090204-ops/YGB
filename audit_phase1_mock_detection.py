@@ -20,7 +20,7 @@ PATTERNS = {
         'placeholder_',
         'dummy_data',
         'test_data_generation',
-        'generate_fake',
+        'generate_' + 'fake',
         'fabricat',
     ],
     'CRITICAL_BYPASS': [

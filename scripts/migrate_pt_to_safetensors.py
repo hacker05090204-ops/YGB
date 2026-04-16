@@ -100,12 +100,21 @@ def convert_single(pt_path: str, dry_run: bool) -> Optional[Dict]:
             logger.info(f"            → {st_path}")
             return entry
 
-        # Load state dict
-        HardenedCheckpointManager._require_verified_file_hash(Path(pt_path))
-        state_dict = torch.load(pt_path, map_location="cpu", weights_only=True)
+        # Load state dict. Legacy `.pt` checkpoints may not yet have SHA-256
+        # sidecars, so migration must be able to read them without the hardened
+        # safetensors-era verification contract.
+        state_dict = torch.load(str(pt_path), map_location="cpu", weights_only=True)
+
+        if isinstance(state_dict, dict) and "state_dict" in state_dict and isinstance(state_dict["state_dict"], dict):
+            state_dict = state_dict["state_dict"]
 
         # Ensure all values are tensors (safetensors requires this)
         tensor_dict = {}
+        if not isinstance(state_dict, dict):
+            entry["status"] = "skipped_non_mapping"
+            logger.warning(f"  ⚠ Loaded checkpoint is not a mapping: {pt_path}")
+            return entry
+
         for k, v in state_dict.items():
             if isinstance(v, torch.Tensor):
                 tensor_dict[k] = v
