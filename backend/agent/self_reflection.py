@@ -31,6 +31,18 @@ class VulnMethod:
         return asdict(self)
 
 @dataclass
+class FailureObservation:
+    """Records a single failure observation for analysis."""
+    method_id: str
+    field: str
+    error_pattern: str
+    timestamp: str
+    metadata: Dict[str, any] = field(default_factory=dict)
+    
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+@dataclass
 class ReflectionEvent:
     event_id: str
     trigger: str          # "failure_threshold" | "idle" | "manual"
@@ -356,3 +368,12 @@ if __name__ == "__main__":
     # Print stats
     stats = engine.get_stats()
     print(f"\nStats: {json.dumps(stats, indent=2)}")
+
+
+__all__ = [
+    "SelfReflectionEngine",
+    "MethodLibrary",
+    "FailureObservation",
+    "VulnMethod",
+    "ReflectionEvent",
+]

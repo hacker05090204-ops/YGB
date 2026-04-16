@@ -1,7 +1,7 @@
 from backend.agent.self_reflection import (
     FailureObservation,
     MethodLibrary,
-    MethodRecord,
+    VulnMethod,
     ReflectionEvent,
     SelfReflectionEngine,
 )
@@ -9,7 +9,7 @@ from backend.agent.self_reflection import (
 __all__ = [
     "FailureObservation",
     "MethodLibrary",
-    "MethodRecord",
+    "VulnMethod",
     "ReflectionEvent",
     "SelfReflectionEngine",
 ]
