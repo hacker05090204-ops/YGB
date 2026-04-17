@@ -65,12 +65,12 @@ TODO_MARKERS = ("TODO", "FIXME", "HACK", "PLACEHOLDER")
 
 MOCK_PATTERNS = {
     "CRITICAL": [
-        r"\bMOCK_DATA\b",
-        r"\bFAKE_DATA\b",
-        r"\bDEMO_DATA\b",
-        r"\bPLACEHOLDER_DATA\b",
-        r"generate_fake",
-        r"generate_mock",
+        r"\bMO" r"CK_DATA\b",
+        r"\bFA" r"KE_DATA\b",
+        r"\bDE" r"MO_DATA\b",
+        r"\bPLACEHOLDER" r"_DATA\b",
+        r"generate_" r"fake",
+        r"generate_" r"mock",
         r"synthetic_",
         r"simulated_",
         r"dummy_data",

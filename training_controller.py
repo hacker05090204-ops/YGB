@@ -26,6 +26,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+import torch
+from config.storage_config import FEATURES_DIR
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
@@ -42,7 +44,7 @@ YGB_USE_MOE = os.getenv(
 ).lower() == "true"
 USE_MOE = YGB_USE_MOE
 N_EXPERTS = 23
-REAL_SAFETENSORS_FEATURE_STORE_ROOT = Path("training") / "features_safetensors"
+REAL_SAFETENSORS_FEATURE_STORE_ROOT = FEATURES_DIR
 MOE_GLOBAL_REGISTRY_PATH = os.path.join("checkpoints", "moe_global_registry.json")
 EXPERT_CHECKPOINT_REGISTRY_PATH = os.path.join(
     "checkpoints", "expert_checkpoint_registry.json"
@@ -194,19 +196,27 @@ def _build_configured_model(
     effective_hidden_dim: Optional[int] = None,
     device=None,
     nn_module=None,
+    expert_id: Optional[int] = None,
 ):
     convenience_mode = all(
         value is None
         for value in (config, total_samples, effective_hidden_dim, device, nn_module)
     )
     if config is None:
-        config = TrainingControllerConfig()
+        if convenience_mode:
+            config = TrainingControllerConfig(
+                input_dim=267,
+                hidden_dim=512,
+                num_classes=5,
+                num_samples=10_000,
+            )
+        else:
+            config = TrainingControllerConfig()
     if total_samples is None:
         total_samples = max(int(getattr(config, "num_samples", 0) or 0), 10_000)
     if effective_hidden_dim is None:
         effective_hidden_dim = int(getattr(config, "hidden_dim", 256) or 256)
     if device is None or nn_module is None:
-        import torch
         import torch.nn as resolved_nn
 
         if device is None:
@@ -216,6 +226,7 @@ def _build_configured_model(
 
     if _refresh_use_moe():
         from impl_v1.phase49.moe import EXPERT_FIELDS, MoEClassifier, MoEConfig
+        resolved_expert_id = getattr(config, "active_expert_id", expert_id)
 
         if len(EXPERT_FIELDS) != N_EXPERTS:
             raise RuntimeError(
@@ -249,7 +260,15 @@ def _build_configured_model(
             moe_config,
             input_dim=config.input_dim,
             output_dim=config.num_classes,
-        ).to(device)
+        )
+        target_dtype = getattr(model, "_preferred_dtype", getattr(model, "_dtype", torch.float32))
+        if getattr(device, "type", str(device)) != "cuda":
+            target_dtype = torch.float32
+        model = model.to(device=device, dtype=target_dtype)
+        if resolved_expert_id is not None:
+            model.set_active_expert(int(resolved_expert_id))
+        if getattr(model, "_use_grad_checkpoint", False):
+            model.gradient_checkpointing_enable()
         enforced_dropout_experts = _ensure_moe_hidden_dropout(model, nn_module, 0.3)
         if enforced_dropout_experts != N_EXPERTS:
             raise RuntimeError(
@@ -264,13 +283,16 @@ def _build_configured_model(
         model.requires_unused_parameter_detection = True
         model.total_parameter_count = int(model_parameter_count)
         logger.info(
-            "  MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s",
+            "  MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s | device=%s | dtype=%s | active_expert=%s",
             moe_config.n_experts,
             moe_config.top_k,
             moe_config.d_model,
             expert_hidden_dim,
             f"{model_parameter_count:,}",
             enforced_dropout_experts,
+            getattr(model, "_device", device),
+            getattr(model, "_dtype", torch.float32),
+            resolved_expert_id,
         )
         return model if convenience_mode else (model, moe_config.d_model)
 
@@ -1184,7 +1206,7 @@ def phase3_training_execution(
     return result
 
 
-def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
+def train_single_expert(expert_id: int, field_name: str, max_epochs: int = 20) -> TrainingResult:
     from impl_v1.phase49.moe import EXPERT_FIELDS
 
     normalized_field_name = str(field_name or "").strip()
@@ -1203,7 +1225,15 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
     logger.info("\n╔══════════════════════════════════════════════════╗")
     logger.info("║  EXPERT TRAINING                                ║")
     logger.info("╚══════════════════════════════════════════════════╝")
-    logger.info("  expert_id=%s | field_name=%s", int(expert_id), normalized_field_name)
+    expert_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(
+        "  expert_id=%s | field_name=%s | device=%s | feature_store=%s | max_epochs=%s",
+        int(expert_id),
+        normalized_field_name,
+        expert_device,
+        REAL_SAFETENSORS_FEATURE_STORE_ROOT.as_posix(),
+        int(max_epochs),
+    )
 
     try:
         expert_features, expert_labels, matched_shards = _load_real_safetensors_expert_subset(
@@ -1237,6 +1267,7 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
         rank=0,
         input_dim=int(expert_features.shape[1]),
         num_classes=max(2, int(class_values.max()) + 1 if class_values.size else 2),
+        num_epochs=max(1, int(max_epochs)),
         checkpoint_dir=os.path.join(
             "secure_data",
             "checkpoints",
@@ -1258,6 +1289,8 @@ def train_single_expert(expert_id: int, field_name: str) -> TrainingResult:
             f"expert_{int(expert_id):02d}_{normalized_field_name}",
         ),
     )
+    setattr(config, "active_expert_id", int(expert_id))
+    setattr(config, "use_amp", expert_device.type == "cuda")
 
     expert_dataset_hash = _compute_dataset_hash(expert_features, expert_labels)
     expert_result = phase3_training_execution(

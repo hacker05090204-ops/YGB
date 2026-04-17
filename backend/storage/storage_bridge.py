@@ -20,6 +20,8 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
 
+from config.storage_config import HDD_ROOT, OVERFLOW_DIR
+
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -172,9 +174,9 @@ def _sanitize_path(base_path: Path, user_path: str) -> Path:
 
 def _safe_storage_topology(active_root: Optional[str] = None) -> Dict[str, Any]:
     topology = {
-        "primary_root": os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
-        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
-        "active_root": active_root or _storage_active_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "primary_root": os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)),
+        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", str(OVERFLOW_DIR)),
+        "active_root": active_root or _storage_active_root or os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)),
         "primary_available": None,
         "fallback_available": None,
         "fallback_active": False,
@@ -395,11 +397,11 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     global _storage_active_root, _storage_mode
 
     topology = {
-        "primary_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
+        "primary_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)))),
         "fallback_root": str(
-            Path(os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"))
+            Path(os.getenv("YGB_HDD_FALLBACK_ROOT", str(OVERFLOW_DIR)))
         ),
-        "active_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
+        "active_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)))),
         "primary_available": True,
         "fallback_available": False,
         "fallback_active": False,
@@ -414,7 +416,7 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
         except Exception as exc:
             logger.warning("Storage topology resolution failed: %s", exc)
     if resolved_root is None:
-        resolved_root = os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd")
+        resolved_root = os.getenv("YGB_HDD_ROOT", str(HDD_ROOT))
 
     raw_engine = get_engine(resolved_root)
     _engine = _wrap_engine(raw_engine)
@@ -1508,9 +1510,9 @@ def get_storage_health() -> Dict[str, Any]:
     checked_at = datetime.now(timezone.utc).isoformat()
     reasons = []
     topology = {
-        "primary_root": os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
-        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
-        "active_root": _storage_active_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "primary_root": os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)),
+        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", str(OVERFLOW_DIR)),
+        "active_root": _storage_active_root or os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)),
         "primary_available": None,
         "fallback_available": None,
         "fallback_active": False,

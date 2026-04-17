@@ -22,6 +22,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
+
 logger = logging.getLogger("ygb.sync.peer")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -52,7 +54,7 @@ def _get_env(name: str, default: str = "") -> str:
     return _load_local_env().get(name, default)
 
 
-SYNC_ROOT = Path(_get_env("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(_get_env("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 PEER_STATE = SYNC_META / "peer_state"

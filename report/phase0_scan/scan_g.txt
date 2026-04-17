@@ -1,0 +1,42 @@
+======================================================================
+SCAN G: SSD MIGRATION STATUS
+======================================================================
+HDD path references found: 55
+  .tmp_hdd_drive/final_benchmark_ab.py: 15:# Setup paths - use project root (parent of .tmp_hdd_drive)
+  .tmp_hdd_drive/final_benchmark_ab.py: 15:# Setup paths - use project root (parent of .tmp_hdd_drive)
+  .tmp_hdd_drive/FINAL_GATE_CHECK.py: 126:Path('.tmp_hdd_drive/PHASE_1_COMPLETE.md'),
+  .tmp_hdd_drive/FINAL_GATE_CHECK.py: 127:Path('.tmp_hdd_drive/IMPLEMENTATION_STATUS.md'),
+  .tmp_hdd_drive/FINAL_GATE_CHECK.py: 126:Path('.tmp_hdd_drive/PHASE_1_COMPLETE.md'),
+  .tmp_hdd_drive/FINAL_GATE_CHECK.py: 127:Path('.tmp_hdd_drive/IMPLEMENTATION_STATUS.md'),
+  .tmp_hdd_drive/phase0b_inventory_scan.py: 16:OUT_DIR = ROOT / '.tmp_hdd_drive'
+  .tmp_hdd_drive/phase0b_inventory_scan.py: 16:OUT_DIR = ROOT / '.tmp_hdd_drive'
+  .tmp_hdd_drive/phase7b_runtime_probe.py: 265:out_path = Path(".tmp_hdd_drive") / "phase7b_runtime_results.json"
+  .tmp_hdd_drive/phase7b_runtime_probe.py: 265:out_path = Path(".tmp_hdd_drive") / "phase7b_runtime_results.json"
+  .tmp_hdd_drive/phase9b_integration_probe.py: 86:runtime_root = workspace / ".tmp_hdd_drive" / "phase9b_integration_runtime"
+  .tmp_hdd_drive/phase9b_integration_probe.py: 86:runtime_root = workspace / ".tmp_hdd_drive" / "phase9b_integration_runtime"
+  .tmp_hdd_drive/run_complete_self_analysis.py: 182:output_path = Path('.tmp_hdd_drive/ybg_analysis.json')
+  .tmp_hdd_drive/run_complete_self_analysis.py: 182:output_path = Path('.tmp_hdd_drive/ybg_analysis.json')
+  .tmp_hdd_drive/run_self_analysis.py: 81:Path('.tmp_hdd_drive').mkdir(exist_ok=True)
+  .tmp_hdd_drive/run_self_analysis.py: 82:with open('.tmp_hdd_drive/ybg_analysis.json','w') as f:
+  .tmp_hdd_drive/run_self_analysis.py: 84:print('Analysis written to .tmp_hdd_drive/ybg_analysis.json')
+  .tmp_hdd_drive/run_self_analysis.py: 81:Path('.tmp_hdd_drive').mkdir(exist_ok=True)
+  .tmp_hdd_drive/run_self_analysis.py: 82:with open('.tmp_hdd_drive/ybg_analysis.json','w') as f:
+  .tmp_hdd_drive/run_self_analysis.py: 84:print('Analysis written to .tmp_hdd_drive/ybg_analysis.json')
+
+SSD path references: 200
+  .tmp_hdd_drive/final_benchmark_ab.py:266:store = SafetensorsFeatureStore(root="training/features_safetensors")
+  api/database.py:2:YGB Database — SQLite on SSD
+  api/database.py:10:Defaults to the SSD-first path from `config.storage_config`.
+  api/server.py:263:# Import tiered storage manager (SSD cap + HDD overflow)
+  api/server.py:267:enforce_ssd_cap,
+  api/server.py:558:# Start tiered-storage SSD cap enforcement inside lifespan (not at import)
+  api/server.py:563:"[BOOT] Tiered storage SSD cap enforcement started (5 min interval)"
+  api/server.py:3762:"""Get SSD/HDD storage tiering status."""
+  api/server.py:3773:"""Manually trigger SSD cap enforcement (compress + migrate)."""
+  api/server.py:3777:result = await asyncio.to_thread(enforce_ssd_cap)
+
+data/: 82529 files, 39.8MB
+
+training/features_safetensors/: 470 files, 0.8MB
+
+checkpoints/: 18 files, 415.2MB

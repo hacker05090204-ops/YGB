@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -18,7 +19,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from backend.cve.bridge_ingestion_worker import get_bridge_worker
 from backend.ingestion._integrity import log_module_sha256
-from backend.ingestion.dedup import DedupIndex
+from backend.ingestion.dedup import DedupIndex as DedupStore
 from backend.ingestion.models import IngestedSample, detect_language, make_sample, normalize_severity
 from backend.ingestion.normalizer import (
     QualityRejectionLog,
@@ -46,6 +47,7 @@ from backend.training.data_purity import (
 )
 from backend.training.rl_feedback import get_rl_collector
 from backend.training.safetensors_store import FEATURE_DIM, SafetensorsFeatureStore
+from config.storage_config import DEDUP_DIR, FEATURES_DIR
 
 logger = logging.getLogger("ygb.ingestion.autograbber")
 DEFAULT_SOURCE_NAMES = [
@@ -170,6 +172,11 @@ class GrabberCycleResult:
     purity_rejected: int
     validator_rejections: dict[str, int]
     errors: list[str]
+    total_tokens: int = 0
+
+    @property
+    def total_accepted(self) -> int:
+        return int(self.samples_accepted)
 
 
 class AutoGrabber:
@@ -186,12 +193,12 @@ class AutoGrabber:
         self._scraper_types = self._resolve_scraper_types(config.sources)
         self._dedup_path = os.environ.get(
             "YGB_CVE_DEDUP_STORE_PATH",
-            "data/dedup_store.json",
+            str(DEDUP_DIR / "dedup_store.json"),
         )
         self._feature_store_root = Path(
             os.environ.get(
                 "YGB_AUTOGRABBER_FEATURE_STORE_PATH",
-                "training/features_safetensors",
+                str(FEATURES_DIR),
             )
         )
         self._feature_store = SafetensorsFeatureStore(self._feature_store_root)
@@ -493,6 +500,42 @@ class AutoGrabber:
             if callable(close_method):
                 close_method()
 
+    @staticmethod
+    def _scraper_source_name(scraper_type: type[BaseScraper]) -> str:
+        return str(getattr(scraper_type, "SOURCE", scraper_type.__name__)).strip().lower()
+
+    async def _fetch_source_async(
+        self,
+        scraper_type: type[BaseScraper],
+        per_source_limit: int,
+    ) -> tuple[str, object]:
+        try:
+            return await asyncio.to_thread(
+                self._fetch_scraper_results,
+                scraper_type,
+                per_source_limit,
+            )
+        except Exception as exc:  # pragma: no cover - defensive outer guard
+            return self._scraper_source_name(scraper_type), exc
+
+    async def _fetch_all_sources_async(self, per_source_limit: int) -> list[tuple[str, object]]:
+        tasks = [
+            self._fetch_source_async(scraper_type, per_source_limit)
+            for scraper_type in self._scraper_types
+        ]
+        if not tasks:
+            return []
+        return list(await asyncio.gather(*tasks))
+
+    def _fetch_all_scraper_results(self, per_source_limit: int) -> list[tuple[str, object]]:
+        if not self._scraper_types:
+            return []
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(self._fetch_all_sources_async(per_source_limit))
+        finally:
+            loop.close()
+
     def _store_result(self, result: GrabberCycleResult) -> None:
         with self._results_lock:
             self._last_cycle_result = result
@@ -741,11 +784,12 @@ class AutoGrabber:
         features_stored = 0
         bridge_published = 0
         purity_rejected = 0
+        total_tokens = 0
         validator_rejections = self._new_validator_rejections()
         accepted_samples: list[IngestedSample] = []
         previous_severities_persisted = False
 
-        dedup_store = DedupIndex(self._dedup_path)
+        dedup_store = DedupStore(self._dedup_path)
         quality_scorer = SampleQualityScorer(
             dedup_store=dedup_store,
             rejection_log=QualityRejectionLog(),
@@ -754,10 +798,7 @@ class AutoGrabber:
 
         try:
             per_source_limit = self.config.max_per_cycle // len(self._scraper_types)
-            fetched_results = [
-                self._fetch_scraper_results(scraper_type, per_source_limit)
-                for scraper_type in self._scraper_types
-            ]
+            fetched_results = self._fetch_all_scraper_results(per_source_limit)
             for source, fetch_result in fetched_results:
                 sources_attempted += 1
                 if isinstance(fetch_result, Exception):
@@ -999,6 +1040,7 @@ class AutoGrabber:
                         accepted_samples.append(ingested_sample)
                         samples_accepted += 1
                         features_stored += int(feature_purity_result.accepted_count)
+                        total_tokens += int(getattr(ingested_sample, "token_count", 0) or 0)
                         if self.config.dedup_enabled:
                             try:
                                 quality_scorer.record_seen(payload)
@@ -1071,6 +1113,7 @@ class AutoGrabber:
                 purity_rejected=purity_rejected,
                 validator_rejections=dict(validator_rejections),
                 errors=list(errors),
+                total_tokens=total_tokens,
             )
             self._store_result(result)
             return result
@@ -1145,10 +1188,9 @@ _grabber: AutoGrabber | None = None
 
 def get_autograbber() -> AutoGrabber:
     """Return the configured autograbber singleton."""
+    global _grabber
     if _grabber is None:
-        raise RealBackendNotConfiguredError(
-            "AutoGrabber is not initialized. Call initialize_autograbber() with a real configuration first."
-        )
+        _grabber = initialize_autograbber(AutoGrabberConfig())
     return _grabber
 
 
@@ -1157,7 +1199,12 @@ def initialize_autograbber(config: AutoGrabberConfig) -> AutoGrabber:
     global _grabber
     if _grabber is not None:
         _grabber.stop()
-    _grabber = AutoGrabber(config)
+    try:
+        from backend.ingestion.industrial_autograbber import IndustrialAutoGrabber
+
+        _grabber = IndustrialAutoGrabber(config)
+    except Exception:
+        _grabber = AutoGrabber(config)
     return _grabber
 
 

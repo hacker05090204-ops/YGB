@@ -1,0 +1,2106 @@
+{
+  "entries": [
+    {
+      "cve_id": "CVE-2026-34197",
+      "first_seen": "2026-04-17T06:56:01.132801+00:00",
+      "source": "cisa",
+      "text_hash": "00126f6a71af4c69665b294b6f8ea6c434a04416fe68346e63e04fb9d0ad0e4a"
+    },
+    {
+      "cve_id": "CVE-2009-0238",
+      "first_seen": "2026-04-17T06:56:01.146710+00:00",
+      "source": "cisa",
+      "text_hash": "ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27"
+    },
+    {
+      "cve_id": "CVE-2026-32201",
+      "first_seen": "2026-04-17T06:56:01.159664+00:00",
+      "source": "cisa",
+      "text_hash": "9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122"
+    },
+    {
+      "cve_id": "CVE-2012-1854",
+      "first_seen": "2026-04-17T06:56:01.173787+00:00",
+      "source": "cisa",
+      "text_hash": "f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7"
+    },
+    {
+      "cve_id": "CVE-2025-60710",
+      "first_seen": "2026-04-17T06:56:01.189533+00:00",
+      "source": "cisa",
+      "text_hash": "19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4"
+    },
+    {
+      "cve_id": "CVE-2023-21529",
+      "first_seen": "2026-04-17T06:56:01.203185+00:00",
+      "source": "cisa",
+      "text_hash": "6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685"
+    },
+    {
+      "cve_id": "CVE-2023-36424",
+      "first_seen": "2026-04-17T06:56:01.214860+00:00",
+      "source": "cisa",
+      "text_hash": "b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb"
+    },
+    {
+      "cve_id": "CVE-2020-9715",
+      "first_seen": "2026-04-17T06:56:01.228824+00:00",
+      "source": "cisa",
+      "text_hash": "636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45"
+    },
+    {
+      "cve_id": "CVE-2026-21643",
+      "first_seen": "2026-04-17T06:56:01.244694+00:00",
+      "source": "cisa",
+      "text_hash": "a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315"
+    },
+    {
+      "cve_id": "CVE-2026-34621",
+      "first_seen": "2026-04-17T06:56:01.258864+00:00",
+      "source": "cisa",
+      "text_hash": "082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827"
+    },
+    {
+      "cve_id": "CVE-2026-1340",
+      "first_seen": "2026-04-17T06:56:01.273861+00:00",
+      "source": "cisa",
+      "text_hash": "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40"
+    },
+    {
+      "cve_id": "CVE-2026-35616",
+      "first_seen": "2026-04-17T06:56:01.289583+00:00",
+      "source": "cisa",
+      "text_hash": "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5"
+    },
+    {
+      "cve_id": "CVE-2026-3502",
+      "first_seen": "2026-04-17T06:56:01.301846+00:00",
+      "source": "cisa",
+      "text_hash": "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123"
+    },
+    {
+      "cve_id": "CVE-2026-5281",
+      "first_seen": "2026-04-17T06:56:01.314934+00:00",
+      "source": "cisa",
+      "text_hash": "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96"
+    },
+    {
+      "cve_id": "CVE-2026-3055",
+      "first_seen": "2026-04-17T06:56:01.326394+00:00",
+      "source": "cisa",
+      "text_hash": "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d"
+    },
+    {
+      "cve_id": "CVE-2025-53521",
+      "first_seen": "2026-04-17T06:56:01.339873+00:00",
+      "source": "cisa",
+      "text_hash": "25e20c271331f74dd194502d3b7311a72d81c8c2171a6514048d7c5a18951483"
+    },
+    {
+      "cve_id": "CVE-2026-33634",
+      "first_seen": "2026-04-17T06:56:01.354230+00:00",
+      "source": "cisa",
+      "text_hash": "ad082cd12bd1d612d35c57a751e1a0784f3d0bcffdfcd8ce4f9decb94a761ba6"
+    },
+    {
+      "cve_id": "CVE-2026-33017",
+      "first_seen": "2026-04-17T06:56:01.367386+00:00",
+      "source": "cisa",
+      "text_hash": "561550735edb5ec972ac97f1696f57bdf390fe9481036f4ba6b226910c3d0852"
+    },
+    {
+      "cve_id": "CVE-2025-32432",
+      "first_seen": "2026-04-17T06:56:01.381909+00:00",
+      "source": "cisa",
+      "text_hash": "5de703363fa237660f19e41e70fd89d4217af0b51a439618e2b44e713bd668cf"
+    },
+    {
+      "cve_id": "CVE-2025-54068",
+      "first_seen": "2026-04-17T06:56:01.396570+00:00",
+      "source": "cisa",
+      "text_hash": "b160ab612e5438ef77ff449543fded69a1faf1616a1b64a8451243999793981f"
+    },
+    {
+      "cve_id": "CVE-2025-43510",
+      "first_seen": "2026-04-17T06:56:01.409524+00:00",
+      "source": "cisa",
+      "text_hash": "61a56087f9e2e09119cdda59727bbf5fcb1d15286aedb90beb3e161f343ecc13"
+    },
+    {
+      "cve_id": "CVE-2025-43520",
+      "first_seen": "2026-04-17T06:56:01.422004+00:00",
+      "source": "cisa",
+      "text_hash": "6889cb147f86f69b75cc99aeba9b04b8f8bf529320fe3fb8a0283d7817714427"
+    },
+    {
+      "cve_id": "CVE-2025-31277",
+      "first_seen": "2026-04-17T06:56:01.434371+00:00",
+      "source": "cisa",
+      "text_hash": "5e91c94cd6e8f5b003468ea6c55a6ef944f4ac83cd9a8f72e48d226eeb9cd84c"
+    },
+    {
+      "cve_id": "CVE-2026-20131",
+      "first_seen": "2026-04-17T06:56:01.448310+00:00",
+      "source": "cisa",
+      "text_hash": "1c5ecd266d4d26b9ed53341cb7be08a637d508ea7fe5162844b04c5b1a4816cd"
+    },
+    {
+      "cve_id": "CVE-2025-66376",
+      "first_seen": "2026-04-17T06:56:01.461460+00:00",
+      "source": "cisa",
+      "text_hash": "8f37d1b582e1c3645f171f9b30f337c4eba8b1609d46c79fca55743fff56d4c3"
+    },
+    {
+      "cve_id": "CVE-2026-20963",
+      "first_seen": "2026-04-17T06:56:01.476788+00:00",
+      "source": "cisa",
+      "text_hash": "d71e3485ae9886de64b34d9cd6e5ba63c88bdab7249cf24e9619c03a56980246"
+    },
+    {
+      "cve_id": "CVE-2025-47813",
+      "first_seen": "2026-04-17T06:56:01.490498+00:00",
+      "source": "cisa",
+      "text_hash": "56aa724951d0c50df6177c51939be06f2bfa8d943fcb03bd1616cb2ef8763f18"
+    },
+    {
+      "cve_id": "CVE-2026-3910",
+      "first_seen": "2026-04-17T06:56:01.503529+00:00",
+      "source": "cisa",
+      "text_hash": "8a1f08843582edddcb0ddfd4a4b36b151891383adae9b52fc70debaee5b82ea3"
+    },
+    {
+      "cve_id": "CVE-2026-3909",
+      "first_seen": "2026-04-17T06:56:01.517165+00:00",
+      "source": "cisa",
+      "text_hash": "754d3609f5fbe0f93df94bb51a5e10402214841a0539db35c1b072007193b7c5"
+    },
+    {
+      "cve_id": "CVE-2025-68613",
+      "first_seen": "2026-04-17T06:56:01.533024+00:00",
+      "source": "cisa",
+      "text_hash": "7f4f8371b6ce62dfb24516289bb4315cfa07a4cf9d47f8185d91583c978c9535"
+    },
+    {
+      "cve_id": "CVE-2021-22054",
+      "first_seen": "2026-04-17T06:56:01.548102+00:00",
+      "source": "cisa",
+      "text_hash": "0abb2c34e6af51e6eb678673ff18245f2b5dea723c42ddb3165db08e99fe5c44"
+    },
+    {
+      "cve_id": "CVE-2025-26399",
+      "first_seen": "2026-04-17T06:56:01.564480+00:00",
+      "source": "cisa",
+      "text_hash": "d7801df897c58bfa3b4bb72ac82a9b5f49b6c9d878f4159010d8dc7eb52ccf33"
+    },
+    {
+      "cve_id": "CVE-2026-1603",
+      "first_seen": "2026-04-17T06:56:01.578776+00:00",
+      "source": "cisa",
+      "text_hash": "0472aecc0dc62939ff7f2bb996799535a7c5930938e01a7ebddd9fb0385ccf0e"
+    },
+    {
+      "cve_id": "CVE-2017-7921",
+      "first_seen": "2026-04-17T06:56:01.592345+00:00",
+      "source": "cisa",
+      "text_hash": "5fa3360b9c30a0a8ffdbdec5ab00316bc40d8b4121b5bdb75bc421a0f79112f5"
+    },
+    {
+      "cve_id": "CVE-2021-22681",
+      "first_seen": "2026-04-17T06:56:01.607961+00:00",
+      "source": "cisa",
+      "text_hash": "244fe72d10eded4159d924bfa79ce15310c3a61827f241c904bf0796c2b0ca04"
+    },
+    {
+      "cve_id": "CVE-2023-43000",
+      "first_seen": "2026-04-17T06:56:01.622021+00:00",
+      "source": "cisa",
+      "text_hash": "ecaa1d98b0f109193137a6a0c2a30cd1f0b0ad735460d31ded89f32038bfb447"
+    },
+    {
+      "cve_id": "CVE-2021-30952",
+      "first_seen": "2026-04-17T06:56:01.636053+00:00",
+      "source": "cisa",
+      "text_hash": "11c9c5315c3aff16dacd8a3de3ecf6c12b20f260d53945b7b5efb7115914e270"
+    },
+    {
+      "cve_id": "CVE-2023-41974",
+      "first_seen": "2026-04-17T06:56:01.649413+00:00",
+      "source": "cisa",
+      "text_hash": "e0b59c8e32eb1bed63bf01c4acd6df3ca3d60a29dc330f980052b146823f90df"
+    },
+    {
+      "cve_id": "CVE-2026-22719",
+      "first_seen": "2026-04-17T06:56:01.663290+00:00",
+      "source": "cisa",
+      "text_hash": "45d7a245e0292376b25c4319ece8997317e7cf06acea3f608a8eb62f25ffc891"
+    },
+    {
+      "cve_id": "CVE-2026-21385",
+      "first_seen": "2026-04-17T06:56:01.677570+00:00",
+      "source": "cisa",
+      "text_hash": "f16fa70eda6b795f1205dea4de8bf61525abe8717d982bc7da32940106096987"
+    },
+    {
+      "cve_id": "CVE-2022-20775",
+      "first_seen": "2026-04-17T06:56:01.691134+00:00",
+      "source": "cisa",
+      "text_hash": "30c789e0dcf82592deb1ce5785740f535f2e10fca044d318c91fb87ba1ec96c8"
+    },
+    {
+      "cve_id": "CVE-2026-20127",
+      "first_seen": "2026-04-17T06:56:01.707717+00:00",
+      "source": "cisa",
+      "text_hash": "2cca79da8bd5bace40797fb1151365eb4b193cb1d0b01f0e2f7b52200f5d1f52"
+    },
+    {
+      "cve_id": "CVE-2026-25108",
+      "first_seen": "2026-04-17T06:56:01.720998+00:00",
+      "source": "cisa",
+      "text_hash": "12649f6c5d3795cfbcbe76306622a7530488c8e74a4a840c07fcdd247783e140"
+    },
+    {
+      "cve_id": "CVE-2025-49113",
+      "first_seen": "2026-04-17T06:56:01.739740+00:00",
+      "source": "cisa",
+      "text_hash": "4e289dc0d0dfdec6e189717e56d5c64001b21bf299556b3a575698ffac3f1ee6"
+    },
+    {
+      "cve_id": "CVE-2025-68461",
+      "first_seen": "2026-04-17T06:56:01.756820+00:00",
+      "source": "cisa",
+      "text_hash": "c5a05d9c2a7375e9f8d1f552750a5cca10907425d22ab474732f6f832329f37d"
+    },
+    {
+      "cve_id": "CVE-2021-22175",
+      "first_seen": "2026-04-17T06:56:01.770975+00:00",
+      "source": "cisa",
+      "text_hash": "dec4a997f916743f7ab3eb091176fb30dee64cafdeff221496a8f815cffdce13"
+    },
+    {
+      "cve_id": "CVE-2026-22769",
+      "first_seen": "2026-04-17T06:56:01.784029+00:00",
+      "source": "cisa",
+      "text_hash": "e94e3f3880b2f2f73430e6e5b3405d5cb73bb47ac69a5d258d63928d78eaf4b7"
+    },
+    {
+      "cve_id": "CVE-2020-7796",
+      "first_seen": "2026-04-17T06:56:01.801531+00:00",
+      "source": "cisa",
+      "text_hash": "c4d432973a53a391ed5b3bdef5ebc252acc67ac59882429d665060bd3949fb24"
+    },
+    {
+      "cve_id": "CVE-2024-7694",
+      "first_seen": "2026-04-17T06:56:01.815644+00:00",
+      "source": "cisa",
+      "text_hash": "a4df485b55cd4a587f4c672580fc7c3ac9f0893277693455f5542c4a23d2688e"
+    },
+    {
+      "cve_id": "CVE-2008-0015",
+      "first_seen": "2026-04-17T06:56:01.829819+00:00",
+      "source": "cisa",
+      "text_hash": "67e0fea2b22529d22825015a284eef334b8a6099beaea5f53d3bf7e5aad976a9"
+    },
+    {
+      "cve_id": "CVE-2026-2441",
+      "first_seen": "2026-04-17T06:56:01.844771+00:00",
+      "source": "cisa",
+      "text_hash": "bc0be7c05798b904c3e2369672b00ec4e6b6a726e7cd792b6da017f3feacbe58"
+    },
+    {
+      "cve_id": "CVE-2026-1731",
+      "first_seen": "2026-04-17T06:56:01.858342+00:00",
+      "source": "cisa",
+      "text_hash": "466fa830606d403e03731a0fe3a7c1edcb06adbb3879a6670bf3098017a3e34a"
+    },
+    {
+      "cve_id": "CVE-2026-20700",
+      "first_seen": "2026-04-17T06:56:01.870891+00:00",
+      "source": "cisa",
+      "text_hash": "b0432f9c73b197b08272381383755996567098aaf38a426f1788b7994144a047"
+    },
+    {
+      "cve_id": "CVE-2024-43468",
+      "first_seen": "2026-04-17T06:56:01.885692+00:00",
+      "source": "cisa",
+      "text_hash": "3643fe2f16b1aae7dcde712a75229707809d3ed724b680d4d3768a437ecb64a8"
+    },
+    {
+      "cve_id": "CVE-2025-15556",
+      "first_seen": "2026-04-17T06:56:01.899104+00:00",
+      "source": "cisa",
+      "text_hash": "a935ed3a86daa978a5300a15933420e10482496d254a230ce28bc05822f186ab"
+    },
+    {
+      "cve_id": "CVE-2018-18074",
+      "first_seen": "2026-04-17T06:56:01.931077+00:00",
+      "source": "osv",
+      "text_hash": "d20a4414e427efb528a68a0072d2130a67f0712352395cb452bfeefcca9c3662"
+    },
+    {
+      "cve_id": "CVE-2018-16487",
+      "first_seen": "2026-04-17T06:56:01.965349+00:00",
+      "source": "osv",
+      "text_hash": "fd04450b51d3d6c48b66b224a09064e9a1715388c29cc34f1b9824681c2c25f4"
+    },
+    {
+      "cve_id": "CVE-2019-10744",
+      "first_seen": "2026-04-17T06:56:01.984302+00:00",
+      "source": "osv",
+      "text_hash": "c62b4e1615f236b6e39e32f3650c62c7df363d7d8305631f73f713451c51a263"
+    },
+    {
+      "cve_id": "CVE-2020-8203",
+      "first_seen": "2026-04-17T06:56:01.999558+00:00",
+      "source": "osv",
+      "text_hash": "4e2512c9858370db1db5c280c9f9fcf1dae0302b039d2ba18c2ac8626484cf51"
+    },
+    {
+      "cve_id": "CVE-2026-4800",
+      "first_seen": "2026-04-17T06:56:02.018284+00:00",
+      "source": "osv",
+      "text_hash": "c215edbdd311279807e51cd64b91b2a1471923c407ee8b997e4d54d94833385f"
+    },
+    {
+      "cve_id": "CVE-2020-36567",
+      "first_seen": "2026-04-17T06:56:02.044032+00:00",
+      "source": "osv",
+      "text_hash": "c23cba409dd6dd297a39c324ecd2b7f94406c2fa13fe17d86797737912d47cce"
+    },
+    {
+      "cve_id": "CVE-2019-25211",
+      "first_seen": "2026-04-17T06:56:02.060080+00:00",
+      "source": "osv",
+      "text_hash": "98e0bde868536671dcae4678d081f1b34f70f3f69c8ba6f4a32504a26a99e0ef"
+    },
+    {
+      "cve_id": "CVE-2020-28483",
+      "first_seen": "2026-04-17T06:56:02.075423+00:00",
+      "source": "osv",
+      "text_hash": "00bfc413abcb78775d9483e0b5c40ccdd49c761365e4cf09b1a6330b2d9b8ac3"
+    },
+    {
+      "cve_id": "CVE-2021-45046",
+      "first_seen": "2026-04-17T06:56:02.120989+00:00",
+      "source": "osv",
+      "text_hash": "625eac4c747297faeeeea6c8fb6ce7af3657b717f39e48d7556f61e428ba9305"
+    },
+    {
+      "cve_id": "CVE-2017-5645",
+      "first_seen": "2026-04-17T06:56:02.145297+00:00",
+      "source": "osv",
+      "text_hash": "2f92927f9759cd6b5048df908efcf21359b05d92374398549ee8abcc2abaa68a"
+    },
+    {
+      "cve_id": "CVE-2021-44228",
+      "first_seen": "2026-04-17T06:56:02.173240+00:00",
+      "source": "osv",
+      "text_hash": "51821cea93b9ed3e50b798a1f9c002966e44b44f7e4de982588898ed3f8310c7"
+    },
+    {
+      "cve_id": "CVE-2021-45105",
+      "first_seen": "2026-04-17T06:56:02.191565+00:00",
+      "source": "osv",
+      "text_hash": "c05280da808741c327b7270280d02c38ff2eb664f3f96509295b13aab724e748"
+    },
+    {
+      "cve_id": "CVE-2023-26464",
+      "first_seen": "2026-04-17T06:56:02.212581+00:00",
+      "source": "osv",
+      "text_hash": "f3156158d1bc1899c9f8fef6e7c1ace70b25cf325f18b53f6e8018ebbbb3d1f9"
+    },
+    {
+      "cve_id": "CVE-2020-9488",
+      "first_seen": "2026-04-17T06:56:02.229076+00:00",
+      "source": "osv",
+      "text_hash": "c9038a38158f873cba3ad6c4145234fdadc96ad718ebfd73d02b7e5dac685936"
+    },
+    {
+      "cve_id": "CVE-2026-40897",
+      "first_seen": "2026-04-17T06:56:02.386010+00:00",
+      "source": "github",
+      "text_hash": "806cb80b66281f678baaa97cb5ceafc1901d02e66022c42ad93e171d5485fb0a"
+    },
+    {
+      "cve_id": "CVE-2026-6410",
+      "first_seen": "2026-04-17T06:56:02.412585+00:00",
+      "source": "github",
+      "text_hash": "909e0f3d92e6a81dc41c87f8b67d12b6b9ff9f744d88233ac1728898aad7f0aa"
+    },
+    {
+      "cve_id": "CVE-2026-6414",
+      "first_seen": "2026-04-17T06:56:02.426639+00:00",
+      "source": "github",
+      "text_hash": "37ed5fb56be22d02d736b811241c294c6c9960d8f9ad05c0375987b5d1b10787"
+    },
+    {
+      "cve_id": "CVE-2026-6270",
+      "first_seen": "2026-04-17T06:56:02.441879+00:00",
+      "source": "github",
+      "text_hash": "0503609116ebaf036378c8572ba1e98cbbf11c057514fec55edea774e95af184"
+    },
+    {
+      "cve_id": "CVE-2026-33804",
+      "first_seen": "2026-04-17T06:56:02.455446+00:00",
+      "source": "github",
+      "text_hash": "6bcc506aabeb02505c1be646e2a3c2e9f8da17532e62897c335f3291e49d303f"
+    },
+    {
+      "cve_id": "CVE-2026-40308",
+      "first_seen": "2026-04-17T06:56:02.608162+00:00",
+      "source": "github",
+      "text_hash": "8eed73daafb86bedc35e125b4e2f57e8a72678791a21d81fd107bbfb19a8373c"
+    },
+    {
+      "cve_id": "CVE-2026-40611",
+      "first_seen": "2026-04-17T06:56:02.640807+00:00",
+      "source": "github",
+      "text_hash": "d322328a430877338347385f259ec2f5464281e8a060247df49cc679709d5c1f"
+    },
+    {
+      "cve_id": "CVE-2026-40602",
+      "first_seen": "2026-04-17T06:56:02.657700+00:00",
+      "source": "github",
+      "text_hash": "cb5c39534214007b9b7701f62b05adeb8fdd03442f1d550c89333ebb81cfac9a"
+    },
+    {
+      "cve_id": "CVE-2014-1830",
+      "first_seen": "2026-04-17T13:52:06.766855+00:00",
+      "source": "osv",
+      "text_hash": "fb8909d714eba19a8207e624010531a86d3edd112a04d78c9e143a238ec54754"
+    },
+    {
+      "cve_id": "CVE-2024-47081",
+      "first_seen": "2026-04-17T13:52:06.781067+00:00",
+      "source": "osv",
+      "text_hash": "a295dad5a57aed3ed4c2d386dca93ca3760ea1b7cf5d349f8bb5299f8333d9aa"
+    },
+    {
+      "cve_id": "CVE-2025-14018",
+      "first_seen": "2026-04-17T13:52:06.816627+00:00",
+      "source": "exploitdb",
+      "text_hash": "1cefdf4a5d5c4b2f5d9421f2c656866d2551b3e66a52c4e95982437bd51e3160"
+    },
+    {
+      "cve_id": "CVE-2025-55182",
+      "first_seen": "2026-04-17T13:52:06.832128+00:00",
+      "source": "exploitdb",
+      "text_hash": "bcc6a2e8b443d685c61b246c28c30e26655946653e8133112bba7c0e7970ce37"
+    },
+    {
+      "cve_id": "CVE-2026-6494",
+      "first_seen": "2026-04-17T13:52:06.864441+00:00",
+      "source": "redhat",
+      "text_hash": "463a1e396d79327658bbe80c71091796610def7dd844c441c077de7f2a932538"
+    },
+    {
+      "cve_id": "CVE-2026-40253",
+      "first_seen": "2026-04-17T13:52:06.877107+00:00",
+      "source": "redhat",
+      "text_hash": "ffb9ad881965ad5f3ec9f26e3783d88aa6f98edb451e2349baa24133ba16718b"
+    },
+    {
+      "cve_id": "CVE-1999-1471",
+      "first_seen": "2026-04-17T14:44:03.902152+00:00",
+      "source": "nvd",
+      "text_hash": "a4ce8e2cd074dc0e961b60f302e2c7b350435cb42e043cfcc30e8b827386482b"
+    },
+    {
+      "cve_id": "CVE-1999-1467",
+      "first_seen": "2026-04-17T14:44:03.916443+00:00",
+      "source": "nvd",
+      "text_hash": "d571058e8195bb3411d927c6c8a52e720b26a24c4f50accc63913c29bb96c154"
+    },
+    {
+      "cve_id": "CVE-1999-1506",
+      "first_seen": "2026-04-17T14:44:03.926830+00:00",
+      "source": "nvd",
+      "text_hash": "bc2e3645076867ff4000d9a73c37a04ec2eb5bcbf1ddf5d693a670f9a77fd5a8"
+    },
+    {
+      "cve_id": "CVE-1999-0084",
+      "first_seen": "2026-04-17T14:44:03.936332+00:00",
+      "source": "nvd",
+      "text_hash": "aab625bd29c61d4bb7798f3690da3a61a416e370a28a5d555fbd27f8fff459cb"
+    },
+    {
+      "cve_id": "CVE-2000-0388",
+      "first_seen": "2026-04-17T14:44:03.949375+00:00",
+      "source": "nvd",
+      "text_hash": "9be8bdf5c5727b70202d5b9c34ad6d67fa63ce0f2d605fe5791962ceb5207274"
+    },
+    {
+      "cve_id": "CVE-1999-1198",
+      "first_seen": "2026-04-17T14:44:03.964599+00:00",
+      "source": "nvd",
+      "text_hash": "910538935223150090c861e121dafb01f47a03d6de9f48466bf747d0427f53c2"
+    },
+    {
+      "cve_id": "CVE-1999-1391",
+      "first_seen": "2026-04-17T14:44:03.976120+00:00",
+      "source": "nvd",
+      "text_hash": "fd20dc13f5c890587134773fbbe98571d78201d9fe2a937007e210a483d5313e"
+    },
+    {
+      "cve_id": "CVE-1999-1392",
+      "first_seen": "2026-04-17T14:44:03.987701+00:00",
+      "source": "nvd",
+      "text_hash": "0250ee93e94b52f41148b535dcc775df5f893a692802ea642d5c65a5325b4529"
+    },
+    {
+      "cve_id": "CVE-1999-1554",
+      "first_seen": "2026-04-17T14:44:03.999805+00:00",
+      "source": "nvd",
+      "text_hash": "80184df26f6e73337b1a7757a37403172964371968a40aa54918376ef6f1c272"
+    },
+    {
+      "cve_id": "CVE-1999-1197",
+      "first_seen": "2026-04-17T14:44:04.008858+00:00",
+      "source": "nvd",
+      "text_hash": "b21359c70e53d4e66935fd504935f06d0b7f3cbdad91a87e2945310d67f4df00"
+    },
+    {
+      "cve_id": "CVE-1999-1115",
+      "first_seen": "2026-04-17T14:44:04.023392+00:00",
+      "source": "nvd",
+      "text_hash": "f74c514983b777d153c83b918e94b1c94b35b9256436cf7be084c090a9807af2"
+    },
+    {
+      "cve_id": "CVE-1999-1258",
+      "first_seen": "2026-04-17T14:44:04.033307+00:00",
+      "source": "nvd",
+      "text_hash": "288d6a08ecd7f1d9d85af0da9363c1ac04ef05bf89b914511d4358d65af97758"
+    },
+    {
+      "cve_id": "CVE-1999-1438",
+      "first_seen": "2026-04-17T14:44:04.045045+00:00",
+      "source": "nvd",
+      "text_hash": "d4341c69ca65a9b857ddc41c81dfd588daa9b9f88a642a3bc575524ef7841f2a"
+    },
+    {
+      "cve_id": "CVE-1999-1194",
+      "first_seen": "2026-04-17T14:44:04.059524+00:00",
+      "source": "nvd",
+      "text_hash": "97ceadea50d81703f18895464b448918f179b8c885d6aac85995f787d4ddc19e"
+    },
+    {
+      "cve_id": "CVE-1999-1193",
+      "first_seen": "2026-04-17T14:44:04.069268+00:00",
+      "source": "nvd",
+      "text_hash": "861892da46a342c20fae4a784c4015ce7c53ef1e686e7f5b61877e4a69263bd8"
+    },
+    {
+      "cve_id": "CVE-1999-1123",
+      "first_seen": "2026-04-17T14:44:04.082586+00:00",
+      "source": "nvd",
+      "text_hash": "78734c932e3b4fed14779168d69f3ff4996ad37c633d661d4ad9e0a274198f92"
+    },
+    {
+      "cve_id": "CVE-1999-1090",
+      "first_seen": "2026-04-17T14:44:04.099069+00:00",
+      "source": "nvd",
+      "text_hash": "548f5bbe733af6569dc8cb112c8d85cab7a5f8ef546c94d6f3f6cec5d6136c23"
+    },
+    {
+      "cve_id": "CVE-1999-0498",
+      "first_seen": "2026-04-17T14:44:04.109927+00:00",
+      "source": "nvd",
+      "text_hash": "3cba52a341f0fa79e6d0bb7d67e7d950cc66da1f57a484ba4113f26687cb0840"
+    },
+    {
+      "cve_id": "CVE-1999-1468",
+      "first_seen": "2026-04-17T14:44:04.120785+00:00",
+      "source": "nvd",
+      "text_hash": "d68c8db3b94cf523be0737f18602b5d9b99cf91df6bf6794c91a58adc6f6c690"
+    },
+    {
+      "cve_id": "CVE-1999-0167",
+      "first_seen": "2026-04-17T14:44:04.131940+00:00",
+      "source": "nvd",
+      "text_hash": "6a381f2bbe5fb82e289efdf5ee27c738291d226ade3975ce435be394a796e34c"
+    },
+    {
+      "cve_id": "CVE-1999-1493",
+      "first_seen": "2026-04-17T14:44:04.142592+00:00",
+      "source": "nvd",
+      "text_hash": "471ee6c80a7abaf0c6a8367cd7c36c33fc4f7672bbfd689a103a741068c3eef3"
+    },
+    {
+      "cve_id": "CVE-1999-1032",
+      "first_seen": "2026-04-17T14:44:04.156039+00:00",
+      "source": "nvd",
+      "text_hash": "e268ac732685d179a61c17e511deb50fea7562498b3df397dbb15358340670fb"
+    },
+    {
+      "cve_id": "CVE-1999-1059",
+      "first_seen": "2026-04-17T14:44:04.167031+00:00",
+      "source": "nvd",
+      "text_hash": "8da85f69282f71f7e3b1f7afef4ed82dbec4cf56f38382f737fbf34703ed320d"
+    },
+    {
+      "cve_id": "CVE-1999-0627",
+      "first_seen": "2026-04-17T14:44:04.178427+00:00",
+      "source": "nvd",
+      "text_hash": "2133015d534158ff1dbc3c8536d9fc569115d035ed00096604a8f01e5c0d4ab5"
+    },
+    {
+      "cve_id": "CVE-1999-1119",
+      "first_seen": "2026-04-17T14:44:04.193733+00:00",
+      "source": "nvd",
+      "text_hash": "174a62b333bb15e8e003218af9b6e5f9376f397507f729e9ba200af20c92280b"
+    },
+    {
+      "cve_id": "CVE-1999-1142",
+      "first_seen": "2026-04-17T14:44:04.205343+00:00",
+      "source": "nvd",
+      "text_hash": "4301f0ced00ea8e772f49f7bf4fc8df5e9cdeb8a821a8340eaa3e37cc9230325"
+    },
+    {
+      "cve_id": "CVE-1999-0168",
+      "first_seen": "2026-04-17T14:44:04.217243+00:00",
+      "source": "nvd",
+      "text_hash": "7cd134f8658f12b7367ed08a66f9a761a915ef1d754491279f19d4bdd8eb1b81"
+    },
+    {
+      "cve_id": "CVE-1999-1396",
+      "first_seen": "2026-04-17T14:44:04.230345+00:00",
+      "source": "nvd",
+      "text_hash": "c8b54bfb89bd83a5e6f7d20f96c366d2e902a92d54ec7563dd160b4a38accbfc"
+    },
+    {
+      "cve_id": "CVE-1999-1395",
+      "first_seen": "2026-04-17T14:44:04.240812+00:00",
+      "source": "nvd",
+      "text_hash": "5dde656416f45e512b34c07e5eb13a0ce558732a9133b761b082502dd7886cd5"
+    },
+    {
+      "cve_id": "CVE-1999-1306",
+      "first_seen": "2026-04-17T14:44:04.252260+00:00",
+      "source": "nvd",
+      "text_hash": "e9e01bbb564d3835b2356f1e0381b165cdd6a776bf37772ed38c0af64081763b"
+    },
+    {
+      "cve_id": "CVE-1999-1466",
+      "first_seen": "2026-04-17T14:44:04.262811+00:00",
+      "source": "nvd",
+      "text_hash": "8e405a6cb718c5438524ed9df67261a5779f068b87e5bd7eab3086ed5a391b20"
+    },
+    {
+      "cve_id": "CVE-1999-1021",
+      "first_seen": "2026-04-17T14:44:04.272166+00:00",
+      "source": "nvd",
+      "text_hash": "48aebbc9dde37f145f92ce8590a011a91e3f085dd8518a2c365d5a4b9bfbc610"
+    },
+    {
+      "cve_id": "CVE-1999-1056",
+      "first_seen": "2026-04-17T14:44:04.284133+00:00",
+      "source": "nvd",
+      "text_hash": "fcfa9ff8a080dc26d659122d1e6eb37aad2277d9083efaa312d9a8f205691132"
+    },
+    {
+      "cve_id": "CVE-1999-1507",
+      "first_seen": "2026-04-17T14:44:04.296605+00:00",
+      "source": "nvd",
+      "text_hash": "12d663891b5cd3d92c34175bfc271cea5a56886f16e7b51b2c4e24b4f5b88856"
+    },
+    {
+      "cve_id": "CVE-1999-1218",
+      "first_seen": "2026-04-17T14:44:04.308769+00:00",
+      "source": "nvd",
+      "text_hash": "9639c041c99351ddbbfb8ab0c0e65d4260aae3f323eb3e4702992aeff2a63d02"
+    },
+    {
+      "cve_id": "CVE-1999-1312",
+      "first_seen": "2026-04-17T14:44:04.320837+00:00",
+      "source": "nvd",
+      "text_hash": "c31be85f58fe47561f9c27cb3779fea486327f03c04dde3d090722c372132945"
+    },
+    {
+      "cve_id": "CVE-1999-1216",
+      "first_seen": "2026-04-17T14:44:04.332096+00:00",
+      "source": "nvd",
+      "text_hash": "4b9344e3607655a84c91855f96fceeaa52eba0b92cddc77deac80c2db2534437"
+    },
+    {
+      "cve_id": "CVE-1999-1162",
+      "first_seen": "2026-04-17T14:44:04.343800+00:00",
+      "source": "nvd",
+      "text_hash": "4d77c3d95b628529e46b52688c11d17f83ac4fce247a9ffdabcde06d64d3ec26"
+    },
+    {
+      "cve_id": "CVE-1999-0124",
+      "first_seen": "2026-04-17T14:44:04.352898+00:00",
+      "source": "nvd",
+      "text_hash": "e388787c42664d9f40c900d794011cdb95049400f599c2ad2a0cfa56f4dc6f6b"
+    },
+    {
+      "cve_id": "CVE-1999-1215",
+      "first_seen": "2026-04-17T14:44:04.365763+00:00",
+      "source": "nvd",
+      "text_hash": "1ee86abd5d3d873aa6d2c2d52f824fa494284f6a2b647d530b73ef1fa9b86d6b"
+    },
+    {
+      "cve_id": "CVE-1999-1138",
+      "first_seen": "2026-04-17T14:44:04.376295+00:00",
+      "source": "nvd",
+      "text_hash": "5554ca97cc045973032c68c8ce25059dd0ff1e49bdf15acda6cac18b492d4e48"
+    },
+    {
+      "cve_id": "CVE-1999-1318",
+      "first_seen": "2026-04-17T14:44:04.387579+00:00",
+      "source": "nvd",
+      "text_hash": "0b00b2ac2598f80d378f4ee54d89c7104ce976cfb24bcb94758fae2bbbd97c46"
+    },
+    {
+      "cve_id": "CVE-2024-35195",
+      "first_seen": "2026-04-17T14:44:04.584978+00:00",
+      "source": "osv",
+      "text_hash": "370917e934b49baf7f55c39f5131c6304233469818c9104e30be134f474b1f4b"
+    },
+    {
+      "cve_id": "CVE-2014-1829",
+      "first_seen": "2026-04-17T14:44:04.599556+00:00",
+      "source": "osv",
+      "text_hash": "ede9473a6dcf55264925da18c58c33f529655b4a2ec023ca421fa8dfb4593ffb"
+    },
+    {
+      "cve_id": "CVE-2026-25645",
+      "first_seen": "2026-04-17T14:44:04.613238+00:00",
+      "source": "osv",
+      "text_hash": "7aa4a975498aef105325cf6888bbda2539c5411b9b105db14cc406662247fb25"
+    },
+    {
+      "cve_id": "CVE-2023-32681",
+      "first_seen": "2026-04-17T14:44:04.631784+00:00",
+      "source": "osv",
+      "text_hash": "0c9406c7081b16c3b501bdb36f36a6c2419167e9fedf8356f3f536bec3941bd9"
+    },
+    {
+      "cve_id": "CVE-2015-2296",
+      "first_seen": "2026-04-17T14:44:04.644534+00:00",
+      "source": "osv",
+      "text_hash": "c2daa5c79dac2322671299804aac01ab7bb81681b230c69d55d590aa8a4200ed"
+    },
+    {
+      "cve_id": "CVE-2020-28500",
+      "first_seen": "2026-04-17T14:44:04.673816+00:00",
+      "source": "osv",
+      "text_hash": "6310985a42a90089dac224c4accd93815f4039349e35b732ed4b5038eef9b821"
+    },
+    {
+      "cve_id": "CVE-2026-2950",
+      "first_seen": "2026-04-17T14:44:04.690485+00:00",
+      "source": "osv",
+      "text_hash": "789c44ce164d83b4cb11c8c6f579912f1cd69e61737b4fb45cb7346cb1e0ba5f"
+    },
+    {
+      "cve_id": "CVE-2018-3721",
+      "first_seen": "2026-04-17T14:44:04.704688+00:00",
+      "source": "osv",
+      "text_hash": "9dbcd00ed2e94bd39d12c26906a5494ddb8880fcebbd244dcc1d90eaa30c59de"
+    },
+    {
+      "cve_id": "CVE-2019-1010266",
+      "first_seen": "2026-04-17T14:44:04.724816+00:00",
+      "source": "osv",
+      "text_hash": "10d9e8eeeabc48734800581de01025cf9dcf4168d8f88fd36c65d1410e9001d7"
+    },
+    {
+      "cve_id": "CVE-2025-13465",
+      "first_seen": "2026-04-17T14:44:04.738709+00:00",
+      "source": "osv",
+      "text_hash": "8543f8794e2162a5976292e23b803394310fb9c2191a2178920b4f9ee7d9fcb6"
+    },
+    {
+      "cve_id": "CVE-2023-29401",
+      "first_seen": "2026-04-17T14:44:04.751741+00:00",
+      "source": "osv",
+      "text_hash": "73690f7c2a23e9bf5f88a96a10018f8bd403c4bdc1484611ede3efe925967a7e"
+    },
+    {
+      "cve_id": "CVE-2023-26125",
+      "first_seen": "2026-04-17T14:44:04.764732+00:00",
+      "source": "osv",
+      "text_hash": "49aed70b72dcc0941b0bfa3c3d898d42269f9d0ca6cadd648fdb2316e3a76f45"
+    },
+    {
+      "cve_id": "CVE-2026-34480",
+      "first_seen": "2026-04-17T14:44:04.792505+00:00",
+      "source": "osv",
+      "text_hash": "a3b73f959308b3a930445595b3c2d8d70bf49561332f0fb03059581914bd9f17"
+    },
+    {
+      "cve_id": "CVE-2026-34478",
+      "first_seen": "2026-04-17T14:44:04.805385+00:00",
+      "source": "osv",
+      "text_hash": "34307ec74972028649b32a516aabac08046ad6ab216af62bd2c8082e6939912a"
+    },
+    {
+      "cve_id": "CVE-2026-34477",
+      "first_seen": "2026-04-17T14:44:04.819188+00:00",
+      "source": "osv",
+      "text_hash": "187cc91e0584cad4e4e2fb83344036cc8457f93830dec17ad71686b0ca1b4ab6"
+    },
+    {
+      "cve_id": "CVE-2021-44832",
+      "first_seen": "2026-04-17T14:44:04.839762+00:00",
+      "source": "osv",
+      "text_hash": "3fc7143ac6e844645988b1e92fb3371cb9774d51343c63b1117f3c12dd246cb9"
+    },
+    {
+      "cve_id": "CVE-2025-68161",
+      "first_seen": "2026-04-17T14:44:04.864444+00:00",
+      "source": "osv",
+      "text_hash": "d596d2931a1b59ed49c33dffe835b517706240bb28a9d0698e4cd46c5bf6f3cf"
+    },
+    {
+      "cve_id": "CVE-2025-65027",
+      "first_seen": "2026-04-17T14:44:05.247606+00:00",
+      "source": "exploitdb",
+      "text_hash": "7e3c92f9639eb79847b40485bf51c46f62129ff143690ac75c1f31cca6c65a70"
+    },
+    {
+      "cve_id": "CVE-2025-11001",
+      "first_seen": "2026-04-17T14:44:05.261984+00:00",
+      "source": "exploitdb",
+      "text_hash": "ac65a544c42bfb739d526a92123f27361b3717a686159c44334c39269596e2e8"
+    },
+    {
+      "cve_id": "CVE-2025-64446",
+      "first_seen": "2026-04-17T14:44:05.281148+00:00",
+      "source": "exploitdb",
+      "text_hash": "ab9ce6fe5d6b6502f027e8b54b8b8226b2becbe856dce4269a4dc4fb3b19b75c"
+    },
+    {
+      "cve_id": "CVE-2025-26633",
+      "first_seen": "2026-04-17T14:44:05.302674+00:00",
+      "source": "exploitdb",
+      "text_hash": "d5a195b32278fd755ac6f0914586367e055e7ffc2e5d8f32afc5241e523e9202"
+    },
+    {
+      "cve_id": "CVE-2025-6965",
+      "first_seen": "2026-04-17T14:44:05.315301+00:00",
+      "source": "exploitdb",
+      "text_hash": "ca20a9db6fa3613edcc95d98b9069d170a90c2312482e2222cc0d617aadc1500"
+    },
+    {
+      "cve_id": "CVE-2025-55315",
+      "first_seen": "2026-04-17T14:44:05.332868+00:00",
+      "source": "exploitdb",
+      "text_hash": "dd2a58de00d447eed66c95d799efcee455046f7780e18cad4507021f837c4080"
+    },
+    {
+      "cve_id": "CVE-2025-4123",
+      "first_seen": "2026-04-17T14:44:05.355336+00:00",
+      "source": "exploitdb",
+      "text_hash": "17dff327577ce8cd7f48de1acb30fd9106533548a17afcea251388bded9fba1d"
+    },
+    {
+      "cve_id": "CVE-2025-4524",
+      "first_seen": "2026-04-17T14:44:05.372231+00:00",
+      "source": "exploitdb",
+      "text_hash": "87ea61f6373837676bab6a07bc46a38a80ddc4e7046194087b980293658e560f"
+    },
+    {
+      "cve_id": "CVE-2025-34040",
+      "first_seen": "2026-04-17T14:44:05.390612+00:00",
+      "source": "exploitdb",
+      "text_hash": "66388c180511039888a532b4c9d5219f33ffcad9ea29935f1f0bedfc4377c37b"
+    },
+    {
+      "cve_id": "CVE-2025-59254",
+      "first_seen": "2026-04-17T14:44:05.404295+00:00",
+      "source": "exploitdb",
+      "text_hash": "79b3828356bf77d83ab5a8e3295fb21e68a84af9f4ab6f49a68efa498e5dd5fd"
+    },
+    {
+      "cve_id": "CVE-2025-62215",
+      "first_seen": "2026-04-17T14:44:05.417529+00:00",
+      "source": "exploitdb",
+      "text_hash": "0daf8633cfd3737d9228cc004e110302e376297bb2ca490ffd09436604ec2ac6"
+    },
+    {
+      "cve_id": "CVE-2023-3643",
+      "first_seen": "2026-04-17T14:44:05.433234+00:00",
+      "source": "exploitdb",
+      "text_hash": "0bbbf54dd8abe02875df9fc24fa7507b0f3c411f8ebf9d1eda4feb1bcdfc6f77"
+    },
+    {
+      "cve_id": "CVE-2025-25198",
+      "first_seen": "2026-04-17T14:44:05.450369+00:00",
+      "source": "exploitdb",
+      "text_hash": "c1f33a6fdbb4ac78fbf1646e2f6a27faa8ea03013183d2904704f9f13502bf3e"
+    },
+    {
+      "cve_id": "CVE-2023-6553",
+      "first_seen": "2026-04-17T14:44:05.463053+00:00",
+      "source": "exploitdb",
+      "text_hash": "d3afdaea65851fd0530e9b55f620eddfe37c61a5d04678a02b864f0e6fe06284"
+    },
+    {
+      "cve_id": "CVE-2023-4911",
+      "first_seen": "2026-04-17T14:44:05.483983+00:00",
+      "source": "exploitdb",
+      "text_hash": "7a6df761f6193655a1373dcb13463d49dd84b763c31565156de200bb1e3f86d5"
+    },
+    {
+      "cve_id": "CVE-2025-24054",
+      "first_seen": "2026-04-17T14:44:05.500612+00:00",
+      "source": "exploitdb",
+      "text_hash": "81677443554d1a3f3db65ed331b685bfe1f43cdd7f658ac59d9350bf8eb514ed"
+    },
+    {
+      "cve_id": "CVE-2025-32023",
+      "first_seen": "2026-04-17T14:44:05.518666+00:00",
+      "source": "exploitdb",
+      "text_hash": "306a2e0e1cb5479311bfb7522aafff57471f3bfc341a7529f26c750b39a9e48d"
+    },
+    {
+      "cve_id": "CVE-2025-9074",
+      "first_seen": "2026-04-17T14:44:05.537657+00:00",
+      "source": "exploitdb",
+      "text_hash": "eb41f1327bdb01e2a0a839ae7277596037c00c9e6b259e262c9425ba13d2ede9"
+    },
+    {
+      "cve_id": "CVE-2025-24514",
+      "first_seen": "2026-04-17T14:44:05.557196+00:00",
+      "source": "exploitdb",
+      "text_hash": "382198fb868980522db8b5dc5f2e6fe30c0a41d63038fa55aa3ffa9669b6804d"
+    },
+    {
+      "cve_id": "CVE-2025-25257",
+      "first_seen": "2026-04-17T14:44:05.576458+00:00",
+      "source": "exploitdb",
+      "text_hash": "791d5de0946099a5997feb2604005aa25eae3d3074ef09d6d6cb096e0ed771b3"
+    },
+    {
+      "cve_id": "CVE-2025-58180",
+      "first_seen": "2026-04-17T14:44:05.593008+00:00",
+      "source": "exploitdb",
+      "text_hash": "2d208e30fc2d126bbcf64274b46f62bb90d74d990e0d731baaa876687423d918"
+    },
+    {
+      "cve_id": "CVE-2024-41358",
+      "first_seen": "2026-04-17T14:44:05.607492+00:00",
+      "source": "exploitdb",
+      "text_hash": "934d5656908fd506dcccd58df525cd15cecb7981f8257e9445f70e82e63905ed"
+    },
+    {
+      "cve_id": "CVE-2024-23334",
+      "first_seen": "2026-04-17T14:44:05.622267+00:00",
+      "source": "exploitdb",
+      "text_hash": "235f571121d1864add59a5475eb91385f236f19064daec7bfe54577a68f7fdc3"
+    },
+    {
+      "cve_id": "CVE-2025-10666",
+      "first_seen": "2026-04-17T14:44:05.648382+00:00",
+      "source": "exploitdb",
+      "text_hash": "5115e183d0cae12055c2e5800ecd25bf8802b72ee88059a0c0f533a64280bf2f"
+    },
+    {
+      "cve_id": "CVE-2025-10370",
+      "first_seen": "2026-04-17T14:44:05.664242+00:00",
+      "source": "exploitdb",
+      "text_hash": "ddfe0f5920323b1871a9129c893541e602a7b821f4e965d500edcecc80387768"
+    },
+    {
+      "cve_id": "CVE-2025-10327",
+      "first_seen": "2026-04-17T14:44:05.684385+00:00",
+      "source": "exploitdb",
+      "text_hash": "ea8abb1dc1d513a3a2a7220ff91263ccf2c532350646d85280b254603a943cfc"
+    },
+    {
+      "cve_id": "CVE-2025-57176",
+      "first_seen": "2026-04-17T14:44:05.704383+00:00",
+      "source": "exploitdb",
+      "text_hash": "f0ecfd6403335b0f17ca9be43cc7884bb3a711b06df02aa556b7f9da220ebbcd"
+    },
+    {
+      "cve_id": "CVE-2025-57174",
+      "first_seen": "2026-04-17T14:44:05.720885+00:00",
+      "source": "exploitdb",
+      "text_hash": "0a320f538741663338690fefdbf5a3c7587a787195e63666546367bed71fe916"
+    },
+    {
+      "cve_id": "CVE-2025-10493",
+      "first_seen": "2026-04-17T14:44:05.734506+00:00",
+      "source": "exploitdb",
+      "text_hash": "a00e81393bafae1ea13281a2d5eb7616b24bd42db10b0a115f098f599716594e"
+    },
+    {
+      "cve_id": "CVE-2025-14558",
+      "first_seen": "2026-04-17T14:44:05.749788+00:00",
+      "source": "exploitdb",
+      "text_hash": "a740e19365276938b5db9d17a237b48e675854cd0fc3300b63a19ee8d52ab928"
+    },
+    {
+      "cve_id": "CVE-2025-10042",
+      "first_seen": "2026-04-17T14:44:05.764482+00:00",
+      "source": "exploitdb",
+      "text_hash": "43f5f9304964cdc17ff73ee4b429ddf8c52807fe914c524b0345c95e3cb1ed64"
+    },
+    {
+      "cve_id": "CVE-2025-59342",
+      "first_seen": "2026-04-17T14:44:05.779814+00:00",
+      "source": "exploitdb",
+      "text_hash": "39f672d9990dd48da12afe56b4b8bf9ea616194b600b93928be8498c1ba2f092"
+    },
+    {
+      "cve_id": "CVE-2025-40677",
+      "first_seen": "2026-04-17T14:44:05.796467+00:00",
+      "source": "exploitdb",
+      "text_hash": "b9453bd003548a7373d54c3c0bbf657f11c7fa632ece48300be38c27c11566fd"
+    },
+    {
+      "cve_id": "CVE-2018-11736",
+      "first_seen": "2026-04-17T14:44:05.814368+00:00",
+      "source": "exploitdb",
+      "text_hash": "356e6e89202b614a343222bf8de7642378828152ffc962a17bd648e91e46e6cd"
+    },
+    {
+      "cve_id": "CVE-2025-64459",
+      "first_seen": "2026-04-17T14:44:05.831578+00:00",
+      "source": "exploitdb",
+      "text_hash": "56421d3cb937cad67e97a47f9cef2e9be693d504bf1fb3e0923cc2dd4b657e32"
+    },
+    {
+      "cve_id": "CVE-2017-6478",
+      "first_seen": "2026-04-17T14:44:05.848247+00:00",
+      "source": "exploitdb",
+      "text_hash": "51d1eaf29f42b9545e356e7511f5d4a2c3f0042c514f6692c4f74a53f23799a0"
+    },
+    {
+      "cve_id": "CVE-2018-25080",
+      "first_seen": "2026-04-17T14:44:05.864714+00:00",
+      "source": "exploitdb",
+      "text_hash": "2d8f47b022e3cf72444b46b7fa735bd0c3280f56bf178e5f513427dc7d0fd92c"
+    },
+    {
+      "cve_id": "CVE-2019-25024",
+      "first_seen": "2026-04-17T14:44:05.880716+00:00",
+      "source": "exploitdb",
+      "text_hash": "00ede0afeabe2d87b3295356d873e9ab8c74ede828158b62fd8d431c0b502e5d"
+    },
+    {
+      "cve_id": "CVE-2021-40617",
+      "first_seen": "2026-04-17T14:44:05.896431+00:00",
+      "source": "exploitdb",
+      "text_hash": "ec672570e5d8570abe8298f855ed2a6888c842a39cea4cb1b62c00eefde140c7"
+    },
+    {
+      "cve_id": "CVE-2020-5504",
+      "first_seen": "2026-04-17T14:44:05.911068+00:00",
+      "source": "exploitdb",
+      "text_hash": "36397cf213c94b56ab3e53580f54991f3de1602c11527d3e0ef4b06ab89f549c"
+    },
+    {
+      "cve_id": "CVE-2017-15735",
+      "first_seen": "2026-04-17T14:44:05.926392+00:00",
+      "source": "exploitdb",
+      "text_hash": "7a9fe54ed75d5f79a95782f19a88d6652745c5b7e40abe3a6e1449666606044a"
+    },
+    {
+      "cve_id": "CVE-2017-15808",
+      "first_seen": "2026-04-17T14:44:05.940525+00:00",
+      "source": "exploitdb",
+      "text_hash": "b05afc388802536d3aecb387906e6a8ba844ee3e9f4dd744c5653aac08152b34"
+    },
+    {
+      "cve_id": "CVE-2017-15734",
+      "first_seen": "2026-04-17T14:44:05.956154+00:00",
+      "source": "exploitdb",
+      "text_hash": "298a3bd4b47724f2065d63e0fed0f50ef54fd3145bd7b4574e189647e6ffe841"
+    },
+    {
+      "cve_id": "CVE-2020-20969",
+      "first_seen": "2026-04-17T14:44:05.968251+00:00",
+      "source": "exploitdb",
+      "text_hash": "990fe70568eabf6ad92e70c94b25a3defa6ed19a464d1fbc064cdcbafeba09f8"
+    },
+    {
+      "cve_id": "CVE-2020-15716",
+      "first_seen": "2026-04-17T14:44:05.982962+00:00",
+      "source": "exploitdb",
+      "text_hash": "4d7845be907fe8bf505acfa49f9c7572499afb3d29e4acfc5cd9a76d7f557353"
+    },
+    {
+      "cve_id": "CVE-2020-15718",
+      "first_seen": "2026-04-17T14:44:05.997561+00:00",
+      "source": "exploitdb",
+      "text_hash": "1279c6c9be3a867ddfde3ab35c75a8ef2d8e7ab6b68b4dcf66a8884670a33096"
+    },
+    {
+      "cve_id": "CVE-2026-34978",
+      "first_seen": "2026-04-17T14:44:06.034876+00:00",
+      "source": "msrc",
+      "text_hash": "0d76f42c6f2c77f914bf6de8298f761f263395ae2af4452e13da5343c3b2a56b"
+    },
+    {
+      "cve_id": "CVE-2026-27447",
+      "first_seen": "2026-04-17T14:44:06.048719+00:00",
+      "source": "msrc",
+      "text_hash": "78b148b48eaef460ab8507d806dc9b6b3e1ed23c595274542ab13980f16f2045"
+    },
+    {
+      "cve_id": "CVE-2026-31394",
+      "first_seen": "2026-04-17T14:44:06.065461+00:00",
+      "source": "msrc",
+      "text_hash": "df567fab8c1f0e9dcee7253e13d2baf14c7996cc539d298b722710de90d97547"
+    },
+    {
+      "cve_id": "CVE-2026-23468",
+      "first_seen": "2026-04-17T14:44:06.088475+00:00",
+      "source": "msrc",
+      "text_hash": "780998be6c9a5afd82a2256f3f3bcdef795ec27c680a834fa6c889bc1ec8a6c2"
+    },
+    {
+      "cve_id": "CVE-2026-27456",
+      "first_seen": "2026-04-17T14:44:06.116812+00:00",
+      "source": "msrc",
+      "text_hash": "3296d54b194e8b20f324408303957734bb7191ce5ff6232dcaf00b1f57c35ea7"
+    },
+    {
+      "cve_id": "CVE-2026-3184",
+      "first_seen": "2026-04-17T14:44:06.156513+00:00",
+      "source": "msrc",
+      "text_hash": "1d01e99a69b99a3401a65c820c51c4ef1f5333eecfd99de3989c025cdbcd2bce"
+    },
+    {
+      "cve_id": "CVE-2026-34982",
+      "first_seen": "2026-04-17T14:44:06.173534+00:00",
+      "source": "msrc",
+      "text_hash": "af9db68a51c1d31bab36d3f22aa95c8671e2db7b7004ea121c3695408d66deb7"
+    },
+    {
+      "cve_id": "CVE-2026-34933",
+      "first_seen": "2026-04-17T14:44:06.187309+00:00",
+      "source": "msrc",
+      "text_hash": "71f3ebac9190505064d02e3220c07430ba1a6cee603125f6799c000a90c5e8fd"
+    },
+    {
+      "cve_id": "CVE-2026-39314",
+      "first_seen": "2026-04-17T14:44:06.202350+00:00",
+      "source": "msrc",
+      "text_hash": "c5da01dae6a94f3a70cd78267f864ec11ec3529c7878ed4948b5072a341be194"
+    },
+    {
+      "cve_id": "CVE-2026-34446",
+      "first_seen": "2026-04-17T14:44:06.230601+00:00",
+      "source": "msrc",
+      "text_hash": "1143996dc85c50e16a20fa3334655a42dbfc2e47c96794f5839ca5fef5bc6197"
+    },
+    {
+      "cve_id": "CVE-2026-29181",
+      "first_seen": "2026-04-17T14:44:06.254699+00:00",
+      "source": "msrc",
+      "text_hash": "a00ec5dc4ad726b21a7c7bc7c21baad2e4f146dbba193aaabbafd1f78fde7ec0"
+    },
+    {
+      "cve_id": "CVE-2026-27144",
+      "first_seen": "2026-04-17T14:44:06.268707+00:00",
+      "source": "msrc",
+      "text_hash": "d6e40839c39578b1652e79123686a84da6b2dbc22c79b9179868ad1fae94f3ef"
+    },
+    {
+      "cve_id": "CVE-2026-32282",
+      "first_seen": "2026-04-17T14:44:06.284016+00:00",
+      "source": "msrc",
+      "text_hash": "b0a689360f4c9d107efd97d2e75c87a9a7b3afc8adb9a0069dff0a8488b350fe"
+    },
+    {
+      "cve_id": "CVE-2026-33810",
+      "first_seen": "2026-04-17T14:44:06.299735+00:00",
+      "source": "msrc",
+      "text_hash": "d531d5d26bb062ace8db2edd000d16522beb66fcf54ae0b4a51b6db4bb0dec17"
+    },
+    {
+      "cve_id": "CVE-2026-4878",
+      "first_seen": "2026-04-17T14:44:06.328726+00:00",
+      "source": "msrc",
+      "text_hash": "f27143c957948653244610c66fa420eded7607472a86251cb365e988175e3eaa"
+    },
+    {
+      "cve_id": "CVE-2026-34757",
+      "first_seen": "2026-04-17T14:44:06.347230+00:00",
+      "source": "msrc",
+      "text_hash": "5db105ba3e83a5535c09542026d83f5343a5b058e07fb2dec353d3f995cc82a1"
+    },
+    {
+      "cve_id": "CVE-2026-39853",
+      "first_seen": "2026-04-17T14:44:06.372365+00:00",
+      "source": "msrc",
+      "text_hash": "044edfbf316b1537c325e3699bcdac921c30642094c76ce113c25d6f71a5a8ce"
+    },
+    {
+      "cve_id": "CVE-2026-39855",
+      "first_seen": "2026-04-17T14:44:06.386348+00:00",
+      "source": "msrc",
+      "text_hash": "91bc57efc3505c1c8664e88333eba0df8e637b1a8d18ffa17779ce6f2b381271"
+    },
+    {
+      "cve_id": "CVE-2026-39856",
+      "first_seen": "2026-04-17T14:44:06.399201+00:00",
+      "source": "msrc",
+      "text_hash": "0c0e2371315c7ff99d8be78714101bbc4adc9514b894e66cfa5dc772b8a13b04"
+    },
+    {
+      "cve_id": "CVE-2026-31424",
+      "first_seen": "2026-04-17T14:44:06.441715+00:00",
+      "source": "msrc",
+      "text_hash": "f8563b8a10dc714f95f9a3ad3fa579050857e5d18097608372923009741d3239"
+    },
+    {
+      "cve_id": "CVE-2026-31427",
+      "first_seen": "2026-04-17T14:44:06.456499+00:00",
+      "source": "msrc",
+      "text_hash": "c02599cba240256b8703a48e6378ad4a0c9958b9d88025b07032593aea3f9dd6"
+    },
+    {
+      "cve_id": "CVE-2026-31421",
+      "first_seen": "2026-04-17T14:44:06.473463+00:00",
+      "source": "msrc",
+      "text_hash": "9ce8f7eac6c3fa0de4df65c01a0d16b65d08e0b74dca42f3f2968834594e1ba6"
+    },
+    {
+      "cve_id": "CVE-2026-31428",
+      "first_seen": "2026-04-17T14:44:06.490552+00:00",
+      "source": "msrc",
+      "text_hash": "a74aa4246629c365c6c2f9c68a959303fb9eef4d835debd948a312f0c5ab1c67"
+    },
+    {
+      "cve_id": "CVE-2026-27820",
+      "first_seen": "2026-04-17T14:44:06.543663+00:00",
+      "source": "redhat",
+      "text_hash": "22b1b2a98b6bcc9b7198c74a0428dd5b95c91a3f985ba091f706df83917abfc4"
+    },
+    {
+      "cve_id": "CVE-2026-41080",
+      "first_seen": "2026-04-17T14:44:06.558550+00:00",
+      "source": "redhat",
+      "text_hash": "8594c64d03658d8a87869408717d7d76e27334f6506d1afeb305cba4d9a6b899"
+    },
+    {
+      "cve_id": "CVE-2026-41035",
+      "first_seen": "2026-04-17T14:44:06.579879+00:00",
+      "source": "redhat",
+      "text_hash": "8e904244611aca0e2fcb14e7edec06ec13f4bed5573776ee368869bc8dc925b8"
+    },
+    {
+      "cve_id": "CVE-2026-40962",
+      "first_seen": "2026-04-17T14:44:06.593717+00:00",
+      "source": "redhat",
+      "text_hash": "72c048fa4902c73c269e7725378e98c9d668892d98adba93e3eec2e0a725186f"
+    },
+    {
+      "cve_id": "CVE-2026-30656",
+      "first_seen": "2026-04-17T14:44:06.606697+00:00",
+      "source": "redhat",
+      "text_hash": "89df5baf541e70dc6eff4c8ef12549a614c553e89fb2d0c6a13be05657075119"
+    },
+    {
+      "cve_id": "CVE-2026-40192",
+      "first_seen": "2026-04-17T14:44:06.620648+00:00",
+      "source": "redhat",
+      "text_hash": "abca6769494991cfe804f659222928d76346dd6804efaa19b7dbc446eb793a68"
+    },
+    {
+      "cve_id": "CVE-2026-39350",
+      "first_seen": "2026-04-17T14:44:06.637720+00:00",
+      "source": "redhat",
+      "text_hash": "a0c9a4bc2067d40be6e79d461c36fb88fee3c37056e6c955fb7efa403204569b"
+    },
+    {
+      "cve_id": "CVE-2026-40261",
+      "first_seen": "2026-04-17T14:44:06.653122+00:00",
+      "source": "redhat",
+      "text_hash": "b0f512b055bb511ea950d76438b13f16878149604fdf1365dcfa735186de954f"
+    },
+    {
+      "cve_id": "CVE-2026-40176",
+      "first_seen": "2026-04-17T14:44:06.666575+00:00",
+      "source": "redhat",
+      "text_hash": "30501dffe7f23b65f068f1bd77db1d66010565617eb8fcdb155a9d0b56acc2eb"
+    },
+    {
+      "cve_id": "CVE-2026-6388",
+      "first_seen": "2026-04-17T14:44:06.684576+00:00",
+      "source": "redhat",
+      "text_hash": "015e05d526e7910e67f4b5aae47b6a90a69e7cd2499c485205d58db27530294e"
+    },
+    {
+      "cve_id": "CVE-2026-6385",
+      "first_seen": "2026-04-17T14:44:06.701090+00:00",
+      "source": "redhat",
+      "text_hash": "88d5b1923e89e1939f30fe241004e5253570a39cb2f03a74af7cc0a74588a7cb"
+    },
+    {
+      "cve_id": "CVE-2026-21727",
+      "first_seen": "2026-04-17T14:44:06.716699+00:00",
+      "source": "redhat",
+      "text_hash": "0b56ef0569ad6845de5d1d99a821e2dd647b43d9b1ea01494c5d016da9c642ea"
+    },
+    {
+      "cve_id": "CVE-2026-40915",
+      "first_seen": "2026-04-17T14:44:06.731812+00:00",
+      "source": "redhat",
+      "text_hash": "00d907f7bf1e79c51c06fcec69d7c42a2670ae604c9f8566e77f9440d3bcd14a"
+    },
+    {
+      "cve_id": "CVE-2026-40916",
+      "first_seen": "2026-04-17T14:44:06.747136+00:00",
+      "source": "redhat",
+      "text_hash": "fdf0f8095562734315f1dc6ef8d9137ff68308f2a86a48b789f25b411f6c7903"
+    },
+    {
+      "cve_id": "CVE-2026-40917",
+      "first_seen": "2026-04-17T14:44:06.763478+00:00",
+      "source": "redhat",
+      "text_hash": "641e5752357f2fb7850d1628c800b3b4bfd5f70b75f7ab799238d77d7a696326"
+    },
+    {
+      "cve_id": "CVE-2026-40918",
+      "first_seen": "2026-04-17T14:44:06.779111+00:00",
+      "source": "redhat",
+      "text_hash": "e4ab4580e21af4fd154f78f16214183251e03a44ecca939ff553d77256f85ad5"
+    },
+    {
+      "cve_id": "CVE-2026-40919",
+      "first_seen": "2026-04-17T14:44:06.794935+00:00",
+      "source": "redhat",
+      "text_hash": "39a602c1548b867ffe3189ad3fac68f52bf99925278fcc0ee590bf86d5efa0d4"
+    },
+    {
+      "cve_id": "CVE-2026-6384",
+      "first_seen": "2026-04-17T14:44:06.808474+00:00",
+      "source": "redhat",
+      "text_hash": "65cee56f814439e811f37ced770aac624c95fe68966618fa7314b308b2a1262c"
+    },
+    {
+      "cve_id": "CVE-2026-6245",
+      "first_seen": "2026-04-17T14:44:06.824526+00:00",
+      "source": "redhat",
+      "text_hash": "f12043379329e632bb72f664ef477fa31a6d0c451693fdb11ba985bb6306070c"
+    },
+    {
+      "cve_id": "CVE-2026-6383",
+      "first_seen": "2026-04-17T14:44:06.839971+00:00",
+      "source": "redhat",
+      "text_hash": "f599ed4fb1bacb96a2c8929b0a24d0696bb1c8357fd27a29b29fc7aaf95041c0"
+    },
+    {
+      "cve_id": "CVE-2026-5758",
+      "first_seen": "2026-04-17T14:44:06.856693+00:00",
+      "source": "redhat",
+      "text_hash": "c840f8191c08a7e134723f7db88a612b378c543937c40a0f64faf0594ef42e58"
+    },
+    {
+      "cve_id": "CVE-2025-12141",
+      "first_seen": "2026-04-17T14:44:06.873536+00:00",
+      "source": "redhat",
+      "text_hash": "1b8a9251e942d2dc4edef52f57c406672d883abc1d56baf64964e36cefd68645"
+    },
+    {
+      "cve_id": "CVE-2026-33805",
+      "first_seen": "2026-04-17T14:44:06.889453+00:00",
+      "source": "redhat",
+      "text_hash": "0ba5277ee4a97aef6736d5934699ee1e3d8c9c2bf3ae07e7e4cb1a8a4540b9c5"
+    },
+    {
+      "cve_id": "CVE-2026-5160",
+      "first_seen": "2026-04-17T14:44:06.907870+00:00",
+      "source": "redhat",
+      "text_hash": "5a259eaf8b161ca77fd754deae559338ee0d45264086db065b9ec3e8f4f1d38d"
+    },
+    {
+      "cve_id": "CVE-2026-33806",
+      "first_seen": "2026-04-17T14:44:06.922179+00:00",
+      "source": "redhat",
+      "text_hash": "07679a82e83c4f38f84c202d114574da2e95934855fe9cf768ffae49277c41fd"
+    },
+    {
+      "cve_id": "CVE-2026-6308",
+      "first_seen": "2026-04-17T14:44:06.933212+00:00",
+      "source": "redhat",
+      "text_hash": "953bf49b45a67b553600adf6726edd4951d71773cef5f849cf3acf9c52a20b1b"
+    },
+    {
+      "cve_id": "CVE-2026-6318",
+      "first_seen": "2026-04-17T14:44:06.946720+00:00",
+      "source": "redhat",
+      "text_hash": "6088371ec267333a4b63ebbc029fc7ca848367baf850a18d5c5a9a3c0fe7e3ff"
+    },
+    {
+      "cve_id": "CVE-2026-6358",
+      "first_seen": "2026-04-17T14:44:06.960238+00:00",
+      "source": "redhat",
+      "text_hash": "b56319e60e0bfc683b91ca9c8cd2ec3ee94eb553a10bb509009aa2a351e9b15d"
+    },
+    {
+      "cve_id": "CVE-2026-6300",
+      "first_seen": "2026-04-17T14:44:06.972346+00:00",
+      "source": "redhat",
+      "text_hash": "dc10616d5120a8631a92701e8dee79955519e10e6ef110edf8e86cb23da7a6f0"
+    },
+    {
+      "cve_id": "CVE-2026-6306",
+      "first_seen": "2026-04-17T14:44:06.984523+00:00",
+      "source": "redhat",
+      "text_hash": "c2f5b19535bc85c4f1c5bb2bc6e85dfbe7864f5ea4a40deadf16e65dd7eb58a4"
+    },
+    {
+      "cve_id": "CVE-2026-6299",
+      "first_seen": "2026-04-17T14:44:06.998061+00:00",
+      "source": "redhat",
+      "text_hash": "c1f1a1780ee44dba66295839ddb869539d5687a0fb18b269b16f227903c31aee"
+    },
+    {
+      "cve_id": "CVE-2026-6311",
+      "first_seen": "2026-04-17T14:44:07.010082+00:00",
+      "source": "redhat",
+      "text_hash": "26cab5c5b36bfa9b1c1b434f15d413d4e8a2d31cfe61dd44c3b8e5174d48e2ac"
+    },
+    {
+      "cve_id": "CVE-2026-6313",
+      "first_seen": "2026-04-17T14:44:07.023287+00:00",
+      "source": "redhat",
+      "text_hash": "9abe5b6c524ad53845a4036565a6cf0b94fc40cdc26d50c026b66aba3a85cc21"
+    },
+    {
+      "cve_id": "CVE-2026-6305",
+      "first_seen": "2026-04-17T14:44:07.037550+00:00",
+      "source": "redhat",
+      "text_hash": "6fdb501509652f46bd69e827fbac20e5b0614de9986aacaedec6423dce77f6a2"
+    },
+    {
+      "cve_id": "CVE-2026-6296",
+      "first_seen": "2026-04-17T14:44:07.050228+00:00",
+      "source": "redhat",
+      "text_hash": "d9634aae83e7e14e37641bb06b965820249d82ae87108a87e583776a6ca5f9ec"
+    },
+    {
+      "cve_id": "CVE-2026-6309",
+      "first_seen": "2026-04-17T14:44:07.065416+00:00",
+      "source": "redhat",
+      "text_hash": "1c264bc54e182f06a537794a4a696d02531c4e4736b6438fdcc0347cfce031ee"
+    },
+    {
+      "cve_id": "CVE-2026-6301",
+      "first_seen": "2026-04-17T14:44:07.078618+00:00",
+      "source": "redhat",
+      "text_hash": "1918c346ac782517c0d2c7d82938510a1ad3dfd330e79e91ad1421c30f28ac4d"
+    },
+    {
+      "cve_id": "CVE-2026-6364",
+      "first_seen": "2026-04-17T14:44:07.090710+00:00",
+      "source": "redhat",
+      "text_hash": "f84485e53d39ef8a8b0fc7196e4b30eae0f999c35975e9054b1d8da709357b90"
+    },
+    {
+      "cve_id": "CVE-2026-6316",
+      "first_seen": "2026-04-17T14:44:07.108318+00:00",
+      "source": "redhat",
+      "text_hash": "7bad7d4ea683f1f3cefc3bc6980c8485bae4250f80a9c7301378adf26c5dfd70"
+    },
+    {
+      "cve_id": "CVE-2026-6314",
+      "first_seen": "2026-04-17T14:44:07.121911+00:00",
+      "source": "redhat",
+      "text_hash": "c32d1f3a55d57e0c1ff51c02f39680c1526071ffe21af2514f7c67764ad4e327"
+    },
+    {
+      "cve_id": "CVE-2026-6310",
+      "first_seen": "2026-04-17T14:44:07.134590+00:00",
+      "source": "redhat",
+      "text_hash": "a6ba9d35a4e3ec90841dce60cc129f6d2f25925af7c16033a4d12bbf3f3de8bc"
+    },
+    {
+      "cve_id": "CVE-2026-6302",
+      "first_seen": "2026-04-17T14:44:07.147217+00:00",
+      "source": "redhat",
+      "text_hash": "e3b7759d063af2e6ed7f04a0b0816c3b1ce0f82f0e8e65b8a9e414dd5547ed78"
+    },
+    {
+      "cve_id": "CVE-2026-6297",
+      "first_seen": "2026-04-17T14:44:07.159976+00:00",
+      "source": "redhat",
+      "text_hash": "d559a896dafbc7858aeac2ca9ef8a9ffae9b1f77b41fdf574b8019fa446508f8"
+    },
+    {
+      "cve_id": "CVE-2026-6317",
+      "first_seen": "2026-04-17T14:44:07.173525+00:00",
+      "source": "redhat",
+      "text_hash": "2484a8d46ad724962c9fba0ff220f77068dba76eefd8573e3451006f79098f9d"
+    },
+    {
+      "cve_id": "CVE-2026-6359",
+      "first_seen": "2026-04-17T14:44:07.187342+00:00",
+      "source": "redhat",
+      "text_hash": "c01a455ed20c4aed410c320d3438bb9f7b09bedc57d209b7c4673f352c14aeb1"
+    },
+    {
+      "cve_id": "CVE-2026-6298",
+      "first_seen": "2026-04-17T14:44:07.200815+00:00",
+      "source": "redhat",
+      "text_hash": "72e929041dd2f6f755ea0d068b2d8aebbfe6413250cbb48d445f1c44d71ac710"
+    },
+    {
+      "cve_id": "CVE-2026-6307",
+      "first_seen": "2026-04-17T14:44:07.212946+00:00",
+      "source": "redhat",
+      "text_hash": "c16f47afe2b1017dccd2c3f4f7188ddaaf2c27e9c5bd499be4e806b0716490e0"
+    },
+    {
+      "cve_id": "CVE-2026-6363",
+      "first_seen": "2026-04-17T14:44:07.224875+00:00",
+      "source": "redhat",
+      "text_hash": "1bdece17f2046cebc30f84a95577ba0881864343f936423584b0656821e849c4"
+    },
+    {
+      "cve_id": "CVE-2026-6362",
+      "first_seen": "2026-04-17T14:44:07.237766+00:00",
+      "source": "redhat",
+      "text_hash": "a36ae56a7bb774179e0cc6b3349a49832ebd62dafde4721e3eb5b5425bc12f38"
+    },
+    {
+      "cve_id": "CVE-2026-6303",
+      "first_seen": "2026-04-17T14:44:07.249973+00:00",
+      "source": "redhat",
+      "text_hash": "6e7b141636a5902217198173ca4e2ccd598bea6642fc30f0af26c1b5721b57db"
+    },
+    {
+      "cve_id": "CVE-2026-6304",
+      "first_seen": "2026-04-17T14:44:07.261142+00:00",
+      "source": "redhat",
+      "text_hash": "74b5e347a527516dccbcc367d6a99b09833e658684d852df4a55884a7590a1ce"
+    }
+  ],
+  "generated_at": "2026-04-17T14:44:07.484788+00:00",
+  "schema_version": 2,
+  "seen_cve_ids": [
+    "CVE-1999-0084",
+    "CVE-1999-0124",
+    "CVE-1999-0167",
+    "CVE-1999-0168",
+    "CVE-1999-0498",
+    "CVE-1999-0627",
+    "CVE-1999-1021",
+    "CVE-1999-1032",
+    "CVE-1999-1056",
+    "CVE-1999-1059",
+    "CVE-1999-1090",
+    "CVE-1999-1115",
+    "CVE-1999-1119",
+    "CVE-1999-1123",
+    "CVE-1999-1138",
+    "CVE-1999-1142",
+    "CVE-1999-1162",
+    "CVE-1999-1193",
+    "CVE-1999-1194",
+    "CVE-1999-1197",
+    "CVE-1999-1198",
+    "CVE-1999-1215",
+    "CVE-1999-1216",
+    "CVE-1999-1218",
+    "CVE-1999-1258",
+    "CVE-1999-1306",
+    "CVE-1999-1312",
+    "CVE-1999-1318",
+    "CVE-1999-1391",
+    "CVE-1999-1392",
+    "CVE-1999-1395",
+    "CVE-1999-1396",
+    "CVE-1999-1438",
+    "CVE-1999-1466",
+    "CVE-1999-1467",
+    "CVE-1999-1468",
+    "CVE-1999-1471",
+    "CVE-1999-1493",
+    "CVE-1999-1506",
+    "CVE-1999-1507",
+    "CVE-1999-1554",
+    "CVE-2000-0388",
+    "CVE-2008-0015",
+    "CVE-2009-0238",
+    "CVE-2012-1854",
+    "CVE-2014-1829",
+    "CVE-2014-1830",
+    "CVE-2015-2296",
+    "CVE-2017-15734",
+    "CVE-2017-15735",
+    "CVE-2017-15808",
+    "CVE-2017-5645",
+    "CVE-2017-6478",
+    "CVE-2017-7921",
+    "CVE-2018-11736",
+    "CVE-2018-16487",
+    "CVE-2018-18074",
+    "CVE-2018-25080",
+    "CVE-2018-3721",
+    "CVE-2019-1010266",
+    "CVE-2019-10744",
+    "CVE-2019-25024",
+    "CVE-2019-25211",
+    "CVE-2020-15716",
+    "CVE-2020-15718",
+    "CVE-2020-20969",
+    "CVE-2020-28483",
+    "CVE-2020-28500",
+    "CVE-2020-36567",
+    "CVE-2020-5504",
+    "CVE-2020-7796",
+    "CVE-2020-8203",
+    "CVE-2020-9488",
+    "CVE-2020-9715",
+    "CVE-2021-22054",
+    "CVE-2021-22175",
+    "CVE-2021-22681",
+    "CVE-2021-30952",
+    "CVE-2021-40617",
+    "CVE-2021-44228",
+    "CVE-2021-44832",
+    "CVE-2021-45046",
+    "CVE-2021-45105",
+    "CVE-2022-20775",
+    "CVE-2023-21529",
+    "CVE-2023-26125",
+    "CVE-2023-26464",
+    "CVE-2023-29401",
+    "CVE-2023-32681",
+    "CVE-2023-36424",
+    "CVE-2023-3643",
+    "CVE-2023-41974",
+    "CVE-2023-43000",
+    "CVE-2023-4911",
+    "CVE-2023-6553",
+    "CVE-2024-23334",
+    "CVE-2024-35195",
+    "CVE-2024-41358",
+    "CVE-2024-43468",
+    "CVE-2024-47081",
+    "CVE-2024-7694",
+    "CVE-2025-10042",
+    "CVE-2025-10327",
+    "CVE-2025-10370",
+    "CVE-2025-10493",
+    "CVE-2025-10666",
+    "CVE-2025-11001",
+    "CVE-2025-12141",
+    "CVE-2025-13465",
+    "CVE-2025-14018",
+    "CVE-2025-14558",
+    "CVE-2025-15556",
+    "CVE-2025-24054",
+    "CVE-2025-24514",
+    "CVE-2025-25198",
+    "CVE-2025-25257",
+    "CVE-2025-26399",
+    "CVE-2025-26633",
+    "CVE-2025-31277",
+    "CVE-2025-32023",
+    "CVE-2025-32432",
+    "CVE-2025-34040",
+    "CVE-2025-40677",
+    "CVE-2025-4123",
+    "CVE-2025-43510",
+    "CVE-2025-43520",
+    "CVE-2025-4524",
+    "CVE-2025-47813",
+    "CVE-2025-49113",
+    "CVE-2025-53521",
+    "CVE-2025-54068",
+    "CVE-2025-55182",
+    "CVE-2025-55315",
+    "CVE-2025-57174",
+    "CVE-2025-57176",
+    "CVE-2025-58180",
+    "CVE-2025-59254",
+    "CVE-2025-59342",
+    "CVE-2025-60710",
+    "CVE-2025-62215",
+    "CVE-2025-64446",
+    "CVE-2025-64459",
+    "CVE-2025-65027",
+    "CVE-2025-66376",
+    "CVE-2025-68161",
+    "CVE-2025-68461",
+    "CVE-2025-68613",
+    "CVE-2025-6965",
+    "CVE-2025-9074",
+    "CVE-2026-1340",
+    "CVE-2026-1603",
+    "CVE-2026-1731",
+    "CVE-2026-20127",
+    "CVE-2026-20131",
+    "CVE-2026-20700",
+    "CVE-2026-20963",
+    "CVE-2026-21385",
+    "CVE-2026-21643",
+    "CVE-2026-21727",
+    "CVE-2026-22719",
+    "CVE-2026-22769",
+    "CVE-2026-23468",
+    "CVE-2026-2441",
+    "CVE-2026-25108",
+    "CVE-2026-25645",
+    "CVE-2026-27144",
+    "CVE-2026-27447",
+    "CVE-2026-27456",
+    "CVE-2026-27820",
+    "CVE-2026-29181",
+    "CVE-2026-2950",
+    "CVE-2026-3055",
+    "CVE-2026-30656",
+    "CVE-2026-31394",
+    "CVE-2026-31421",
+    "CVE-2026-31424",
+    "CVE-2026-31427",
+    "CVE-2026-31428",
+    "CVE-2026-3184",
+    "CVE-2026-32201",
+    "CVE-2026-32282",
+    "CVE-2026-33017",
+    "CVE-2026-33634",
+    "CVE-2026-33804",
+    "CVE-2026-33805",
+    "CVE-2026-33806",
+    "CVE-2026-33810",
+    "CVE-2026-34197",
+    "CVE-2026-34446",
+    "CVE-2026-34477",
+    "CVE-2026-34478",
+    "CVE-2026-34480",
+    "CVE-2026-34621",
+    "CVE-2026-34757",
+    "CVE-2026-34933",
+    "CVE-2026-34978",
+    "CVE-2026-34982",
+    "CVE-2026-3502",
+    "CVE-2026-35616",
+    "CVE-2026-3909",
+    "CVE-2026-3910",
+    "CVE-2026-39314",
+    "CVE-2026-39350",
+    "CVE-2026-39853",
+    "CVE-2026-39855",
+    "CVE-2026-39856",
+    "CVE-2026-40176",
+    "CVE-2026-40192",
+    "CVE-2026-40253",
+    "CVE-2026-40261",
+    "CVE-2026-40308",
+    "CVE-2026-40602",
+    "CVE-2026-40611",
+    "CVE-2026-40897",
+    "CVE-2026-40915",
+    "CVE-2026-40916",
+    "CVE-2026-40917",
+    "CVE-2026-40918",
+    "CVE-2026-40919",
+    "CVE-2026-40962",
+    "CVE-2026-41035",
+    "CVE-2026-41080",
+    "CVE-2026-4800",
+    "CVE-2026-4878",
+    "CVE-2026-5160",
+    "CVE-2026-5281",
+    "CVE-2026-5758",
+    "CVE-2026-6245",
+    "CVE-2026-6270",
+    "CVE-2026-6296",
+    "CVE-2026-6297",
+    "CVE-2026-6298",
+    "CVE-2026-6299",
+    "CVE-2026-6300",
+    "CVE-2026-6301",
+    "CVE-2026-6302",
+    "CVE-2026-6303",
+    "CVE-2026-6304",
+    "CVE-2026-6305",
+    "CVE-2026-6306",
+    "CVE-2026-6307",
+    "CVE-2026-6308",
+    "CVE-2026-6309",
+    "CVE-2026-6310",
+    "CVE-2026-6311",
+    "CVE-2026-6313",
+    "CVE-2026-6314",
+    "CVE-2026-6316",
+    "CVE-2026-6317",
+    "CVE-2026-6318",
+    "CVE-2026-6358",
+    "CVE-2026-6359",
+    "CVE-2026-6362",
+    "CVE-2026-6363",
+    "CVE-2026-6364",
+    "CVE-2026-6383",
+    "CVE-2026-6384",
+    "CVE-2026-6385",
+    "CVE-2026-6388",
+    "CVE-2026-6410",
+    "CVE-2026-6414",
+    "CVE-2026-6494"
+  ],
+  "seen_text_hashes": [
+    "00126f6a71af4c69665b294b6f8ea6c434a04416fe68346e63e04fb9d0ad0e4a",
+    "00bfc413abcb78775d9483e0b5c40ccdd49c761365e4cf09b1a6330b2d9b8ac3",
+    "00d907f7bf1e79c51c06fcec69d7c42a2670ae604c9f8566e77f9440d3bcd14a",
+    "00ede0afeabe2d87b3295356d873e9ab8c74ede828158b62fd8d431c0b502e5d",
+    "015e05d526e7910e67f4b5aae47b6a90a69e7cd2499c485205d58db27530294e",
+    "0250ee93e94b52f41148b535dcc775df5f893a692802ea642d5c65a5325b4529",
+    "044edfbf316b1537c325e3699bcdac921c30642094c76ce113c25d6f71a5a8ce",
+    "0472aecc0dc62939ff7f2bb996799535a7c5930938e01a7ebddd9fb0385ccf0e",
+    "0503609116ebaf036378c8572ba1e98cbbf11c057514fec55edea774e95af184",
+    "07679a82e83c4f38f84c202d114574da2e95934855fe9cf768ffae49277c41fd",
+    "082c16b483f310ae4cc1b050057f02e5b98e830134360ccec059bc938f7a3827",
+    "0a320f538741663338690fefdbf5a3c7587a787195e63666546367bed71fe916",
+    "0abb2c34e6af51e6eb678673ff18245f2b5dea723c42ddb3165db08e99fe5c44",
+    "0b00b2ac2598f80d378f4ee54d89c7104ce976cfb24bcb94758fae2bbbd97c46",
+    "0b56ef0569ad6845de5d1d99a821e2dd647b43d9b1ea01494c5d016da9c642ea",
+    "0ba5277ee4a97aef6736d5934699ee1e3d8c9c2bf3ae07e7e4cb1a8a4540b9c5",
+    "0bbbf54dd8abe02875df9fc24fa7507b0f3c411f8ebf9d1eda4feb1bcdfc6f77",
+    "0c0e2371315c7ff99d8be78714101bbc4adc9514b894e66cfa5dc772b8a13b04",
+    "0c9406c7081b16c3b501bdb36f36a6c2419167e9fedf8356f3f536bec3941bd9",
+    "0d76f42c6f2c77f914bf6de8298f761f263395ae2af4452e13da5343c3b2a56b",
+    "0daf8633cfd3737d9228cc004e110302e376297bb2ca490ffd09436604ec2ac6",
+    "10b675a34aaaf9d706bbcdbc14eaa5fe2040a5990b398c413c7f674deaf3cc6d",
+    "10d9e8eeeabc48734800581de01025cf9dcf4168d8f88fd36c65d1410e9001d7",
+    "1143996dc85c50e16a20fa3334655a42dbfc2e47c96794f5839ca5fef5bc6197",
+    "11c9c5315c3aff16dacd8a3de3ecf6c12b20f260d53945b7b5efb7115914e270",
+    "12649f6c5d3795cfbcbe76306622a7530488c8e74a4a840c07fcdd247783e140",
+    "1279c6c9be3a867ddfde3ab35c75a8ef2d8e7ab6b68b4dcf66a8884670a33096",
+    "12d663891b5cd3d92c34175bfc271cea5a56886f16e7b51b2c4e24b4f5b88856",
+    "174a62b333bb15e8e003218af9b6e5f9376f397507f729e9ba200af20c92280b",
+    "17dff327577ce8cd7f48de1acb30fd9106533548a17afcea251388bded9fba1d",
+    "187cc91e0584cad4e4e2fb83344036cc8457f93830dec17ad71686b0ca1b4ab6",
+    "1918c346ac782517c0d2c7d82938510a1ad3dfd330e79e91ad1421c30f28ac4d",
+    "19cc6f10ec39a39ee100817d8fb16a38ae7b1b852ab0ff1187470cc91d98d8a4",
+    "1b8a9251e942d2dc4edef52f57c406672d883abc1d56baf64964e36cefd68645",
+    "1bdece17f2046cebc30f84a95577ba0881864343f936423584b0656821e849c4",
+    "1c264bc54e182f06a537794a4a696d02531c4e4736b6438fdcc0347cfce031ee",
+    "1c5ecd266d4d26b9ed53341cb7be08a637d508ea7fe5162844b04c5b1a4816cd",
+    "1cefdf4a5d5c4b2f5d9421f2c656866d2551b3e66a52c4e95982437bd51e3160",
+    "1d01e99a69b99a3401a65c820c51c4ef1f5333eecfd99de3989c025cdbcd2bce",
+    "1ee86abd5d3d873aa6d2c2d52f824fa494284f6a2b647d530b73ef1fa9b86d6b",
+    "2133015d534158ff1dbc3c8536d9fc569115d035ed00096604a8f01e5c0d4ab5",
+    "22b1b2a98b6bcc9b7198c74a0428dd5b95c91a3f985ba091f706df83917abfc4",
+    "235f571121d1864add59a5475eb91385f236f19064daec7bfe54577a68f7fdc3",
+    "244fe72d10eded4159d924bfa79ce15310c3a61827f241c904bf0796c2b0ca04",
+    "2484a8d46ad724962c9fba0ff220f77068dba76eefd8573e3451006f79098f9d",
+    "25e20c271331f74dd194502d3b7311a72d81c8c2171a6514048d7c5a18951483",
+    "26cab5c5b36bfa9b1c1b434f15d413d4e8a2d31cfe61dd44c3b8e5174d48e2ac",
+    "288d6a08ecd7f1d9d85af0da9363c1ac04ef05bf89b914511d4358d65af97758",
+    "298a3bd4b47724f2065d63e0fed0f50ef54fd3145bd7b4574e189647e6ffe841",
+    "2cca79da8bd5bace40797fb1151365eb4b193cb1d0b01f0e2f7b52200f5d1f52",
+    "2d208e30fc2d126bbcf64274b46f62bb90d74d990e0d731baaa876687423d918",
+    "2d8f47b022e3cf72444b46b7fa735bd0c3280f56bf178e5f513427dc7d0fd92c",
+    "2f92927f9759cd6b5048df908efcf21359b05d92374398549ee8abcc2abaa68a",
+    "30501dffe7f23b65f068f1bd77db1d66010565617eb8fcdb155a9d0b56acc2eb",
+    "306a2e0e1cb5479311bfb7522aafff57471f3bfc341a7529f26c750b39a9e48d",
+    "30c789e0dcf82592deb1ce5785740f535f2e10fca044d318c91fb87ba1ec96c8",
+    "3296d54b194e8b20f324408303957734bb7191ce5ff6232dcaf00b1f57c35ea7",
+    "34307ec74972028649b32a516aabac08046ad6ab216af62bd2c8082e6939912a",
+    "356e6e89202b614a343222bf8de7642378828152ffc962a17bd648e91e46e6cd",
+    "36397cf213c94b56ab3e53580f54991f3de1602c11527d3e0ef4b06ab89f549c",
+    "3643fe2f16b1aae7dcde712a75229707809d3ed724b680d4d3768a437ecb64a8",
+    "370917e934b49baf7f55c39f5131c6304233469818c9104e30be134f474b1f4b",
+    "37ed5fb56be22d02d736b811241c294c6c9960d8f9ad05c0375987b5d1b10787",
+    "382198fb868980522db8b5dc5f2e6fe30c0a41d63038fa55aa3ffa9669b6804d",
+    "39a602c1548b867ffe3189ad3fac68f52bf99925278fcc0ee590bf86d5efa0d4",
+    "39f672d9990dd48da12afe56b4b8bf9ea616194b600b93928be8498c1ba2f092",
+    "3cba52a341f0fa79e6d0bb7d67e7d950cc66da1f57a484ba4113f26687cb0840",
+    "3fc7143ac6e844645988b1e92fb3371cb9774d51343c63b1117f3c12dd246cb9",
+    "41fb3038305ea535347a80edb591fa560b3bc41670d7f649f373d25dd12550a5",
+    "4301f0ced00ea8e772f49f7bf4fc8df5e9cdeb8a821a8340eaa3e37cc9230325",
+    "43f5f9304964cdc17ff73ee4b429ddf8c52807fe914c524b0345c95e3cb1ed64",
+    "45d7a245e0292376b25c4319ece8997317e7cf06acea3f608a8eb62f25ffc891",
+    "463a1e396d79327658bbe80c71091796610def7dd844c441c077de7f2a932538",
+    "466fa830606d403e03731a0fe3a7c1edcb06adbb3879a6670bf3098017a3e34a",
+    "471ee6c80a7abaf0c6a8367cd7c36c33fc4f7672bbfd689a103a741068c3eef3",
+    "48aebbc9dde37f145f92ce8590a011a91e3f085dd8518a2c365d5a4b9bfbc610",
+    "49aed70b72dcc0941b0bfa3c3d898d42269f9d0ca6cadd648fdb2316e3a76f45",
+    "4b9344e3607655a84c91855f96fceeaa52eba0b92cddc77deac80c2db2534437",
+    "4d77c3d95b628529e46b52688c11d17f83ac4fce247a9ffdabcde06d64d3ec26",
+    "4d7845be907fe8bf505acfa49f9c7572499afb3d29e4acfc5cd9a76d7f557353",
+    "4e2512c9858370db1db5c280c9f9fcf1dae0302b039d2ba18c2ac8626484cf51",
+    "4e289dc0d0dfdec6e189717e56d5c64001b21bf299556b3a575698ffac3f1ee6",
+    "5115e183d0cae12055c2e5800ecd25bf8802b72ee88059a0c0f533a64280bf2f",
+    "51821cea93b9ed3e50b798a1f9c002966e44b44f7e4de982588898ed3f8310c7",
+    "51d1eaf29f42b9545e356e7511f5d4a2c3f0042c514f6692c4f74a53f23799a0",
+    "548f5bbe733af6569dc8cb112c8d85cab7a5f8ef546c94d6f3f6cec5d6136c23",
+    "5554ca97cc045973032c68c8ce25059dd0ff1e49bdf15acda6cac18b492d4e48",
+    "561550735edb5ec972ac97f1696f57bdf390fe9481036f4ba6b226910c3d0852",
+    "56421d3cb937cad67e97a47f9cef2e9be693d504bf1fb3e0923cc2dd4b657e32",
+    "56aa724951d0c50df6177c51939be06f2bfa8d943fcb03bd1616cb2ef8763f18",
+    "5a259eaf8b161ca77fd754deae559338ee0d45264086db065b9ec3e8f4f1d38d",
+    "5db105ba3e83a5535c09542026d83f5343a5b058e07fb2dec353d3f995cc82a1",
+    "5dde656416f45e512b34c07e5eb13a0ce558732a9133b761b082502dd7886cd5",
+    "5de703363fa237660f19e41e70fd89d4217af0b51a439618e2b44e713bd668cf",
+    "5e91c94cd6e8f5b003468ea6c55a6ef944f4ac83cd9a8f72e48d226eeb9cd84c",
+    "5fa3360b9c30a0a8ffdbdec5ab00316bc40d8b4121b5bdb75bc421a0f79112f5",
+    "6088371ec267333a4b63ebbc029fc7ca848367baf850a18d5c5a9a3c0fe7e3ff",
+    "61a56087f9e2e09119cdda59727bbf5fcb1d15286aedb90beb3e161f343ecc13",
+    "625eac4c747297faeeeea6c8fb6ce7af3657b717f39e48d7556f61e428ba9305",
+    "6310985a42a90089dac224c4accd93815f4039349e35b732ed4b5038eef9b821",
+    "6366a7ae3873e489fd3b85d53d89d2197d3e19f33bbba770391fde364d663685",
+    "636d7ca728b860c0f84e93f24bf16794cf8522fa673c0e97dc716431ba7afb45",
+    "641e5752357f2fb7850d1628c800b3b4bfd5f70b75f7ab799238d77d7a696326",
+    "65cee56f814439e811f37ced770aac624c95fe68966618fa7314b308b2a1262c",
+    "66388c180511039888a532b4c9d5219f33ffcad9ea29935f1f0bedfc4377c37b",
+    "67e0fea2b22529d22825015a284eef334b8a6099beaea5f53d3bf7e5aad976a9",
+    "6889cb147f86f69b75cc99aeba9b04b8f8bf529320fe3fb8a0283d7817714427",
+    "6a381f2bbe5fb82e289efdf5ee27c738291d226ade3975ce435be394a796e34c",
+    "6bcc506aabeb02505c1be646e2a3c2e9f8da17532e62897c335f3291e49d303f",
+    "6e7b141636a5902217198173ca4e2ccd598bea6642fc30f0af26c1b5721b57db",
+    "6fdb501509652f46bd69e827fbac20e5b0614de9986aacaedec6423dce77f6a2",
+    "71f3ebac9190505064d02e3220c07430ba1a6cee603125f6799c000a90c5e8fd",
+    "72c048fa4902c73c269e7725378e98c9d668892d98adba93e3eec2e0a725186f",
+    "72e929041dd2f6f755ea0d068b2d8aebbfe6413250cbb48d445f1c44d71ac710",
+    "73690f7c2a23e9bf5f88a96a10018f8bd403c4bdc1484611ede3efe925967a7e",
+    "74b5e347a527516dccbcc367d6a99b09833e658684d852df4a55884a7590a1ce",
+    "754d3609f5fbe0f93df94bb51a5e10402214841a0539db35c1b072007193b7c5",
+    "780998be6c9a5afd82a2256f3f3bcdef795ec27c680a834fa6c889bc1ec8a6c2",
+    "78734c932e3b4fed14779168d69f3ff4996ad37c633d661d4ad9e0a274198f92",
+    "789c44ce164d83b4cb11c8c6f579912f1cd69e61737b4fb45cb7346cb1e0ba5f",
+    "78b148b48eaef460ab8507d806dc9b6b3e1ed23c595274542ab13980f16f2045",
+    "791d5de0946099a5997feb2604005aa25eae3d3074ef09d6d6cb096e0ed771b3",
+    "79b3828356bf77d83ab5a8e3295fb21e68a84af9f4ab6f49a68efa498e5dd5fd",
+    "7a6df761f6193655a1373dcb13463d49dd84b763c31565156de200bb1e3f86d5",
+    "7a9fe54ed75d5f79a95782f19a88d6652745c5b7e40abe3a6e1449666606044a",
+    "7aa4a975498aef105325cf6888bbda2539c5411b9b105db14cc406662247fb25",
+    "7bad7d4ea683f1f3cefc3bc6980c8485bae4250f80a9c7301378adf26c5dfd70",
+    "7cd134f8658f12b7367ed08a66f9a761a915ef1d754491279f19d4bdd8eb1b81",
+    "7e3c92f9639eb79847b40485bf51c46f62129ff143690ac75c1f31cca6c65a70",
+    "7f4f8371b6ce62dfb24516289bb4315cfa07a4cf9d47f8185d91583c978c9535",
+    "80184df26f6e73337b1a7757a37403172964371968a40aa54918376ef6f1c272",
+    "806cb80b66281f678baaa97cb5ceafc1901d02e66022c42ad93e171d5485fb0a",
+    "81677443554d1a3f3db65ed331b685bfe1f43cdd7f658ac59d9350bf8eb514ed",
+    "8543f8794e2162a5976292e23b803394310fb9c2191a2178920b4f9ee7d9fcb6",
+    "8594c64d03658d8a87869408717d7d76e27334f6506d1afeb305cba4d9a6b899",
+    "861892da46a342c20fae4a784c4015ce7c53ef1e686e7f5b61877e4a69263bd8",
+    "87ea61f6373837676bab6a07bc46a38a80ddc4e7046194087b980293658e560f",
+    "88d5b1923e89e1939f30fe241004e5253570a39cb2f03a74af7cc0a74588a7cb",
+    "89df5baf541e70dc6eff4c8ef12549a614c553e89fb2d0c6a13be05657075119",
+    "8a1f08843582edddcb0ddfd4a4b36b151891383adae9b52fc70debaee5b82ea3",
+    "8da85f69282f71f7e3b1f7afef4ed82dbec4cf56f38382f737fbf34703ed320d",
+    "8e405a6cb718c5438524ed9df67261a5779f068b87e5bd7eab3086ed5a391b20",
+    "8e904244611aca0e2fcb14e7edec06ec13f4bed5573776ee368869bc8dc925b8",
+    "8eed73daafb86bedc35e125b4e2f57e8a72678791a21d81fd107bbfb19a8373c",
+    "8f37d1b582e1c3645f171f9b30f337c4eba8b1609d46c79fca55743fff56d4c3",
+    "909e0f3d92e6a81dc41c87f8b67d12b6b9ff9f744d88233ac1728898aad7f0aa",
+    "910538935223150090c861e121dafb01f47a03d6de9f48466bf747d0427f53c2",
+    "91bc57efc3505c1c8664e88333eba0df8e637b1a8d18ffa17779ce6f2b381271",
+    "934d5656908fd506dcccd58df525cd15cecb7981f8257e9445f70e82e63905ed",
+    "9394b390f95e80c90bab312b17b21fb2e8f475b6796038c20e41bff2575b9123",
+    "953bf49b45a67b553600adf6726edd4951d71773cef5f849cf3acf9c52a20b1b",
+    "9639c041c99351ddbbfb8ab0c0e65d4260aae3f323eb3e4702992aeff2a63d02",
+    "97ceadea50d81703f18895464b448918f179b8c885d6aac85995f787d4ddc19e",
+    "98b0a2b58b8c0af3b554b11e485f80792deefca1ea6ca38dd65401d35916cc96",
+    "98e0bde868536671dcae4678d081f1b34f70f3f69c8ba6f4a32504a26a99e0ef",
+    "990fe70568eabf6ad92e70c94b25a3defa6ed19a464d1fbc064cdcbafeba09f8",
+    "9abe5b6c524ad53845a4036565a6cf0b94fc40cdc26d50c026b66aba3a85cc21",
+    "9b1268659f29ea39b7c48d8d59da761df1e997bffba27b9785ec56587c6b5122",
+    "9be8bdf5c5727b70202d5b9c34ad6d67fa63ce0f2d605fe5791962ceb5207274",
+    "9ce8f7eac6c3fa0de4df65c01a0d16b65d08e0b74dca42f3f2968834594e1ba6",
+    "9dbcd00ed2e94bd39d12c26906a5494ddb8880fcebbd244dcc1d90eaa30c59de",
+    "a00e81393bafae1ea13281a2d5eb7616b24bd42db10b0a115f098f599716594e",
+    "a00ec5dc4ad726b21a7c7bc7c21baad2e4f146dbba193aaabbafd1f78fde7ec0",
+    "a059e06ae407c8acac63cbe917a745f05bb5e01288b19e3aa9b87034093e3315",
+    "a0c9a4bc2067d40be6e79d461c36fb88fee3c37056e6c955fb7efa403204569b",
+    "a295dad5a57aed3ed4c2d386dca93ca3760ea1b7cf5d349f8bb5299f8333d9aa",
+    "a36ae56a7bb774179e0cc6b3349a49832ebd62dafde4721e3eb5b5425bc12f38",
+    "a3b73f959308b3a930445595b3c2d8d70bf49561332f0fb03059581914bd9f17",
+    "a4ce8e2cd074dc0e961b60f302e2c7b350435cb42e043cfcc30e8b827386482b",
+    "a4df485b55cd4a587f4c672580fc7c3ac9f0893277693455f5542c4a23d2688e",
+    "a6ba9d35a4e3ec90841dce60cc129f6d2f25925af7c16033a4d12bbf3f3de8bc",
+    "a740e19365276938b5db9d17a237b48e675854cd0fc3300b63a19ee8d52ab928",
+    "a74aa4246629c365c6c2f9c68a959303fb9eef4d835debd948a312f0c5ab1c67",
+    "a935ed3a86daa978a5300a15933420e10482496d254a230ce28bc05822f186ab",
+    "aa40ab22569cfc2aa4dc84c26273ee5e71c88b803b3d6bb6d7416e5d178d0e40",
+    "aab625bd29c61d4bb7798f3690da3a61a416e370a28a5d555fbd27f8fff459cb",
+    "ab9ce6fe5d6b6502f027e8b54b8b8226b2becbe856dce4269a4dc4fb3b19b75c",
+    "abca6769494991cfe804f659222928d76346dd6804efaa19b7dbc446eb793a68",
+    "ac65a544c42bfb739d526a92123f27361b3717a686159c44334c39269596e2e8",
+    "ad082cd12bd1d612d35c57a751e1a0784f3d0bcffdfcd8ce4f9decb94a761ba6",
+    "af9db68a51c1d31bab36d3f22aa95c8671e2db7b7004ea121c3695408d66deb7",
+    "b0432f9c73b197b08272381383755996567098aaf38a426f1788b7994144a047",
+    "b05afc388802536d3aecb387906e6a8ba844ee3e9f4dd744c5653aac08152b34",
+    "b0a689360f4c9d107efd97d2e75c87a9a7b3afc8adb9a0069dff0a8488b350fe",
+    "b0f512b055bb511ea950d76438b13f16878149604fdf1365dcfa735186de954f",
+    "b160ab612e5438ef77ff449543fded69a1faf1616a1b64a8451243999793981f",
+    "b21359c70e53d4e66935fd504935f06d0b7f3cbdad91a87e2945310d67f4df00",
+    "b56319e60e0bfc683b91ca9c8cd2ec3ee94eb553a10bb509009aa2a351e9b15d",
+    "b75f314cd57457b52f716d9a93e8e1508e0f75764b7cf11b829d4e8d0e6a5cdb",
+    "b9453bd003548a7373d54c3c0bbf657f11c7fa632ece48300be38c27c11566fd",
+    "bc0be7c05798b904c3e2369672b00ec4e6b6a726e7cd792b6da017f3feacbe58",
+    "bc2e3645076867ff4000d9a73c37a04ec2eb5bcbf1ddf5d693a670f9a77fd5a8",
+    "bcc6a2e8b443d685c61b246c28c30e26655946653e8133112bba7c0e7970ce37",
+    "c01a455ed20c4aed410c320d3438bb9f7b09bedc57d209b7c4673f352c14aeb1",
+    "c02599cba240256b8703a48e6378ad4a0c9958b9d88025b07032593aea3f9dd6",
+    "c05280da808741c327b7270280d02c38ff2eb664f3f96509295b13aab724e748",
+    "c16f47afe2b1017dccd2c3f4f7188ddaaf2c27e9c5bd499be4e806b0716490e0",
+    "c1f1a1780ee44dba66295839ddb869539d5687a0fb18b269b16f227903c31aee",
+    "c1f33a6fdbb4ac78fbf1646e2f6a27faa8ea03013183d2904704f9f13502bf3e",
+    "c215edbdd311279807e51cd64b91b2a1471923c407ee8b997e4d54d94833385f",
+    "c23cba409dd6dd297a39c324ecd2b7f94406c2fa13fe17d86797737912d47cce",
+    "c2daa5c79dac2322671299804aac01ab7bb81681b230c69d55d590aa8a4200ed",
+    "c2f5b19535bc85c4f1c5bb2bc6e85dfbe7864f5ea4a40deadf16e65dd7eb58a4",
+    "c31be85f58fe47561f9c27cb3779fea486327f03c04dde3d090722c372132945",
+    "c32d1f3a55d57e0c1ff51c02f39680c1526071ffe21af2514f7c67764ad4e327",
+    "c4d432973a53a391ed5b3bdef5ebc252acc67ac59882429d665060bd3949fb24",
+    "c5a05d9c2a7375e9f8d1f552750a5cca10907425d22ab474732f6f832329f37d",
+    "c5da01dae6a94f3a70cd78267f864ec11ec3529c7878ed4948b5072a341be194",
+    "c62b4e1615f236b6e39e32f3650c62c7df363d7d8305631f73f713451c51a263",
+    "c840f8191c08a7e134723f7db88a612b378c543937c40a0f64faf0594ef42e58",
+    "c8b54bfb89bd83a5e6f7d20f96c366d2e902a92d54ec7563dd160b4a38accbfc",
+    "c9038a38158f873cba3ad6c4145234fdadc96ad718ebfd73d02b7e5dac685936",
+    "ca20a9db6fa3613edcc95d98b9069d170a90c2312482e2222cc0d617aadc1500",
+    "cb5c39534214007b9b7701f62b05adeb8fdd03442f1d550c89333ebb81cfac9a",
+    "d20a4414e427efb528a68a0072d2130a67f0712352395cb452bfeefcca9c3662",
+    "d322328a430877338347385f259ec2f5464281e8a060247df49cc679709d5c1f",
+    "d3afdaea65851fd0530e9b55f620eddfe37c61a5d04678a02b864f0e6fe06284",
+    "d4341c69ca65a9b857ddc41c81dfd588daa9b9f88a642a3bc575524ef7841f2a",
+    "d531d5d26bb062ace8db2edd000d16522beb66fcf54ae0b4a51b6db4bb0dec17",
+    "d559a896dafbc7858aeac2ca9ef8a9ffae9b1f77b41fdf574b8019fa446508f8",
+    "d571058e8195bb3411d927c6c8a52e720b26a24c4f50accc63913c29bb96c154",
+    "d596d2931a1b59ed49c33dffe835b517706240bb28a9d0698e4cd46c5bf6f3cf",
+    "d5a195b32278fd755ac6f0914586367e055e7ffc2e5d8f32afc5241e523e9202",
+    "d68c8db3b94cf523be0737f18602b5d9b99cf91df6bf6794c91a58adc6f6c690",
+    "d6e40839c39578b1652e79123686a84da6b2dbc22c79b9179868ad1fae94f3ef",
+    "d71e3485ae9886de64b34d9cd6e5ba63c88bdab7249cf24e9619c03a56980246",
+    "d7801df897c58bfa3b4bb72ac82a9b5f49b6c9d878f4159010d8dc7eb52ccf33",
+    "d9634aae83e7e14e37641bb06b965820249d82ae87108a87e583776a6ca5f9ec",
+    "dc10616d5120a8631a92701e8dee79955519e10e6ef110edf8e86cb23da7a6f0",
+    "dd2a58de00d447eed66c95d799efcee455046f7780e18cad4507021f837c4080",
+    "ddfe0f5920323b1871a9129c893541e602a7b821f4e965d500edcecc80387768",
+    "dec4a997f916743f7ab3eb091176fb30dee64cafdeff221496a8f815cffdce13",
+    "df567fab8c1f0e9dcee7253e13d2baf14c7996cc539d298b722710de90d97547",
+    "e0b59c8e32eb1bed63bf01c4acd6df3ca3d60a29dc330f980052b146823f90df",
+    "e268ac732685d179a61c17e511deb50fea7562498b3df397dbb15358340670fb",
+    "e388787c42664d9f40c900d794011cdb95049400f599c2ad2a0cfa56f4dc6f6b",
+    "e3b7759d063af2e6ed7f04a0b0816c3b1ce0f82f0e8e65b8a9e414dd5547ed78",
+    "e4ab4580e21af4fd154f78f16214183251e03a44ecca939ff553d77256f85ad5",
+    "e94e3f3880b2f2f73430e6e5b3405d5cb73bb47ac69a5d258d63928d78eaf4b7",
+    "e9e01bbb564d3835b2356f1e0381b165cdd6a776bf37772ed38c0af64081763b",
+    "ea8abb1dc1d513a3a2a7220ff91263ccf2c532350646d85280b254603a943cfc",
+    "eb41f1327bdb01e2a0a839ae7277596037c00c9e6b259e262c9425ba13d2ede9",
+    "ec672570e5d8570abe8298f855ed2a6888c842a39cea4cb1b62c00eefde140c7",
+    "ecaa1d98b0f109193137a6a0c2a30cd1f0b0ad735460d31ded89f32038bfb447",
+    "ede9473a6dcf55264925da18c58c33f529655b4a2ec023ca421fa8dfb4593ffb",
+    "ef41217e793aff17642df2fbe5e493bdb604211adb5dc4b20d0b211f799dcb27",
+    "f0ecfd6403335b0f17ca9be43cc7884bb3a711b06df02aa556b7f9da220ebbcd",
+    "f12043379329e632bb72f664ef477fa31a6d0c451693fdb11ba985bb6306070c",
+    "f16fa70eda6b795f1205dea4de8bf61525abe8717d982bc7da32940106096987",
+    "f27143c957948653244610c66fa420eded7607472a86251cb365e988175e3eaa",
+    "f3156158d1bc1899c9f8fef6e7c1ace70b25cf325f18b53f6e8018ebbbb3d1f9",
+    "f599ed4fb1bacb96a2c8929b0a24d0696bb1c8357fd27a29b29fc7aaf95041c0",
+    "f6a698637235b3666567fa6b286f19ffcdb712f0ab005db155abcc794215dfd7",
+    "f74c514983b777d153c83b918e94b1c94b35b9256436cf7be084c090a9807af2",
+    "f84485e53d39ef8a8b0fc7196e4b30eae0f999c35975e9054b1d8da709357b90",
+    "f8563b8a10dc714f95f9a3ad3fa579050857e5d18097608372923009741d3239",
+    "fb8909d714eba19a8207e624010531a86d3edd112a04d78c9e143a238ec54754",
+    "fcfa9ff8a080dc26d659122d1e6eb37aad2277d9083efaa312d9a8f205691132",
+    "fd04450b51d3d6c48b66b224a09064e9a1715388c29cc34f1b9824681c2c25f4",
+    "fd20dc13f5c890587134773fbbe98571d78201d9fe2a937007e210a483d5313e",
+    "fdf0f8095562734315f1dc6ef8d9137ff68308f2a86a48b789f25b411f6c7903",
+    "ffb9ad881965ad5f3ec9f26e3783d88aa6f98edb451e2349baa24133ba16718b"
+  ]
+}

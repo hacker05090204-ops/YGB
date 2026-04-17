@@ -12,7 +12,18 @@ import numpy as np
 from backend.ingestion.models import IngestedSample
 from backend.ingestion.normalizer import SampleQualityScorer
 
-_CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
+_ADVISORY_ID_PATTERNS = (
+    re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE),
+    re.compile(r"^GHSA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$", re.IGNORECASE),
+    re.compile(r"^GO-\d{4}-\d+$", re.IGNORECASE),
+    re.compile(r"^PYSEC-\d{4}-\d+$", re.IGNORECASE),
+    re.compile(r"^SNYK-[A-Z0-9-]+$", re.IGNORECASE),
+    re.compile(r"^RUSTSEC-\d{4}-\d+$", re.IGNORECASE),
+)
+
+
+def _is_valid_advisory_id(value: str) -> bool:
+    return any(pattern.fullmatch(value) for pattern in _ADVISORY_ID_PATTERNS)
 
 
 @dataclass(frozen=True)
@@ -55,6 +66,7 @@ class DataPurityEnforcer:
             "LOW",
             "INFO",
             "INFORMATIONAL",
+            "UNKNOWN",
         }
     )
     ALLOWED_SOURCES = frozenset(
@@ -69,6 +81,13 @@ class DataPurityEnforcer:
             "exploitdb",
             "bugcrowd",
             "circl_cve",
+            "msrc",
+            "redhat",
+            "vulnrichment",
+            "snyk",
+            "debian",
+            "alpine",
+            "packetstorm",
         }
     )
     UNSOURCED_MARKERS = frozenset(
@@ -145,7 +164,7 @@ class DataPurityEnforcer:
     @classmethod
     def _payload_rejection_reason(cls, payload: dict[str, object]) -> str | None:
         cve_id = str(payload.get("cve_id", "") or "").strip().upper()
-        if not _CVE_ID_RE.fullmatch(cve_id):
+        if not _is_valid_advisory_id(cve_id):
             return "invalid_cve_id_format"
 
         severity = str(payload.get("severity", "") or "").strip().upper()

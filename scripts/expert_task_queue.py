@@ -35,6 +35,16 @@ _ALLOWED_STATUSES = {
 logger = logging.getLogger(__name__)
 
 
+class QueueStatus(dict):
+    """Mapping-compatible queue status whose [`len()`](scripts/expert_task_queue.py:38) reflects expert count."""
+
+    def __len__(self) -> int:
+        experts = self.get("experts")
+        if isinstance(experts, list):
+            return len(experts)
+        return super().__len__()
+
+
 def _is_lock_contention_error(exc: OSError) -> bool:
     err_no = getattr(exc, "errno", None)
     win_error = getattr(exc, "winerror", None)
@@ -74,7 +84,7 @@ class ExpertTaskQueue:
         return load_status(self.status_path)
 
     def get_status(self) -> Dict[str, Any]:
-        return self.load_status()
+        return QueueStatus(self.load_status())
 
     def render_status(self) -> str:
         return render_status(self.status_path)

@@ -18,10 +18,13 @@ CORE RULES:
 - Audit is append-only
 """
 import hashlib
+import sqlite3
+import threading
+import time
 import uuid
-from collections import OrderedDict
 from typing import Optional, Tuple
 
+from config.storage_config import NONCE_DB
 from HUMANOID_HUNTER.decision import DecisionRecord, HumanDecision
 
 from .intent_types import IntentStatus, BindingResult
@@ -33,31 +36,82 @@ from .intent_context import (
 )
 
 
-class _BoundedSet:
-    """Bounded insertion-ordered set for hot-path duplicate tracking."""
+class PersistentNonceStore:
+    """SQLite-backed persistent nonce tracker for replay-safe intent binding."""
 
-    def __init__(self, maxsize: int = 10000):
+    def __init__(self, maxsize: int = 10000, ttl_seconds: int = 365 * 24 * 3600):
         self._maxsize = maxsize
-        self._entries: OrderedDict[str, None] = OrderedDict()
+        self._ttl_seconds = ttl_seconds
+        self._lock = threading.Lock()
+        self._db = sqlite3.connect(str(NONCE_DB), check_same_thread=False)
+        self._db.execute("PRAGMA journal_mode=WAL")
+        self._db.execute("PRAGMA synchronous=NORMAL")
+        self._db.execute("PRAGMA busy_timeout=30000")
+        self._db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS nonces (
+                nonce TEXT PRIMARY KEY,
+                expires_at REAL NOT NULL,
+                used_at REAL NOT NULL
+            )
+            """
+        )
+        self._db.execute(
+            "CREATE INDEX IF NOT EXISTS idx_nonces_expires ON nonces(expires_at)"
+        )
+        self._db.commit()
 
-    def add(self, key: str) -> None:
-        self._entries[key] = None
-        self._entries.move_to_end(key)
-        if len(self._entries) > self._maxsize:
-            evict_count = max(1, self._maxsize // 4)
-            for _ in range(min(evict_count, len(self._entries))):
-                self._entries.popitem(last=False)
+    def _prune(self) -> None:
+        now = time.time()
+        self._db.execute("DELETE FROM nonces WHERE expires_at < ?", (now,))
+        row = self._db.execute("SELECT COUNT(*) FROM nonces").fetchone()
+        count = int(row[0]) if row else 0
+        overflow = count - self._maxsize
+        if overflow > 0:
+            self._db.execute(
+                """
+                DELETE FROM nonces
+                WHERE nonce IN (
+                    SELECT nonce FROM nonces
+                    ORDER BY used_at ASC
+                    LIMIT ?
+                )
+                """,
+                (overflow,),
+            )
+        self._db.commit()
+
+    def add(self, key: str, ttl_seconds: Optional[int] = None) -> None:
+        with self._lock:
+            self._prune()
+            now = time.time()
+            ttl = self._ttl_seconds if ttl_seconds is None else max(int(ttl_seconds), 1)
+            self._db.execute(
+                "INSERT OR REPLACE INTO nonces (nonce, expires_at, used_at) VALUES (?, ?, ?)",
+                (key, now + ttl, now),
+            )
+            self._db.commit()
+
+    def is_replay(self, key: str) -> bool:
+        with self._lock:
+            self._prune()
+            row = self._db.execute(
+                "SELECT 1 FROM nonces WHERE nonce = ? AND expires_at > ?",
+                (key, time.time()),
+            ).fetchone()
+            return row is not None
 
     def __contains__(self, key: str) -> bool:
-        return key in self._entries
+        return self.is_replay(key)
 
     def clear(self) -> None:
-        self._entries.clear()
+        with self._lock:
+            self._db.execute("DELETE FROM nonces")
+            self._db.commit()
 
 
-# Track bound decisions to prevent duplicates (in-memory for pure function use)
-# In real implementation, this would be persisted.
-_BOUND_DECISIONS = _BoundedSet(10000)
+# Track bound decisions with persistent SSD-backed replay protection.
+_BOUND_DECISIONS = PersistentNonceStore(10000)
 
 
 def _compute_intent_hash(

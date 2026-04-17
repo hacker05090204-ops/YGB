@@ -317,7 +317,6 @@ class FasterWhisperSTT:
             )
             self._record_warning(message)
             raise RuntimeError(message) from exc
-
     def transcribe(
         self,
         audio: AudioFrame | bytes | str | Path,
@@ -366,6 +365,9 @@ class FasterWhisperSTT:
             "model_path": str(self.model_path) if self.model_path is not None else None,
             "warning": self.warning,
         }
+
+
+FastWhisperSTT = FasterWhisperSTT
 
 
 class PiperTTS:
@@ -728,6 +730,7 @@ def main() -> None:
 __all__ = [
     "AudioFrame",
     "ConversationPager",
+    "FastWhisperSTT",
     "FasterWhisperSTT",
     "PiperTTS",
     "ProductionVoicePipeline",

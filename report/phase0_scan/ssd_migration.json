@@ -1,0 +1,297 @@
+{
+  "hdd_refs": [
+    {
+      "file": ".tmp_hdd_drive/final_benchmark_ab.py",
+      "line": "15:# Setup paths - use project root (parent of .tmp_hdd_drive)",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/final_benchmark_ab.py",
+      "line": "15:# Setup paths - use project root (parent of .tmp_hdd_drive)",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/FINAL_GATE_CHECK.py",
+      "line": "126:Path('.tmp_hdd_drive/PHASE_1_COMPLETE.md'),",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/FINAL_GATE_CHECK.py",
+      "line": "127:Path('.tmp_hdd_drive/IMPLEMENTATION_STATUS.md'),",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/FINAL_GATE_CHECK.py",
+      "line": "126:Path('.tmp_hdd_drive/PHASE_1_COMPLETE.md'),",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/FINAL_GATE_CHECK.py",
+      "line": "127:Path('.tmp_hdd_drive/IMPLEMENTATION_STATUS.md'),",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase0b_inventory_scan.py",
+      "line": "16:OUT_DIR = ROOT / '.tmp_hdd_drive'",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase0b_inventory_scan.py",
+      "line": "16:OUT_DIR = ROOT / '.tmp_hdd_drive'",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase7b_runtime_probe.py",
+      "line": "265:out_path = Path(\".tmp_hdd_drive\") / \"phase7b_runtime_results.json\"",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase7b_runtime_probe.py",
+      "line": "265:out_path = Path(\".tmp_hdd_drive\") / \"phase7b_runtime_results.json\"",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase9b_integration_probe.py",
+      "line": "86:runtime_root = workspace / \".tmp_hdd_drive\" / \"phase9b_integration_runtime\"",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase9b_integration_probe.py",
+      "line": "86:runtime_root = workspace / \".tmp_hdd_drive\" / \"phase9b_integration_runtime\"",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_complete_self_analysis.py",
+      "line": "182:output_path = Path('.tmp_hdd_drive/ybg_analysis.json')",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_complete_self_analysis.py",
+      "line": "182:output_path = Path('.tmp_hdd_drive/ybg_analysis.json')",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "81:Path('.tmp_hdd_drive').mkdir(exist_ok=True)",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "82:with open('.tmp_hdd_drive/ybg_analysis.json','w') as f:",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "84:print('Analysis written to .tmp_hdd_drive/ybg_analysis.json')",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "81:Path('.tmp_hdd_drive').mkdir(exist_ok=True)",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "82:with open('.tmp_hdd_drive/ybg_analysis.json','w') as f:",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/run_self_analysis.py",
+      "line": "84:print('Analysis written to .tmp_hdd_drive/ybg_analysis.json')",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase8b_runtime/run_phase8b_check.py",
+      "line": "31:work_root = Path(\".tmp_hdd_drive/phase8b_runtime/artifacts\")",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": ".tmp_hdd_drive/phase8b_runtime/run_phase8b_check.py",
+      "line": "31:work_root = Path(\".tmp_hdd_drive/phase8b_runtime/artifacts\")",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "api/server.py",
+      "line": "204:# Ensure HDD storage root points to the dedicated YGB_DATA partition (D:\\)",
+      "pattern": "D:\\\\"
+    },
+    {
+      "file": "config/storage_config.py",
+      "line": "29:HDD_ROOT = _resolve_root(\"YGB_HDD_PATH\", \"data/hdd\")",
+      "pattern": "HDD_PATH"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "D:\\\\"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "/hdd/"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "/mnt/hdd"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "HDD_PATH"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "hdd_path"
+    },
+    {
+      "file": "report/phase0_scan/phase0_scan_runner.py",
+      "line": "489:hdd_patterns = [r\"D:\\\\\", \"/hdd/\", \"/mnt/hdd\", \"hdd_drive\", \".tmp_hdd\", \"HDD_PATH\", \"hdd_path\", \"D:/ygb_data\"]",
+      "pattern": "D:/ygb_data"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "64:\".tmp_hdd_drive/**/*.lock\",",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "65:\".tmp_hdd_drive/**/*.meta\",",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "66:\".tmp_hdd_drive/**/*.log\",",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "185:if relative_path.startswith(\".tmp_hdd_drive/\") and suffix == \".lock\":",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "188:if relative_path.startswith(\".tmp_hdd_drive/\") and suffix == \".meta\":",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "196:rule = self.REMOVE_PATTERNS[10] if relative_path.startswith(\".tmp_hdd_drive/\") else self.REMOVE_PATTERNS[11]",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "64:\".tmp_hdd_drive/**/*.lock\",",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "65:\".tmp_hdd_drive/**/*.meta\",",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "66:\".tmp_hdd_drive/**/*.log\",",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "185:if relative_path.startswith(\".tmp_hdd_drive/\") and suffix == \".lock\":",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "188:if relative_path.startswith(\".tmp_hdd_drive/\") and suffix == \".meta\":",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/clean_repo.py",
+      "line": "196:rule = self.REMOVE_PATTERNS[10] if relative_path.startswith(\".tmp_hdd_drive/\") else self.REMOVE_PATTERNS[11]",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/db_backup.py",
+      "line": "44:\"hdd_path\": HDD_DB,",
+      "pattern": "hdd_path"
+    },
+    {
+      "file": "scripts/industrial_audit.py",
+      "line": "50:\".tmp_hdd_drive\",",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/industrial_audit.py",
+      "line": "50:\".tmp_hdd_drive\",",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "D:\\\\"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "/hdd/"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "/mnt/hdd"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "hdd_drive"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "\\.tmp_hdd"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "HDD_PATH"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "hdd_path"
+    },
+    {
+      "file": "scripts/phase0_scan.py",
+      "line": "540:hdd_patterns = [r\"D:\\\\\", r\"/hdd/\", r\"/mnt/hdd\", r\"hdd_drive\", r\"\\.tmp_hdd\", r\"HDD_PATH\", r\"hdd_path\", r\"D:/ygb_data\"]",
+      "pattern": "D:/ygb_data"
+    }
+  ],
+  "ssd_refs": 200,
+  "data_sizes": {
+    "data": {
+      "bytes": 41709957,
+      "files": 82529,
+      "mb": 39.8
+    },
+    "training/features_safetensors": {
+      "bytes": 875261,
+      "files": 470,
+      "mb": 0.8
+    },
+    "checkpoints": {
+      "bytes": 435414048,
+      "files": 18,
+      "mb": 415.2
+    }
+  }
+}

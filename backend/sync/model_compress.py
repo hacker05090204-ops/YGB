@@ -23,11 +23,12 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
 from impl_v1.training.checkpoints.checkpoint_hardening import HardenedCheckpointManager
 
 logger = logging.getLogger("ygb.sync.compress")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 MODEL_ROOT = SYNC_ROOT / "ygb_training" / "models"
 
 

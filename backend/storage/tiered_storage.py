@@ -1,8 +1,8 @@
 """
 YGB Tiered Storage Manager
 ===========================
-SSD (C:) for hot training data — capped at 110 GB.
-HDD (D:) for everything else: videos, logs, user data, backups, overflow.
+SSD-first storage for hot training data.
+HDD archive storage for logs, raw feeds, backups, and overflow.
 
 Policy:
   1. Training artefacts (models, checkpoints, datasets) → SSD first.
@@ -26,6 +26,17 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
+from config.storage_config import (
+    ACTIVE_DB,
+    CHECKPOINTS_DIR,
+    FEATURES_DIR,
+    HDD_ROOT as CONFIG_HDD_ROOT,
+    LOG_DIR,
+    OVERFLOW_DIR,
+    SSD_ROOT as CONFIG_SSD_ROOT,
+    TRAINING_DIR,
+)
+
 logger = logging.getLogger("tiered_storage")
 
 
@@ -39,19 +50,19 @@ class StorageCompletelyUnavailableError(RuntimeError):
 _GB = 1024 ** 3
 _MB = 1024 ** 2
 
-SSD_ROOT = Path(os.environ.get("YGB_SSD_ROOT", "C:/ygb_data"))
-PRIMARY_HDD_ROOT = Path(os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd"))
+SSD_ROOT = CONFIG_SSD_ROOT
+PRIMARY_HDD_ROOT = CONFIG_HDD_ROOT
 FALLBACK_HDD_ROOT = Path(
-    os.environ.get("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
+    os.environ.get("YGB_HDD_FALLBACK_ROOT", str(CONFIG_SSD_ROOT / "archive_fallback"))
 )
 
 SSD_CAP_BYTES = int(float(os.environ.get("YGB_SSD_CAP_GB", "110")) * _GB)
 
 # Sub-directories — training artefacts on SSD, everything else on HDD/NAS.
-SSD_TRAINING_DIR   = SSD_ROOT / "training"
-SSD_CHECKPOINTS    = SSD_ROOT / "checkpoints"
-SSD_DATASETS       = SSD_ROOT / "datasets"
-SSD_DB             = SSD_ROOT / "ygb.db"
+SSD_TRAINING_DIR = TRAINING_DIR
+SSD_CHECKPOINTS = CHECKPOINTS_DIR
+SSD_DATASETS = FEATURES_DIR
+SSD_DB = ACTIVE_DB
 
 # Files older than this and bigger than MIN_COMPRESS_SIZE are eligible for
 # compression / migration when the SSD cap is hit.
@@ -328,8 +339,8 @@ def resolve_hdd_root(*, log_availability: bool = False) -> tuple[Path, dict]:
     Resolve the active HDD/NAS root.
 
     Primary policy:
-      1. Use configured D:-backed NAS root when available.
-      2. Fall back to configured C:-backed local root when NAS is unavailable.
+      1. Use the configured archive root when available.
+      2. Fall back to the configured local archive fallback when the primary root is unavailable.
     """
     primary_ok, primary_reason = _path_is_usable(PRIMARY_HDD_ROOT)
     fallback_ok, fallback_reason = _path_is_usable(FALLBACK_HDD_ROOT)
@@ -351,7 +362,7 @@ def resolve_hdd_root(*, log_availability: bool = False) -> tuple[Path, dict]:
             "fallback_available": fallback_ok,
             "fallback_active": False,
             "mode": "PRIMARY",
-            "reason": "Primary NAS root active",
+            "reason": "Primary archive root active",
         }
 
     if fallback_ok:
@@ -363,7 +374,7 @@ def resolve_hdd_root(*, log_availability: bool = False) -> tuple[Path, dict]:
             "fallback_available": True,
             "fallback_active": True,
             "mode": "FALLBACK",
-            "reason": f"Primary root unavailable ({primary_reason}) — using local fallback",
+            "reason": f"Primary archive root unavailable ({primary_reason}) — using local fallback",
         }
 
     raise StorageCompletelyUnavailableError("No storage backend available.")

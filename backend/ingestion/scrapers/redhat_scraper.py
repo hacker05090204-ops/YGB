@@ -1,9 +1,11 @@
-"""Red Hat advisory scraper backed by the public Hydra security API."""
+"""Red Hat advisory scraper backed by the public securitydata API with Hydra fallback."""
 
 from __future__ import annotations
 
 from typing import Any
 from urllib.parse import quote
+
+import requests
 
 from backend.ingestion.scrapers.base_scraper import BaseScraper, ScrapedSample
 
@@ -13,9 +15,50 @@ class RedHatAdvisoryScraper(BaseScraper):
 
     SOURCE = "redhat"
     REQUEST_DELAY_SECONDS = 1.0
-    LIST_URL = "https://access.redhat.com/hydra/rest/securitydata/cve.json"
-    DETAIL_URL_TEMPLATE = "https://access.redhat.com/hydra/rest/securitydata/cve/{cve_id}.json"
+    LIST_URLS = (
+        "https://access.redhat.com/hydra/rest/securitydata/cve.json",
+        "https://access.redhat.com/labs/securitydataapi/cve.json",
+    )
+    DETAIL_URL_TEMPLATES = (
+        "https://access.redhat.com/hydra/rest/securitydata/cve/{cve_id}.json",
+        "https://access.redhat.com/labs/securitydataapi/cve/{cve_id}.json",
+    )
     DETAIL_PAGE_URL_TEMPLATE = "https://access.redhat.com/security/cve/{cve_id}"
+
+    def _fetch_from_candidates(
+        self,
+        urls: tuple[str, ...],
+        *,
+        params: dict[str, Any] | None = None,
+        cve_id: str = "",
+    ) -> Any:
+        last_error: Exception | None = None
+        for url in urls:
+            try:
+                return self._get_json(url, params=params)
+            except requests.HTTPError as exc:
+                last_error = exc
+                status_code = exc.response.status_code if exc.response is not None else 0
+                self._log_partial_failure(
+                    reason=f"candidate_http_{status_code}",
+                    url=url,
+                    cve_id=cve_id,
+                )
+                if status_code in {404, 410}:
+                    continue
+                raise RuntimeError(f"redhat: upstream request failed (HTTP {status_code})") from exc
+            except requests.RequestException as exc:
+                last_error = exc
+                self._log_partial_failure(
+                    reason="candidate_request_exception",
+                    url=url,
+                    cve_id=cve_id,
+                    error_type=type(exc).__name__,
+                )
+                continue
+        if last_error is not None:
+            raise RuntimeError(f"redhat: no working advisory endpoint: {last_error}") from last_error
+        raise RuntimeError("redhat: no advisory endpoint candidates configured")
 
     def extract_recent_ids(self, payload: Any, *, max_items: int) -> list[str]:
         raw_entries: Any = payload
@@ -154,9 +197,9 @@ class RedHatAdvisoryScraper(BaseScraper):
         )
 
     def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
-        list_payload = self._get_json(
-            self.LIST_URL,
-            params={"per_page": min(max(max_items * 4, 20), 100), "page": 1},
+        list_payload = self._fetch_from_candidates(
+            self.LIST_URLS,
+            params={"after": "2024-01-01", "per_page": min(max(max_items * 4, 20), 100), "page": 1},
         )
         cve_ids = self.extract_recent_ids(list_payload, max_items=max(max_items * 2, 10))
         samples: list[ScrapedSample] = []
@@ -164,9 +207,11 @@ class RedHatAdvisoryScraper(BaseScraper):
             if len(samples) >= max_items:
                 break
             try:
-                detail_payload = self._get_json(
-                    self.DETAIL_URL_TEMPLATE.format(cve_id=quote(cve_id, safe=""))
+                detail_urls = tuple(
+                    template.format(cve_id=quote(cve_id, safe=""))
+                    for template in self.DETAIL_URL_TEMPLATES
                 )
+                detail_payload = self._fetch_from_candidates(detail_urls, cve_id=cve_id)
                 sample = self.parse_detail(detail_payload)
                 if sample is not None:
                     samples.append(sample)

@@ -35,7 +35,32 @@ from backend.training.safetensors_store import FEATURE_DIM, SafetensorsFeatureSt
 
 logger = logging.getLogger("ygb.training.auto_train_controller")
 
+try:
+    from impl_v1.phase49.moe import MoEClassifier  # noqa: F401
+except ImportError:  # pragma: no cover
+    MoEClassifier = None  # type: ignore[assignment]
+
+AUTO_TRAIN_DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 DEFAULT_CHECKPOINTS_ROOT = Path("checkpoints")
+
+
+def _gpu_memory_snapshot() -> dict[str, Any]:
+    if not torch.cuda.is_available():
+        return {
+            "device": str(AUTO_TRAIN_DEVICE),
+            "cuda_available": False,
+            "allocated_bytes": 0,
+            "reserved_bytes": 0,
+            "max_allocated_bytes": 0,
+        }
+    return {
+        "device": str(AUTO_TRAIN_DEVICE),
+        "cuda_available": True,
+        "allocated_bytes": int(torch.cuda.memory_allocated()),
+        "reserved_bytes": int(torch.cuda.memory_reserved()),
+        "max_allocated_bytes": int(torch.cuda.max_memory_allocated()),
+    }
 
 
 def _utc_now() -> str:
@@ -101,6 +126,8 @@ class AutoTrainController:
         self._run_active = False
         self._active_run_id: str | None = None
         self._last_promoted_at: str | None = None
+        self.device = AUTO_TRAIN_DEVICE
+        self._last_gpu_memory = _gpu_memory_snapshot()
         self._last_processed_total_samples = 0
         self._last_observed_total_samples = 0
         self._last_observed_shard_count = 0
@@ -501,19 +528,51 @@ class AutoTrainController:
             shuffle=False,
         )
 
+    def _prepare_trainer_device(self) -> None:
+        setattr(self.trainer, "device", self.device)
+        trainer_model = getattr(self.trainer, "model", None)
+        if trainer_model is None:
+            return
+        target_dtype = torch.float16 if self.device.type == "cuda" else torch.float32
+        trainer_model.to(device=self.device, dtype=target_dtype)
+
+    def _capture_gpu_memory(self) -> dict[str, Any]:
+        snapshot = _gpu_memory_snapshot()
+        self._last_gpu_memory = snapshot
+        return snapshot
+
     def _run_incremental_epoch(
         self,
         *,
         sample_weights: dict[str, float] | None,
     ):
+        self._prepare_trainer_device()
+        if self.device.type == "cuda":
+            before_snapshot = self._capture_gpu_memory()
+            logger.info(
+                "auto train using cuda device=%s allocated_bytes=%d reserved_bytes=%d",
+                self.device,
+                before_snapshot["allocated_bytes"],
+                before_snapshot["reserved_bytes"],
+            )
         run_incremental_epoch = getattr(self.trainer, "run_incremental_epoch")
         try:
             signature = inspect.signature(run_incremental_epoch)
         except (TypeError, ValueError):
             signature = None
         if signature is not None and "sample_weights" in signature.parameters:
-            return run_incremental_epoch(sample_weights=sample_weights)
-        return run_incremental_epoch()
+            result = run_incremental_epoch(sample_weights=sample_weights)
+        else:
+            result = run_incremental_epoch()
+        if self.device.type == "cuda":
+            after_snapshot = self._capture_gpu_memory()
+            logger.info(
+                "auto train cuda memory after run allocated_bytes=%d reserved_bytes=%d max_allocated_bytes=%d",
+                after_snapshot["allocated_bytes"],
+                after_snapshot["reserved_bytes"],
+                after_snapshot["max_allocated_bytes"],
+            )
+        return result
 
     def _artifact_signature(self) -> tuple[tuple[str, int, int], ...]:
         model_path = Path(getattr(self.trainer, "model_path", self.config.checkpoints_root / DEFAULT_MODEL_PATH.name))

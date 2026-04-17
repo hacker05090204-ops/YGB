@@ -23,6 +23,7 @@ import shutil
 import sys
 import threading
 import time
+import uuid
 from collections import deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -46,6 +47,7 @@ from backend.sync.manifest import (
 from backend.sync.chunker import (
     chunk_file, cleanup_orphan_chunks, CHUNK_SIZE,
 )
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
 
 logger = logging.getLogger("ygb.sync")
 _SYNC_STOP_EVENT = threading.Event()
@@ -223,12 +225,21 @@ class LocalSyncIndex:
         self.INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
         with self._lock:
             payload = {key: value.__dict__ for key, value in self._records.items()}
-        temp_path = self.INDEX_PATH.with_suffix(".json.tmp")
-        temp_path.write_text(
-            json.dumps(payload, indent=2),
-            encoding="utf-8",
+        temp_path = self.INDEX_PATH.with_name(
+            f"{self.INDEX_PATH.name}.{uuid.uuid4().hex}.tmp"
         )
-        temp_path.replace(self.INDEX_PATH)
+        temp_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        try:
+            temp_path.replace(self.INDEX_PATH)
+        except PermissionError:
+            if self.INDEX_PATH.exists():
+                logger.warning(
+                    "LocalSyncIndex: target index busy, leaving existing index in place",
+                    exc_info=True,
+                )
+                temp_path.unlink(missing_ok=True)
+                return
+            raise
 
     def _load(self):
         if not self.INDEX_PATH.exists():
@@ -335,7 +346,7 @@ def write_sync_status_snapshot(payload: dict[str, object]) -> None:
 
 # ── Configuration ─────────────────────────────────────────────────────
 
-SYNC_ROOT     = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT     = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 SYNC_META     = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 PEER_STATE    = SYNC_META / "peer_state"

@@ -12,6 +12,8 @@ import os
 
 from pathlib import Path as _Path
 
+from config.storage_config import HDD_ROOT, OVERFLOW_DIR
+
 
 def _is_placeholder_env_value(key: str, value: str) -> bool:
     upper = value.strip().upper()
@@ -87,8 +89,8 @@ def _shared_oauth_candidate_files(provider: str = "github") -> list[_Path]:
     filenames = [f"{normalized}_oauth.env", "oauth.env"]
 
     for root in (
-        os.getenv("YGB_HDD_ROOT", "C:/ygb_hdd"),
-        os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
+        os.getenv("YGB_HDD_ROOT", str(HDD_ROOT)),
+        os.getenv("YGB_HDD_FALLBACK_ROOT", str(OVERFLOW_DIR)),
     ):
         if not root:
             continue
@@ -203,8 +205,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import platform as _plat
 
 if _plat.system() == "Windows":
-    os.environ.setdefault("YGB_HDD_ROOT", "C:/ygb_hdd")
-    os.environ.setdefault("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
+    os.environ.setdefault("YGB_HDD_ROOT", str(HDD_ROOT))
+    os.environ.setdefault("YGB_HDD_FALLBACK_ROOT", str(OVERFLOW_DIR))
 
 # Import HDD storage bridge (replaces SQLite database module)
 from backend.storage.storage_bridge import (

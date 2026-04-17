@@ -1,15 +1,8 @@
 """
 Hardened Training Pipeline for MODE-B Gate Fix.
 
-Integrates all C++/numpy augmentation engines into training:
-  - Interaction dropout (p=0.3) per batch
-  - Adversarial scrambling (10% of batches)
-  - Noise augmentation on signal+response dims
-  - Domain randomization (±10%)
-  - Novel pattern injection (5% per epoch)
-  - Mixup augmentation (Beta(0.4))
-  - Calibration-aware loss (CE + 0.1 * cal_penalty + 0.05 * monotonicity_penalty)
-  - Feature balance penalty (interaction < 50%)
+Runs deterministic, real-data-only training and robustness checks.
+No synthetic augmentation, perturbation injection, or simulated drift is allowed.
 
 RTX 2050 safe:
   - AMP enabled
@@ -28,11 +21,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.amp import autocast, GradScaler
 
-# Feature bridge
-from backend.training.feature_bridge import (
-    FeatureDiversifier, FeatureConfig,
-    CalibrationEngine, DriftAugmenter,
-)
+from backend.training.adaptive_learner import DistributionMonitor
+from backend.training.feature_bridge import CalibrationEngine
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [HARDENED] %(message)s')
 logger = logging.getLogger(__name__)
@@ -64,6 +54,21 @@ def build_model(input_dim: int = 256) -> nn.Module:
     )
 
 
+def _interaction_contribution(features: np.ndarray) -> float:
+    feature_array = np.asarray(features, dtype=np.float32)
+    if feature_array.ndim != 2 or feature_array.shape[1] < 192:
+        return 0.0
+    interaction_variance = float(np.var(feature_array[:, 128:192], axis=0).mean())
+    total_variance = float(np.var(feature_array, axis=0).mean())
+    if total_variance <= 0.0:
+        return 0.0
+    return interaction_variance / total_variance
+
+
+def _balance_penalty(features: np.ndarray) -> float:
+    return max(0.0, _interaction_contribution(features) - 0.50)
+
+
 def train_hardened(features: np.ndarray, labels: np.ndarray,
                    epochs: int = 20, batch_size: int = 256,
                    lr: float = 0.001, grad_accum: int = 2,
@@ -89,10 +94,6 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
     train_f, train_l = features[idx[:split]], labels[idx[:split]]
     test_f, test_l = features[idx[split:]], labels[idx[split:]]
     
-    # Initialize augmentation engines
-    feat_config = FeatureConfig(seed=seed, training=True)
-    diversifier = FeatureDiversifier(feat_config)
-    drift_aug = DriftAugmenter()
     cal_engine = CalibrationEngine()
     
     # Model
@@ -123,20 +124,6 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
         epoch_f = train_f[perm]
         epoch_l = train_l[perm]
         
-        # Apply epoch-level augmentation
-        # 1) Domain randomization (±10%)
-        aug_seed = seed ^ (epoch * 11111)
-        epoch_f = drift_aug.apply_domain_randomization(epoch_f, scale_pct=0.10, seed=aug_seed)
-        
-        # 2) Novel pattern injection (5%)
-        epoch_f = drift_aug.inject_novel_patterns(epoch_f, inject_rate=0.15, seed=aug_seed + 1)
-        
-        # 3) Correlated noise
-        epoch_f = drift_aug.apply_correlated_noise(epoch_f, sigma=0.03, seed=aug_seed + 2)
-        
-        # 4) Random missingness (5%)
-        epoch_f = drift_aug.apply_random_missingness(epoch_f, miss_rate=0.10, seed=aug_seed + 3)
-        
         n_batches = (len(epoch_l) + batch_size - 1) // batch_size
         optimizer.zero_grad(set_to_none=True)
         
@@ -145,17 +132,6 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
             end = min(start + batch_size, len(epoch_l))
             batch_f = epoch_f[start:end].copy()
             batch_l = epoch_l[start:end].copy()
-            
-            # === Per-batch augmentation ===
-            
-            # 5) Interaction dropout (p=0.3)
-            batch_f = diversifier.apply_interaction_dropout(batch_f, epoch, b)
-            
-            # 6) Adversarial scrambling (10% of batches)
-            batch_f = diversifier.apply_adversarial_scramble(batch_f, epoch, b)
-            
-            # 7) Noise augmentation on signal+response
-            batch_f = diversifier.apply_noise_augmentation(batch_f, epoch, b)
             
             # Convert to tensors
             bx = torch.tensor(batch_f, dtype=torch.float32).to(device)
@@ -179,7 +155,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
                 cal_penalty = cal_engine.compute_calibration_penalty(
                     confidences.cpu().numpy(), correct.cpu().numpy()
                 )
-                bal_penalty = diversifier.compute_balance_penalty(batch_f)
+                bal_penalty = _balance_penalty(batch_f)
             
             # Total loss
             total_loss_val = ce_loss + cal_weight * cal_penalty + balance_weight * bal_penalty
@@ -221,7 +197,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
             test_correct = (test_preds == tl).cpu().numpy().astype(float)
             
             # Interaction importance
-            interaction_contrib = diversifier.compute_interaction_contribution(test_f)
+            interaction_contrib = _interaction_contribution(test_f)
         
         train_acc = total_correct / max(total_samples, 1)
         avg_loss = total_loss / max(total_samples, 1)
@@ -277,32 +253,45 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
 
 
 def verify_robustness(model, test_features, test_labels, device):
-    """Quick robustness check: interaction scramble and novel pattern."""
+    """Quick robustness check using real observed windows only."""
     model.eval()
+    if len(test_labels) < 100:
+        raise RuntimeError(
+            "verify_robustness requires at least 100 real evaluation samples"
+        )
     
     def _acc(f, l):
         with torch.no_grad():
             x = torch.tensor(f, dtype=torch.float32).to(device)
             preds = model(x).argmax(dim=1).cpu().numpy()
         return (preds == l).mean()
+
+    def _severity_counts(window_labels: np.ndarray) -> dict[str, int]:
+        return {
+            "NEGATIVE": int(np.sum(window_labels == 0)),
+            "POSITIVE": int(np.sum(window_labels == 1)),
+        }
     
     baseline = _acc(test_features, test_labels)
-    
-    # Interaction scramble
-    scrambled = test_features.copy()
-    np.random.shuffle(scrambled[:, 128:192])
-    scramble_acc = _acc(scrambled, test_labels)
+
+    feature_array = np.asarray(test_features, dtype=np.float32)
+    label_array = np.asarray(test_labels, dtype=np.int64)
+    window_size = max(25, min(len(label_array) // 3, 200))
+    baseline_window_l = label_array[:window_size]
+    middle_window_f = feature_array[window_size:window_size * 2]
+    middle_window_l = label_array[window_size:window_size * 2]
+    late_window_f = feature_array[-window_size:]
+    late_window_l = label_array[-window_size:]
+
+    monitor = DistributionMonitor(history_size=5, shift_threshold=0.15)
+    monitor.observe(_severity_counts(baseline_window_l))
+
+    middle_shift = monitor.observe(_severity_counts(middle_window_l))
+    scramble_acc = _acc(middle_window_f, middle_window_l)
     scramble_drop = baseline - scramble_acc
-    
-    # Novel patterns — structural perturbation (NOT full replacement)
-    novel = test_features.copy()
-    n_inject = len(novel) // 5
-    # Perturb interaction+noise dims while preserving signal/response
-    novel[:n_inject, 128:192] = np.random.uniform(0.2, 0.8, (n_inject, 64))
-    novel[:n_inject, 192:256] = np.random.normal(0.5, 0.2, (n_inject, 64)).clip(0, 1)
-    perturbation = np.random.normal(0, 0.10, (n_inject, 128))
-    novel[:n_inject, :128] = np.clip(novel[:n_inject, :128] + perturbation, 0, 1)
-    novel_acc = _acc(novel, test_labels)
+
+    late_shift = monitor.observe(_severity_counts(late_window_l))
+    novel_acc = _acc(late_window_f, late_window_l)
     novel_drop = baseline - novel_acc
     
     return {
@@ -311,8 +300,10 @@ def verify_robustness(model, test_features, test_labels, device):
         "scramble_drop": round(float(scramble_drop), 4),
         "novel_acc": round(float(novel_acc), 4),
         "novel_drop": round(float(novel_drop), 4),
-        "scramble_pass": scramble_drop < 0.05,
-        "novel_pass": novel_drop < 0.05,
+        "middle_window_js": round(float(middle_shift.js_distance), 4),
+        "late_window_js": round(float(late_shift.js_distance), 4),
+        "scramble_pass": scramble_drop < 0.05 and middle_shift.js_distance <= middle_shift.threshold,
+        "novel_pass": novel_drop < 0.05 and late_shift.js_distance <= late_shift.threshold,
     }
 
 
@@ -342,5 +333,5 @@ if __name__ == "__main__":
     
     logger.info(f"Robustness check:")
     logger.info(f"  Baseline:         {robustness['baseline_acc']:.4f}")
-    logger.info(f"  Scramble:         {robustness['scramble_acc']:.4f} (drop={robustness['scramble_drop']:.4f}) {'PASS' if robustness['scramble_pass'] else 'FAIL'}")
-    logger.info(f"  Novel patterns:   {robustness['novel_acc']:.4f} (drop={robustness['novel_drop']:.4f}) {'PASS' if robustness['novel_pass'] else 'FAIL'}")
+    logger.info(f"  Middle window:    {robustness['scramble_acc']:.4f} (drop={robustness['scramble_drop']:.4f}, js={robustness['middle_window_js']:.4f}) {'PASS' if robustness['scramble_pass'] else 'FAIL'}")
+    logger.info(f"  Late window:      {robustness['novel_acc']:.4f} (drop={robustness['novel_drop']:.4f}, js={robustness['late_window_js']:.4f}) {'PASS' if robustness['novel_pass'] else 'FAIL'}")

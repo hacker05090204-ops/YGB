@@ -1,12 +1,13 @@
 """
-YGB Database — SQLite on HDD
+YGB Database — SQLite on SSD
 
-Production-grade persistent storage using aiosqlite.
-Replaces the old JSON-file based database.
+Production-grade persistent storage using per-operation `aiosqlite`
+connections guarded by a lightweight connection semaphore.
 
 Models: users, sessions, devices, training_runs, audit_log
 
-Configure via DATABASE_URL in .env (default: D:/ygb_data/ygb.db)
+Configure via `YGB_DB_PATH` or `DATABASE_URL`.
+Defaults to the SSD-first path from `config.storage_config`.
 """
 
 import asyncio
@@ -21,6 +22,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, List, Any, AsyncIterator
 
+from config.storage_config import ACTIVE_DB
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,14 +34,49 @@ try:
 except ImportError:
     logger.debug("python-dotenv not installed; skipping .env autoload")
 
-# Database path from env
-_raw_url = os.getenv("DATABASE_URL", "sqlite:///D:/ygb_data/ygb.db")
-# Strip sqlite:/// prefix if present
-DB_PATH = _raw_url.replace("sqlite:///", "").replace("sqlite://", "")
+
+def _resolve_db_path() -> Path:
+    raw_path = os.getenv("YGB_DB_PATH", "").strip()
+    if raw_path:
+        return Path(raw_path)
+
+    database_url = os.getenv("DATABASE_URL", "").strip()
+    if database_url:
+        if database_url.startswith("sqlite:///"):
+            return Path(database_url.replace("sqlite:///", "", 1))
+        if database_url.startswith("sqlite://"):
+            return Path(database_url.replace("sqlite://", "", 1))
+        return Path(database_url)
+
+    return ACTIVE_DB
+
+
+_DB_PATH = _resolve_db_path()
+DB_PATH = str(_DB_PATH)
+
+# Backward-compatibility sentinel for older tests/callers that reset a module-
+# level connection handle even though connections are now request-scoped.
+_db = None
+_db_pragma_lock: asyncio.Lock | None = None
+_configured_db_paths: set[str] = set()
+
+
+def _current_db_path() -> Path:
+    raw = str(DB_PATH or "").strip()
+    if not raw:
+        return ACTIVE_DB
+    return Path(raw)
+
+
+def _get_db_pragma_lock() -> asyncio.Lock:
+    global _db_pragma_lock
+    if _db_pragma_lock is None:
+        _db_pragma_lock = asyncio.Lock()
+    return _db_pragma_lock
 
 # SQLite connection-pool controls.
-_POOL_SIZE = 10
-_pool_semaphore = asyncio.Semaphore(_POOL_SIZE)
+_POOL_SIZE = max(4, int(os.getenv("YGB_DB_POOL_SIZE", "16")))
+_connection_pool = asyncio.Semaphore(_POOL_SIZE)
 
 
 def _now_iso() -> str:
@@ -49,22 +87,35 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-async def _configure_connection(conn: aiosqlite.Connection) -> None:
-    conn.row_factory = aiosqlite.Row
-    await conn.execute("PRAGMA journal_mode=WAL")
-    await conn.execute("PRAGMA foreign_keys=ON")
+async def _configure_connection(conn: aiosqlite.Connection, db_path: Path) -> None:
     await conn.execute("PRAGMA busy_timeout=30000")
+    await conn.execute("PRAGMA foreign_keys=ON")
+    await conn.execute("PRAGMA cache_size=-65536")
+
+    db_key = str(db_path.resolve())
+    if db_key not in _configured_db_paths:
+        async with _get_db_pragma_lock():
+            if db_key not in _configured_db_paths:
+                await conn.execute("PRAGMA journal_mode=WAL")
+                await conn.execute("PRAGMA synchronous=NORMAL")
+                _configured_db_paths.add(db_key)
+    else:
+        await conn.execute("PRAGMA synchronous=NORMAL")
+
+    conn.row_factory = aiosqlite.Row
+    await conn.commit()
 
 
 @asynccontextmanager
 async def get_db() -> AsyncIterator[aiosqlite.Connection]:
-    """Yield a pooled SQLite connection for the duration of one operation."""
-    db_dir = Path(DB_PATH).parent
+    """Yield a request-scoped SQLite connection for the duration of one operation."""
+    runtime_db_path = _current_db_path()
+    db_dir = runtime_db_path.parent
     db_dir.mkdir(parents=True, exist_ok=True)
 
-    async with _pool_semaphore:
-        async with aiosqlite.connect(DB_PATH) as conn:
-            await _configure_connection(conn)
+    async with _connection_pool:
+        async with aiosqlite.connect(str(runtime_db_path), timeout=30) as conn:
+            await _configure_connection(conn, runtime_db_path)
             yield conn
 
 
@@ -172,7 +223,7 @@ async def init_database():
     async with get_db() as db:
         await db.executescript(SCHEMA_SQL)
         await db.commit()
-    print(f"[OK] SQLite database initialized at: {DB_PATH}")
+    print(f"[OK] SQLite database initialized at: {_current_db_path()}")
 
 
 async def close_pool():

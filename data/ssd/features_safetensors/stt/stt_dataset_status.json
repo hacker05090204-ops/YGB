@@ -1,0 +1,41 @@
+{
+  "status": "EMPTY",
+  "dataset_root": "C:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\data\\ssd\\features_safetensors\\stt",
+  "manifest_path": "C:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\data\\ssd\\features_safetensors\\stt\\stt_manifest.jsonl",
+  "sample_count": 0,
+  "min_samples_for_training": 200,
+  "training_ready": false,
+  "total_duration_sec": 0,
+  "total_duration_hours": 0.0,
+  "avg_duration_sec": 0.0,
+  "avg_transcript_chars": 0.0,
+  "max_transcript_chars": 0,
+  "languages": {},
+  "providers": {},
+  "unique_users": 0,
+  "unique_sessions": 0,
+  "last_sample_at": null,
+  "last_sample_id": null,
+  "last_session_id": null,
+  "storage_topology": {
+    "primary_root": "C:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\data\\hdd",
+    "fallback_root": "C:\\ygb_hdd_fallback",
+    "active_root": "C:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\data\\hdd",
+    "primary_available": true,
+    "fallback_available": true,
+    "fallback_active": false,
+    "mode": "PRIMARY",
+    "reason": "Primary archive root active"
+  },
+  "training_status": {
+    "status": "IDLE",
+    "last_training_at": null,
+    "last_completed_session": null,
+    "latest_checkpoint": null,
+    "best_checkpoint": null
+  },
+  "checkpoint_dir": "C:\\Users\\Unkno\\Videos\\New folder\\YGB-main (1)\\checkpoints\\stt",
+  "latest_checkpoint": null,
+  "best_checkpoint": null,
+  "checked_at": "2026-04-17T14:44:07.949273+00:00"
+}

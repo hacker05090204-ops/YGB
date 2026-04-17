@@ -1,0 +1,18 @@
+======================================================================
+SCAN E: SCRAPER URL HEALTH
+======================================================================
+  LIVE  NVD_v2: 1779ms
+  LIVE  CISA_KEV: 1063ms
+  400   OSV_API: URL format wrong — FIX SCRAPER
+  LIVE  GitHub_Adv: 781ms
+  LIVE  ExploitDB_CSV: 6997ms
+  LIVE  MSRC: 1960ms
+  404   RedHat_API: endpoint moved — UPDATE URL
+  ERR   Snyk_Query: HTTPSConnectionPool(host='api.security.snyk.io', port=443): Max retries exceeded with url: /v1/vuln/npm?page=1 (Caused b
+  LIVE  VulnRichment: 754ms
+  ERR   PacketStorm: HTTPSConnectionPool(host='rss.packetstormsecurity.com', port=443): Max retries exceeded with url: /files/ (Caused by SSL
+  404   AlpineSecDB: endpoint moved — UPDATE URL
+  TIME  DebianSec: timeout
+
+LIVE: 6/12 sources reachable
+BROKEN (need URL fix): ['OSV_API', 'RedHat_API', 'Snyk_Query', 'PacketStorm', 'AlpineSecDB', 'DebianSec']

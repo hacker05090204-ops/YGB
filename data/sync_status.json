@@ -1,9 +1,9 @@
 {
-  "cycle_id": "benchmark_node-20260416T222217731131Z",
+  "cycle_id": "benchmark_node-20260417T143914183420Z",
   "mode": "STANDALONE",
-  "local_files": 511,
-  "local_bytes": 438824616,
-  "last_sync_time": "2026-04-16T22:22:17.731131+00:00",
+  "local_files": 687,
+  "local_bytes": 439174922,
+  "last_sync_time": "2026-04-17T14:39:14.183420+00:00",
   "peers_connected": 0,
   "files_synced_last_cycle": 3,
   "configured": false,

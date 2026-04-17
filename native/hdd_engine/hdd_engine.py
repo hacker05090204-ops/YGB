@@ -41,6 +41,8 @@ from typing import Optional, Dict, List, Any, Tuple
 from datetime import datetime, timezone
 from enum import Enum
 
+from config.storage_config import HDD_ROOT as CONFIG_HDD_ROOT
+
 logger = logging.getLogger("hdd_engine")
 logger.setLevel(logging.INFO)
 if not logger.handlers:
@@ -56,10 +58,7 @@ if not logger.handlers:
 # =============================================================================
 
 # Default HDD root — MUST be on HDD, never SSD
-if platform.system() == "Windows":
-    DEFAULT_HDD_ROOT = "C:/ygb_hdd"
-else:
-    DEFAULT_HDD_ROOT = "/mnt/hdd/ygb"
+DEFAULT_HDD_ROOT = str(CONFIG_HDD_ROOT)
 
 # Entity types (subdirectories)
 ENTITY_TYPES = (

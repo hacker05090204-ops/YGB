@@ -1,8 +1,7 @@
-"""Recent NVD feed scraper backed by the public recent feed archive."""
+"""Recent NVD scraper backed by the public NVD REST API."""
 
 from __future__ import annotations
 
-import gzip
 import logging
 from typing import Any
 
@@ -17,7 +16,7 @@ class NVDScraper(BaseScraper):
 
     SOURCE = "nvd"
     REQUEST_DELAY_SECONDS = 1.0
-    RECENT_FEED_URL = "https://nvd.nist.gov/feeds/json/cves/2.0/nvdcve-2.0-recent.json.gz"
+    API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
     @staticmethod
     def _extract_description(cve_payload: dict[str, Any]) -> str:
@@ -156,10 +155,8 @@ class NVDScraper(BaseScraper):
         return samples
 
     def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
-        raw_bytes = self._get_bytes(self.RECENT_FEED_URL)
-        try:
-            decoded_bytes = gzip.decompress(raw_bytes)
-        except OSError:
-            decoded_bytes = raw_bytes
-        payload = self._load_json_bytes(decoded_bytes, source=self.SOURCE)
+        payload = self._get_json(
+            self.API_URL,
+            params={"resultsPerPage": min(max(max_items, 1), 100), "startIndex": 0},
+        )
         return self.parse_feed(payload, max_items=max_items)

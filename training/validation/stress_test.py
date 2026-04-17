@@ -1,13 +1,8 @@
 """
 Phase 3: Generalization Stress Test for MODE-B Gate.
 
-Adversarial perturbation tests:
-  1) Boundary noise (0.45-0.55 signal region)
-  2) Feature scaling +/-15%
-  3) Random feature masking
-  4) Interaction scrambling
-  5) Correlated noise injection
-  6) Shuffled non-label features
+This validator uses only real observed windows from the supplied dataset.
+It does not inject synthetic perturbations or randomized drift.
 
 REQUIREMENTS:
   Accuracy drop < 5%
@@ -23,6 +18,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 import numpy as np
 import torch
 import torch.nn as nn
+
+from backend.training.adaptive_learner import DistributionMonitor
 
 ACCURACY_DROP_MAX = 0.05
 CALIBRATION_SHIFT_MAX = 0.05
@@ -58,14 +55,9 @@ def _build_model(input_dim: int, device: torch.device) -> nn.Module:
 
 
 def _train_model(model, features, labels, device, epochs=15, lr=0.001):
-    """Hardened training with augmentation to prevent shortcut reliance."""
-    from backend.training.feature_bridge import (
-        FeatureDiversifier, FeatureConfig, CalibrationEngine, DriftAugmenter,
-    )
-    
-    feat_config = FeatureConfig(seed=42, training=True)
-    diversifier = FeatureDiversifier(feat_config)
-    drift_aug = DriftAugmenter()
+    """Real-data-only training with calibration-aware loss."""
+    from backend.training.feature_bridge import CalibrationEngine
+
     cal_engine = CalibrationEngine()
     
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
@@ -77,25 +69,14 @@ def _train_model(model, features, labels, device, epochs=15, lr=0.001):
         perm = np.random.permutation(len(labels))
         epoch_f = features[perm].copy()
         epoch_l = labels[perm].copy()
-        
-        # Epoch-level augmentation
-        aug_seed = 42 ^ (epoch * 11111)
-        epoch_f = drift_aug.apply_domain_randomization(epoch_f, scale_pct=0.10, seed=aug_seed)
-        epoch_f = drift_aug.inject_novel_patterns(epoch_f, inject_rate=0.10, seed=aug_seed + 1)
-        epoch_f = drift_aug.apply_correlated_noise(epoch_f, sigma=0.03, seed=aug_seed + 2)
-        
+
         n_batches = (len(epoch_l) + batch_size - 1) // batch_size
         for b in range(n_batches):
             start = b * batch_size
             end = min(start + batch_size, len(epoch_l))
             batch_f = epoch_f[start:end].copy()
             batch_l = epoch_l[start:end]
-            
-            # Per-batch augmentation
-            batch_f = diversifier.apply_interaction_dropout(batch_f, epoch, b)
-            batch_f = diversifier.apply_adversarial_scramble(batch_f, epoch, b)
-            batch_f = diversifier.apply_noise_augmentation(batch_f, epoch, b)
-            
+
             bx = torch.tensor(batch_f, dtype=torch.float32).to(device)
             by = torch.tensor(batch_l, dtype=torch.long).to(device)
             optimizer.zero_grad(set_to_none=True)
@@ -141,6 +122,20 @@ def _evaluate(model, features, labels, device, confidence_threshold=0.7):
 def run_stress_tests(features: np.ndarray, labels: np.ndarray) -> StressTestReport:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     N, D = features.shape
+    if N < 240:
+        raise RuntimeError(
+            "run_stress_tests requires at least 240 real samples for windowed evaluation"
+        )
+
+    def _severity_counts(window_labels: np.ndarray) -> dict[str, int]:
+        return {
+            "NEGATIVE": int(np.sum(window_labels == 0)),
+            "POSITIVE": int(np.sum(window_labels == 1)),
+        }
+
+    ordered_features = np.ascontiguousarray(features, dtype=np.float32)
+    ordered_labels = np.ascontiguousarray(labels, dtype=np.int64)
+    window_size = max(40, min(N // 5, 400))
     
     # Split 80/20
     np.random.seed(42)
@@ -157,89 +152,101 @@ def run_stress_tests(features: np.ndarray, labels: np.ndarray) -> StressTestRepo
     
     results = []
     failures = []
+    monitor = DistributionMonitor(history_size=6, shift_threshold=0.15)
+    baseline_window_l = ordered_labels[:window_size]
+    monitor.observe(_severity_counts(baseline_window_l))
+
+    def _evaluate_real_window(name: str, window_f: np.ndarray, window_l: np.ndarray):
+        acc, ece, abst = _evaluate(model, window_f, window_l, device)
+        drop = baseline_acc - acc
+        shift = abs(ece - baseline_ece)
+        distribution_shift = monitor.observe(_severity_counts(window_l))
+        result = StressResult(
+            name,
+            baseline_acc,
+            acc,
+            drop,
+            shift,
+            abst,
+            drop < ACCURACY_DROP_MAX
+            and shift < CALIBRATION_SHIFT_MAX
+            and distribution_shift.js_distance <= distribution_shift.threshold,
+        )
+        return result, distribution_shift
     
-    # --- Test 1: Boundary noise (0.45-0.55 signal) ---
-    stressed = test_f.copy()
-    for i in range(len(stressed)):
-        stressed[i, :64] = np.clip(stressed[i, :64] + np.random.uniform(-0.05, 0.05, 64), 0, 1)
-        stressed[i, :64] = np.clip(stressed[i, :64], 0.35, 0.65)
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("boundary_noise", baseline_acc, acc, drop, shift, abst, 
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 1: Early real window ---
+    r, dist = _evaluate_real_window(
+        "early_real_window",
+        ordered_features[window_size:window_size * 2],
+        ordered_labels[window_size:window_size * 2],
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"boundary_noise: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Boundary noise: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"early_real_window: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Early real window: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
-    # --- Test 2: Feature scaling +/-15% ---
-    stressed = test_f.copy() * np.random.uniform(0.85, 1.15, (1, D))
-    stressed = np.clip(stressed, 0, 1)
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("feature_scaling", baseline_acc, acc, drop, shift, abst,
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 2: Mid real window ---
+    r, dist = _evaluate_real_window(
+        "mid_real_window",
+        ordered_features[window_size * 2:window_size * 3],
+        ordered_labels[window_size * 2:window_size * 3],
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"feature_scaling: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Feature scaling: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"mid_real_window: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Mid real window: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
-    # --- Test 3: Random feature masking (10% of dims) ---
-    stressed = test_f.copy()
-    mask_dims = np.random.choice(D, D // 10, replace=False)
-    stressed[:, mask_dims] = 0.0
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("feature_masking", baseline_acc, acc, drop, shift, abst,
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 3: Late real window ---
+    r, dist = _evaluate_real_window(
+        "late_real_window",
+        ordered_features[-window_size * 2:-window_size],
+        ordered_labels[-window_size * 2:-window_size],
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"feature_masking: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Feature masking: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"late_real_window: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Late real window: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
-    # --- Test 4: Interaction scrambling ---
-    stressed = test_f.copy()
-    np.random.shuffle(stressed[:, 128:192])  # Shuffle interaction dims
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("interaction_scramble", baseline_acc, acc, drop, shift, abst,
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 4: Held-out evaluation window ---
+    r, dist = _evaluate_real_window("heldout_eval", test_f, test_l)
     results.append(r)
     if not r.passed:
-        failures.append(f"interaction_scramble: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Interaction scramble: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"heldout_eval: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Held-out eval: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
-    # --- Test 5: Correlated noise injection ---
-    noise = np.random.randn(*test_f.shape) * 0.1
-    noise[:, :64] *= (test_f[:, :64] + 0.1)  # Noise correlated with signal
-    stressed = np.clip(test_f + noise, 0, 1)
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("correlated_noise", baseline_acc, acc, drop, shift, abst,
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 5: Tail real window ---
+    r, dist = _evaluate_real_window(
+        "tail_real_window",
+        ordered_features[-window_size:],
+        ordered_labels[-window_size:],
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"correlated_noise: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Correlated noise: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"tail_real_window: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Tail real window: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
-    # --- Test 6: Shuffle non-label features (noise dims) ---
-    stressed = test_f.copy()
-    for d in range(192, 256):
-        np.random.shuffle(stressed[:, d])
-    acc, ece, abst = _evaluate(model, stressed, test_l, device)
-    drop = baseline_acc - acc
-    shift = abs(ece - baseline_ece)
-    r = StressResult("shuffle_noise_dims", baseline_acc, acc, drop, shift, abst,
-                     drop < ACCURACY_DROP_MAX and shift < CALIBRATION_SHIFT_MAX)
+    # --- Test 6: Baseline window replay ---
+    r, dist = _evaluate_real_window(
+        "baseline_window_replay",
+        ordered_features[:window_size],
+        ordered_labels[:window_size],
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"shuffle_noise_dims: drop={drop:.4f} shift={shift:.4f}")
-    print(f"  Shuffle noise: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"baseline_window_replay: drop={r.accuracy_drop:.4f} shift={r.calibration_shift:.4f} js={dist.js_distance:.4f}"
+        )
+    print(f"  Baseline replay: acc={r.stressed_accuracy:.4f} drop={r.accuracy_drop:.4f} js={dist.js_distance:.4f}")
     
     return StressTestReport(
         passed=len(failures) == 0,

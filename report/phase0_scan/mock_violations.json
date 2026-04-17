@@ -1,0 +1,1124 @@
+[
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "audit_comprehensive.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "182:x = torch.randn(4, 267)"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase0_inventory.py",
+    "pattern": "SIMULATED",
+    "line": "70:'STUB', 'MOCK', 'FAKE', 'SIMULATED', 'NotImplementedError']:"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "torch\\.rand\\(",
+    "line": "12:'torch.rand(',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "return 0\\.95",
+    "line": "41:'return 0.95',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "return 0\\.87",
+    "line": "42:'return 0.87',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "return 0\\.9",
+    "line": "41:'return 0.95',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "accuracy = 1\\.0",
+    "line": "43:'accuracy = 1.0',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "f1 = 0\\.9",
+    "line": "44:'f1 = 0.9',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "val_f1 = 0\\.8",
+    "line": "45:'val_f1 = 0.8',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "return \\[\\]  # TODO",
+    "line": "32:'return []  # TODO',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "return \\{\\}  # placeholder",
+    "line": "37:'return {}  # placeholder',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "SIMULATED",
+    "line": "73:print('MOCK / FAKE / SIMULATED CODE DETECTION')"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "fake_",
+    "line": "15:'fake_',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "FAKE ",
+    "line": "73:print('MOCK / FAKE / SIMULATED CODE DETECTION')"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "dummy_data",
+    "line": "21:'dummy_data',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "mock_data",
+    "line": "17:'mock_data',"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "bypass_auth",
+    "line": "29:'bypass_auth',"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "30:'TEMP_AUTH_BYPASS',"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "except:\\s*pass",
+    "line": "61:'except: pass',"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "audit_phase1_mock_detection.py",
+    "pattern": "except Exception:\\s*pass",
+    "line": "62:'except Exception: pass',"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "torch\\.rand\\(",
+    "line": "8:'torch.rand(',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "return 0\\.95",
+    "line": "23:'return 0.95',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "return 0\\.9",
+    "line": "23:'return 0.95',"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "accuracy = 1\\.0",
+    "line": "24:'accuracy = 1.0',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "SIMULATED",
+    "line": "30:print('MOCK / FAKE / SIMULATED CODE DETECTION')"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "fake_",
+    "line": "9:'fake_',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "FAKE ",
+    "line": "30:print('MOCK / FAKE / SIMULATED CODE DETECTION')"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "dummy_data",
+    "line": "13:'dummy_data',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "mock_data",
+    "line": "10:'mock_data',"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "bypass_auth",
+    "line": "18:'bypass_auth',"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "19:'TEMP_AUTH_BYPASS',"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE1_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "99:x = torch.randn(4, 267)"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE3_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "113:\"layer1.weight\": torch.randn(100, 100),"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE3_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "114:\"layer2.weight\": torch.randn(100, 100),"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE3_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "159:\"layer1\": torch.randn(50, 50),"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE3_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "160:\"layer2\": torch.randn(50, 50),"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE3_GATE_TEST.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "167:\"layer1\": torch.randn(50, 50),  # Changed"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE4_GATE_TEST.py",
+    "pattern": "np\\.random\\.randn\\(",
+    "line": "65:X_train = np.random.randn(100, 50).astype(np.float32)"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "PHASE4_GATE_TEST.py",
+    "pattern": "np\\.random\\.randn\\(",
+    "line": "75:X_test = np.random.randn(10, 50).astype(np.float32)"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "run_self_analysis.py",
+    "pattern": "except:\\s*pass",
+    "line": "62:print(f'Bare except:pass violations: {bare} (target: 0)')"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": ".tmp_hdd_drive/final_benchmark_ab.py",
+    "pattern": "except:\\s*pass",
+    "line": "313:\"\"\"Audit for bare except:pass patterns under backend/, impl_v1/, scripts/.\"\"\""
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": ".tmp_hdd_drive/FINAL_GATE_CHECK.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "57:x = torch.randn(2, 267)"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": ".tmp_hdd_drive/verify_moe_scale.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "44:x = torch.randn(2, 267)"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "api/server.py",
+    "pattern": "SIMULATED",
+    "line": "1773:(\"PLANNED\", \"SIMULATE\"): \"SIMULATED\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "api/server.py",
+    "pattern": "SIMULATED",
+    "line": "1774:(\"SIMULATED\", \"REQUEST_APPROVAL\"): \"AWAIT_HUMAN\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "api/server.py",
+    "pattern": "SIMULATED",
+    "line": "1781:(\"SIMULATED\", \"ABORT\"): \"STOPPED\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "backend/api/admin_auth.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "78:return os.environ.get('YGB_TEMP_AUTH_BYPASS', 'false').strip().lower() in _TRUTHY_VALUES"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "backend/auth/auth_guard.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "194:return os.getenv(\"YGB_TEMP_AUTH_BYPASS\", \"false\").strip().lower() in _TRUTHY_VALUES"
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "backend/auth/auth_guard.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "222:\"Disable YGB_TEMP_AUTH_BYPASS before deployment.\""
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "backend/auth/auth_guard.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "733:\"YGB_TEMP_AUTH_BYPASS=true is not allowed when YGB_ENV=production. \""
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "backend/auth/auth_guard.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "734:\"Set YGB_TEMP_AUTH_BYPASS=false before startup.\""
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "backend/governance/clock_guard.py",
+    "pattern": "SIMULATED",
+    "line": "206:ntp_time=ntp_time, ntp_server=\"SIMULATED\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "148:simulated_result=False,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "160:simulated_result=False,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "182:simulated_result=executed,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "191:simulated_result=False,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "202:simulated_result=False,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_engine.py",
+    "pattern": "simulated_result",
+    "line": "213:simulated_result=executed,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase38/browser_types.py",
+    "pattern": "simulated_result",
+    "line": "158:simulated_result: bool  # Would have succeeded (NO ACTUAL EXECUTION)"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase49/governors/g01_execution_kernel.py",
+    "pattern": "SIMULATED",
+    "line": "23:SIMULATED = \"SIMULATED\""
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase49/governors/g01_execution_kernel.py",
+    "pattern": "SIMULATED",
+    "line": "71:(ExecutionState.PLANNED, ExecutionTransition.SIMULATE): ExecutionState.SIMULATED,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase49/governors/g01_execution_kernel.py",
+    "pattern": "SIMULATED",
+    "line": "72:(ExecutionState.SIMULATED, ExecutionTransition.REQUEST_APPROVAL): ExecutionState.AWAIT_HUMAN,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/phase49/governors/g01_execution_kernel.py",
+    "pattern": "SIMULATED",
+    "line": "80:(ExecutionState.SIMULATED, ExecutionTransition.ABORT): ExecutionState.STOPPED,"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "impl_v1/phase49/moe/moe_architecture.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "953:features = torch.randn(32, 256, device=device)  # batch of 32, 256-dim features"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/phase49/moe/moe_architecture.py",
+    "pattern": "RTX 2050",
+    "line": "78:Scale knobs (defaults tuned for RTX 2050 4 GB):"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/phase49/moe/moe_architecture.py",
+    "pattern": "RTX 2050",
+    "line": "673:For the RTX 2050 (4 GB), with d_model=512:"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/phase49/moe/moe_architecture.py",
+    "pattern": "RTX 2050",
+    "line": "751:Small config for RTX 2050 (4 GB VRAM)."
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/config/device_selector.py",
+    "pattern": "RTX 2050",
+    "line": "32:device_name: str        # e.g. \"NVIDIA GeForce RTX 2050\""
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/data/data_source_audit.py",
+    "pattern": "mock_data",
+    "line": "42:r\"mock_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/data/governance_pipeline.py",
+    "pattern": "mock_data",
+    "line": "18:training_truth_ledger, mock_data_scanner,"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/data/governance_pipeline.py",
+    "pattern": "mock_data",
+    "line": "180:from impl_v1.training.safety.mock_data_scanner import scan_production_code"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/data/governance_pipeline.py",
+    "pattern": "mock_data",
+    "line": "186:_raise_missing_governance_dependency(exc, \"impl_v1.training.safety.mock_data_scanner\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/data/real_dataset_loader.py",
+    "pattern": "RTX 2050",
+    "line": "377:batch_size: Samples per batch (default 1024 for RTX 2050)"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "16:from impl_v1.training.distributed.cuda_node_rtx2050 import RTX2050Node"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "17:node = RTX2050Node(...)"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "88:class RTX2050Node:"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "227:f\"[RTX2050] CUDA verified: {device_name}, cc={cc_str}, \""
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "231:logger.error(f\"[RTX2050] CUDA verification FAILED: {errors}\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "272:f\"[RTX2050] Adaptive batch: optimal_batch_2050={self.optimal_batch_2050}\""
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "304:logger.error(f\"[RTX2050] {err}\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "316:f\"[RTX2050] Joined NCCL group: \""
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "341:\"[RTX2050] Could not enable torch deterministic algorithms; continuing with best-effort deterministic settings\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "345:logger.info(\"[RTX2050] Deterministic mode initialized\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "378:\"[RTX2050] DistributedDataParallel wrapping failed; continuing with local model execution\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "434:f\"[RTX2050] Epoch {epoch}: loss={avg_loss:.4f}, \""
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "461:logger.info(f\"[RTX2050] REPORT: {json.dumps(log_entry)}\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX2050",
+    "line": "474:logger.info(\"[RTX2050] Starting 8-step DDP node protocol\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX 2050",
+    "line": "2:cuda_node_rtx2050.py \u2014 CUDA RTX 2050 DDP Node Entrypoint"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX 2050",
+    "line": "85:# RTX 2050 NODE"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX 2050",
+    "line": "89:\"\"\"CUDA RTX 2050 DDP training node."
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx2050.py",
+    "pattern": "RTX 2050",
+    "line": "533:device_name=\"RTX 2050\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx3050.py",
+    "pattern": "RTX 2050",
+    "line": "4:8-step protocol for joining RTX 2050 leader as follower (rank=1):"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/cuda_node_rtx3050.py",
+    "pattern": "RTX 2050",
+    "line": "124:Implements the full 8-step protocol for joining the RTX 2050 leader."
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/device_classifier.py",
+    "pattern": "RTX 2050",
+    "line": "12:Plug-and-play: RTX 3050, RTX 2050, Mac M1 \u2014 zero manual config."
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/ha_leader.py",
+    "pattern": "RTX2050",
+    "line": "39:- Owner node (RTX2050) = priority 100"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/distributed/production_ddp_launcher.py",
+    "pattern": "RTX2050",
+    "line": "4:Real RTX3050 + RTX2050 distributed training:"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/dataset_quality_gate.py",
+    "pattern": "mock_data",
+    "line": "106:mock = _detect_mock_data(features, labels)"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/dataset_quality_gate.py",
+    "pattern": "mock_data",
+    "line": "136:def _detect_mock_data(features: np.ndarray, labels: np.ndarray) -> bool:"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/mock_data_scanner.py",
+    "pattern": "fake_",
+    "line": "38:r'fake_data\\s*=',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/mock_data_scanner.py",
+    "pattern": "dummy_data",
+    "line": "35:r'dummy_data\\s*=',"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/mock_data_scanner.py",
+    "pattern": "mock_data",
+    "line": "2:mock_data_scanner.py \u2014 Production Mock Data Scanner"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "impl_v1/training/safety/mock_data_scanner.py",
+    "pattern": "mock_data",
+    "line": "32:r'mock_data\\s*=',"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "impl_v1/training/validation/baseline_benchmark.py",
+    "pattern": "RTX 2050",
+    "line": "10:Stores baseline JSON for comparison across devices (RTX 2050/3050)."
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "SIMULATED",
+    "line": "137:\"CRITICAL_SIMULATED\": ["
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "SIMULATED",
+    "line": "138:r\"SIMULATED\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "simulated_result",
+    "line": "139:r\"simulated_result\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "fake_",
+    "line": "140:r\"fake_\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "FAKE ",
+    "line": "112:lines = [\"=\" * 70, \"SCAN B: MOCK/FAKE DATA HUNT\", \"=\" * 70]"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "FAKE ",
+    "line": "141:r\"FAKE \","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "dummy_data",
+    "line": "142:r\"dummy_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "mock_data",
+    "line": "143:r\"mock_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "synthetic_data",
+    "line": "144:r\"synthetic_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "placeholder_value",
+    "line": "145:r\"placeholder_value\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "bypass_auth",
+    "line": "149:r\"bypass_auth\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "150:r\"TEMP_AUTH_BYPASS\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "leader_node.*RTX",
+    "line": "159:r\"leader_node.*RTX\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "RTX2050",
+    "line": "160:r\"RTX2050\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "RTX 2050",
+    "line": "161:r\"RTX 2050\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "hostname.*=.*laptop",
+    "line": "162:r\"hostname.*=.*laptop\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "pattern": "device.*=.*my_machine",
+    "line": "163:r\"device.*=.*my_machine\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/ci_banned_tokens.py",
+    "pattern": "SIMULATED",
+    "line": "10:- The SIMULATED governance state machine constant"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/ci_banned_tokens.py",
+    "pattern": "SIMULATED",
+    "line": "71:r'\"SIMULATED\"',                       # Legitimate governance state"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/ci_banned_tokens.py",
+    "pattern": "SIMULATED",
+    "line": "72:r\"'SIMULATED'\",                       # Legitimate governance state"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/ci_banned_tokens.py",
+    "pattern": "SIMULATED",
+    "line": "73:r'SIMULATED:',                        # State-to-color mapping"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "290:(\"torch.randn(\", r\"\\btorch\\.randn\\s*\\(\"),"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "621:x = torch.randn(1000, 1000, device=device)"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "853:x = torch.randn(32, 267)"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "1008:out = model(torch.randn(2, 267, device=device)).detach().cpu()"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.randn\\(",
+    "line": "1370:for pattern in (\"np.random.rand\", \"torch.randn(\", \"fake_data\", \"mock_data\"):"
+  },
+  {
+    "severity": "CRITICAL_FAKE_TENSOR",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "torch\\.rand\\(",
+    "line": "291:(\"torch.rand(\", r\"\\btorch\\.rand\\s*\\(\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return 0\\.95",
+    "line": "294:(\"return 0.95\", r\"\\breturn\\s+0\\.95\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return 0\\.87",
+    "line": "295:(\"return 0.87\", r\"\\breturn\\s+0\\.87\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return 0\\.9",
+    "line": "294:(\"return 0.95\", r\"\\breturn\\s+0\\.95\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return 0\\.9",
+    "line": "296:(\"return 0.9\", r\"\\breturn\\s+0\\.9\\b(?!\\d)\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "accuracy = 1\\.0",
+    "line": "297:(\"accuracy = 1.0\", r\"\\baccuracy\\s*=\\s*1\\.0\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "f1 = 0\\.9",
+    "line": "298:(\"f1 = 0.9\", r\"\\bf1\\s*=\\s*0\\.9\\b(?!\\d)\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "val_f1 = 0\\.8",
+    "line": "299:(\"val_f1 = 0.8\", r\"\\bval_f1\\s*=\\s*0\\.8\\b(?!\\d)\"),"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return \\[\\]  # TODO",
+    "line": "325:\"return []  # TODO\","
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "return \\{\\}  # placeholder",
+    "line": "326:\"return {}  # placeholder\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "SIMULATED",
+    "line": "308:(\"SIMULATED\", r\"\\bSIMULATED\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "simulated_result",
+    "line": "304:(\"simulated_result\", r\"\\bsimulated_result\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "fake_",
+    "line": "300:(\"fake_\", r\"\\bfake_\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "fake_",
+    "line": "1370:for pattern in (\"np.random.rand\", \"torch.randn(\", \"fake_data\", \"mock_data\"):"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "dummy_data",
+    "line": "301:(\"dummy_data\", r\"\\bdummy_data\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "mock_data",
+    "line": "110:\"mock_data_scanner.py\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "mock_data",
+    "line": "302:(\"mock_data\", r\"\\bmock_data\\b\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "mock_data",
+    "line": "1370:for pattern in (\"np.random.rand\", \"torch.randn(\", \"fake_data\", \"mock_data\"):"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "synthetic_data",
+    "line": "303:(\"synthetic_data\", r\"\\bsynthetic_data\\b\"),"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except:\\s*pass",
+    "line": "323:\"except: pass\","
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except:\\s*pass",
+    "line": "1126:bare_except_hits = grep_literal([\"backend\"], {\".py\"}, \"except: pass\") + grep_literal([\"backend\"], {\".py\"}, \"except Exception: pass\")"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except:\\s*pass",
+    "line": "1350:hits = grep_literal([\"backend\", \"impl_v1\"], {\".py\"}, \"except: pass\") + grep_literal([\"backend\", \"impl_v1\"], {\".py\"}, \"except Exception: pass\")"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except:\\s*pass",
+    "line": "1447:gate(\"Zero bare except:pass\", g_bare)"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except Exception:\\s*pass",
+    "line": "324:\"except Exception: pass\","
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except Exception:\\s*pass",
+    "line": "1126:bare_except_hits = grep_literal([\"backend\"], {\".py\"}, \"except: pass\") + grep_literal([\"backend\"], {\".py\"}, \"except Exception: pass\")"
+  },
+  {
+    "severity": "HIGH_INCOMPLETE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "except Exception:\\s*pass",
+    "line": "1350:hits = grep_literal([\"backend\", \"impl_v1\"], {\".py\"}, \"except: pass\") + grep_literal([\"backend\", \"impl_v1\"], {\".py\"}, \"except Exception: pass\")"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "leader_node.*RTX",
+    "line": "520:r'leader_node\\s*:\\s*str\\s*=\\s*\"RTX2050\"|'"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "leader_node.*RTX",
+    "line": "522:r'getattr\\(config,\\s*\"leader_node\",\\s*\"RTX2050\"|'"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "RTX2050",
+    "line": "520:r'leader_node\\s*:\\s*str\\s*=\\s*\"RTX2050\"|'"
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/industrial_audit.py",
+    "pattern": "RTX2050",
+    "line": "522:r'getattr\\(config,\\s*\"leader_node\",\\s*\"RTX2050\"|'"
+  },
+  {
+    "severity": "CRITICAL_HARDCODED_METRIC",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "return True  # always",
+    "line": "179:r\"return True  # always\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "SIMULATED",
+    "line": "184:\"CRITICAL_SIMULATED\": ["
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "SIMULATED",
+    "line": "185:r\"SIMULATED\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "simulated_result",
+    "line": "186:r\"simulated_result\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "fake_",
+    "line": "187:r\"fake_\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "FAKE ",
+    "line": "188:r\"FAKE \","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "FAKE ",
+    "line": "215:out: list[str] = [heading(\"SCAN B: MOCK/FAKE DATA HUNT\").rstrip()]"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "dummy_data",
+    "line": "189:r\"dummy_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "mock_data",
+    "line": "190:r\"mock_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "synthetic_data",
+    "line": "191:r\"synthetic_data\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "placeholder_value",
+    "line": "192:r\"placeholder_value\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "skip_verification = True",
+    "line": "195:r\"skip_verification = True\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "bypass_auth",
+    "line": "196:r\"bypass_auth\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "TEMP_AUTH_BYPASS",
+    "line": "197:r\"TEMP_AUTH_BYPASS\","
+  },
+  {
+    "severity": "CRITICAL_BYPASS",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "skip_validation = True",
+    "line": "198:r\"skip_validation = True\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "leader_node.*RTX",
+    "line": "206:r\"leader_node.*RTX\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "RTX2050",
+    "line": "207:r\"RTX2050\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "RTX 2050",
+    "line": "208:r\"RTX 2050\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "hostname.*=.*laptop",
+    "line": "209:r\"hostname.*=.*laptop\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "scripts/phase0_scan.py",
+    "pattern": "device.*=.*my_machine",
+    "line": "210:r\"device.*=.*my_machine\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/remediation_scan.py",
+    "pattern": "SIMULATED",
+    "line": "47:# --- simulate/SIMULATED: legitimate execution state machine ---"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/remediation_scan.py",
+    "pattern": "simulated_result",
+    "line": "54:(\"simulate\", \"impl_v1/phase38/browser_engine.py\", \"simulated_result field tracks whether action would succeed without execution\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/remediation_scan.py",
+    "pattern": "simulated_result",
+    "line": "55:(\"simulate\", \"impl_v1/phase38/browser_types.py\", \"simulated_result dataclass field definition\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/remediation_scan.py",
+    "pattern": "mock_data",
+    "line": "79:(\"mock\", \"impl_v1/training/safety/mock_data_scanner.py\", \"Scanner that DETECTS mock data patterns\"),"
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/remediation_scan.py",
+    "pattern": "mock_data",
+    "line": "102:(\"placeholder\", \"impl_v1/training/safety/mock_data_scanner.py\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/repo_audit_inventory.py",
+    "pattern": "fake_",
+    "line": "78:r\"fake_\","
+  },
+  {
+    "severity": "CRITICAL_SIMULATED",
+    "file": "scripts/repo_audit_inventory.py",
+    "pattern": "dummy_data",
+    "line": "76:r\"dummy_data\","
+  },
+  {
+    "severity": "HIGH_HARDCODED_DEVICE",
+    "file": "training/validation/hardened_trainer.py",
+    "pattern": "RTX 2050",
+    "line": "7:RTX 2050 safe:"
+  }
+]

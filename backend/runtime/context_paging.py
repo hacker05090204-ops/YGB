@@ -8,9 +8,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+from config.storage_config import SSD_ROOT
+
 
 LOW_VRAM_CONTEXT_THRESHOLD_GB = 4.0
-_DEFAULT_STORAGE_ROOT = Path(".tmp_hdd_drive") / "context_paging"
+_DEFAULT_STORAGE_ROOT = SSD_ROOT / "context_paging"
 _SEGMENT_RE = re.compile(r"[^A-Za-z0-9_.-]+")
 
 
@@ -83,7 +85,7 @@ def resolve_context_paging_decision(
 
 
 class PagedContextBuffer:
-    """Reusable runtime context buffer with optional HDD paging for low-VRAM nodes."""
+    """Reusable runtime context buffer with optional SSD paging for low-VRAM nodes."""
 
     def __init__(
         self,

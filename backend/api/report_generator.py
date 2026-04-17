@@ -26,6 +26,8 @@ from typing import Any, Optional, Dict, List
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
 
+from config.storage_config import HDD_ROOT
+
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -720,7 +722,7 @@ async def start_video_recording(request: Request, user=Depends(require_auth)):
     filename = body.get("filename", f"recording-{video_id}.webm")
 
     # Determine storage path
-    hdd_root = os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd")
+    hdd_root = os.getenv("YGB_HDD_ROOT", str(HDD_ROOT))
     storage_dir = os.path.join(hdd_root, "videos", user_id)
     os.makedirs(storage_dir, exist_ok=True)
     storage_path = os.path.join(storage_dir, filename)

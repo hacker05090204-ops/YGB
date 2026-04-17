@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "dataset_source": "INGESTION_PIPELINE",
-  "total_samples": 129411,
-  "verified_samples": 129411,
+  "total_samples": 129413,
+  "verified_samples": 129413,
   "per_field_counts": {
     "endpoint": 0,
     "parameters": 0,
@@ -13,17 +13,17 @@
   },
   "source_mix": {},
   "strict_real_mode": true,
-  "updated_at": "2026-04-16T22:01:07.376714+00:00",
-  "ingestion_manifest_hash": "14a09fbda8ba3f0a",
+  "updated_at": "2026-04-17T15:33:49.234069+00:00",
+  "ingestion_manifest_hash": "ed47fb67bbb1affc",
   "worker_stats": {
     "total_ingested": 0,
-    "total_dropped": 14,
+    "total_dropped": 8,
     "total_deduped": 0
   },
-  "sample_count": 129411,
-  "dataset_hash": "14a09fbda8ba3f0a",
-  "signed_by": "f23d19936b0de6de8db931770553aa3daa4604c95e9a327588bb2988b3f5f213",
+  "sample_count": 129413,
+  "dataset_hash": "ed47fb67bbb1affc",
+  "signed_by": "f4a4d3f25df0b939bfe0c4a50647ba0b6826bf3eec11bbca2652ac822977c883",
   "version": "1.0",
-  "created_at": "2026-04-16T22:01:07.376714+00:00",
-  "signature_hash": "514d48d9027f2306e78de168677ad8de4f61d98a14dc8f40d7d73c9787d8764c"
+  "created_at": "2026-04-17T15:33:49.234069+00:00",
+  "signature_hash": "98ea6bf27c62c49b83b2c31b478c3db95456e43b65d76ac1430ad838691704a6"
 }

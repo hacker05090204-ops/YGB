@@ -17,9 +17,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
+
 logger = logging.getLogger("ygb.sync.health")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 SYNC_LOG = SYNC_META / "sync.log"

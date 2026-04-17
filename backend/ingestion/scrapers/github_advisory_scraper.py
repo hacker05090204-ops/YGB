@@ -90,6 +90,7 @@ class GitHubAdvisoryScraper(BaseScraper):
                 self._log_partial_failure(reason="advisory_not_object")
                 continue
             advisory_id = str(advisory.get("ghsa_id", "")).strip() or str(advisory.get("id", "")).strip()
+            resolved_identifier = self._extract_cve_id(advisory) or advisory_id
             summary = str(advisory.get("summary", "")).strip()
             description = str(advisory.get("description", "")).strip()
             combined_description = " ".join(part for part in (summary, description) if part).strip()
@@ -107,7 +108,7 @@ class GitHubAdvisoryScraper(BaseScraper):
                     title=summary or advisory_id,
                     description=combined_description,
                     severity=normalize_severity(str(advisory.get("severity", "UNKNOWN"))),
-                    cve_id=self._extract_cve_id(advisory),
+                    cve_id=resolved_identifier,
                     tags=self._extract_tags(advisory),
                     aliases=self._extract_aliases(advisory),
                     published_at=str(advisory.get("published_at", "") or "") or None,

@@ -42,6 +42,7 @@ CORE_SYSTEMS = {"storage", "auth", "governance", "ingestion"}
 NON_CORE_SYSTEMS = {"voice", "sync", "training", "reporting"}
 AUXILIARY_SYSTEMS = {"readiness", "metrics", "canonical_status"}
 CACHE_TTL_SECONDS = 15.0
+CACHE_TTL = CACHE_TTL_SECONDS
 DEGRADED_HEALTH_STATES = {"DEGRADED", "CRITICAL", "UNAVAILABLE"}
 VOICE_DEPENDENCY_ERROR_MARKERS = (
     "modulenotfounderror",
@@ -818,9 +819,14 @@ def _start_background_refresh() -> bool:
     return True
 
 
+def _trigger_background() -> bool:
+    """Compatibility alias for stale-while-revalidate background refresh."""
+    return _start_background_refresh()
+
+
 def seed_system_status_cache() -> bool:
     """Seed the aggregated status cache in the background during startup."""
-    return _start_background_refresh()
+    return _trigger_background()
 
 
 @system_status_router.get("/api/system/status")
@@ -848,7 +854,7 @@ async def aggregated_system_status(user=Depends(require_auth)):
         cached = copy.deepcopy(_status_cache)
 
     if (not has_refresh) or age > CACHE_TTL_SECONDS:
-        _start_background_refresh()
+        _trigger_background()
 
     cached["cache_age_seconds"] = round(age, 1)
     cached["cached"] = bool(has_refresh and age <= CACHE_TTL_SECONDS)

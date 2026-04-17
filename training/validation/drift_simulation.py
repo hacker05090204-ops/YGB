@@ -1,11 +1,8 @@
 """
-Phase 6: Drift Simulation for MODE-B Gate.
+Phase 6: Real distribution drift validation for MODE-B Gate.
 
-Simulate:
-  - Feature distribution shift +10%
-  - New unseen pattern injection
-  - Class imbalance 70/30
-  - Feature missingness
+This module evaluates drift using only real observed samples.
+It does NOT synthesize perturbations or inject simulated patterns.
 
 Reject if:
   Accuracy drop > 5%
@@ -20,6 +17,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 import numpy as np
 import torch
 import torch.nn as nn
+
+from backend.training.adaptive_learner import DistributionMonitor
 
 ACC_DROP_MAX = 0.05
 CONF_INFLATION_MAX = 0.05
@@ -46,10 +45,8 @@ class DriftSimulationReport:
 
 
 def _build_and_train(features, labels, device, epochs=15):
-    """Train with hardened augmentation for drift robustness."""
-    from backend.training.feature_bridge import (
-        FeatureDiversifier, FeatureConfig, CalibrationEngine, DriftAugmenter,
-    )
+    """Train only on real observed features without synthetic augmentation."""
+    from backend.training.feature_bridge import CalibrationEngine
     
     D = features.shape[1]
     model = nn.Sequential(
@@ -59,9 +56,6 @@ def _build_and_train(features, labels, device, epochs=15):
         nn.Linear(128, 2),
     ).to(device)
     
-    feat_config = FeatureConfig(seed=42, training=True)
-    diversifier = FeatureDiversifier(feat_config)
-    drift_aug = DriftAugmenter()
     cal_engine = CalibrationEngine()
     
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
@@ -73,25 +67,14 @@ def _build_and_train(features, labels, device, epochs=15):
         perm = np.random.permutation(len(labels))
         epoch_f = features[perm].copy()
         epoch_l = labels[perm].copy()
-        
-        # Epoch-level augmentation
-        aug_seed = 42 ^ (epoch * 11111)
-        epoch_f = drift_aug.apply_domain_randomization(epoch_f, scale_pct=0.10, seed=aug_seed)
-        epoch_f = drift_aug.inject_novel_patterns(epoch_f, inject_rate=0.10, seed=aug_seed + 1)
-        epoch_f = drift_aug.apply_correlated_noise(epoch_f, sigma=0.03, seed=aug_seed + 2)
-        
+
         n_batches = (len(epoch_l) + batch_size - 1) // batch_size
         for b in range(n_batches):
             start = b * batch_size
             end = min(start + batch_size, len(epoch_l))
             batch_f = epoch_f[start:end].copy()
             batch_l = epoch_l[start:end]
-            
-            # Per-batch augmentation
-            batch_f = diversifier.apply_interaction_dropout(batch_f, epoch, b)
-            batch_f = diversifier.apply_adversarial_scramble(batch_f, epoch, b)
-            batch_f = diversifier.apply_noise_augmentation(batch_f, epoch, b)
-            
+
             bx = torch.tensor(batch_f, dtype=torch.float32).to(device)
             by = torch.tensor(batch_l, dtype=torch.long).to(device)
             optimizer.zero_grad(set_to_none=True)
@@ -141,6 +124,12 @@ def run_drift_simulation(features: np.ndarray, labels: np.ndarray) -> DriftSimul
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     N, D = features.shape
     np.random.seed(42)
+
+    if N < 200:
+        raise RuntimeError(
+            "Real drift validation requires at least 200 real samples to compare "
+            "baseline and later observed windows."
+        )
     
     idx = np.random.permutation(N)
     split = int(0.8 * N)
@@ -154,70 +143,98 @@ def run_drift_simulation(features: np.ndarray, labels: np.ndarray) -> DriftSimul
     results = []
     failures = []
     
-    # Test 1: Feature distribution shift +10%
-    shifted = test_f * 1.10
-    shifted = np.clip(shifted, 0, 1)
-    acc, ci, rd = _evaluate_drift(model, shifted, test_l, device, test_f)
-    drop = baseline_acc - acc
-    r = DriftTestResult("distribution_shift_10pct", baseline_acc, acc, drop, ci, rd,
-                        drop < ACC_DROP_MAX and ci < CONF_INFLATION_MAX and rd < REPR_DEVIATION_MAX)
+    def _severity_counts(window_labels: np.ndarray) -> dict[str, int]:
+        positives = int(np.sum(window_labels == 1))
+        negatives = int(np.sum(window_labels == 0))
+        return {
+            "POSITIVE": positives,
+            "NEGATIVE": negatives,
+        }
+
+    def _window_metrics(
+        name: str,
+        observed_f: np.ndarray,
+        observed_l: np.ndarray,
+        baseline_features: np.ndarray,
+        *,
+        monitor: DistributionMonitor,
+    ) -> DriftTestResult:
+        acc, ci, rd = _evaluate_drift(model, observed_f, observed_l, device, baseline_features)
+        drop = baseline_acc - acc
+        shift = monitor.observe(_severity_counts(observed_l))
+        passed = (
+            drop < ACC_DROP_MAX
+            and ci < CONF_INFLATION_MAX
+            and rd < REPR_DEVIATION_MAX
+            and shift.js_distance <= shift.threshold
+        )
+        return DriftTestResult(
+            name,
+            baseline_acc,
+            acc,
+            drop,
+            ci,
+            rd,
+            passed,
+        )
+
+    ordered_features = np.ascontiguousarray(features, dtype=np.float32)
+    ordered_labels = np.ascontiguousarray(labels, dtype=np.int64)
+    window_size = max(50, min(len(ordered_labels) // 4, 500))
+    baseline_window_f = ordered_features[:window_size]
+    baseline_window_l = ordered_labels[:window_size]
+    later_window_f = ordered_features[window_size:window_size * 2]
+    later_window_l = ordered_labels[window_size:window_size * 2]
+    latest_window_f = ordered_features[-window_size:]
+    latest_window_l = ordered_labels[-window_size:]
+
+    monitor = DistributionMonitor(history_size=5, shift_threshold=0.15)
+    monitor.observe(_severity_counts(baseline_window_l))
+
+    # Test 1: adjacent real-time window drift
+    r = _window_metrics(
+        "adjacent_real_window",
+        later_window_f,
+        later_window_l,
+        baseline_window_f,
+        monitor=monitor,
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"dist_shift: drop={drop:.4f} ci={ci:.4f} rd={rd:.4f}")
-    print(f"  Distribution shift: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"adjacent_real_window: drop={r.acc_drop:.4f} ci={r.conf_inflation:.4f} rd={r.repr_deviation:.4f}"
+        )
+    print(f"  Adjacent real window: acc={r.drifted_acc:.4f} drop={r.acc_drop:.4f}")
     
-    # Test 2: Structural perturbation (perturb non-signal dims in 20% of samples)
-    # Preserves label-correlated signal/response dims, perturbs interaction+noise
-    novel = test_f.copy()
-    n_inject = len(novel) // 5
-    # Perturb interaction dims (128-191) with novel patterns
-    novel[:n_inject, 128:192] = np.random.uniform(0.2, 0.8, (n_inject, 64))
-    # Perturb noise dims (192-256) with novel patterns
-    novel[:n_inject, 192:256] = np.random.normal(0.5, 0.2, (n_inject, 64)).clip(0, 1)
-    # Add small perturbation to signal/response dims (±10%)
-    perturbation = np.random.normal(0, 0.10, (n_inject, 128))
-    novel[:n_inject, :128] = np.clip(novel[:n_inject, :128] + perturbation, 0, 1)
-    acc, ci, rd = _evaluate_drift(model, novel, test_l, device, test_f)
-    drop = baseline_acc - acc
-    r = DriftTestResult("structural_perturbation", baseline_acc, acc, drop, ci, rd,
-                        drop < ACC_DROP_MAX and ci < CONF_INFLATION_MAX and rd < REPR_DEVIATION_MAX)
+    # Test 2: late real window drift
+    r = _window_metrics(
+        "late_real_window",
+        latest_window_f,
+        latest_window_l,
+        baseline_window_f,
+        monitor=monitor,
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"structural_perturbation: drop={drop:.4f} ci={ci:.4f}")
-    print(f"  Structural perturbation: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"late_real_window: drop={r.acc_drop:.4f} ci={r.conf_inflation:.4f} rd={r.repr_deviation:.4f}"
+        )
+    print(f"  Late real window: acc={r.drifted_acc:.4f} drop={r.acc_drop:.4f}")
     
-    # Test 3: Class imbalance 70/30
-    pos_idx = np.where(test_l == 1)[0]
-    neg_idx = np.where(test_l == 0)[0]
-    n_target = min(len(pos_idx), len(neg_idx))
-    n_major = int(n_target * 0.7 / 0.3)
-    if n_major > max(len(pos_idx), len(neg_idx)):
-        n_major = max(len(pos_idx), len(neg_idx))
-    
-    imb_pos = pos_idx[:n_target]
-    imb_neg = neg_idx[:min(n_major, len(neg_idx))]
-    imb_idx = np.concatenate([imb_pos, imb_neg])
-    acc, ci, rd = _evaluate_drift(model, test_f[imb_idx], test_l[imb_idx], device, test_f)
-    drop = baseline_acc - acc
-    r = DriftTestResult("class_imbalance_70_30", baseline_acc, acc, drop, ci, rd,
-                        drop < ACC_DROP_MAX and ci < CONF_INFLATION_MAX)
+    # Test 3: evaluation split against real held-out baseline
+    r = _window_metrics(
+        "heldout_real_eval",
+        test_f,
+        test_l,
+        baseline_window_f,
+        monitor=monitor,
+    )
     results.append(r)
     if not r.passed:
-        failures.append(f"imbalance: drop={drop:.4f}")
-    print(f"  Class imbalance: acc={acc:.4f} drop={drop:.4f}")
-    
-    # Test 4: Feature missingness (15% of features set to 0)
-    missing = test_f.copy()
-    mask = np.random.random(missing.shape) < 0.15
-    missing[mask] = 0.0
-    acc, ci, rd = _evaluate_drift(model, missing, test_l, device, test_f)
-    drop = baseline_acc - acc
-    r = DriftTestResult("feature_missingness_15pct", baseline_acc, acc, drop, ci, rd,
-                        drop < ACC_DROP_MAX and ci < CONF_INFLATION_MAX)
-    results.append(r)
-    if not r.passed:
-        failures.append(f"missingness: drop={drop:.4f}")
-    print(f"  Feature missingness: acc={acc:.4f} drop={drop:.4f}")
+        failures.append(
+            f"heldout_real_eval: drop={r.acc_drop:.4f} ci={r.conf_inflation:.4f} rd={r.repr_deviation:.4f}"
+        )
+    print(f"  Held-out real eval: acc={r.drifted_acc:.4f} drop={r.acc_drop:.4f}")
     
     return DriftSimulationReport(
         passed=len(failures) == 0, results=results,

@@ -31,6 +31,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from backend.training.adaptive_learner import DistributionMonitor
 from training.validation.representation_audit import (
     compute_entropy, compute_kl_divergence, FEATURE_GROUPS,
 )
@@ -129,21 +130,22 @@ def quick_train(features, labels, epochs=5, lr=0.002, seed=42):
     return acc, model
 
 
-def apply_rolling_drift(features, day, n_days=7, base_sigma=0.05, seed=42):
-    """Apply Gaussian drift to features. Sigma grows linearly per day."""
-    rng = np.random.RandomState(seed + day * 1000)
-    sigma = base_sigma * (day + 1) / n_days
-    drifted = features.copy()
+def _evaluate_model(model, features, labels) -> float:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.eval()
+    with torch.no_grad():
+        x = torch.tensor(features, dtype=torch.float32).to(device)
+        y = torch.tensor(labels, dtype=torch.long).to(device)
+        logits = model(x)
+        preds = logits.argmax(1)
+        return float((preds == y).float().mean().item())
 
-    group_scales = {"signal": 1.0, "response": 1.0,
-                    "interaction": 1.5, "noise": 1.0}
 
-    for group_name, (start, end) in FEATURE_GROUPS.items():
-        scale = group_scales[group_name]
-        noise = rng.normal(0, sigma * scale, drifted[:, start:end].shape)
-        drifted[:, start:end] = np.clip(drifted[:, start:end] + noise, 0, 1)
-
-    return drifted
+def _severity_counts(window_labels: np.ndarray) -> dict[str, int]:
+    return {
+        "NEGATIVE": int(np.sum(window_labels == 0)),
+        "POSITIVE": int(np.sum(window_labels == 1)),
+    }
 
 
 def compute_stability_score(kl, entropy_ret, acc_ret, cal_delta=0.0):
@@ -176,7 +178,7 @@ def compute_stability_score(kl, entropy_ret, acc_ret, cal_delta=0.0):
 
 
 def run_temporal_drift_simulation(features, labels):
-    """Run full temporal drift + forgetting simulation."""
+    """Run temporal drift and forgetting checks using real sequential windows."""
     report = TemporalDriftReport(
         timestamp=datetime.now(timezone.utc).isoformat())
 
@@ -185,40 +187,62 @@ def run_temporal_drift_simulation(features, labels):
     logger.info("=" * 60)
 
     N, D = features.shape
+    total_windows = 13
+    minimum_window_size = 32
+    if N < total_windows * minimum_window_size:
+        raise RuntimeError(
+            "Temporal drift validation requires at least "
+            f"{total_windows * minimum_window_size} real samples"
+        )
     logger.info(f"Dataset: {N} samples, {D}D")
 
+    ordered_features = np.ascontiguousarray(features, dtype=np.float32)
+    ordered_labels = np.ascontiguousarray(labels, dtype=np.int64)
+    window_size = N // total_windows
+    windows = [
+        (
+            ordered_features[index * window_size:(index + 1) * window_size],
+            ordered_labels[index * window_size:(index + 1) * window_size],
+        )
+        for index in range(total_windows)
+    ]
+
     # Baseline
-    baseline_acc, _ = quick_train(features, labels, epochs=5)
+    baseline_features, baseline_labels = windows[0]
+    baseline_acc, baseline_model = quick_train(baseline_features, baseline_labels, epochs=5)
     logger.info(f"Baseline accuracy: {baseline_acc:.4f}")
 
     # Baseline entropy
     baseline_entropy = {}
     for gn, (s, e) in FEATURE_GROUPS.items():
-        baseline_entropy[gn] = compute_entropy(features[:, s:e].flatten())
+        baseline_entropy[gn] = compute_entropy(baseline_features[:, s:e].flatten())
 
     # ---------------------------------------------------------------
     # Part 1: 7-day rolling drift
     # ---------------------------------------------------------------
-    logger.info("\n--- 7-Day Rolling Drift ---")
+    logger.info("\n--- 7 Sequential Real Windows ---")
     stability_scores = []
+    monitor = DistributionMonitor(history_size=7, shift_threshold=0.15)
+    monitor.observe(_severity_counts(baseline_labels))
 
     for day in range(7):
-        drifted = apply_rolling_drift(features, day)
-        acc, _ = quick_train(drifted, labels, epochs=5, seed=42 + day)
+        current_features, current_labels = windows[day + 1]
+        acc = _evaluate_model(baseline_model, current_features, current_labels)
         acc_drop = baseline_acc - acc
+        shift = monitor.observe(_severity_counts(current_labels))
 
         # KL divergence (avg across groups)
         kl_avg = 0.0
         for gn, (s, e) in FEATURE_GROUPS.items():
             kl = compute_kl_divergence(
-                features[:, s:e].flatten(), drifted[:, s:e].flatten())
+                baseline_features[:, s:e].flatten(), current_features[:, s:e].flatten())
             kl_avg += kl
         kl_avg /= 4.0
 
         # Entropy retention
         ent_retention = 0.0
         for gn, (s, e) in FEATURE_GROUPS.items():
-            current_ent = compute_entropy(drifted[:, s:e].flatten())
+            current_ent = compute_entropy(current_features[:, s:e].flatten())
             ent_retention += current_ent / max(baseline_entropy[gn], 1e-10)
         ent_retention /= 4.0
 
@@ -233,14 +257,15 @@ def run_temporal_drift_simulation(features, labels):
             entropy_retention=round(ent_retention, 4),
             stability_score=round(score, 1),
             passed=(acc_drop < ACC_DROP_MAX and kl_avg < KL_SHIFT_MAX
-                    and ent_retention > (1.0 - ENTROPY_DROP_MAX)))
+                    and ent_retention > (1.0 - ENTROPY_DROP_MAX)
+                    and shift.js_distance <= shift.threshold))
 
         report.drift_results.append(asdict(result))
 
         status = "PASS" if result.passed else "FAIL"
         logger.info(
             f"  Day {day+1}: acc={acc:.4f} drop={acc_drop:.4f} "
-            f"KL={kl_avg:.4f} ent_ret={ent_retention:.4f} "
+            f"KL={kl_avg:.4f} ent_ret={ent_retention:.4f} js={shift.js_distance:.4f} "
             f"score={score:.1f} [{status}]")
 
         if not result.passed:
@@ -249,39 +274,23 @@ def run_temporal_drift_simulation(features, labels):
     # ---------------------------------------------------------------
     # Part 2: 5 sequential expansions (catastrophic forgetting)
     # ---------------------------------------------------------------
-    logger.info("\n--- 5 Sequential Expansions (Forgetting Check) ---")
-    group_names = ["signal", "response", "interaction", "noise"]
-    current_features = features.copy()
+    logger.info("\n--- 5 Sequential Real Windows (Forgetting Check) ---")
     snapshots = []
-    snapshots.append(("original", features.copy(), labels.copy(), baseline_acc))
+    snapshots.append(("baseline", baseline_features.copy(), baseline_labels.copy(), baseline_acc))
 
     for exp in range(5):
-        group_idx = exp % 4
-        group_name = group_names[group_idx]
-        gstart, gend = list(FEATURE_GROUPS.values())[group_idx]
-
-        # Apply 10% mutation to the target group
-        rng = np.random.RandomState(42 + exp * 100)
-        mask = rng.random(current_features.shape[0]) < 0.10
-        n_mutated = mask.sum()
-        current_features[mask, gstart:gend] = rng.uniform(
-            0, 1, (n_mutated, gend - gstart)).astype(np.float32)
-
-        # Train on mutated data
-        exp_acc, _ = quick_train(current_features, labels, epochs=5,
-                                  seed=42 + exp)
-
-        # Check accuracy on original data
-        orig_acc_now, _ = quick_train(features, labels, epochs=5,
-                                       seed=42 + exp)
-
-        # Worst drop across snapshots
-        worst_drop = baseline_acc - exp_acc
+        current_features, current_labels = windows[8 + exp]
+        exp_acc, exp_model = quick_train(current_features, current_labels, epochs=5, seed=42 + exp)
+        baseline_eval = _evaluate_model(exp_model, baseline_features, baseline_labels)
+        worst_drop = 0.0
+        for _snapshot_name, snapshot_features, snapshot_labels, snapshot_acc in snapshots:
+            replay_acc = _evaluate_model(exp_model, snapshot_features, snapshot_labels)
+            worst_drop = max(worst_drop, snapshot_acc - replay_acc)
 
         fr = ForgettingResult(
-            expansion_id=exp + 1, mutated_group=group_name,
+            expansion_id=exp + 1, mutated_group=f"real_window_{exp + 1}",
             accuracy_on_current=round(exp_acc, 4),
-            accuracy_on_original=round(orig_acc_now, 4),
+            accuracy_on_original=round(baseline_eval, 4),
             worst_drop=round(worst_drop, 4),
             forgetting_detected=worst_drop > ACC_DROP_MAX)
 
@@ -289,15 +298,14 @@ def run_temporal_drift_simulation(features, labels):
 
         status = "PASS" if not fr.forgetting_detected else "FORGETTING"
         logger.info(
-            f"  Expansion {exp+1} ({group_name}): "
-            f"current_acc={exp_acc:.4f} orig_acc={orig_acc_now:.4f} "
+            f"  Window {exp+1}: "
+            f"current_acc={exp_acc:.4f} baseline_eval={baseline_eval:.4f} "
             f"drop={worst_drop:.4f} [{status}]")
 
         if fr.forgetting_detected:
             report.overall_pass = False
 
-        snapshots.append((f"exp_{exp+1}", current_features.copy(),
-                          labels.copy(), exp_acc))
+        snapshots.append((f"window_{exp+1}", current_features.copy(), current_labels.copy(), exp_acc))
 
     # Summary
     report.avg_stability_score = round(
@@ -319,28 +327,10 @@ def run_temporal_drift_simulation(features, labels):
 if __name__ == "__main__":
     from impl_v1.training.data.scaled_dataset import DatasetConfig
     from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
-    from backend.training.representation_bridge import (
-        RepresentationExpander, ExpansionConfig,
-    )
-
-    # Load merged dataset
-    orig_config = DatasetConfig(total_samples=18000)
-    orig_ds = RealTrainingDataset(config=orig_config, seed=42)
-    orig_f = orig_ds._features_tensor.numpy()
-    orig_l = orig_ds._labels_tensor.numpy()
-
-    exp = RepresentationExpander(seed=42)
-    exp_f, exp_l = exp.generate_expanded_dataset(8000)
-
-    features = np.concatenate([orig_f, exp_f], axis=0)
-    labels = np.concatenate([orig_l, exp_l], axis=0)
-
-    rng = np.random.RandomState(42)
-    perm = rng.permutation(len(labels))
-    features, labels = features[perm], labels[perm]
-
-    # Use smaller subset for speed (6000 samples)
-    features, labels = features[:6000], labels[:6000]
+    config = DatasetConfig(total_samples=6000)
+    dataset = RealTrainingDataset(config=config, seed=42)
+    features = dataset._features_tensor.numpy()
+    labels = dataset._labels_tensor.numpy()
 
     report = run_temporal_drift_simulation(features, labels)
 

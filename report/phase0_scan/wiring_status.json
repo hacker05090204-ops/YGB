@@ -1,0 +1,182 @@
+{
+  "wired": [
+    {
+      "desc": "MoE\u2192training_controller",
+      "path": "training_controller.py"
+    },
+    {
+      "desc": "MoE\u2192auto_train_controller",
+      "path": "backend/training/auto_train_controller.py"
+    },
+    {
+      "desc": "EarlyStopping\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "GradScaler\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "label_smoothing\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "weight_decay\u2192optimizer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "clip_grad_norm\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "ClassBalancer\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "val_f1_checkpoint",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "RL_rewards\u2192auto_trainer",
+      "path": "backend/training/auto_train_controller.py"
+    },
+    {
+      "desc": "RL_weights\u2192trainer",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "CISA_KEV\u2192rl_collector",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "EWC\u2192trainer_loss",
+      "path": "backend/training/incremental_trainer.py"
+    },
+    {
+      "desc": "DistMonitor\u2192autograbber",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "QualityScorer\u2192autograbber",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "PurityEnforcer\u2192autograbber",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "DedupStore\u2192autograbber",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "9scrapers\u2192autograbber",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "StatusCache\u2192system_status",
+      "path": "backend/api/system_status.py"
+    },
+    {
+      "desc": "BgRefresh\u2192system_status",
+      "path": "backend/api/system_status.py"
+    },
+    {
+      "desc": "GovernanceHardFail",
+      "path": "impl_v1/training/data/governance_pipeline.py"
+    },
+    {
+      "desc": "AuditNoSwallow",
+      "path": "impl_v1/training/data/governance_pipeline.py"
+    },
+    {
+      "desc": "WorkflowOrchestrator\u2192agent",
+      "path": "backend/tasks/industrial_agent.py"
+    },
+    {
+      "desc": "DBConnectionPool",
+      "path": "api/database.py"
+    },
+    {
+      "desc": "BypassDisabledProd",
+      "path": "backend/auth/auth_guard.py"
+    },
+    {
+      "desc": "ExpertDistributor",
+      "path": "backend/distributed/expert_distributor.py"
+    },
+    {
+      "desc": "CloudWorker",
+      "path": "scripts/cloud_worker.py"
+    },
+    {
+      "desc": "FastWhisperSTT",
+      "path": "backend/voice/production_voice.py"
+    },
+    {
+      "desc": "SelfReflectionEngine",
+      "path": "backend/agent/self_reflection.py"
+    },
+    {
+      "desc": "FieldRegistry80plus",
+      "path": "backend/testing/field_registry.py"
+    },
+    {
+      "desc": "OSV_fix",
+      "path": "backend/ingestion/scrapers/osv_scraper.py"
+    },
+    {
+      "desc": "ExploitDB_fix",
+      "path": "backend/ingestion/scrapers/exploit_db_scraper.py"
+    },
+    {
+      "desc": "RedHat_fix",
+      "path": "backend/ingestion/scrapers/vendor_advisory_scraper.py"
+    },
+    {
+      "desc": "Snyk_fix",
+      "path": "backend/ingestion/scrapers/snyk_scraper.py"
+    },
+    {
+      "desc": "VulnRichment_fix",
+      "path": "backend/ingestion/scrapers/vulnrichment_scraper.py"
+    },
+    {
+      "desc": "GPU_MoE",
+      "path": "impl_v1/phase49/moe/__init__.py"
+    },
+    {
+      "desc": "GPU_auto_trainer",
+      "path": "backend/training/auto_train_controller.py"
+    },
+    {
+      "desc": "SSD_IO_async",
+      "path": "backend/ingestion/autograbber.py"
+    },
+    {
+      "desc": "SSD_storage_path",
+      "path": "backend/storage/tiered_storage.py"
+    },
+    {
+      "desc": "NonceDB_persist",
+      "path": "HUMANOID_HUNTER/"
+    },
+    {
+      "desc": "CompressionRealBytes",
+      "path": "backend/training/compression_engine.py"
+    },
+    {
+      "desc": "VulnDetectionEngine",
+      "path": "backend/intelligence/"
+    },
+    {
+      "desc": "PayloadGenerator",
+      "path": "backend/intelligence/"
+    },
+    {
+      "desc": "ScannerEngine",
+      "path": "backend/scanner/"
+    }
+  ],
+  "not_wired": [],
+  "file_missing": []
+}

@@ -424,6 +424,7 @@ class ParallelAutoGrabber(AutoGrabber):
         features_stored = 0
         bridge_published = 0
         purity_rejected = 0
+        total_tokens = 0
         validator_rejections = self._new_validator_rejections()
         accepted_samples: list[IngestedSample] = []
         previous_severities_persisted = False
@@ -712,6 +713,7 @@ class ParallelAutoGrabber(AutoGrabber):
                         accepted_samples.append(ingested_sample)
                         samples_accepted += 1
                         features_stored += int(feature_purity_result.accepted_count)
+                        total_tokens += int(getattr(ingested_sample, "token_count", 0) or 0)
                         if self.config.dedup_enabled:
                             try:
                                 quality_scorer.record_seen(payload)
@@ -795,6 +797,7 @@ class ParallelAutoGrabber(AutoGrabber):
                 expert_routes=dict(expert_routes),
                 source_failures=dict(source_failures),
                 validation_failures=tuple(validation_failures),
+                total_tokens=total_tokens,
             )
             self._store_result(result)
             return result

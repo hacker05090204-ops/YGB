@@ -1,0 +1,278 @@
+[
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 32,
+    "location": "audit_phase1_mock_detection.py:32:'return []  # TODO',"
+  },
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 34,
+    "location": "audit_phase1_mock_detection.py:34:'# TODO: implement',"
+  },
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 35,
+    "location": "audit_phase1_mock_detection.py:35:'# FIXME: not implemented',"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 36,
+    "location": "audit_phase1_mock_detection.py:36:'raise NotImplementedError',"
+  },
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 38,
+    "location": "audit_phase1_mock_detection.py:38:'return None  # TODO',"
+  },
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 66,
+    "location": "audit_phase1_mock_detection.py:66:'# TODO',"
+  },
+  {
+    "type": "TODO",
+    "file": "audit_phase1_mock_detection.py",
+    "line": 67,
+    "location": "audit_phase1_mock_detection.py:67:'# FIXME',"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "audit_phase1_mock_detection_v2.py",
+    "line": 20,
+    "location": "audit_phase1_mock_detection_v2.py:20:'raise NotImplementedError',"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "api/phase_runner.py",
+    "line": 682,
+    "location": "api/phase_runner.py:682:raise NotImplementedError("
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "api/phase_runner.py",
+    "line": 695,
+    "location": "api/phase_runner.py:695:raise NotImplementedError("
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "api/phase_runner.py",
+    "line": 865,
+    "location": "api/phase_runner.py:865:raise NotImplementedError("
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "api/phase_runner.py",
+    "line": 878,
+    "location": "api/phase_runner.py:878:raise NotImplementedError("
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "api/phase_runner.py",
+    "line": 891,
+    "location": "api/phase_runner.py:891:raise NotImplementedError("
+  },
+  {
+    "type": "empty_function",
+    "file": "backend/tests/test_risk_remediation.py",
+    "line": 82,
+    "location": "backend/tests/test_risk_remediation.py:82:def my_insert(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "backend/training/incremental_trainer.py",
+    "line": 566,
+    "location": "backend/training/incremental_trainer.py:566:def get_changed_dirs(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "backend/training/tests/test_runtime_status_validator.py",
+    "line": 12,
+    "location": "backend/training/tests/test_runtime_status_validator.py:12:def __init__(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g16_gmail_alerts.py",
+    "line": 86,
+    "location": "impl_v1/phase49/governors/g16_gmail_alerts.py:86:def send(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g19_interactive_browser.py",
+    "line": 126,
+    "location": "impl_v1/phase49/governors/g19_interactive_browser.py:126:def launch(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g19_interactive_browser.py",
+    "line": 129,
+    "location": "impl_v1/phase49/governors/g19_interactive_browser.py:129:def close(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g21_auto_update.py",
+    "line": 83,
+    "location": "impl_v1/phase49/governors/g21_auto_update.py:83:def verify_signature(...)"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "impl_v1/phase49/governors/g29_voice_stt.py",
+    "line": 255,
+    "location": "impl_v1/phase49/governors/g29_voice_stt.py:255:raise NotImplementedError("
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g30_parallel_tasks.py",
+    "line": 76,
+    "location": "impl_v1/phase49/governors/g30_parallel_tasks.py:76:def dispatch(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g38_self_trained_model.py",
+    "line": 203,
+    "location": "impl_v1/phase49/governors/g38_self_trained_model.py:203:def detect_gpu(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g38_self_trained_model.py",
+    "line": 208,
+    "location": "impl_v1/phase49/governors/g38_self_trained_model.py:208:def check_idle(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g38_self_trained_model.py",
+    "line": 213,
+    "location": "impl_v1/phase49/governors/g38_self_trained_model.py:213:def check_power(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/governors/g38_self_trained_model.py",
+    "line": 218,
+    "location": "impl_v1/phase49/governors/g38_self_trained_model.py:218:def get_memory_mb(...)"
+  },
+  {
+    "type": "empty_function",
+    "file": "impl_v1/phase49/tests/test_sandbox_specification.py",
+    "line": 182,
+    "location": "impl_v1/phase49/tests/test_sandbox_specification.py:182:def test_chroot_followed_by_chdir(...)"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "impl_v1/training/voice/stt_adapter.py",
+    "line": 142,
+    "location": "impl_v1/training/voice/stt_adapter.py:142:raise NotImplementedError"
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "line": 65,
+    "location": "report/phase0_scan/phase0_scan_runner.py:65:if \"raise NotImplementedError\" in line:"
+  },
+  {
+    "type": "TODO",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "line": 67,
+    "location": "report/phase0_scan/phase0_scan_runner.py:67:if any(token in line for token in (\"# TODO\", \"# FIXME\", \"# NOT IMPLEMENTED\")):"
+  },
+  {
+    "type": "TODO",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "line": 74,
+    "location": "report/phase0_scan/phase0_scan_runner.py:74:if nxt in {\"pass\", \"...\", \"# TODO\", \"# FIXME\", \"# NOT IMPLEMENTED\"}:"
+  },
+  {
+    "type": "TODO",
+    "file": "report/phase0_scan/phase0_scan_runner.py",
+    "line": 134,
+    "location": "report/phase0_scan/phase0_scan_runner.py:134:r\"return \\[\\]\\s*# TODO\","
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "scripts/industrial_audit.py",
+    "line": 317,
+    "location": "scripts/industrial_audit.py:317:\"raise NotImplementedError\","
+  },
+  {
+    "type": "TODO",
+    "file": "scripts/industrial_audit.py",
+    "line": 325,
+    "location": "scripts/industrial_audit.py:325:\"return []  # TODO\","
+  },
+  {
+    "type": "NotImplementedError",
+    "file": "scripts/phase0_scan.py",
+    "line": 82,
+    "location": "scripts/phase0_scan.py:82:if \"raise NotImplementedError\" in line:"
+  },
+  {
+    "type": "TODO",
+    "file": "scripts/phase0_scan.py",
+    "line": 97,
+    "location": "scripts/phase0_scan.py:97:todo_patterns = (\"# TODO\", \"# FIXME\", \"# NOT IMPLEMENTED\")"
+  },
+  {
+    "type": "TODO",
+    "file": "scripts/phase0_scan.py",
+    "line": 181,
+    "location": "scripts/phase0_scan.py:181:r\"return \\[\\]  # TODO\","
+  },
+  {
+    "type": "empty_directory",
+    "file": "checkpoints",
+    "line": 0,
+    "location": "checkpoints"
+  },
+  {
+    "type": "empty_directory",
+    "file": "data",
+    "line": 0,
+    "location": "data"
+  },
+  {
+    "type": "empty_directory",
+    "file": "docs",
+    "line": 0,
+    "location": "docs"
+  },
+  {
+    "type": "empty_directory",
+    "file": "edge",
+    "line": 0,
+    "location": "edge"
+  },
+  {
+    "type": "empty_directory",
+    "file": "frontend",
+    "line": 0,
+    "location": "frontend"
+  },
+  {
+    "type": "empty_directory",
+    "file": "logs",
+    "line": 0,
+    "location": "logs"
+  },
+  {
+    "type": "empty_directory",
+    "file": "reports",
+    "line": 0,
+    "location": "reports"
+  },
+  {
+    "type": "empty_directory",
+    "file": "secure_data",
+    "line": 0,
+    "location": "secure_data"
+  },
+  {
+    "type": "empty_directory",
+    "file": "testsprite_tests",
+    "line": 0,
+    "location": "testsprite_tests"
+  }
+]

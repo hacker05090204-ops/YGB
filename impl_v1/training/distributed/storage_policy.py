@@ -21,11 +21,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
+from config.storage_config import HDD_ROOT, SSD_ROOT
+
 logger = logging.getLogger(__name__)
 
 # Default paths
-SSD_ROOT = "C:\\"
-NAS_ROOT = "C:\\ygb_storage"
+SSD_ROOT_PATH = str(SSD_ROOT)
+NAS_ROOT = str(HDD_ROOT)
 FREE_SPACE_MIN_GB = 10.0
 
 
@@ -132,7 +134,7 @@ def check_nas_clean(nas_path: str) -> Tuple[bool, List[str]]:
 
 
 def validate_storage_policy(
-    ssd_path: str = SSD_ROOT,
+    ssd_path: str = SSD_ROOT_PATH,
     nas_path: str = NAS_ROOT,
 ) -> StoragePolicyResult:
     """Validate full storage policy.

@@ -1,0 +1,20 @@
+======================================================================
+SCAN D: GPU UTILIZATION
+======================================================================
+GPU: NVIDIA GeForce RTX 2050 | VRAM: 4.3GB | CUDA: 12.1
+GPU count: 1
+
+--- GPU Usage in Critical Files ---
+  GPU OK   training_controller.py: ['.to(device)', 'torch.cuda', 'device = ']
+  GPU OK   backend/training/incremental_trainer.py: ['torch.cuda', 'device = ', 'GradScaler', 'autocast']
+  GPU WEAK backend/training/auto_train_controller.py: only ['torch.cuda', 'device = '] — needs more GPU ops
+  GPU OK   impl_v1/phase49/moe/__init__.py: ['.to(device)', 'torch.cuda', 'device = ']
+  NO GPU   impl_v1/phase49/moe/expert.py — running on CPU only!
+  NO GPU   backend/ingestion/industrial_autograbber.py — running on CPU only!
+
+CPU-only patterns: 7 (these should GPU-first)
+  backend/training/adaptive_learner.py:438:tensors = load_safetensors(str(self.state_path), device="cpu")
+  backend/training/incremental_trainer.py:647:self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  training_controller.py:223:device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  training_controller.py:422:state_dict = st_load(source_model_path, device="cpu")
+  training_controller.py:482:state_dict = st_load(source_model_path, device="cpu")

@@ -26,6 +26,7 @@ Modules wired:
 
 import ctypes
 import hashlib
+import json
 import logging
 import os
 import time
@@ -51,6 +52,29 @@ def _raise_missing_governance_dependency(exc: ImportError, dependency_name: str)
         f"Cannot proceed without required module '{dependency_name}'. "
         "Install it or this check cannot be satisfied."
     ) from exc
+
+
+def _record_audit_failure(epoch: int, error_message: str) -> None:
+    """Persist explicit governance audit failure records for post-mortem review."""
+    try:
+        from config.storage_config import REPORTS_DIR
+
+        report_path = REPORTS_DIR / "governance_audit_failures.jsonl"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "epoch": int(epoch),
+            "error": error_message,
+        }
+        with report_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, sort_keys=True) + "\n")
+    except Exception as exc:
+        logger.critical(
+            "[GOVERNANCE] Failed to persist audit failure record: %s",
+            repr(exc),
+            exc_info=True,
+        )
+        raise RuntimeError("Unable to persist governance audit failure record") from exc
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -360,7 +384,9 @@ def post_epoch_audit(
         append_truth_entry(entry)
         result.truth_logged = True
     except Exception as e:
-        logger.warning(f"[GOVERNANCE] Truth ledger: {e}")
+        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
+        _record_audit_failure(epoch, f"truth_ledger: {e}")
+        raise
 
     # ── 2: Overfitting detection ──
     gap = train_accuracy - holdout_accuracy
@@ -377,8 +403,10 @@ def post_epoch_audit(
         if dll is not None:
             dll.update_throughput(ctypes.c_double(total_samples / max(1.0, 1.0)))
             result.performance_adjusted = True
-    except Exception:
-        logger.error("[GOVERNANCE] Performance optimizer update failed", exc_info=True)
+    except Exception as e:
+        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
+        _record_audit_failure(epoch, f"performance_optimizer: {e}")
+        raise
 
     # ── 4: C++ auto_ingest_scheduler stats ──
     try:
@@ -388,8 +416,10 @@ def post_epoch_audit(
             dupes = dll.dedup_get_rejected()
             if dupes > 0:
                 logger.info(f"[GOVERNANCE] Ingestion: {unique} unique, {dupes} dupes rejected")
-    except Exception:
-        logger.error("[GOVERNANCE] Auto-ingest scheduler stats retrieval failed", exc_info=True)
+    except Exception as e:
+        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
+        _record_audit_failure(epoch, f"auto_ingest_scheduler: {e}")
+        raise
 
     return result
 

@@ -82,6 +82,10 @@ class SafetensorsFeatureStore:
     def __init__(self, root: Path | str, *, feature_dim: int = FEATURE_DIM) -> None:
         self.root = Path(root)
         self.feature_dim = self._coerce_feature_dim(feature_dim)
+        self._total_samples_cache: int | None = None
+
+    def _invalidate_total_samples_cache(self) -> None:
+        self._total_samples_cache = None
 
     def shard_path(self, shard_name: str | Path) -> Path:
         normalized_name = self._normalize_shard_name(shard_name)
@@ -131,6 +135,8 @@ class SafetensorsFeatureStore:
             if temp_path.exists():
                 temp_path.unlink()
             raise
+
+        self._invalidate_total_samples_cache()
 
         return target_path
 
@@ -209,13 +215,18 @@ class SafetensorsFeatureStore:
             deleted = True
         if description_path.exists():
             description_path.unlink()
+        if deleted:
+            self._invalidate_total_samples_cache()
         return deleted
 
     def total_samples(self) -> int:
+        if self._total_samples_cache is not None:
+            return int(self._total_samples_cache)
         total = 0
         for shard_name in self.list_shards():
             total += int(self.read(shard_name).labels.shape[0])
-        return total
+        self._total_samples_cache = int(total)
+        return int(total)
 
     @classmethod
     def read_path(
@@ -456,7 +467,8 @@ class CheckpointManager:
         if not isinstance(metadata_payload, dict):
             raise TypeError("metadata must be a dict with JSON-serializable values")
         epoch_value = self._coerce_epoch(metadata_payload.get("epoch", 0))
-        inferred_metadata = self._infer_moe_classifier_metadata(state_dict)
+        normalized_state_dict = self._normalize_checkpoint_state_dict(state_dict)
+        inferred_metadata = self._infer_moe_classifier_metadata(normalized_state_dict)
 
         registry = self._load_registry()
         registry_key = self._registry_key(expert_id_value, field_name_value)
@@ -517,7 +529,7 @@ class CheckpointManager:
         }
         checkpoint_file_hash, tensor_hash = self._write_checkpoint(
             checkpoint_path,
-            state_dict,
+            normalized_state_dict,
             metadata=checkpoint_metadata,
         )
         checkpoint_metadata = {
@@ -571,6 +583,16 @@ class CheckpointManager:
             "is_best": normalized_entry["best_checkpoint_path"] == retained_path,
             **status,
         }
+
+    @staticmethod
+    def _normalize_checkpoint_state_dict(state_dict: dict[str, Any]) -> dict[str, Any]:
+        normalized: dict[str, Any] = {}
+        for key, value in dict(state_dict).items():
+            if hasattr(value, "detach") and hasattr(value, "cpu"):
+                normalized[key] = value.detach().cpu()
+            else:
+                normalized[key] = value
+        return normalized
 
     def load(
         self,

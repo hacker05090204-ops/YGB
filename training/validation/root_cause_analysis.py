@@ -15,6 +15,8 @@ import torch
 import torch.nn as nn
 from scipy import stats as scipy_stats
 
+from backend.training.adaptive_learner import DistributionMonitor
+
 
 def _build_model(D, device):
     return nn.Sequential(
@@ -64,6 +66,10 @@ def _get_probs(model, features, device):
 def run_root_cause_analysis(features, labels):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     N, D = features.shape
+    if N < 200:
+        raise RuntimeError(
+            "Root cause analysis requires at least 200 real samples for window-based drift evaluation"
+        )
     np.random.seed(42)
     torch.manual_seed(42)
     
@@ -176,28 +182,47 @@ def run_root_cause_analysis(features, labels):
     
     # ===== SECTION D: Drift Sensitivity =====
     lines += ["", "-" * 70, "  SECTION D -- Drift Sensitivity", "-" * 70]
-    
-    # Novel pattern injection
-    novel = test_f.copy()
-    n_inject = len(novel) // 5
-    novel[:n_inject] = np.random.uniform(0.3, 0.7, (n_inject, D))
-    novel_acc = _accuracy(model, novel, test_l, device)
-    novel_drop = baseline_acc - novel_acc
-    lines.append(f"  Novel patterns (20%): acc={novel_acc:.4f} drop={novel_drop:.4f} (target <0.05)")
-    
-    # Interaction perturbation
+
+    def _severity_counts(window_labels: np.ndarray) -> dict[str, int]:
+        return {
+            "NEGATIVE": int(np.sum(window_labels == 0)),
+            "POSITIVE": int(np.sum(window_labels == 1)),
+        }
+
+    ordered_features = np.ascontiguousarray(features, dtype=np.float32)
+    ordered_labels = np.ascontiguousarray(labels, dtype=np.int64)
+    window_size = max(50, min(len(ordered_labels) // 4, 500))
+    baseline_window_f = ordered_features[:window_size]
+    baseline_window_l = ordered_labels[:window_size]
+    middle_window_f = ordered_features[window_size:window_size * 2]
+    middle_window_l = ordered_labels[window_size:window_size * 2]
+    late_window_f = ordered_features[-window_size:]
+    late_window_l = ordered_labels[-window_size:]
+
+    monitor = DistributionMonitor(history_size=5, shift_threshold=0.15)
+    monitor.observe(_severity_counts(baseline_window_l))
+
+    middle_shift = monitor.observe(_severity_counts(middle_window_l))
+    middle_acc = _accuracy(model, middle_window_f, middle_window_l, device)
+    middle_drop = baseline_acc - middle_acc
+    lines.append(
+        f"  Middle real window: acc={middle_acc:.4f} drop={middle_drop:.4f} js={middle_shift.js_distance:.4f} "
+        f"(target drop <0.05, js < {middle_shift.threshold:.2f})"
+    )
+
+    late_shift = monitor.observe(_severity_counts(late_window_l))
+    late_acc = _accuracy(model, late_window_f, late_window_l, device)
+    late_drop = baseline_acc - late_acc
+    lines.append(
+        f"  Late real window:   acc={late_acc:.4f} drop={late_drop:.4f} js={late_shift.js_distance:.4f} "
+        f"(target drop <0.05, js < {late_shift.threshold:.2f})"
+    )
+
     scrambled = test_f.copy()
     np.random.shuffle(scrambled[:, 128:192])
     scramble_acc = _accuracy(model, scrambled, test_l, device)
     scramble_drop = baseline_acc - scramble_acc
     lines.append(f"  Interaction scramble: acc={scramble_acc:.4f} drop={scramble_drop:.4f} (target <0.05)")
-    
-    # Scaled features
-    scaled = test_f * np.random.uniform(0.85, 1.15, (1, D))
-    scaled = np.clip(scaled, 0, 1)
-    scaled_acc = _accuracy(model, scaled, test_l, device)
-    scaled_drop = baseline_acc - scaled_acc
-    lines.append(f"  Feature scaling ±15%: acc={scaled_acc:.4f} drop={scaled_drop:.4f} (target <0.05)")
     
     # ===== SUMMARY =====
     lines += [
@@ -207,7 +232,8 @@ def run_root_cause_analysis(features, labels):
         f"  1. Interaction dominance:    {interaction_pct:.1f}% -- {'FIX REQUIRED' if interaction_pct > 50 else 'OK'}",
         f"  2. Interaction scramble drop: {scramble_drop:.4f} -- {'FIX REQUIRED' if scramble_drop > 0.05 else 'OK'}",
         f"  3. Calibration monotonic:     {'YES' if is_monotonic else 'NO'} (Spearman={spearman_r:.4f}) -- {'FIX REQUIRED' if not is_monotonic or spearman_r < 0.95 else 'OK'}",
-        f"  4. Novel pattern drop:        {novel_drop:.4f} -- {'FIX REQUIRED' if novel_drop > 0.05 else 'OK'}",
+        f"  4. Middle window drop:        {middle_drop:.4f} -- {'FIX REQUIRED' if middle_drop > 0.05 else 'OK'}",
+        f"  5. Late window drop:          {late_drop:.4f} -- {'FIX REQUIRED' if late_drop > 0.05 else 'OK'}",
         "=" * 70,
     ]
     
@@ -217,7 +243,10 @@ def run_root_cause_analysis(features, labels):
         "interaction_scramble_drop": scramble_drop,
         "calibration_spearman": spearman_r,
         "calibration_monotonic": is_monotonic,
-        "novel_pattern_drop": novel_drop,
+        "middle_window_drop": middle_drop,
+        "late_window_drop": late_drop,
+        "middle_window_js": middle_shift.js_distance,
+        "late_window_js": late_shift.js_distance,
         "confidence_inflation": conf_inflation,
     }
 

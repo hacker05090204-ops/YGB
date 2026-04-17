@@ -22,9 +22,11 @@ import time
 from pathlib import Path
 from typing import Optional
 
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
+
 logger = logging.getLogger("ygb.sync.gdrive")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "C:\\ygb_storage"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 STAGING_DIR = SYNC_ROOT / "ygb_gdrive_staging"

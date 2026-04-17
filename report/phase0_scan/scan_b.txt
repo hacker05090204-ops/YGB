@@ -1,0 +1,37 @@
+======================================================================
+SCAN B: MOCK/FAKE DATA HUNT
+======================================================================
+CRITICAL violations: 132
+HIGH violations: 55
+
+CRITICAL (must fix):
+  [audit_comprehensive.py] 182:x = torch.randn(4, 267)
+  [audit_phase0_inventory.py] 70:'STUB', 'MOCK', 'FAKE', 'SIMULATED', 'NotImplementedError']:
+  [audit_phase1_mock_detection.py] 12:'torch.rand(',
+  [audit_phase1_mock_detection.py] 41:'return 0.95',
+  [audit_phase1_mock_detection.py] 42:'return 0.87',
+  [audit_phase1_mock_detection.py] 41:'return 0.95',
+  [audit_phase1_mock_detection.py] 43:'accuracy = 1.0',
+  [audit_phase1_mock_detection.py] 44:'f1 = 0.9',
+  [audit_phase1_mock_detection.py] 45:'val_f1 = 0.8',
+  [audit_phase1_mock_detection.py] 32:'return []  # TODO',
+  [audit_phase1_mock_detection.py] 37:'return {}  # placeholder',
+  [audit_phase1_mock_detection.py] 73:print('MOCK / FAKE / SIMULATED CODE DETECTION')
+  [audit_phase1_mock_detection.py] 15:'fake_',
+  [audit_phase1_mock_detection.py] 73:print('MOCK / FAKE / SIMULATED CODE DETECTION')
+  [audit_phase1_mock_detection.py] 21:'dummy_data',
+  [audit_phase1_mock_detection.py] 17:'mock_data',
+  [audit_phase1_mock_detection.py] 29:'bypass_auth',
+  [audit_phase1_mock_detection.py] 30:'TEMP_AUTH_BYPASS',
+  [audit_phase1_mock_detection_v2.py] 8:'torch.rand(',
+  [audit_phase1_mock_detection_v2.py] 23:'return 0.95',
+  [audit_phase1_mock_detection_v2.py] 23:'return 0.95',
+  [audit_phase1_mock_detection_v2.py] 24:'accuracy = 1.0',
+  [audit_phase1_mock_detection_v2.py] 30:print('MOCK / FAKE / SIMULATED CODE DETECTION')
+  [audit_phase1_mock_detection_v2.py] 9:'fake_',
+  [audit_phase1_mock_detection_v2.py] 30:print('MOCK / FAKE / SIMULATED CODE DETECTION')
+  [audit_phase1_mock_detection_v2.py] 13:'dummy_data',
+  [audit_phase1_mock_detection_v2.py] 10:'mock_data',
+  [audit_phase1_mock_detection_v2.py] 18:'bypass_auth',
+  [audit_phase1_mock_detection_v2.py] 19:'TEMP_AUTH_BYPASS',
+  [PHASE1_GATE_TEST.py] 99:x = torch.randn(4, 267)

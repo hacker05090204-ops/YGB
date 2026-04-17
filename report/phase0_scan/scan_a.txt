@@ -1,0 +1,52 @@
+======================================================================
+SCAN A: PLANNED BUT NOT IMPLEMENTED
+======================================================================
+Found 46 planned-but-not-implemented items
+  [TODO] audit_phase1_mock_detection.py:32:'return []  # TODO',
+  [TODO] audit_phase1_mock_detection.py:34:'# TODO: implement',
+  [TODO] audit_phase1_mock_detection.py:35:'# FIXME: not implemented',
+  [NotImplementedError] audit_phase1_mock_detection.py:36:'raise NotImplementedError',
+  [TODO] audit_phase1_mock_detection.py:38:'return None  # TODO',
+  [TODO] audit_phase1_mock_detection.py:66:'# TODO',
+  [TODO] audit_phase1_mock_detection.py:67:'# FIXME',
+  [NotImplementedError] audit_phase1_mock_detection_v2.py:20:'raise NotImplementedError',
+  [NotImplementedError] api/phase_runner.py:682:raise NotImplementedError(
+  [NotImplementedError] api/phase_runner.py:695:raise NotImplementedError(
+  [NotImplementedError] api/phase_runner.py:865:raise NotImplementedError(
+  [NotImplementedError] api/phase_runner.py:878:raise NotImplementedError(
+  [NotImplementedError] api/phase_runner.py:891:raise NotImplementedError(
+  [empty_function] backend/tests/test_risk_remediation.py:82:def my_insert(...)
+  [empty_function] backend/training/incremental_trainer.py:566:def get_changed_dirs(...)
+  [empty_function] backend/training/tests/test_runtime_status_validator.py:12:def __init__(...)
+  [empty_function] impl_v1/phase49/governors/g16_gmail_alerts.py:86:def send(...)
+  [empty_function] impl_v1/phase49/governors/g19_interactive_browser.py:126:def launch(...)
+  [empty_function] impl_v1/phase49/governors/g19_interactive_browser.py:129:def close(...)
+  [empty_function] impl_v1/phase49/governors/g21_auto_update.py:83:def verify_signature(...)
+  [NotImplementedError] impl_v1/phase49/governors/g29_voice_stt.py:255:raise NotImplementedError(
+  [empty_function] impl_v1/phase49/governors/g30_parallel_tasks.py:76:def dispatch(...)
+  [empty_function] impl_v1/phase49/governors/g38_self_trained_model.py:203:def detect_gpu(...)
+  [empty_function] impl_v1/phase49/governors/g38_self_trained_model.py:208:def check_idle(...)
+  [empty_function] impl_v1/phase49/governors/g38_self_trained_model.py:213:def check_power(...)
+  [empty_function] impl_v1/phase49/governors/g38_self_trained_model.py:218:def get_memory_mb(...)
+  [empty_function] impl_v1/phase49/tests/test_sandbox_specification.py:182:def test_chroot_followed_by_chdir(...)
+  [NotImplementedError] impl_v1/training/voice/stt_adapter.py:142:raise NotImplementedError
+  [NotImplementedError] report/phase0_scan/phase0_scan_runner.py:65:if "raise NotImplementedError" in line:
+  [TODO] report/phase0_scan/phase0_scan_runner.py:67:if any(token in line for token in ("# TODO", "# FIXME", "# NOT IMPLEMENTED")):
+  [TODO] report/phase0_scan/phase0_scan_runner.py:74:if nxt in {"pass", "...", "# TODO", "# FIXME", "# NOT IMPLEMENTED"}:
+  [TODO] report/phase0_scan/phase0_scan_runner.py:134:r"return \[\]\s*# TODO",
+  [NotImplementedError] scripts/industrial_audit.py:317:"raise NotImplementedError",
+  [TODO] scripts/industrial_audit.py:325:"return []  # TODO",
+  [NotImplementedError] scripts/phase0_scan.py:82:if "raise NotImplementedError" in line:
+  [TODO] scripts/phase0_scan.py:97:todo_patterns = ("# TODO", "# FIXME", "# NOT IMPLEMENTED")
+  [TODO] scripts/phase0_scan.py:181:r"return \[\]  # TODO",
+  [empty_directory] checkpoints
+  [empty_directory] data
+  [empty_directory] docs
+  [empty_directory] edge
+  [empty_directory] frontend
+  [empty_directory] logs
+  [empty_directory] reports
+  [empty_directory] secure_data
+  [empty_directory] testsprite_tests
+
+Full list: report/phase0_scan/planned_not_implemented.json

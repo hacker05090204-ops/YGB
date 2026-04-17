@@ -1,9 +1,9 @@
 """
-Unified Storage Backend — D: Drive + Google Drive Fallback
-==========================================================
+Unified Storage Backend — Archive Root + Google Drive Fallback
+==============================================================
 
-PRIMARY: D:\\ (local/NAS via Tailscale)
-FALLBACK: Google Drive (when D: is inactive/unavailable)
+PRIMARY: configured archive root from `config.storage_config`
+FALLBACK: Google Drive when the archive root is inactive/unavailable
 
 Usage:
     from storage_backend import get_storage
@@ -13,7 +13,7 @@ Usage:
     storage.list_dir("path/to/dir")
 
 Environment Variables:
-    YGB_STORAGE_PRIMARY    D:\\ path (default: D:\\)
+    YGB_STORAGE_PRIMARY    archive path (default: `config.storage_config.HDD_ROOT`)
     YGB_GDRIVE_FOLDER_ID   Google Drive folder ID for fallback
     YGB_GDRIVE_CREDS_PATH  Path to Google service account JSON key
     YGB_STORAGE_MODE       "auto" (default), "local", "gdrive"
@@ -29,13 +29,15 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any
 from abc import ABC, abstractmethod
 
+from config.storage_config import HDD_ROOT
+
 logger = logging.getLogger(__name__)
 
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
 
-PRIMARY_PATH = Path(os.environ.get("YGB_STORAGE_PRIMARY", "C:\\ygb_storage"))
+PRIMARY_PATH = Path(os.environ.get("YGB_STORAGE_PRIMARY", str(HDD_ROOT)))
 GDRIVE_FOLDER_ID = os.environ.get("YGB_GDRIVE_FOLDER_ID", "")
 GDRIVE_CREDS_PATH = os.environ.get("YGB_GDRIVE_CREDS_PATH", "")
 STORAGE_MODE = os.environ.get("YGB_STORAGE_MODE", "auto").lower()
@@ -43,7 +45,7 @@ STORAGE_MODE = os.environ.get("YGB_STORAGE_MODE", "auto").lower()
 # Health check interval (seconds)
 _HEALTH_CHECK_INTERVAL = 30
 _last_health_check = 0.0
-_d_drive_healthy = True
+_primary_root_healthy = True
 
 
 # =============================================================================
@@ -56,57 +58,57 @@ class StorageBackend(ABC):
     @abstractmethod
     def is_available(self) -> bool:
         """Check if this storage backend is currently available."""
-        ...
+        raise RuntimeError("StorageBackend.is_available() must be implemented by a concrete backend")
 
     @abstractmethod
     def read(self, path: str) -> bytes:
         """Read a file and return its contents as bytes."""
-        ...
+        raise RuntimeError("StorageBackend.read() must be implemented by a concrete backend")
 
     @abstractmethod
     def write(self, path: str, data: bytes) -> bool:
         """Write data to a file. Returns True on success."""
-        ...
+        raise RuntimeError("StorageBackend.write() must be implemented by a concrete backend")
 
     @abstractmethod
     def exists(self, path: str) -> bool:
         """Check if a file or directory exists."""
-        ...
+        raise RuntimeError("StorageBackend.exists() must be implemented by a concrete backend")
 
     @abstractmethod
     def list_dir(self, path: str) -> List[str]:
         """List contents of a directory."""
-        ...
+        raise RuntimeError("StorageBackend.list_dir() must be implemented by a concrete backend")
 
     @abstractmethod
     def delete(self, path: str) -> bool:
         """Delete a file. Returns True on success."""
-        ...
+        raise RuntimeError("StorageBackend.delete() must be implemented by a concrete backend")
 
     @abstractmethod
     def get_info(self) -> Dict[str, Any]:
         """Return backend info (name, status, capacity, etc.)."""
-        ...
+        raise RuntimeError("StorageBackend.get_info() must be implemented by a concrete backend")
 
 
 # =============================================================================
-# LOCAL D: DRIVE BACKEND
+# LOCAL ARCHIVE ROOT BACKEND
 # =============================================================================
 
 class LocalDriveBackend(StorageBackend):
-    """Primary storage: Local D:\\ drive (accessible via Tailscale NAS)."""
+    """Primary storage rooted at the configured archive directory."""
 
     def __init__(self, root: Path = PRIMARY_PATH):
         self.root = root
         self._name = "LocalDrive"
 
     def is_available(self) -> bool:
-        """Check if D: drive is mounted, writable, and has space."""
-        global _last_health_check, _d_drive_healthy
+        """Check if the configured archive root is mounted, writable, and has space."""
+        global _last_health_check, _primary_root_healthy
 
         now = time.time()
         if now - _last_health_check < _HEALTH_CHECK_INTERVAL:
-            return _d_drive_healthy
+            return _primary_root_healthy
 
         _last_health_check = now
 
@@ -114,7 +116,7 @@ class LocalDriveBackend(StorageBackend):
             # Check if drive exists
             if not self.root.exists():
                 logger.warning(f"[STORAGE] {self.root} not found")
-                _d_drive_healthy = False
+                _primary_root_healthy = False
                 return False
 
             # Check if writable (create temp file)
@@ -127,15 +129,15 @@ class LocalDriveBackend(StorageBackend):
             free_gb = usage.free / (1024 ** 3)
             if free_gb < 1.0:
                 logger.warning(f"[STORAGE] {self.root} low space: {free_gb:.1f} GB")
-                _d_drive_healthy = False
+                _primary_root_healthy = False
                 return False
 
-            _d_drive_healthy = True
+            _primary_root_healthy = True
             return True
 
         except Exception as e:
             logger.warning(f"[STORAGE] {self.root} health check failed: {e}")
-            _d_drive_healthy = False
+            _primary_root_healthy = False
             return False
 
     def _resolve(self, path: str) -> Path:
@@ -379,8 +381,8 @@ class UnifiedStorage:
     Unified storage with automatic failover.
 
     Priority:
-      1. D:\\ drive (local/NAS via Tailscale)
-      2. Google Drive (cloud fallback when D: is inactive)
+      1. configured archive root
+      2. Google Drive (cloud fallback when archive storage is inactive)
 
     Privacy:
       - All Tailscale traffic is WireGuard encrypted (E2E)
@@ -404,19 +406,17 @@ class UnifiedStorage:
             self._active_backend = self.gdrive
             return self.gdrive
 
-        # Auto mode: prefer local, fallback to gdrive
+        # Auto mode: prefer configured archive storage, fallback to Google Drive.
         if self.local.is_available():
             if self._active_backend != self.local:
-                logger.info("[STORAGE] ✅ Active backend: LocalDrive (D:\\)")
+                logger.info("[STORAGE] Active backend: LocalDrive (%s)", self.local.root)
                 self._active_backend = self.local
             return self.local
 
-        # D: unavailable — failover to Google Drive
+        # Archive root unavailable — fail over to Google Drive.
         if self.gdrive.is_available():
             if self._active_backend != self.gdrive:
-                logger.warning(
-                    "[STORAGE] ⚠️ D:\\ unavailable — failing over to Google Drive"
-                )
+                logger.warning("[STORAGE] %s unavailable — failing over to Google Drive", self.local.root)
                 self._active_backend = self.gdrive
             return self.gdrive
 

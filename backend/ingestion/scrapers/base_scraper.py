@@ -195,6 +195,22 @@ class BaseScraper(abc.ABC):
             )
             raise ValueError(f"{self.SOURCE}: invalid JSON from {url}") from exc
 
+    def _post_json(self, url: str, payload: Any | None = None, **kwargs: Any) -> Any:
+        headers = dict(kwargs.pop("headers", {}) or {})
+        headers.setdefault("Content-Type", "application/json")
+        response = self._request("POST", url, headers=headers, json=payload, **kwargs)
+        try:
+            return response.json()
+        except ValueError as exc:
+            preview = response.text[:200].replace("\n", " ")
+            logger.warning(
+                "scraper_json_decode_failed source=%s url=%s preview=%s",
+                self.SOURCE,
+                url,
+                preview,
+            )
+            raise ValueError(f"{self.SOURCE}: invalid JSON from POST {url}") from exc
+
     def _get_bytes(self, url: str, **kwargs: Any) -> bytes:
         return self._request("GET", url, **kwargs).content
 

@@ -4,7 +4,7 @@ YGB Chunk Engine — Content-addressed chunking for parallel transfers.
 Files > CHUNK_SIZE are split into fixed-size chunks, each stored by its
 xxh3_128 hash.  This gives automatic deduplication across files and devices.
 
-Chunks are stored in D:\\ygb_sync\\chunk_cache\\ as {hash}.chunk
+Chunks are stored in the SSD-backed sync cache as {hash}.chunk.
 """
 
 import logging
@@ -13,11 +13,12 @@ from pathlib import Path
 from typing import List, Optional
 
 from backend.sync.manifest import hash_bytes
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
 
 logger = logging.getLogger("ygb.sync.chunker")
 
 CHUNK_SIZE = int(os.getenv("YGB_CHUNK_SIZE_MB", "64")) * 1024 * 1024  # 64 MB default
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 CHUNK_CACHE = SYNC_ROOT / "ygb_sync" / "chunk_cache"
 
 

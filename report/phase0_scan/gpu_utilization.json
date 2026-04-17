@@ -1,0 +1,64 @@
+{
+  "has_gpu": true,
+  "gpu_files": [
+    {
+      "path": "training_controller.py",
+      "status": "GPU OK",
+      "found": [
+        ".to(device)",
+        "torch.cuda",
+        "device = "
+      ]
+    },
+    {
+      "path": "backend/training/incremental_trainer.py",
+      "status": "GPU OK",
+      "found": [
+        "torch.cuda",
+        "device = ",
+        "GradScaler",
+        "autocast"
+      ]
+    },
+    {
+      "path": "backend/training/auto_train_controller.py",
+      "status": "GPU WEAK",
+      "found": [
+        "torch.cuda",
+        "device = "
+      ]
+    },
+    {
+      "path": "impl_v1/phase49/moe/__init__.py",
+      "status": "GPU OK",
+      "found": [
+        ".to(device)",
+        "torch.cuda",
+        "device = "
+      ]
+    },
+    {
+      "path": "impl_v1/phase49/moe/expert.py",
+      "status": "NO GPU",
+      "found": []
+    },
+    {
+      "path": "backend/ingestion/industrial_autograbber.py",
+      "status": "NO GPU",
+      "found": []
+    }
+  ],
+  "cpu_hits": [
+    "backend/training/adaptive_learner.py:438:tensors = load_safetensors(str(self.state_path), device=\"cpu\")",
+    "backend/training/incremental_trainer.py:647:self.device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")",
+    "training_controller.py:223:device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")",
+    "training_controller.py:422:state_dict = st_load(source_model_path, device=\"cpu\")",
+    "training_controller.py:482:state_dict = st_load(source_model_path, device=\"cpu\")",
+    "training_controller.py:1228:expert_device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")",
+    "training_controller.py:1353:state_dict = st_load(selected_meta[\"model_path\"], device=\"cpu\")"
+  ],
+  "gpu_name": "NVIDIA GeForce RTX 2050",
+  "gpu_vram_gb": 4.3,
+  "gpu_count": 1,
+  "cuda_version": "12.1"
+}

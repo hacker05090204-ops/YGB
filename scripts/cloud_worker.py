@@ -7,21 +7,97 @@ import time
 
 from backend.ingestion.industrial_autograbber import IndustrialAutoGrabber
 from backend.ingestion.parallel_autograbber import ParallelAutoGrabberConfig
+from scripts.device_manager import get_config
+from scripts.expert_task_queue import ExpertTaskQueue, STATUS_COMPLETED, STATUS_FAILED
+from training_controller import train_single_expert
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("ygb.cloud_worker")
 
 
 class CloudGPUWorker:
-    """Local or cloud worker entrypoint for real-data industrial ingestion cycles."""
+    """Local or cloud worker entrypoint for real-data expert training and ingestion cycles."""
 
     def __init__(self, config: ParallelAutoGrabberConfig | None = None) -> None:
         self.config = config or ParallelAutoGrabberConfig(sources=["nvd", "cisa", "osv", "github"])
         self.grabber = IndustrialAutoGrabber(self.config)
+        self.device_config = get_config()
+        self.queue = ExpertTaskQueue()
+        self.worker_id = f"cloud-{self.device_config.device}-{self.device_config.device_name}"
+
+    def _train_next_expert(self) -> dict[str, object] | None:
+        claimed = self.queue.claim_next_expert(worker_id=self.worker_id)
+        if claimed is None:
+            logger.info("cloud_worker_no_expert_available worker_id=%s", self.worker_id)
+            return None
+        expert_id = int(claimed["expert_id"])
+        field_name = str(claimed["field_name"])
+        logger.info(
+            "cloud_worker_claimed expert_id=%s field_name=%s device=%s batch_size=%s amp=%s",
+            expert_id,
+            field_name,
+            self.device_config.device,
+            self.device_config.batch_size,
+            self.device_config.use_amp,
+        )
+        try:
+            result = train_single_expert(expert_id, field_name)
+            released = self.queue.release_expert(
+                expert_id,
+                worker_id=self.worker_id,
+                status=STATUS_COMPLETED,
+                val_f1=float(result.val_f1),
+                val_precision=float(result.val_precision),
+                val_recall=float(result.val_recall),
+                checkpoint_path=str(result.checkpoint_path),
+            )
+            payload = {
+                "expert_id": expert_id,
+                "field_name": field_name,
+                "status": STATUS_COMPLETED,
+                "val_f1": float(result.val_f1),
+                "val_precision": float(result.val_precision),
+                "val_recall": float(result.val_recall),
+                "checkpoint_path": str(result.checkpoint_path),
+                "queue_record": released,
+            }
+            logger.info("cloud_worker_training_complete=%s", json.dumps(payload, default=str))
+            return payload
+        except Exception as exc:
+            released = self.queue.release_expert(
+                expert_id,
+                worker_id=self.worker_id,
+                status=STATUS_FAILED,
+                error=f"{type(exc).__name__}: {exc}",
+            )
+            logger.exception(
+                "cloud_worker_training_failed expert_id=%s field_name=%s reason=%s",
+                expert_id,
+                field_name,
+                exc,
+            )
+            return {
+                "expert_id": expert_id,
+                "field_name": field_name,
+                "status": STATUS_FAILED,
+                "error": f"{type(exc).__name__}: {exc}",
+                "queue_record": released,
+            }
 
     def run_once(self) -> dict[str, object]:
-        result = self.grabber.run_cycle()
-        payload = dict(result.__dict__) if hasattr(result, "__dict__") else dict(result)
+        training_payload = self._train_next_expert()
+        ingestion_result = self.grabber.run_cycle()
+        ingestion_payload = (
+            dict(ingestion_result.__dict__)
+            if hasattr(ingestion_result, "__dict__")
+            else dict(ingestion_result)
+        )
+        payload = {
+            "worker_id": self.worker_id,
+            "device": self.device_config.to_dict(),
+            "training": training_payload,
+            "ingestion": ingestion_payload,
+        }
         logger.info("cloud_worker_cycle=%s", json.dumps(payload, default=str))
         return payload
 

@@ -137,6 +137,26 @@ class EpochResult:
     status: str = "COMPLETED"
     metrics_report: MetricsReport | None = None
 
+    @property
+    def val_accuracy(self) -> float:
+        return float(self.accuracy)
+
+    @property
+    def val_precision(self) -> float:
+        return float(self.precision)
+
+    @property
+    def val_recall(self) -> float:
+        return float(self.recall)
+
+    @property
+    def val_f1(self) -> float:
+        return float(self.f1)
+
+    @property
+    def val_loss(self) -> float:
+        return float(self.eval_loss)
+
 
 TrainingResult = EpochResult
 
@@ -159,6 +179,26 @@ class TrainingLoopResult:
     epochs_completed: int
     early_stopped: bool
     metrics_report: MetricsReport | None = None
+
+    @property
+    def val_accuracy(self) -> float:
+        return float(self.accuracy)
+
+    @property
+    def val_precision(self) -> float:
+        return float(self.precision)
+
+    @property
+    def val_recall(self) -> float:
+        return float(self.recall)
+
+    @property
+    def val_f1(self) -> float:
+        return float(self.f1)
+
+    @property
+    def val_loss(self) -> float:
+        return float(self.eval_loss)
 
 
 @dataclass(frozen=True)

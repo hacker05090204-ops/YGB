@@ -23,9 +23,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from config.storage_config import SYNC_ROOT as DEFAULT_SYNC_ROOT
+
 logger = logging.getLogger("ygb.sync.recovery")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", str(DEFAULT_SYNC_ROOT)))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 DEVICE_ID = os.getenv("YGB_DEVICE_ID", "laptop_a")
 RECOVERY_LOG_PATH = SYNC_META / "recovery_log.json"

@@ -1,0 +1,122 @@
+{
+  "SQL Injection Detection": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "api/phase_runner.py",
+      "backend/ingestion/parallel_autograbber.py",
+      "backend/testing/field_registry.py"
+    ]
+  },
+  "XSS Detection": {
+    "status": "MISSING",
+    "files": []
+  },
+  "SSRF Detection": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "api/phase_runner.py"
+    ]
+  },
+  "Auth Bypass Detection": {
+    "status": "MISSING",
+    "files": []
+  },
+  "IDOR Detection": {
+    "status": "MISSING",
+    "files": []
+  },
+  "RCE Detection": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "backend/training/incremental_trainer.py",
+      "impl_v1/training/distributed/assistant_controller.py",
+      "impl_v1/training/distributed/report_validation_gate.py"
+    ]
+  },
+  "Payload Generation": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "backend/intelligence/payload_generator.py",
+      "impl_v1/governance/evolution_test.py"
+    ]
+  },
+  "POC Generation": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "impl_v1/phase49/governors/g26_forensic_evidence.py",
+      "impl_v1/phase49/governors/g32_reasoning_scope_engine.py",
+      "impl_v1/training/distributed/assistant_controller.py"
+    ]
+  },
+  "Vulnerability Scanner": {
+    "status": "MISSING",
+    "files": []
+  },
+  "Report Generation (real)": {
+    "status": "MISSING",
+    "files": []
+  },
+  "Self-Reflection Loop": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "backend/agent/__init__.py",
+      "backend/agent/self_reflection.py"
+    ]
+  },
+  "Deep RL Agent": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "backend/training/deep_rl_agent.py"
+    ]
+  },
+  "Multi-GPU DDP": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "impl_v1/training/distributed/cuda_ddp_group.py",
+      "impl_v1/training/distributed/cuda_node_rtx2050.py",
+      "impl_v1/training/distributed/cuda_node_rtx3050.py"
+    ]
+  },
+  "Real NCCL": {
+    "status": "MISSING",
+    "files": []
+  },
+  "Production STT": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "api/voice_gateway.py",
+      "backend/voice/production_voice.py"
+    ]
+  },
+  "Bug Bounty Integration": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "api/database.py",
+      "api/intelligence_layer.py",
+      "backend/assistant/query_router.py"
+    ]
+  },
+  "Sandbox Execution": {
+    "status": "MISSING",
+    "files": []
+  },
+  "Evidence Capture": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "backend/intelligence/__init__.py",
+      "impl_v1/phase49/governors/g26_forensic_evidence.py"
+    ]
+  },
+  "Exploit Chain": {
+    "status": "MISSING",
+    "files": []
+  },
+  "Scope Validator": {
+    "status": "IMPLEMENTED",
+    "files": [
+      "api/database.py",
+      "api/schemas/storage.py",
+      "api/services/storage_service.py"
+    ]
+  }
+}

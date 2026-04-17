@@ -62,6 +62,23 @@ def test_enforce_rejects_invalid_cve_format() -> None:
     assert result.rejection_reasons == {"invalid_cve_id_format": 1}
 
 
+def test_enforce_accepts_real_github_advisory_identifier_with_unknown_severity() -> None:
+    enforcer = DataPurityEnforcer()
+
+    accepted_sample, result = enforcer.enforce(
+        _payload(
+            _long_description("GitHub advisory content with sufficient detail."),
+            cve_id="GHSA-AB12-CD34-EF56",
+            severity="UNKNOWN",
+            source="github",
+        )
+    )
+
+    assert accepted_sample is not None
+    assert result.accepted_count == 1
+    assert result.rejected_count == 0
+
+
 def test_enforce_feature_tensor_removes_all_zero_row() -> None:
     enforcer = DataPurityEnforcer()
     features = np.stack([_good_row(), np.zeros(256, dtype=np.float32)], axis=0)

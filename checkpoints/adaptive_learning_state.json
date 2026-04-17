@@ -2,46 +2,6 @@
   "events": [
     {
       "baseline_distribution": {
-        "NEGATIVE": 0.049079754601226995,
-        "POSITIVE": 0.950920245398773
-      },
-      "current_distribution": {
-        "CRITICAL": 0.5,
-        "HIGH": 0.5
-      },
-      "event_id": "42d95ecc4f2d407d849a266a8546b41d",
-      "fisher_sample_count": 0,
-      "history_depth": 5,
-      "js_distance": 1.0,
-      "observed_at": "2026-04-12T08:58:25.916434+00:00",
-      "severity_counts": {
-        "CRITICAL": 1,
-        "HIGH": 1
-      },
-      "threshold": 0.15
-    },
-    {
-      "baseline_distribution": {
-        "CRITICAL": 0.1,
-        "HIGH": 0.1,
-        "NEGATIVE": 0.0392638036809816,
-        "POSITIVE": 0.7607361963190183
-      },
-      "current_distribution": {
-        "HIGH": 1.0
-      },
-      "event_id": "cda9aaa40b7b48e39aa018bbc2aa8f8f",
-      "fisher_sample_count": 0,
-      "history_depth": 5,
-      "js_distance": 0.7582766571931676,
-      "observed_at": "2026-04-12T16:28:42.038440+00:00",
-      "severity_counts": {
-        "HIGH": 3
-      },
-      "threshold": 0.15
-    },
-    {
-      "baseline_distribution": {
         "CRITICAL": 0.1,
         "HIGH": 0.3,
         "NEGATIVE": 0.0294478527607362,
@@ -3249,6 +3209,851 @@
         "POSITIVE": 377
       },
       "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "NEGATIVE": 0.05276381909547738,
+        "POSITIVE": 0.9472361809045227
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "31c5a2fc4aa0428d9bd4698ab40cf960",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 1.0,
+      "observed_at": "2026-04-17T06:06:00.177513+00:00",
+      "severity_counts": {
+        "HIGH": 3
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.2,
+        "NEGATIVE": 0.04221105527638191,
+        "POSITIVE": 0.7577889447236181
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "9783d92ab9dd45dcb0fca1981f53d0fa",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.6099865470109875,
+      "observed_at": "2026-04-17T06:06:00.236148+00:00",
+      "severity_counts": {
+        "HIGH": 2
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.4,
+        "NEGATIVE": 0.03165829145728643,
+        "POSITIVE": 0.5683417085427136
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "b975ee2c009d4fa5beee5d2b461de080",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.3958156020033583,
+      "observed_at": "2026-04-17T06:06:00.308088+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.6,
+        "NEGATIVE": 0.021105527638190954,
+        "POSITIVE": 0.37889447236180906
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "a32860940bae4542abdf6298ced99bd3",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.23645279766002797,
+      "observed_at": "2026-04-17T06:06:00.346929+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "738089738eef4c2992e09c40b77821a8",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T06:06:00.679445+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "8f7eab5acfcb4ef3b53a4d86632d8f85",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T06:08:21.100973+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "08dd5ed42c034544a456bbe8776ce608",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T06:11:09.320947+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "0ab1cb70723b4fecb2c67e449680fc6b",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T06:49:02.279252+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.9
+      },
+      "current_distribution": {
+        "CRITICAL": 0.7922077922077922,
+        "HIGH": 0.15584415584415584,
+        "LOW": 0.012987012987012988,
+        "MEDIUM": 0.03896103896103896
+      },
+      "event_id": "2ab0b3ddb8d345c88675912eb4236938",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.4554367035566481,
+      "observed_at": "2026-04-17T06:56:03.143539+00:00",
+      "severity_counts": {
+        "CRITICAL": 61,
+        "HIGH": 12,
+        "LOW": 1,
+        "MEDIUM": 3
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "4addf4f4d25b4a8cafab9e8c2e8d0c8f",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T10:16:04.674851+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "004e3b76c20043f9aebb41de2afcf382",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T10:35:48.709948+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.9
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "0cc68e5f86914d7e875edfd54bf5a194",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 1.0,
+      "observed_at": "2026-04-17T10:38:02.835524+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10000000000000002,
+        "HIGH": 0.7000000000000001,
+        "NEGATIVE": 0.010552763819095479,
+        "POSITIVE": 0.18944723618090456
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "e18685d1a6984c46bb0f433fd2d3aba8",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.6099865470109875,
+      "observed_at": "2026-04-17T10:39:03.187569+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.5,
+        "NEGATIVE": 0.021105527638190954,
+        "POSITIVE": 0.37889447236180906
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "ec265533ac4341bcb50aeaa75e97b9e1",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.3958156020033583,
+      "observed_at": "2026-04-17T10:40:03.562122+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.4,
+        "NEGATIVE": 0.03165829145728643,
+        "POSITIVE": 0.5683417085427136
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "9c079a41a63f44ddb9452b98f7724d20",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.23645279766002802,
+      "observed_at": "2026-04-17T10:41:04.013157+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "NEGATIVE": 0.05276381909547738,
+        "POSITIVE": 0.9472361809045227
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "6c81341e631f43e3aa3898920bc6f383",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 1.0,
+      "observed_at": "2026-04-17T12:54:20.643977+00:00",
+      "severity_counts": {
+        "HIGH": 3
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.2,
+        "NEGATIVE": 0.04221105527638191,
+        "POSITIVE": 0.7577889447236181
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "e7fe94d4807744f581ba1d7a57ccf24a",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.6099865470109875,
+      "observed_at": "2026-04-17T12:54:20.690869+00:00",
+      "severity_counts": {
+        "HIGH": 2
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.4,
+        "NEGATIVE": 0.03165829145728643,
+        "POSITIVE": 0.5683417085427136
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "1072efa15e4b492c995e898259546781",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.3958156020033583,
+      "observed_at": "2026-04-17T12:54:20.758083+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.6,
+        "NEGATIVE": 0.021105527638190954,
+        "POSITIVE": 0.37889447236180906
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "d169099bce75478bac1877618bf63b41",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.23645279766002797,
+      "observed_at": "2026-04-17T12:54:20.794854+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "fef1737b0ea34d54b18047f63e53a4a1",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T12:54:21.101773+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "d1707ac69d6b4eb392f77551ebfa3e50",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T13:18:31.682875+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "5471c7eb163f4d4c9a92d5c480475aa1",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T13:39:50.542123+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "714d279ef760419291c1ed1dbefdc5c2",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T13:51:28.254684+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.9
+      },
+      "current_distribution": {
+        "MEDIUM": 0.3333333333333333,
+        "UNKNOWN": 0.6666666666666666
+      },
+      "event_id": "4f779107713c4d96914ff586b91cf24b",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 1.0,
+      "observed_at": "2026-04-17T13:52:06.937530+00:00",
+      "severity_counts": {
+        "MEDIUM": 2,
+        "UNKNOWN": 4
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10000000000000002,
+        "HIGH": 0.7000000000000001,
+        "MEDIUM": 0.06666666666666668,
+        "UNKNOWN": 0.13333333333333336
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "17a008ba38bf4f90baab00f6c1998e27",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.169194855101054,
+      "observed_at": "2026-04-17T13:53:10.211181+00:00",
+      "severity_counts": {
+        "HIGH": 3
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10000000000000002,
+        "HIGH": 0.7000000000000001,
+        "MEDIUM": 0.06666666666666668,
+        "UNKNOWN": 0.13333333333333336
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "2294e308289d4532823895bd3a7dd3b5",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.169194855101054,
+      "observed_at": "2026-04-17T13:53:10.250421+00:00",
+      "severity_counts": {
+        "HIGH": 2
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "c7c1dd044b9e41019c56301b9a1419a1",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T13:53:10.594162+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.9
+      },
+      "current_distribution": {
+        "CRITICAL": 0.25,
+        "MEDIUM": 0.25,
+        "UNKNOWN": 0.5
+      },
+      "event_id": "adc4100984fa4c40aa22ece84b7ecb87",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.8489539005008395,
+      "observed_at": "2026-04-17T13:59:38.381999+00:00",
+      "severity_counts": {
+        "CRITICAL": 2,
+        "MEDIUM": 2,
+        "UNKNOWN": 4
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.15,
+        "HIGH": 0.7,
+        "MEDIUM": 0.05,
+        "UNKNOWN": 0.1
+      },
+      "current_distribution": {
+        "CRITICAL": 0.27099236641221375,
+        "HIGH": 0.26717557251908397,
+        "LOW": 0.030534351145038167,
+        "MEDIUM": 0.1717557251908397,
+        "UNKNOWN": 0.2595419847328244
+      },
+      "event_id": "35c7550b3e1b44f5842af3bcbedab5bd",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.1523332407984899,
+      "observed_at": "2026-04-17T14:04:26.714529+00:00",
+      "severity_counts": {
+        "CRITICAL": 71,
+        "HIGH": 70,
+        "LOW": 8,
+        "MEDIUM": 45,
+        "UNKNOWN": 68
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.20419847328244276,
+        "HIGH": 0.5534351145038168,
+        "LOW": 0.0061068702290076335,
+        "MEDIUM": 0.08435114503816794,
+        "UNKNOWN": 0.15190839694656488
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "499a43d7355b48cc8821d83f157effa7",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.2702432363714026,
+      "observed_at": "2026-04-17T14:38:26.373334+00:00",
+      "severity_counts": {
+        "HIGH": 3
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10419847328244274,
+        "HIGH": 0.6534351145038167,
+        "LOW": 0.006106870229007632,
+        "MEDIUM": 0.08435114503816793,
+        "UNKNOWN": 0.15190839694656486
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "70e9ad2424cc49c683900cffa3f3ec10",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.19967744728101133,
+      "observed_at": "2026-04-17T14:38:26.422177+00:00",
+      "severity_counts": {
+        "HIGH": 2
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10419847328244274,
+        "HIGH": 0.6534351145038167,
+        "LOW": 0.006106870229007632,
+        "MEDIUM": 0.08435114503816793,
+        "UNKNOWN": 0.15190839694656486
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "7ad3fa5b2cee46cdadb74e21b29e99e1",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.19967744728101133,
+      "observed_at": "2026-04-17T14:38:26.490750+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10419847328244274,
+        "HIGH": 0.6534351145038167,
+        "LOW": 0.006106870229007632,
+        "MEDIUM": 0.08435114503816793,
+        "UNKNOWN": 0.15190839694656486
+      },
+      "current_distribution": {
+        "HIGH": 1.0
+      },
+      "event_id": "80970dce6d994e218ba896c60f292dfa",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.19967744728101133,
+      "observed_at": "2026-04-17T14:38:26.527882+00:00",
+      "severity_counts": {
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 1.0
+      },
+      "current_distribution": {
+        "CRITICAL": 0.5,
+        "HIGH": 0.5
+      },
+      "event_id": "08ad25cb6b5d43809c6b4dab869099ed",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.31127812445913283,
+      "observed_at": "2026-04-17T14:38:26.846590+00:00",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 1
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.9
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "8f6449681caa44d8b577f3ad3820ac42",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 1.0,
+      "observed_at": "2026-04-17T14:40:44.957031+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.10000000000000002,
+        "HIGH": 0.7000000000000001,
+        "NEGATIVE": 0.010552763819095479,
+        "POSITIVE": 0.18944723618090456
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "97e3cebf3cdd4911a2956298b3ee90fd",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.6099865470109875,
+      "observed_at": "2026-04-17T14:41:45.354742+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.1,
+        "HIGH": 0.5,
+        "NEGATIVE": 0.021105527638190954,
+        "POSITIVE": 0.37889447236180906
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "da03030588614cae80ac68fe65fb393e",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.3958156020033583,
+      "observed_at": "2026-04-17T14:42:45.789581+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.4,
+        "NEGATIVE": 0.03165829145728643,
+        "POSITIVE": 0.5683417085427136
+      },
+      "current_distribution": {
+        "NEGATIVE": 0.052763819095477386,
+        "POSITIVE": 0.9472361809045227
+      },
+      "event_id": "9b706197f27e4e1e8aaa6a7fb9213fcf",
+      "fisher_sample_count": 398,
+      "history_depth": 5,
+      "js_distance": 0.23645279766002802,
+      "observed_at": "2026-04-17T14:43:46.264582+00:00",
+      "severity_counts": {
+        "NEGATIVE": 21,
+        "POSITIVE": 377
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "HIGH": 0.2,
+        "NEGATIVE": 0.04221105527638191,
+        "POSITIVE": 0.7577889447236181
+      },
+      "current_distribution": {
+        "CRITICAL": 0.055865921787709494,
+        "HIGH": 0.3240223463687151,
+        "LOW": 0.03910614525139665,
+        "MEDIUM": 0.22346368715083798,
+        "UNKNOWN": 0.3575418994413408
+      },
+      "event_id": "c7c077b3542e428f961e00ad0750ae6d",
+      "fisher_sample_count": 83,
+      "history_depth": 5,
+      "js_distance": 0.7486767438351516,
+      "observed_at": "2026-04-17T14:44:07.455666+00:00",
+      "severity_counts": {
+        "CRITICAL": 10,
+        "HIGH": 58,
+        "LOW": 7,
+        "MEDIUM": 40,
+        "UNKNOWN": 64
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.011173184357541898,
+        "HIGH": 0.06480446927374302,
+        "LOW": 0.00782122905027933,
+        "MEDIUM": 0.04469273743016759,
+        "NEGATIVE": 0.04221105527638191,
+        "POSITIVE": 0.7577889447236181,
+        "UNKNOWN": 0.07150837988826816
+      },
+      "current_distribution": {
+        "CRITICAL": 0.25,
+        "MEDIUM": 0.25,
+        "UNKNOWN": 0.5
+      },
+      "event_id": "65d4d6fa9f1d4e35a845b13f59c4e43c",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.7208225962450354,
+      "observed_at": "2026-04-17T15:32:04.111465+00:00",
+      "severity_counts": {
+        "CRITICAL": 2,
+        "MEDIUM": 2,
+        "UNKNOWN": 4
+      },
+      "threshold": 0.15
+    },
+    {
+      "baseline_distribution": {
+        "CRITICAL": 0.05,
+        "MEDIUM": 0.05,
+        "NEGATIVE": 0.04221105527638191,
+        "POSITIVE": 0.7577889447236181,
+        "UNKNOWN": 0.1
+      },
+      "current_distribution": {
+        "CRITICAL": 0.25,
+        "MEDIUM": 0.25,
+        "UNKNOWN": 0.5
+      },
+      "event_id": "2452c05879f144b6bcca94a79e9cb29d",
+      "fisher_sample_count": 0,
+      "history_depth": 5,
+      "js_distance": 0.6099865470109875,
+      "observed_at": "2026-04-17T15:33:48.327080+00:00",
+      "severity_counts": {
+        "CRITICAL": 2,
+        "MEDIUM": 2,
+        "UNKNOWN": 4
+      },
+      "threshold": 0.15
     }
   ],
   "monitor": {
@@ -3267,16 +4072,18 @@
         "POSITIVE": 0.9472361809045227
       },
       {
-        "NEGATIVE": 0.052763819095477386,
-        "POSITIVE": 0.9472361809045227
+        "CRITICAL": 0.25,
+        "MEDIUM": 0.25,
+        "UNKNOWN": 0.5
       },
       {
-        "NEGATIVE": 0.052763819095477386,
-        "POSITIVE": 0.9472361809045227
+        "CRITICAL": 0.25,
+        "MEDIUM": 0.25,
+        "UNKNOWN": 0.5
       }
     ],
     "shift_threshold": 0.15
   },
   "schema_version": 1,
-  "updated_at": "2026-04-16T22:28:45.390660+00:00"
+  "updated_at": "2026-04-17T15:33:48.327080+00:00"
 }
