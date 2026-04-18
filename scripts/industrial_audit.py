@@ -647,30 +647,49 @@ def step4_scraper_reality() -> None:
     user_agent = "YBG-Audit/1.0 (security research; non-commercial)"
     timeout = 15
     sources = {
-        "NVD 2.0": "https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1",
-        "CISA KEV": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
-        "OSV API": "https://api.osv.dev/v1/query",
-        "GitHub Adv": "https://api.github.com/advisories?per_page=1&type=reviewed",
-        "ExploitDB": "https://exploit-db.com/download/exploits/",
-        "MSRC": "https://api.msrc.microsoft.com/cvrf/v2.0/updates",
-        "Red Hat": "https://access.redhat.com/labs/securitydataapi/cve.json?per_page=1",
-        "Snyk npm": "https://security.snyk.io/api/v1/vuln?type=npm&page=1&perPage=1",
-        "VulnRichment": "https://api.github.com/repos/cisagov/vulnrichment/git/trees/main",
+        "NVD 2.0": {"method": "GET", "url": "https://services.nvd.nist.gov/rest/json/cves/2.0", "params": {"resultsPerPage": 1}},
+        "CISA KEV": {"method": "GET", "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"},
+        "OSV API": {
+            "method": "POST",
+            "url": "https://api.osv.dev/v1/query",
+            "json": {"package": {"ecosystem": "npm", "name": "lodash"}},
+        },
+        "GitHub Adv": {"method": "GET", "url": "https://api.github.com/advisories", "params": {"per_page": 1, "type": "reviewed"}},
+        "ExploitDB": {"method": "GET", "url": "https://gitlab.com/exploit-database/exploitdb/-/raw/main/files_exploits.csv", "stream": True},
+        "MSRC": {"method": "GET", "url": "https://api.msrc.microsoft.com/cvrf/v2.0/updates"},
+        "Red Hat": {
+            "method": "GET",
+            "url": "https://access.redhat.com/hydra/rest/securitydata/cve.json",
+            "params": {"per_page": 1, "after": "2024-01-01"},
+        },
+        "Snyk npm": {
+            "method": "POST",
+            "url": "https://api.osv.dev/v1/query",
+            "json": {"package": {"ecosystem": "npm", "name": "lodash"}},
+        },
+        "VulnRichment": {"method": "GET", "url": "https://api.github.com/repos/cisagov/vulnrichment/contents/"},
+        "Alpine SecDB": {"method": "GET", "url": "https://secdb.alpinelinux.org/v3.20/main.json", "stream": True},
+        "Debian Tracker": {"method": "GET", "url": "https://security-tracker.debian.org/tracker/CVE-2024-3094"},
     }
 
     live = 0
     total_real_cves = 0
-    for name, url in sources.items():
+    for name, request_spec in sources.items():
         start = time.perf_counter()
         try:
-            if "osv" in url:
-                response = requests.post(url, json={"page_size": 1}, timeout=timeout, headers={"User-Agent": user_agent})
-            else:
-                response = requests.get(url, timeout=timeout, headers={"User-Agent": user_agent})
+            response = requests.request(
+                request_spec["method"],
+                request_spec["url"],
+                params=request_spec.get("params"),
+                json=request_spec.get("json"),
+                timeout=request_spec.get("timeout", timeout),
+                headers={"User-Agent": user_agent},
+                stream=bool(request_spec.get("stream", False)),
+            )
             elapsed_ms = (time.perf_counter() - start) * 1000
             if response.status_code == 200:
                 content_type = response.headers.get("content-type", "")
-                data = response.json() if "json" in content_type else {}
+                data = response.json() if "json" in content_type and not request_spec.get("stream", False) else {}
                 cve_count = 0
                 if isinstance(data, dict):
                     if "vulnerabilities" in data and isinstance(data["vulnerabilities"], list):

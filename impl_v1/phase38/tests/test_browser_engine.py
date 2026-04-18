@@ -5,7 +5,12 @@ Tests for Phase-38 browser decision engine.
 Negative paths dominate.
 """
 
+import sys
+import types
+
 import pytest
+
+import impl_v1.phase38.browser_engine as browser_engine_module
 
 from impl_v1.phase38.browser_types import (
     BrowserIntent,
@@ -19,6 +24,7 @@ from impl_v1.phase38.browser_types import (
 )
 
 from impl_v1.phase38.browser_engine import (
+    _run_real_observation,
     make_browser_decision,
     create_browser_audit_entry,
     check_navigation_scope,
@@ -61,8 +67,13 @@ def make_valid_intent(
 class TestDecisionEngine:
     """Test browser decision making."""
     
-    def test_valid_allow_action_granted(self):
+    def test_valid_allow_action_granted(self, monkeypatch):
         """Valid ALLOW action is allowed."""
+        monkeypatch.setattr(
+            browser_engine_module,
+            "_run_real_observation",
+            lambda intent: (True, "REAL_FETCH_OK bytes=128 elapsed_ms=2 hash=abc"),
+        )
         intent = make_valid_intent(action=BrowserAction.NAVIGATE)
         response = make_browser_decision(intent)
         
@@ -102,8 +113,13 @@ class TestDecisionEngine:
         assert response.decision == BrowserDecision.PENDING
         assert response.requires_human is True
     
-    def test_human_approved_allowed(self):
+    def test_human_approved_allowed(self, monkeypatch):
         """Human approval allows the intent."""
+        monkeypatch.setattr(
+            browser_engine_module,
+            "_run_real_observation",
+            lambda intent: (True, "REAL_FETCH_OK bytes=64 elapsed_ms=1 hash=def"),
+        )
         intent = make_valid_intent(browser_type=BrowserType.HEADED)
         response = make_browser_decision(intent, human_approved=True)
         
@@ -250,10 +266,72 @@ class TestNegativePaths:
         assert response.decision == BrowserDecision.DENY
         assert response.simulated_result is False
     
-    def test_simulated_result_true_on_allow(self):
+    def test_simulated_result_true_on_allow(self, monkeypatch):
         """Simulated result is True when allowed."""
+        monkeypatch.setattr(
+            browser_engine_module,
+            "_run_real_observation",
+            lambda intent: (True, "REAL_FETCH_OK bytes=256 elapsed_ms=3 hash=ghi"),
+        )
         intent = make_valid_intent()
         response = make_browser_decision(intent)
         
         assert response.decision == BrowserDecision.ALLOW
         assert response.simulated_result is True
+
+    def test_allow_denied_when_real_observation_fails(self, monkeypatch):
+        """Validated intents fail closed when real execution does not complete."""
+        monkeypatch.setattr(
+            browser_engine_module,
+            "_run_real_observation",
+            lambda intent: (False, "REAL_FETCH_FAILED: timeout"),
+        )
+        intent = make_valid_intent()
+        response = make_browser_decision(intent)
+
+        assert response.decision == BrowserDecision.DENY
+        assert response.reason_code == "REAL_EXECUTION_FAILED"
+        assert response.simulated_result is False
+
+    def test_human_approved_denied_when_real_observation_fails(self, monkeypatch):
+        """Human approval does not permit a fake success path."""
+        monkeypatch.setattr(
+            browser_engine_module,
+            "_run_real_observation",
+            lambda intent: (False, "REAL_EXECUTION_UNSUPPORTED_ACTION: CLICK"),
+        )
+        intent = make_valid_intent(browser_type=BrowserType.HEADED)
+        response = make_browser_decision(intent, human_approved=True)
+
+        assert response.decision == BrowserDecision.DENY
+        assert response.reason_code == "REAL_EXECUTION_FAILED"
+        assert response.simulated_result is False
+
+    def test_whitelist_skip_not_reported_as_success(self, monkeypatch):
+        """Whitelist skips fail closed instead of reporting a fake success."""
+        fake_isolation_module = types.ModuleType("backend.browser.browser_isolation")
+
+        def _fake_safe_fetch(_url):
+            return types.SimpleNamespace(
+                success=False,
+                error="not in whitelist",
+                content_bytes=0,
+                elapsed_ms=0,
+                content_hash="",
+            )
+
+        def _fake_check_isolation(_url):
+            return types.SimpleNamespace(all_passed=True)
+
+        fake_isolation_module.safe_fetch = _fake_safe_fetch
+        fake_isolation_module.check_isolation = _fake_check_isolation
+        monkeypatch.setitem(
+            sys.modules,
+            "backend.browser.browser_isolation",
+            fake_isolation_module,
+        )
+
+        executed, message = _run_real_observation(make_valid_intent())
+
+        assert executed is False
+        assert "REAL_FETCH_BLOCKED_WHITELIST" in message

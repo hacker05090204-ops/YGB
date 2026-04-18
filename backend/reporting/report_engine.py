@@ -13,8 +13,67 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from backend.ingestion.models import normalize_severity
+from backend.intelligence.vuln_detector import VulnerabilityPatternEngine
 
 logger = logging.getLogger("ygb.reporting.report_engine")
+
+CANONICAL_EXPERT_FIELDS: tuple[str, ...] = (
+    "web_vulns",
+    "api_testing",
+    "mobile_apk",
+    "cloud_misconfig",
+    "blockchain",
+    "iot",
+    "hardware",
+    "firmware",
+    "ssrf",
+    "rce",
+    "xss",
+    "sqli",
+    "auth_bypass",
+    "idor",
+    "graphql_abuse",
+    "rest_attacks",
+    "csrf",
+    "file_upload",
+    "deserialization",
+    "privilege_escalation",
+    "cryptography",
+    "subdomain_takeover",
+    "race_condition",
+)
+
+KNOWN_REPORT_EXPERT_FIELDS = frozenset(CANONICAL_EXPERT_FIELDS) | frozenset({"general_vuln"})
+
+EXPERT_FIELD_ALIASES: dict[str, str] = {
+    "web_vuln": "web_vulns",
+    "graphql": "graphql_abuse",
+    "graph_ql": "graphql_abuse",
+    "rest": "rest_attacks",
+    "crypto": "cryptography",
+    "dns": "subdomain_takeover",
+    "general_triage": "general_vuln",
+}
+
+# Mapping from vulnerability types to expert fields for Group H reporting.
+# Prefer exact specialist experts where they exist and fall back to general_vuln.
+VULN_TYPE_TO_EXPERT_FIELD: dict[str, str] = {
+    "rce": "rce",
+    "rce_memory": "rce",
+    "sqli": "sqli",
+    "xss": "xss",
+    "ssrf": "ssrf",
+    "idor": "idor",
+    "auth_bypass": "auth_bypass",
+    "privilege_escalation": "privilege_escalation",
+    "deserialization": "deserialization",
+    "csrf": "csrf",
+    "path_traversal": "general_vuln",
+    "xxe": "general_vuln",
+    "ssti": "general_vuln",
+    "information_disclosure": "general_vuln",
+    "dos": "general_vuln",
+}
 
 REPORT_ENGINE_VERSION = "1.0"
 MIN_DESCRIPTION_LENGTH = 50
@@ -106,6 +165,12 @@ class VulnerabilityFinding:
     source_url: str = ""
     evidence: tuple[str, ...] = field(default_factory=tuple)
     references: tuple[str, ...] = field(default_factory=tuple)
+    # Per-expert fields for Group H reporting
+    expert_id: int = -1
+    expert_field: str = ""
+    expert_val_f1: float = 0.0
+    expert_val_precision: float = 0.0
+    expert_val_recall: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -121,6 +186,11 @@ class VulnerabilityFinding:
             "source_url": self.source_url,
             "evidence": list(self.evidence),
             "references": list(self.references),
+            "expert_id": self.expert_id,
+            "expert_field": self.expert_field,
+            "expert_val_f1": self.expert_val_f1,
+            "expert_val_precision": self.expert_val_precision,
+            "expert_val_recall": self.expert_val_recall,
         }
 
 
@@ -190,6 +260,7 @@ class ReportEngine:
     def __init__(self, output_dir: str | os.PathLike[str] | None = None) -> None:
         configured_dir = os.environ.get("YGB_REPORT_OUTPUT_DIR")
         self.output_dir = Path(output_dir or configured_dir or "reports/generated_reports")
+        self._pattern_engine = VulnerabilityPatternEngine()
 
     def build_report(
         self,
@@ -201,13 +272,19 @@ class ReportEngine:
         findings: Sequence[Mapping[str, Any] | VulnerabilityFinding],
         source_context: Mapping[str, Any] | None = None,
         generated_at: str | None = None,
+        per_expert_metrics: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None = None,
     ) -> VulnerabilityReport:
         normalized_findings = [self._coerce_finding(finding) for finding in findings]
         if not normalized_findings:
             raise ValueError("build_report() requires at least one finding")
 
+        metrics_index = self._normalize_per_expert_metrics(per_expert_metrics)
+        enriched_findings = [
+            self._attach_expert_metadata(finding, metrics_index) for finding in normalized_findings
+        ]
+
         sorted_findings = sorted(
-            normalized_findings,
+            enriched_findings,
             key=lambda finding: (
                 -SEVERITY_PRIORITY.get(finding.severity, 0),
                 -(finding.cvss_score if finding.cvss_score is not None else -1.0),
@@ -352,6 +429,33 @@ class ReportEngine:
                 source_url=str(payload.get("source_url") or payload.get("url") or "").strip(),
                 evidence=_coerce_text_list(payload.get("evidence", ())),
                 references=_coerce_text_list(payload.get("references", ())),
+                expert_id=int(payload.get("expert_id", -1) or -1),
+                expert_field=self._normalize_expert_field_name(
+                    str(
+                        payload.get("expert_field")
+                        or payload.get("field_name")
+                        or payload.get("field")
+                        or ""
+                    ).strip()
+                ),
+                expert_val_f1=float(
+                    payload.get("expert_val_f1", payload.get("val_f1", payload.get("f1", 0.0)))
+                    or 0.0
+                ),
+                expert_val_precision=float(
+                    payload.get(
+                        "expert_val_precision",
+                        payload.get("val_precision", payload.get("precision", 0.0)),
+                    )
+                    or 0.0
+                ),
+                expert_val_recall=float(
+                    payload.get(
+                        "expert_val_recall",
+                        payload.get("val_recall", payload.get("recall", 0.0)),
+                    )
+                    or 0.0
+                ),
             )
         else:
             raise ValueError("findings must be mappings or VulnerabilityFinding instances")
@@ -359,6 +463,157 @@ class ReportEngine:
         if len(candidate.description.strip()) < MIN_DESCRIPTION_LENGTH:
             raise ValueError(f"finding {candidate.finding_id} description_too_short")
         return candidate
+
+    def _normalize_per_expert_metrics(
+        self, per_expert_metrics: Mapping[str, Any] | Sequence[Mapping[str, Any]] | None
+    ) -> dict[str, dict[str, Any]]:
+        if per_expert_metrics is None:
+            return {}
+
+        raw_entries: list[tuple[str | None, Any]] = []
+        if isinstance(per_expert_metrics, Mapping):
+            for key, value in per_expert_metrics.items():
+                raw_entries.append((str(key), value))
+        elif isinstance(per_expert_metrics, Sequence) and not isinstance(
+            per_expert_metrics, (str, bytes, bytearray)
+        ):
+            for value in per_expert_metrics:
+                raw_entries.append((None, value))
+        else:
+            raise ValueError("per_expert_metrics must be a mapping or sequence of mappings")
+
+        normalized: dict[str, dict[str, Any]] = {}
+        for key_hint, raw_value in raw_entries:
+            if not isinstance(raw_value, Mapping):
+                continue
+            entry = dict(raw_value)
+            field_name = self._normalize_expert_field_name(
+                str(
+                    entry.get("expert_field")
+                    or entry.get("field_name")
+                    or entry.get("field")
+                    or key_hint
+                    or ""
+                ).strip()
+            )
+            expert_id_raw = entry.get("expert_id", -1)
+            try:
+                expert_id = int(expert_id_raw)
+            except (TypeError, ValueError):
+                expert_id = -1
+            if not field_name:
+                field_name = self._field_name_for_expert_id(expert_id)
+            if not field_name:
+                continue
+            normalized[field_name] = {
+                "expert_id": self._resolve_expert_id(field_name, expert_id),
+                "expert_field": field_name,
+                "expert_val_f1": float(
+                    entry.get("expert_val_f1", entry.get("val_f1", entry.get("f1", 0.0))) or 0.0
+                ),
+                "expert_val_precision": float(
+                    entry.get(
+                        "expert_val_precision",
+                        entry.get("val_precision", entry.get("precision", 0.0)),
+                    )
+                    or 0.0
+                ),
+                "expert_val_recall": float(
+                    entry.get(
+                        "expert_val_recall",
+                        entry.get("val_recall", entry.get("recall", 0.0)),
+                    )
+                    or 0.0
+                ),
+            }
+        return normalized
+
+    def _normalize_expert_field_name(self, field_name: str) -> str:
+        normalized_field = (
+            str(field_name or "").strip().lower().replace("-", "_").replace(" ", "_")
+        )
+        if not normalized_field:
+            return ""
+        return EXPERT_FIELD_ALIASES.get(normalized_field, normalized_field)
+
+    def _field_name_for_expert_id(self, expert_id: int) -> str:
+        if 0 <= int(expert_id) < len(CANONICAL_EXPERT_FIELDS):
+            return CANONICAL_EXPERT_FIELDS[int(expert_id)]
+        return ""
+
+    def _expert_id_for_field(self, field_name: str) -> int:
+        normalized_field = self._normalize_expert_field_name(field_name)
+        if not normalized_field:
+            return -1
+        try:
+            return CANONICAL_EXPERT_FIELDS.index(normalized_field)
+        except ValueError:
+            return -1
+
+    def _resolve_expert_id(self, expert_field: str, *candidate_ids: Any) -> int:
+        canonical_id = self._expert_id_for_field(expert_field)
+        if canonical_id >= 0:
+            return canonical_id
+        for candidate_id in candidate_ids:
+            try:
+                parsed_id = int(candidate_id)
+            except (TypeError, ValueError):
+                continue
+            if parsed_id >= 0:
+                return parsed_id
+        return -1
+
+    def _detect_field(self, finding: VulnerabilityFinding) -> str:
+        detected_signals = self._pattern_engine.analyze(
+            finding.description,
+            title=finding.title,
+            cvss=finding.cvss_score,
+        )
+        for signal in detected_signals:
+            mapped_field = self._normalize_expert_field_name(
+                VULN_TYPE_TO_EXPERT_FIELD.get(signal.vuln_type, signal.vuln_type)
+            )
+            if mapped_field in KNOWN_REPORT_EXPERT_FIELDS:
+                return mapped_field
+        return "general_vuln"
+
+    def _attach_expert_metadata(
+        self,
+        finding: VulnerabilityFinding,
+        metrics_index: Mapping[str, Mapping[str, Any]],
+    ) -> VulnerabilityFinding:
+        expert_field = self._normalize_expert_field_name(finding.expert_field) or self._detect_field(
+            finding
+        )
+        metric = dict(metrics_index.get(expert_field, {}))
+        expert_id = self._resolve_expert_id(
+            expert_field,
+            finding.expert_id,
+            metric.get("expert_id", -1),
+        )
+        return VulnerabilityFinding(
+            finding_id=finding.finding_id,
+            title=finding.title,
+            description=finding.description,
+            severity=finding.severity,
+            cvss_score=finding.cvss_score,
+            model_confidence=finding.model_confidence,
+            cve_id=finding.cve_id,
+            cwe_id=finding.cwe_id,
+            affected_asset=finding.affected_asset,
+            source_url=finding.source_url,
+            evidence=finding.evidence,
+            references=finding.references,
+            expert_id=expert_id,
+            expert_field=expert_field,
+            expert_val_f1=float(metric.get("expert_val_f1", finding.expert_val_f1) or 0.0),
+            expert_val_precision=float(
+                metric.get("expert_val_precision", finding.expert_val_precision) or 0.0
+            ),
+            expert_val_recall=float(
+                metric.get("expert_val_recall", finding.expert_val_recall) or 0.0
+            ),
+        )
 
     def _summary_counts(self, findings: Sequence[VulnerabilityFinding]) -> dict[str, int]:
         counts = {severity: 0 for severity in SEVERITY_PRIORITY}
@@ -446,6 +701,8 @@ class ReportEngine:
                     line += f" | CVSS {finding.cvss_score:.1f}"
                 if finding.model_confidence is not None:
                     line += f" | Model confidence {finding.model_confidence:.2f}%"
+                if finding.expert_field:
+                    line += f" | Expert field {finding.expert_field}"
                 line += "]"
                 overview_lines.append(line)
             return "\n".join(overview_lines)
@@ -463,6 +720,11 @@ class ReportEngine:
                     block_lines.append(
                         f"Model confidence: {finding.model_confidence:.2f}%"
                     )
+                if finding.expert_field:
+                    block_lines.append(f"Expert field: {finding.expert_field}")
+                block_lines.append(f"Validation F1: {finding.expert_val_f1:.4f}")
+                block_lines.append(f"Validation precision: {finding.expert_val_precision:.4f}")
+                block_lines.append(f"Validation recall: {finding.expert_val_recall:.4f}")
                 if finding.cve_id:
                     block_lines.append(f"CVE: {finding.cve_id}")
                 if finding.cwe_id:
@@ -518,7 +780,10 @@ class ReportEngine:
         if not isinstance(findings_raw, Sequence) or isinstance(findings_raw, (str, bytes, bytearray)):
             raise ValueError("saved report content must contain findings")
 
-        findings = [self._coerce_finding(finding) for finding in findings_raw]
+        findings = [
+            self._attach_expert_metadata(self._coerce_finding(finding), {})
+            for finding in findings_raw
+        ]
         if not findings:
             raise ValueError("saved report content must contain at least one finding")
 
@@ -608,6 +873,8 @@ class ReportEngine:
                 overview += f", CVSS {finding.cvss_score:.1f}"
             if finding.model_confidence is not None:
                 overview += f", model confidence {finding.model_confidence:.2f}%"
+            if finding.expert_field:
+                overview += f", expert field {finding.expert_field}"
             overview += ")"
             lines.append(overview)
         lines.append("")
@@ -620,6 +887,11 @@ class ReportEngine:
                 lines.append(f"- CVSS: {finding.cvss_score:.1f}")
             if finding.model_confidence is not None:
                 lines.append(f"- Model Confidence: {finding.model_confidence:.2f}%")
+            lines.append(f"- Expert ID: {finding.expert_id}")
+            lines.append(f"- Expert Field: {finding.expert_field or 'general_vuln'}")
+            lines.append(f"- Expert Validation F1: {finding.expert_val_f1:.4f}")
+            lines.append(f"- Expert Validation Precision: {finding.expert_val_precision:.4f}")
+            lines.append(f"- Expert Validation Recall: {finding.expert_val_recall:.4f}")
             if finding.cve_id:
                 lines.append(f"- CVE: {finding.cve_id}")
             if finding.cwe_id:

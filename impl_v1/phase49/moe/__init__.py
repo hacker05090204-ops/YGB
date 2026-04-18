@@ -25,6 +25,13 @@ from .moe_architecture import (
     run_smoke_test,
 )
 from .router import MoERouter, NoisyTopKGate
+from .pro_moe import (
+    ProMoEClassifier,
+    ProMoEConfig,
+    ProMoELayer,
+    ProMoEModel,
+    ProMoERouter,
+)
 from .simple_moe import SimpleMoEClassifier
 from .simple_expert import SimpleExpert130M, count_params
 from .simple_router import SimpleRouter
@@ -254,6 +261,11 @@ __all__ = [
     "MoELayer",
     "MoEBugClassifier",
     "MoEClassifier",
+    "ProMoEClassifier",
+    "ProMoEConfig",
+    "ProMoELayer",
+    "ProMoEModel",
+    "ProMoERouter",
     "SimpleMoEClassifier",
     "SimpleExpert130M",
     "SimpleRouter",

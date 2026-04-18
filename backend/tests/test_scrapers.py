@@ -8,7 +8,9 @@ import requests
 
 import backend.ingestion.scrapers.base_scraper as base_scraper_module
 from backend.ingestion.scrapers import (
+    AlpineSecDBScraper,
     CISAScraper,
+    DebianTrackerScraper,
     ExploitDBScraper,
     GitHubAdvisoryScraper,
     MSRCScraper,
@@ -75,6 +77,23 @@ def test_osv_scraper_parses_known_fixture():
     assert sample.severity == "HIGH"
     assert sample.tags == ("PyPI",)
     assert sample.references == ("https://github.com/advisories/GHSA-9wx4-h78v-vm56",)
+
+
+def test_snyk_scraper_parses_osv_replacement_payload():
+    scraper = SnykScraper()
+    try:
+        sample = scraper.parse_osv_vulnerability(
+            _load_fixture("osv_vuln.json"),
+            ecosystem="npm",
+            package_name="lodash",
+        )
+    finally:
+        scraper.close()
+    assert sample is not None
+    assert sample.source == "snyk"
+    assert sample.cve_id == "CVE-2026-2001"
+    assert sample.product == "lodash"
+    assert "npm" in sample.tags
 
 
 def test_github_advisory_scraper_parses_known_fixture():
@@ -170,6 +189,60 @@ def test_vulnrichment_scraper_parses_known_fixture():
     assert sample.tags == ("CWE-94",)
 
 
+def test_alpine_scraper_parses_known_payload():
+    scraper = AlpineSecDBScraper()
+    payload = {
+        "packages": {
+            "openssl": {
+                "secfixes": {
+                    "3.1.0-r1": ["CVE-2026-5001", "CVE-2026-5002"],
+                }
+            }
+        }
+    }
+    try:
+        samples = scraper.parse_feed(payload, release="v3.21", repo="main", max_items=10)
+    finally:
+        scraper.close()
+    assert len(samples) == 2
+    assert samples[0].source == "alpine"
+    assert samples[0].product == "openssl"
+    assert samples[0].cve_id == "CVE-2026-5001"
+
+
+def test_debian_scraper_parses_known_payload():
+    scraper = DebianTrackerScraper()
+    payload = {
+        "openssl": {
+            "CVE-2026-6001": {
+                "description": "OpenSSL mishandles certificate validation.",
+                "releases": {
+                    "bookworm": {
+                        "status": "open",
+                        "urgency": "high",
+                        "fixed_version": "3.0.15-1",
+                    },
+                    "bullseye": {
+                        "status": "resolved",
+                        "urgency": "medium",
+                        "fixed_version": "1.1.1w-0+deb11u2",
+                    },
+                },
+            }
+        }
+    }
+    try:
+        samples = scraper.parse_tracker(payload, max_items=10)
+    finally:
+        scraper.close()
+    assert len(samples) == 1
+    sample = samples[0]
+    assert sample.source == "debian"
+    assert sample.cve_id == "CVE-2026-6001"
+    assert sample.severity == "HIGH"
+    assert sample.product == "openssl"
+
+
 class _ErrorScraper(BaseScraper):
     SOURCE = "error"
 
@@ -201,6 +274,8 @@ def test_base_scraper_returns_empty_list_on_error_and_logs(caplog):
         RedHatAdvisoryScraper,
         SnykScraper,
         VulnrichmentScraper,
+        AlpineSecDBScraper,
+        DebianTrackerScraper,
     ],
 )
 def test_each_scraper_returns_empty_list_on_network_error(monkeypatch, scraper_cls, caplog):
@@ -233,6 +308,8 @@ def test_each_scraper_returns_empty_list_on_network_error(monkeypatch, scraper_c
         RedHatAdvisoryScraper,
         SnykScraper,
         VulnrichmentScraper,
+        AlpineSecDBScraper,
+        DebianTrackerScraper,
     ],
 )
 def test_scrapers_use_consistent_non_commercial_research_user_agent(scraper_cls):
@@ -256,6 +333,8 @@ def test_scrapers_use_consistent_non_commercial_research_user_agent(scraper_cls)
         RedHatAdvisoryScraper,
         SnykScraper,
         VulnrichmentScraper,
+        AlpineSecDBScraper,
+        DebianTrackerScraper,
     ],
 )
 def test_scrapers_enforce_polite_delay(monkeypatch, scraper_cls):

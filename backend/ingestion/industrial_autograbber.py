@@ -3,10 +3,14 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import os
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Iterable, Sequence
 
+from backend.ingestion.scrapers import AlpineSecDBScraper, DebianTrackerScraper, ScrapedSample
 from backend.ingestion.parallel_autograbber import (
     ExpertRoute,
     ParallelAutoGrabber,
@@ -19,6 +23,17 @@ _SOURCE_TRUST_SCORES = {
     "cisa": 0.95,
     "osv": 0.85,
     "github": 0.75,
+    "exploitdb": 0.8,
+    "msrc": 0.9,
+    "redhat": 0.9,
+    "snyk": 0.8,
+    "vulnrichment": 0.85,
+    "alpine": 0.8,
+    "debian": 0.9,
+}
+_INDUSTRIAL_EXTRA_SCRAPERS = {
+    "alpine": AlpineSecDBScraper,
+    "debian": DebianTrackerScraper,
 }
 
 
@@ -244,6 +259,141 @@ class FilterPipeline:
 class IndustrialAutoGrabber(ParallelAutoGrabber):
     """Async source-fetching wrapper around the production parallel autograbber."""
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._active_cycle_id_hint: str | None = None
+        self._last_fetch_duration_seconds = 0.0
+        self._last_validate_duration_seconds = 0.0
+        self._last_raw_samples = 0
+        self._last_prefilter_accepted = 0
+        self._last_prefilter_rejected = 0
+        self._last_validate_worker_count = 0
+
+    @staticmethod
+    def _available_scraper_types():
+        available = ParallelAutoGrabber._available_scraper_types()
+        available.update(_INDUSTRIAL_EXTRA_SCRAPERS)
+        return available
+
+    def _cycle_log_id(self) -> str:
+        if self._active_cycle_id_hint is not None:
+            return self._active_cycle_id_hint
+        return f"AGC-{self._cycle_sequence + 1:06d}"
+
+    @staticmethod
+    def _to_raw_sample(sample: ScrapedSample) -> RawSample:
+        combined_text = sample.render_text()
+        raw_hash = hashlib.sha256(
+            "|".join(
+                [
+                    str(sample.source or "").strip(),
+                    str(sample.cve_id or "").strip(),
+                    str(sample.advisory_id or "").strip(),
+                    str(sample.url or "").strip(),
+                    combined_text,
+                ]
+            ).encode("utf-8")
+        ).hexdigest()
+        return RawSample(
+            source=str(sample.source or "").strip(),
+            cve_id=str(sample.cve_id or sample.advisory_id or "").strip(),
+            title=str(sample.title or sample.advisory_id or "").strip(),
+            severity=str(sample.severity or "UNKNOWN").strip(),
+            cvss_score=sample.cvss_score,
+            description=str(sample.description or "").strip(),
+            published_at=str(sample.published_at or "").strip(),
+            has_public_exploit=bool(sample.is_exploited),
+            raw_hash=raw_hash,
+            fetched_at=datetime.now(UTC).isoformat(),
+        )
+
+    def _validate_source_samples(
+        self,
+        source: str,
+        source_samples: Sequence[ScrapedSample],
+    ) -> tuple[str, int, int, int, int]:
+        dedup_seen: set[str] = set()
+        raw_samples = [self._to_raw_sample(sample) for sample in source_samples]
+        accepted = 0
+        total_tokens = 0
+        batch_count = 0
+        for batch in TokenBatch.build(raw_samples):
+            batch_count += 1
+            total_tokens += batch.token_count
+            for raw_sample in batch.samples:
+                if FilterPipeline.run_all(raw_sample, dedup_seen).accepted:
+                    accepted += 1
+        return source, len(raw_samples), accepted, total_tokens, batch_count
+
+    def _resolve_validate_workers(self, successful_sources: int) -> int:
+        if successful_sources <= 0:
+            return 0
+        return max(1, min(successful_sources, os.cpu_count() or 1))
+
+    def _run_prefilter_metrics(self, fetched_results: Sequence[tuple[str, object]]) -> None:
+        successful_sources = [
+            (source, tuple(fetch_result))
+            for source, fetch_result in fetched_results
+            if not isinstance(fetch_result, Exception)
+        ]
+        raw_samples = sum(len(samples) for _, samples in successful_sources)
+        worker_count = self._resolve_validate_workers(len(successful_sources))
+        accepted = 0
+        rejected = 0
+        cycle_id = self._cycle_log_id()
+        started = time.perf_counter()
+
+        if worker_count > 0 and successful_sources:
+            with ThreadPoolExecutor(
+                max_workers=worker_count,
+                thread_name_prefix="industrial-autograbber-validate",
+            ) as executor:
+                future_map = {
+                    executor.submit(self._validate_source_samples, source, samples): source
+                    for source, samples in successful_sources
+                }
+                for future in as_completed(future_map):
+                    source = future_map[future]
+                    try:
+                        source_name, source_raw, source_accepted, token_count, batch_count = future.result()
+                    except Exception as exc:  # pragma: no cover - defensive telemetry path
+                        logger.warning(
+                            "industrial_autograbber_validate_phase_failed cycle_id=%s source=%s reason=%s: %s",
+                            cycle_id,
+                            source,
+                            type(exc).__name__,
+                            exc,
+                        )
+                        continue
+                    source_rejected = max(source_raw - source_accepted, 0)
+                    accepted += source_accepted
+                    rejected += source_rejected
+                    logger.info(
+                        "industrial_autograbber_validate_source cycle_id=%s source=%s raw_samples=%d accepted=%d rejected=%d token_count=%d batches=%d",
+                        cycle_id,
+                        source_name,
+                        source_raw,
+                        source_accepted,
+                        source_rejected,
+                        token_count,
+                        batch_count,
+                    )
+
+        self._last_validate_duration_seconds = time.perf_counter() - started
+        self._last_raw_samples = raw_samples
+        self._last_prefilter_accepted = accepted
+        self._last_prefilter_rejected = rejected
+        self._last_validate_worker_count = worker_count
+        logger.info(
+            "industrial_autograbber_validate_phase cycle_id=%s raw_samples=%d accepted=%d rejected=%d validate_seconds=%.3f validate_workers=%d",
+            cycle_id,
+            raw_samples,
+            accepted,
+            rejected,
+            self._last_validate_duration_seconds,
+            worker_count,
+        )
+
     async def _fetch_source_async(self, scraper_type, per_source_limit: int):
         return await asyncio.to_thread(
             self._fetch_scraper_results,
@@ -269,17 +419,61 @@ class IndustrialAutoGrabber(ParallelAutoGrabber):
 
     def _fetch_all_scraper_results(self, per_source_limit: int):
         if not self._scraper_types:
+            self._last_fetch_duration_seconds = 0.0
+            self._last_validate_duration_seconds = 0.0
+            self._last_raw_samples = 0
+            self._last_prefilter_accepted = 0
+            self._last_prefilter_rejected = 0
+            self._last_validate_worker_count = 0
             return [], False, 1
         worker_count = self._resolve_max_workers()
+        fetch_started = time.perf_counter()
         loop = asyncio.new_event_loop()
         try:
-            return (
-                loop.run_until_complete(self._fetch_all_sources(per_source_limit)),
-                True,
+            fetched_results = loop.run_until_complete(self._fetch_all_sources(per_source_limit))
+            self._last_fetch_duration_seconds = time.perf_counter() - fetch_started
+            successful_sources = sum(
+                1 for _, fetch_result in fetched_results if not isinstance(fetch_result, Exception)
+            )
+            raw_samples = sum(
+                len(fetch_result)
+                for _, fetch_result in fetched_results
+                if not isinstance(fetch_result, Exception)
+            )
+            logger.info(
+                "industrial_autograbber_fetch_phase cycle_id=%s sources_attempted=%d sources_succeeded=%d raw_samples=%d fetch_seconds=%.3f fetch_workers=%d",
+                self._cycle_log_id(),
+                len(self._scraper_types),
+                successful_sources,
+                raw_samples,
+                self._last_fetch_duration_seconds,
                 worker_count,
             )
+            self._run_prefilter_metrics(fetched_results)
+            return (fetched_results, True, worker_count)
         finally:
             loop.close()
+
+    def run_cycle(self):
+        self._active_cycle_id_hint = f"AGC-{self._cycle_sequence + 1:06d}"
+        try:
+            result = super().run_cycle()
+        finally:
+            cycle_log_id = self._active_cycle_id_hint
+            self._active_cycle_id_hint = None
+        logger.info(
+            "industrial_autograbber_cycle_complete cycle_id=%s raw_samples=%d prefilter_accepted=%d prefilter_rejected=%d final_accepted=%d final_rejected=%d fetch_seconds=%.3f validate_seconds=%.3f bridge_published=%d",
+            result.cycle_id if hasattr(result, "cycle_id") else cycle_log_id,
+            int(getattr(result, "samples_fetched", self._last_raw_samples)),
+            self._last_prefilter_accepted,
+            self._last_prefilter_rejected,
+            int(getattr(result, "samples_accepted", 0)),
+            int(getattr(result, "samples_rejected", 0)),
+            self._last_fetch_duration_seconds,
+            self._last_validate_duration_seconds,
+            int(getattr(result, "bridge_published", 0)),
+        )
+        return result
 
 
 __all__ = [

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import importlib
 import json
 import logging
@@ -28,6 +29,7 @@ from backend.voice.streaming_pipeline import (
     Transcript,
     VoiceTurnResult,
 )
+from backend.voice.vad import EnergyVAD, detect_segments, strip_silence
 from scripts.device_manager import DeviceConfiguration, resolve_device_configuration
 
 
@@ -106,14 +108,27 @@ def _write_wav_file(path: Path, pcm16: bytes, sample_rate: int, channels: int = 
         wav_file.writeframes(pcm16)
 
 
+def _temporary_path(*, suffix: str) -> Path:
+    fd, raw_path = tempfile.mkstemp(suffix=suffix)
+    os.close(fd)
+    return Path(raw_path)
+
+
+def _read_wav_file(path: Path) -> tuple[bytes, int, int]:
+    with wave.open(str(path), "rb") as wav_file:
+        if wav_file.getsampwidth() != 2:
+            raise ValueError("Only 16-bit PCM WAV files are supported for VAD")
+        return wav_file.readframes(wav_file.getnframes()), wav_file.getframerate(), wav_file.getnchannels()
+
+
 def _normalize_audio_source(audio: AudioFrame | bytes | str | Path) -> tuple[str, Path | None]:
     if isinstance(audio, AudioFrame):
-        temp_path = Path(tempfile.mkstemp(suffix=".wav")[1])
+        temp_path = _temporary_path(suffix=".wav")
         _write_wav_file(temp_path, audio.pcm16, audio.sample_rate, audio.channels)
         return str(temp_path), temp_path
 
     if isinstance(audio, (bytes, bytearray)):
-        temp_path = Path(tempfile.mkstemp(suffix=".wav")[1])
+        temp_path = _temporary_path(suffix=".wav")
         payload = bytes(audio)
         if payload[:4] == b"RIFF":
             temp_path.write_bytes(payload)
@@ -128,6 +143,103 @@ def _normalize_audio_source(audio: AudioFrame | bytes | str | Path) -> tuple[str
         return str(candidate), None
 
     raise TypeError(f"Unsupported audio source: {type(audio).__name__}")
+
+
+def _decode_audio_for_vad(
+    audio: AudioFrame | bytes | str | Path,
+    *,
+    language_hint: str | None = None,
+) -> tuple[bytes, int, int, str | None] | None:
+    if isinstance(audio, AudioFrame):
+        return audio.pcm16, audio.sample_rate, audio.channels, language_hint or audio.language_hint
+
+    if isinstance(audio, (bytes, bytearray)):
+        payload = bytes(audio)
+        if payload[:4] == b"RIFF":
+            with wave.open(io.BytesIO(payload), "rb") as wav_file:
+                if wav_file.getsampwidth() != 2:
+                    raise ValueError("Only 16-bit PCM WAV payloads are supported for VAD")
+                return (
+                    wav_file.readframes(wav_file.getnframes()),
+                    wav_file.getframerate(),
+                    wav_file.getnchannels(),
+                    language_hint,
+                )
+        return payload, 16000, 1, language_hint
+
+    if isinstance(audio, (str, Path)):
+        candidate = Path(audio)
+        if not candidate.exists():
+            raise FileNotFoundError(f"Audio source not found: {candidate}")
+        if candidate.suffix.lower() != ".wav":
+            return None
+        pcm16, sample_rate, channels = _read_wav_file(candidate)
+        return pcm16, sample_rate, channels, language_hint
+
+    return None
+
+
+def _pcm_duration_ms(pcm16: bytes, sample_rate: int, channels: int) -> float:
+    if sample_rate <= 0 or channels <= 0:
+        return 0.0
+    aligned_length = len(pcm16) - (len(pcm16) % 2)
+    sample_count = aligned_length / 2.0
+    return (sample_count / float(sample_rate * channels)) * 1000.0
+
+
+def _coerce_transcript(result: Transcript | Mapping[str, Any]) -> tuple[Transcript, str | None]:
+    if isinstance(result, Transcript):
+        return result, None
+    if not isinstance(result, Mapping):
+        raise TypeError(f"Unsupported STT result payload: {type(result).__name__}")
+
+    error = str(result.get("error", "") or "").strip() or None
+    transcript = Transcript(
+        text=str(result.get("text", "") or "").strip(),
+        language=str(result.get("language", "") or "en"),
+        confidence=float(result.get("language_probability", result.get("confidence", 0.0)) or 0.0),
+        latency_ms=float(result.get("transcription_time_s", result.get("latency_s", 0.0)) or 0.0) * 1000.0,
+    )
+    return transcript, error
+
+
+def _coerce_synthesis(
+    result: SynthesisResult | Mapping[str, Any],
+    *,
+    language: str,
+) -> tuple[SynthesisResult | None, str | None, dict[str, float]]:
+    if isinstance(result, SynthesisResult):
+        return result, None, {}
+    if not isinstance(result, Mapping):
+        raise TypeError(f"Unsupported TTS result payload: {type(result).__name__}")
+
+    error = str(result.get("error", "") or "").strip() or None
+    audio = result.get("audio", b"")
+    if isinstance(audio, bytearray):
+        audio = bytes(audio)
+    if not isinstance(audio, bytes):
+        audio = b""
+
+    output_path_value = result.get("output_path")
+    if not audio and output_path_value:
+        output_path = Path(str(output_path_value))
+        if output_path.exists():
+            audio = output_path.read_bytes()
+        elif error is None:
+            error = f"TTS output path was reported but does not exist: {output_path}"
+
+    metrics = {
+        "tts_chars_per_second": float(result.get("chars_per_second", 0.0) or 0.0),
+    }
+    if not audio:
+        return None, error or "TTS did not produce audio output", metrics
+
+    synthesis = SynthesisResult(
+        audio=audio,
+        provider=str(result.get("provider", f"piper:{language}") or f"piper:{language}"),
+        latency_ms=float(result.get("synthesis_time_s", 0.0) or 0.0) * 1000.0,
+    )
+    return synthesis, error, metrics
 
 
 @dataclass
@@ -246,6 +358,7 @@ class FasterWhisperSTT:
         self._model_factory: Any | None = None
         self._model: Any | None = None
         self._module: Any | None = None
+        self._supports_vad_filter = True
 
         if self.device_configuration.selected_device not in {"cuda", "cpu"}:
             self._record_warning(
@@ -317,40 +430,77 @@ class FasterWhisperSTT:
             )
             self._record_warning(message)
             raise RuntimeError(message) from exc
+
     def transcribe(
         self,
         audio: AudioFrame | bytes | str | Path,
         *,
         language_hint: str | None = None,
         beam_size: int = 1,
-    ) -> Transcript:
+    ) -> dict[str, Any]:
         start = time.perf_counter()
-        model = self._ensure_model()
-        audio_source, temporary_path = _normalize_audio_source(audio)
+        payload: dict[str, Any] = {
+            "text": "",
+            "language": str(language_hint or "en"),
+            "language_probability": 0.0,
+            "transcription_time_s": 0.0,
+            "provider": "faster_whisper",
+            "error": None,
+        }
+
+        if not self.available:
+            payload["error"] = self.warning or "FasterWhisperSTT unavailable"
+            payload["transcription_time_s"] = time.perf_counter() - start
+            return payload
+
         try:
-            segments, info = model.transcribe(
-                audio_source,
-                language=language_hint,
-                beam_size=max(1, int(beam_size)),
-                vad_filter=True,
-            )
+            model = self._ensure_model()
+        except Exception as exc:
+            payload["error"] = str(exc)
+            payload["transcription_time_s"] = time.perf_counter() - start
+            return payload
+
+        audio_source = ""
+        temporary_path: Path | None = None
+        try:
+            audio_source, temporary_path = _normalize_audio_source(audio)
+            kwargs: dict[str, Any] = {
+                "language": language_hint,
+                "beam_size": max(1, int(beam_size)),
+            }
+            if self._supports_vad_filter:
+                kwargs["vad_filter"] = True
+
+            try:
+                segments, info = model.transcribe(audio_source, **kwargs)
+            except TypeError as exc:
+                if kwargs.get("vad_filter") and "vad_filter" in str(exc):
+                    self._supports_vad_filter = False
+                    kwargs.pop("vad_filter", None)
+                    segments, info = model.transcribe(audio_source, **kwargs)
+                else:
+                    raise
+
             text = " ".join(
                 str(getattr(segment, "text", "")).strip()
                 for segment in segments
                 if str(getattr(segment, "text", "")).strip()
             ).strip()
-            language = str(getattr(info, "language", "") or language_hint or "en")
-            confidence = float(getattr(info, "language_probability", 0.0) or 0.0)
-            return Transcript(
-                text=text,
-                language=language,
-                confidence=confidence,
-                latency_ms=(time.perf_counter() - start) * 1000,
+            payload.update(
+                {
+                    "text": text,
+                    "language": str(getattr(info, "language", "") or language_hint or "en"),
+                    "language_probability": float(getattr(info, "language_probability", 0.0) or 0.0),
+                    "transcription_time_s": time.perf_counter() - start,
+                }
             )
+            return payload
         except Exception as exc:
             message = f"FasterWhisperSTT transcription failed: {type(exc).__name__}: {exc}"
             logger.warning(message)
-            raise RuntimeError(message) from exc
+            payload["error"] = message
+            payload["transcription_time_s"] = time.perf_counter() - start
+            return payload
         finally:
             if temporary_path is not None:
                 temporary_path.unlink(missing_ok=True)
@@ -457,16 +607,29 @@ class PiperTTS:
             or next(iter(self.voice_models.values()), None)
         )
 
-    def synthesize(self, text: str, language: str = "en") -> SynthesisResult:
+    def synthesize(self, text: str, language: str = "en") -> dict[str, Any]:
         start = time.perf_counter()
+        payload: dict[str, Any] = {
+            "output_path": None,
+            "synthesis_time_s": 0.0,
+            "chars_per_second": 0.0,
+            "audio": b"",
+            "provider": f"piper:{language}",
+            "error": None,
+        }
         if not self.available or self.binary_path is None:
-            raise RuntimeError(self.warning or "PiperTTS unavailable")
+            payload["error"] = self.warning or "PiperTTS unavailable"
+            payload["synthesis_time_s"] = time.perf_counter() - start
+            return payload
 
         voice_model = self._resolve_voice_model(language)
         if voice_model is None:
-            raise RuntimeError(f"PiperTTS unavailable: no voice model configured for language '{language}'")
+            payload["error"] = f"PiperTTS unavailable: no voice model configured for language '{language}'"
+            payload["synthesis_time_s"] = time.perf_counter() - start
+            return payload
 
-        output_path = Path(tempfile.mkstemp(suffix=".wav")[1])
+        output_path = _temporary_path(suffix=".wav")
+        success = False
         command = [self.binary_path, "--model", str(voice_model), "--output_file", str(output_path)]
         if self.speaker is not None:
             command.extend(["--speaker", str(int(self.speaker))])
@@ -486,18 +649,27 @@ class PiperTTS:
                 raise RuntimeError(stderr or f"Piper exited with code {completed.returncode}")
             if not output_path.exists():
                 raise RuntimeError("Piper did not create the requested output file")
-            audio_bytes = output_path.read_bytes()
-            return SynthesisResult(
-                audio=audio_bytes,
-                provider=f"piper:{language}",
-                latency_ms=(time.perf_counter() - start) * 1000,
+            elapsed = time.perf_counter() - start
+            char_count = len(str(text or ""))
+            success = True
+            payload.update(
+                {
+                    "output_path": str(output_path),
+                    "synthesis_time_s": elapsed,
+                    "chars_per_second": (char_count / elapsed) if elapsed > 0.0 and char_count > 0 else 0.0,
+                    "audio": output_path.read_bytes(),
+                }
             )
+            return payload
         except Exception as exc:
             message = f"PiperTTS synthesis failed: {type(exc).__name__}: {exc}"
             logger.warning(message)
-            raise RuntimeError(message) from exc
+            payload["error"] = message
+            payload["synthesis_time_s"] = time.perf_counter() - start
+            return payload
         finally:
-            output_path.unlink(missing_ok=True)
+            if not success:
+                output_path.unlink(missing_ok=True)
 
     def status(self) -> dict[str, Any]:
         return {
@@ -526,6 +698,8 @@ class ProductionVoicePipeline:
         preferred_device: str | None = None,
         device_configuration: DeviceConfiguration | None = None,
         context_storage_root: str | Path | None = None,
+        vad: EnergyVAD | None = None,
+        min_voiced_duration_ms: int = 120,
     ) -> None:
         self.device_configuration = device_configuration or resolve_device_configuration(
             preferred_device,
@@ -538,6 +712,8 @@ class ProductionVoicePipeline:
         self.query_router = query_router or QueryRouter()
         self.research_pipeline = research_pipeline or ResearchSearchPipeline()
         self.language_detector = language_detector or LanguageDetector()
+        self.vad = vad or EnergyVAD()
+        self.min_voiced_duration_ms = max(1, int(min_voiced_duration_ms))
         self.context = ConversationPager(
             max_turns=max_context_turns,
             page_size=context_page_size,
@@ -550,6 +726,7 @@ class ProductionVoicePipeline:
         return {
             "stt_available": 1.0 if bool(getattr(self.stt, "available", False)) else 0.0,
             "tts_available": 1.0 if bool(getattr(self.tts, "available", False)) else 0.0,
+            "vad_enabled": 1.0,
             "context_turns": float(self.context.turn_count),
             "context_pages": float(self.context.page_count),
             "context_disk_mode": 1.0 if self.context.storage_mode == "disk" else 0.0,
@@ -570,6 +747,7 @@ class ProductionVoicePipeline:
                 and bool(getattr(self.tts, "available", False))
             ),
             "device": self.device_configuration.selected_device,
+            "vad_enabled": True,
             "stt_available": bool(getattr(self.stt, "available", False)),
             "tts_available": bool(getattr(self.tts, "available", False)),
             "routing_available": True,
@@ -580,6 +758,55 @@ class ProductionVoicePipeline:
             "context_pages": self.context.page_count,
             "warnings": warnings,
         }
+
+    def _prepare_audio_for_stt(
+        self,
+        audio: AudioFrame | bytes | str | Path,
+        *,
+        language_hint: str | None = None,
+    ) -> tuple[AudioFrame | bytes | str | Path, dict[str, float], str | None]:
+        decoded = _decode_audio_for_vad(audio, language_hint=language_hint)
+        if decoded is None:
+            return audio, {}, None
+
+        pcm16, sample_rate, channels, effective_language_hint = decoded
+        input_duration_ms = _pcm_duration_ms(pcm16, sample_rate, channels)
+        metrics = {
+            "vad_input_duration_ms": float(input_duration_ms),
+            "vad_output_duration_ms": float(input_duration_ms),
+            "vad_trimmed": 0.0,
+            "vad_segments": 0.0,
+        }
+        if input_duration_ms < float(self.vad.frame_ms):
+            return audio, metrics, None
+
+        segments = detect_segments(pcm16, sample_rate, channels=channels, vad=self.vad)
+        voiced_pcm16 = strip_silence(pcm16, sample_rate, channels=channels, vad=self.vad)
+        output_duration_ms = _pcm_duration_ms(voiced_pcm16, sample_rate, channels)
+        metrics.update(
+            {
+                "vad_output_duration_ms": float(output_duration_ms),
+                "vad_trimmed": 1.0 if voiced_pcm16 != (pcm16[: len(pcm16) - (len(pcm16) % 2)]) else 0.0,
+                "vad_segments": float(len(segments)),
+            }
+        )
+
+        if not segments or output_duration_ms < float(self.min_voiced_duration_ms):
+            return audio, metrics, "No speech detected after silence stripping"
+
+        if voiced_pcm16 == pcm16[: len(pcm16) - (len(pcm16) % 2)]:
+            return audio, metrics, None
+
+        return (
+            AudioFrame(
+                pcm16=voiced_pcm16,
+                sample_rate=sample_rate,
+                channels=channels,
+                language_hint=effective_language_hint,
+            ),
+            metrics,
+            None,
+        )
 
     def process_audio(
         self,
@@ -592,7 +819,28 @@ class ProductionVoicePipeline:
         metrics = self._base_metrics()
 
         try:
-            transcript = self.stt.transcribe(audio, language_hint=language_hint)
+            prepared_audio, vad_metrics, vad_error = self._prepare_audio_for_stt(audio, language_hint=language_hint)
+            metrics.update(vad_metrics)
+        except Exception as exc:
+            logger.warning("VAD preprocessing failed, falling back to original audio: %s: %s", type(exc).__name__, exc)
+            prepared_audio = audio
+            vad_error = None
+
+        if vad_error is not None:
+            warnings.append(vad_error)
+            return ProductionVoiceTurnResult(
+                status="error",
+                response_text=vad_error,
+                conversation_context=self.context.render_page(),
+                metrics=metrics,
+                route_mode="ERROR",
+                route_reason=vad_error,
+                warnings=tuple(warnings),
+            )
+
+        try:
+            transcript_result = self.stt.transcribe(prepared_audio, language_hint=language_hint)
+            transcript, stt_error = _coerce_transcript(transcript_result)
         except Exception as exc:
             message = f"STT unavailable: {exc}"
             warnings.append(message)
@@ -607,8 +855,14 @@ class ProductionVoicePipeline:
                 warnings=tuple(warnings),
             )
 
+        if stt_error:
+            warnings.append(stt_error)
+            logger.warning(stt_error)
+
         if not transcript.text.strip():
-            message = "STT produced an empty transcript"
+            message = stt_error or "STT produced an empty transcript"
+            if stt_error and not stt_error.startswith("STT unavailable:"):
+                message = f"STT unavailable: {stt_error}"
             warnings.append(message)
             return ProductionVoiceTurnResult(
                 status="error",
@@ -629,6 +883,7 @@ class ProductionVoicePipeline:
         metrics.update(
             {
                 "stt_latency_ms": float(transcript.latency_ms),
+                "stt_language_probability": float(transcript.confidence),
                 "intent_risk_score": float(getattr(intent, "risk_score", 0.0) or 0.0),
                 "context_turns": float(self.context.turn_count),
                 "context_pages": float(self.context.page_count),
@@ -689,8 +944,16 @@ class ProductionVoicePipeline:
         synthesis: SynthesisResult | None = None
         if synthesize_response and response_text:
             try:
-                synthesis = self.tts.synthesize(response_text, transcript.language)
-                metrics["tts_latency_ms"] = float(synthesis.latency_ms)
+                synthesis_result = self.tts.synthesize(response_text, transcript.language)
+                synthesis, tts_error, tts_metrics = _coerce_synthesis(
+                    synthesis_result,
+                    language=transcript.language,
+                )
+                metrics.update(tts_metrics)
+                if synthesis is not None:
+                    metrics["tts_latency_ms"] = float(synthesis.latency_ms)
+                if tts_error:
+                    raise RuntimeError(tts_error)
             except Exception as exc:
                 message = f"TTS unavailable: {exc}"
                 warnings.append(message)
@@ -730,6 +993,7 @@ def main() -> None:
 __all__ = [
     "AudioFrame",
     "ConversationPager",
+    "EnergyVAD",
     "FastWhisperSTT",
     "FasterWhisperSTT",
     "PiperTTS",

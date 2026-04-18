@@ -17,6 +17,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from backend.agent.self_reflection import MethodLibrary, SelfReflectionEngine
 from impl_v1.phase49.runtime.idle_detector import get_idle_info, is_power_connected
 from scripts.device_manager import (
     AUTO_DEVICE,
@@ -242,6 +243,8 @@ class OpportunisticTrainer:
         mixed_precision: str | None = DEFAULT_MIXED_PRECISION,
         train_expert_fn: Optional[TrainExpertFn] = None,
         queue: Optional[ExpertTaskQueue] = None,
+        method_library: Optional[MethodLibrary] = None,
+        self_reflection_engine: Optional[SelfReflectionEngine] = None,
         stop_event: Optional[threading.Event] = None,
     ) -> None:
         worker_text = str(worker_id or "").strip()
@@ -266,6 +269,8 @@ class OpportunisticTrainer:
             self.status_path,
             claim_timeout_seconds=self.claim_timeout_seconds,
         )
+        self._method_library = method_library
+        self._self_reflection_engine = self_reflection_engine
         self.device_configuration = resolve_device_configuration(
             preferred_device,
             mixed_precision=mixed_precision,
@@ -297,6 +302,55 @@ class OpportunisticTrainer:
 
     def should_stop(self) -> bool:
         return self.stop_event.is_set()
+
+    def _get_self_reflection_engine(self) -> SelfReflectionEngine:
+        if self._self_reflection_engine is None:
+            if self._method_library is None:
+                self._method_library = MethodLibrary(root=self.status_path.parent / "data")
+            self._self_reflection_engine = SelfReflectionEngine(
+                method_library=self._method_library,
+            )
+        return self._self_reflection_engine
+
+    def _derive_idle_reflection_fields(self) -> list[str]:
+        state = self.queue.load_status()
+        experts = state.get("experts", []) if isinstance(state, dict) else []
+        records = sorted(
+            (
+                record
+                for record in experts
+                if isinstance(record, dict)
+            ),
+            key=lambda record: int(record.get("expert_id", 0) or 0),
+        )
+
+        fields: list[str] = []
+        seen_fields: set[str] = set()
+        for record in records:
+            field_name = str(record.get("field_name", "") or "").strip()
+            if not field_name or field_name in seen_fields:
+                continue
+            seen_fields.add(field_name)
+            fields.append(field_name)
+        return fields
+
+    def _run_idle_self_reflection(self, idle_status: IdleStatus) -> dict[str, Any]:
+        requested_fields = self._derive_idle_reflection_fields()
+        reflection_result = self._get_self_reflection_engine().idle_reflection(
+            requested_fields,
+            idle_seconds=idle_status.idle_seconds,
+        )
+        logger.info(
+            "Idle self-reflection worker_id=%s reason=%s requested_fields=%s reflected_fields=%s",
+            self.worker_id,
+            reflection_result.get("reason", ""),
+            requested_fields,
+            reflection_result.get("reflected_fields", []),
+        )
+        return {
+            "fields": requested_fields,
+            **reflection_result,
+        }
 
     def _release_failure(
         self,
@@ -353,11 +407,13 @@ class OpportunisticTrainer:
                     "No expert available for opportunistic worker_id=%s",
                     self.worker_id,
                 )
+                idle_reflection = self._run_idle_self_reflection(idle_status)
                 return {
                     **base_result,
                     "action": "queue_empty",
                     "status": "SKIPPED",
                     "reason": "queue_empty",
+                    "idle_reflection": idle_reflection,
                 }
 
             expert_id = int(claimed["expert_id"])

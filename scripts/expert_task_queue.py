@@ -109,6 +109,25 @@ class ExpertTaskQueue:
             claim_timeout_seconds=timeout_seconds,
         )
 
+    def heartbeat_expert(
+        self,
+        expert_id: int,
+        *,
+        worker_id: str,
+        claim_timeout_seconds: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        timeout_seconds = (
+            self.claim_timeout_seconds
+            if claim_timeout_seconds is None
+            else float(claim_timeout_seconds)
+        )
+        return heartbeat_expert(
+            expert_id,
+            status_path=self.status_path,
+            worker_id=worker_id,
+            claim_timeout_seconds=timeout_seconds,
+        )
+
     def release_expert(
         self,
         expert_id: int,
@@ -420,6 +439,54 @@ def claim_next_expert(
             dict(record)
             for record in state["experts"]
             if int(record["expert_id"]) == int(selected["expert_id"])
+        )
+
+
+def heartbeat_expert(
+    expert_id: int,
+    *,
+    status_path: Path | str = DEFAULT_STATUS_PATH,
+    worker_id: str,
+    claim_timeout_seconds: float = DEFAULT_CLAIM_TIMEOUT_SECONDS,
+) -> Dict[str, Any]:
+    worker_text = str(worker_id or "").strip()
+    if not worker_text:
+        raise ValueError("worker_id is required")
+
+    resolved = _resolve_status_path(status_path)
+    timeout_seconds = max(1e-6, float(claim_timeout_seconds))
+    with _FileLock(_lock_path_for(resolved)):
+        state = _load_state_unlocked(resolved)
+        _release_expired_claims_unlocked(state, time.time())
+
+        record = next(
+            (
+                item
+                for item in state.get("experts", [])
+                if int(item.get("expert_id", -1)) == int(expert_id)
+            ),
+            None,
+        )
+        if record is None:
+            raise KeyError(f"Unknown expert_id={expert_id}")
+
+        status_value = str(record.get("status", "") or "").upper()
+        claimed_by = str(record.get("claimed_by") or "").strip()
+        if status_value != STATUS_CLAIMED:
+            raise RuntimeError(
+                f"expert_id={expert_id} is not actively claimed; current status={status_value or STATUS_AVAILABLE}"
+            )
+        if claimed_by != worker_text:
+            raise RuntimeError(
+                f"expert_id={expert_id} is claimed by {claimed_by or '-'}, not {worker_text}"
+            )
+
+        record["claim_expires_at_epoch"] = time.time() + timeout_seconds
+        state = _save_state_unlocked(resolved, state)
+        return next(
+            dict(item)
+            for item in state["experts"]
+            if int(item["expert_id"]) == int(expert_id)
         )
 
 

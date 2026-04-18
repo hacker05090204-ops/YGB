@@ -766,6 +766,15 @@ try:
 except ImportError as e:
     logger.warning(f"[BOOT] Runtime API router not available: {e}")
 
+# Task queue API router (expert claim/release/heartbeat/status)
+try:
+    from backend.api.task_queue_api import router as task_queue_api_router
+
+    app.include_router(task_queue_api_router)
+    logger.info("[BOOT] Task queue API endpoints registered: /api/v1/tasks/*")
+except ImportError as e:
+    logger.warning(f"[BOOT] Task queue API router not available: {e}")
+
 # =============================================================================
 # REQUEST/RESPONSE MODELS
 # =============================================================================

@@ -1,9 +1,10 @@
-"""Vulnrichment scraper backed by the public CIRCL CVE API."""
+"""Vulnrichment scraper backed by the public GitHub contents API with a legacy fallback."""
 
 from __future__ import annotations
 
+import base64
+import json
 from typing import Any
-from urllib.parse import quote
 
 from backend.ingestion.scrapers.base_scraper import BaseScraper, ScrapedSample
 
@@ -13,8 +14,11 @@ class VulnrichmentScraper(BaseScraper):
 
     SOURCE = "vulnrichment"
     REQUEST_DELAY_SECONDS = 1.0
-    FEED_URL = "https://cve.circl.lu/api/db/list/vulnrichment/last"
-    DETAIL_URL_TEMPLATE = "https://cve.circl.lu/api/cve/{cve_id}"
+    FEED_URL = "https://api.github.com/repos/cisagov/vulnrichment/contents"
+    LEGACY_FEED_URL = "https://cve.circl.lu/api/db/list/vulnrichment/last"
+    LEGACY_DETAIL_URL_TEMPLATE = "https://cve.circl.lu/api/cve/{cve_id}"
+    MAX_CONTENT_LISTINGS = 12
+    MAX_FILE_CANDIDATES = 64
 
     @staticmethod
     def _first_english_text(values: Any) -> str:
@@ -110,6 +114,13 @@ class VulnrichmentScraper(BaseScraper):
 
     def parse_record(self, payload: Any) -> ScrapedSample | None:
         raw_payload = payload.get("data") if isinstance(payload, dict) and isinstance(payload.get("data"), dict) else payload
+        if isinstance(raw_payload, dict) and str(raw_payload.get("encoding", "")).strip().lower() == "base64":
+            try:
+                content_bytes = base64.b64decode(str(raw_payload.get("content") or ""))
+                raw_payload = json.loads(content_bytes.decode("utf-8"))
+            except (ValueError, TypeError, json.JSONDecodeError):
+                self._log_partial_failure(reason="invalid_github_file_payload")
+                return None
         record_payload = self._ensure_json_object(raw_payload, source=self.SOURCE)
         cve_id = self._extract_cve_id(record_payload)
         containers = record_payload.get("containers", {})
@@ -209,29 +220,93 @@ class VulnrichmentScraper(BaseScraper):
             product=product,
         )
 
+    @staticmethod
+    def _sort_contents_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return sorted(
+            entries,
+            key=lambda item: (
+                str(item.get("type") or "") != "dir",
+                str(item.get("name") or ""),
+            ),
+            reverse=True,
+        )
+
+    def _list_contents(self, url: str) -> list[dict[str, Any]]:
+        payload = self._get_json(url)
+        if isinstance(payload, list):
+            return [item for item in payload if isinstance(item, dict)]
+        if isinstance(payload, dict):
+            return [payload]
+        raise ValueError("vulnrichment: invalid GitHub contents payload")
+
+    def _load_github_record(self, entry: dict[str, Any]) -> Any:
+        download_url = str(entry.get("download_url") or "").strip()
+        if download_url:
+            return self._get_json(download_url)
+        entry_url = str(entry.get("url") or "").strip()
+        if entry_url:
+            return self._get_json(entry_url)
+        raise ValueError("vulnrichment: contents entry missing url")
+
+    def _fetch_from_github_contents(self, max_items: int) -> list[ScrapedSample]:
+        pending_urls = [self.FEED_URL]
+        listing_requests = 0
+        file_entries: list[dict[str, Any]] = []
+        while pending_urls and listing_requests < self.MAX_CONTENT_LISTINGS and len(file_entries) < self.MAX_FILE_CANDIDATES:
+            listing_url = pending_urls.pop(0)
+            listing_requests += 1
+            entries = self._sort_contents_entries(self._list_contents(listing_url))
+            for entry in entries:
+                entry_type = str(entry.get("type") or "").strip().lower()
+                if entry_type == "dir":
+                    next_url = str(entry.get("url") or "").strip()
+                    if next_url:
+                        pending_urls.append(next_url)
+                    continue
+                if entry_type == "file" and str(entry.get("name") or "").strip().lower().endswith(".json"):
+                    file_entries.append(entry)
+                    if len(file_entries) >= self.MAX_FILE_CANDIDATES:
+                        break
+
+        samples: list[ScrapedSample] = []
+        for entry in file_entries:
+            if len(samples) >= max_items:
+                break
+            try:
+                sample = self.parse_record(self._load_github_record(entry))
+                if sample is not None:
+                    samples.append(sample)
+            except Exception as exc:
+                self._log_partial_failure(
+                    reason="github_record_fetch_failed",
+                    path=str(entry.get("path") or entry.get("name") or "<unknown-path>"),
+                    error_type=type(exc).__name__,
+                )
+        return samples[:max_items]
+
     def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
-        feed_payload = self._get_json(self.FEED_URL)
+        try:
+            github_samples = self._fetch_from_github_contents(max_items)
+            if github_samples:
+                return github_samples[:max_items]
+        except Exception as exc:
+            self._log_partial_failure(
+                reason="github_contents_fetch_failed",
+                error_type=type(exc).__name__,
+            )
+
+        feed_payload = self._get_json(self.LEGACY_FEED_URL)
         samples: list[ScrapedSample] = []
         for entry in self._extract_feed_entries(feed_payload, max_items=max(max_items * 2, 10)):
             if len(samples) >= max_items:
                 break
             try:
-                if isinstance(entry, dict) and ("containers" in entry or "cveMetadata" in entry):
-                    sample = self.parse_record(entry)
-                else:
-                    cve_id = self._extract_cve_id(entry)
-                    if not cve_id:
-                        self._log_partial_failure(reason="missing_cve_id")
-                        continue
-                    detail_payload = self._get_json(
-                        self.DETAIL_URL_TEMPLATE.format(cve_id=quote(cve_id, safe=""))
-                    )
-                    sample = self.parse_record(detail_payload)
+                sample = self.parse_record(entry)
                 if sample is not None:
                     samples.append(sample)
             except Exception as exc:
                 self._log_partial_failure(
-                    reason="record_fetch_failed",
+                    reason="legacy_record_fetch_failed",
                     cve_id=self._extract_cve_id(entry) or "<missing-cve-id>",
                     error_type=type(exc).__name__,
                 )

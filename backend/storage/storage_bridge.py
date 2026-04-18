@@ -385,6 +385,13 @@ def get_audit_log() -> List[BridgeAuditEntry]:
     return _audit_log.get_entries()
 
 
+def _ensure_storage_directories(root: str) -> Path:
+    """Create the resolved storage root before subsystem initialization."""
+    storage_root = Path(root)
+    storage_root.mkdir(parents=True, exist_ok=True)
+    return storage_root
+
+
 def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     """
     Initialize the HDD storage engine and all subsystems.
@@ -418,7 +425,8 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     if resolved_root is None:
         resolved_root = os.getenv("YGB_HDD_ROOT", str(HDD_ROOT))
 
-    raw_engine = get_engine(resolved_root)
+    storage_root = _ensure_storage_directories(resolved_root)
+    raw_engine = get_engine(str(storage_root))
     _engine = _wrap_engine(raw_engine)
     _EMAIL_INDEX = {}
     _EMAIL_INDEX_BUILT = False
@@ -1532,8 +1540,8 @@ def get_storage_health() -> Dict[str, Any]:
         reasons.append("Storage engine not initialized")
     else:
         try:
-            root = _engine.root
-            if root and root.exists():
+            root = Path(_engine.root)
+            if root.exists() and root.is_dir():
                 storage_active = True
             else:
                 reasons.append(f"Storage root missing or inaccessible: {root}")

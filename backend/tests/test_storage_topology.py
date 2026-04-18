@@ -74,8 +74,7 @@ def test_storage_health_reports_fallback_truthfully(monkeypatch):
     original_dm = sb._disk_monitor
     try:
         mock_engine = MagicMock()
-        mock_root = MagicMock()
-        mock_root.exists.return_value = True
+        mock_root = Path("C:/ygb_hdd_fallback")
         mock_engine.root = mock_root
 
         sb._engine = mock_engine
@@ -107,6 +106,120 @@ def test_storage_health_reports_fallback_truthfully(monkeypatch):
         sb._disk_monitor = original_dm
 
 
+
+def test_init_storage_creates_resolved_root_before_engine_boot(monkeypatch, tmp_path):
+    from backend.storage import storage_bridge as sb
+
+    storage_root = tmp_path / "missing-storage-root"
+    fallback_root = tmp_path / "fallback-root"
+
+    class _FakeEngine:
+        def __init__(self, root: Path):
+            self.root = root
+
+    class _FakeLifecycleManager:
+        def __init__(self, engine):
+            self.engine = engine
+
+        def start_sweep_thread(self):
+            return None
+
+    class _FakeDiskMonitor:
+        def __init__(self, engine):
+            self.engine = engine
+
+        def start(self):
+            return None
+
+    original_engine = sb._engine
+    original_lifecycle = sb._lifecycle
+    original_dm = sb._disk_monitor
+    original_video_streamer = sb._video_streamer
+    original_active_root = sb._storage_active_root
+    original_storage_mode = sb._storage_mode
+    try:
+        monkeypatch.setattr(
+            sb,
+            "resolve_hdd_root",
+            lambda: (
+                storage_root,
+                {
+                    "primary_root": str(storage_root),
+                    "fallback_root": str(fallback_root),
+                    "active_root": str(storage_root),
+                    "primary_available": True,
+                    "fallback_available": True,
+                    "fallback_active": False,
+                    "mode": "PRIMARY",
+                    "reason": "primary root active",
+                },
+            ),
+        )
+        monkeypatch.setattr(sb, "LifecycleManager", _FakeLifecycleManager)
+        monkeypatch.setattr(sb, "DiskMonitor", _FakeDiskMonitor)
+        monkeypatch.setattr(sb, "VideoStreamer", lambda root: {"root": root})
+
+        def _fake_get_engine(root: str):
+            assert Path(root).exists()
+            assert Path(root).is_dir()
+            return _FakeEngine(Path(root))
+
+        monkeypatch.setattr(sb, "get_engine", _fake_get_engine)
+
+        result = sb.init_storage()
+
+        assert storage_root.exists()
+        assert storage_root.is_dir()
+        assert result["status"] == "initialized"
+        assert result["hdd_root"] == str(storage_root)
+    finally:
+        sb._engine = original_engine
+        sb._lifecycle = original_lifecycle
+        sb._disk_monitor = original_dm
+        sb._video_streamer = original_video_streamer
+        sb._storage_active_root = original_active_root
+        sb._storage_mode = original_storage_mode
+
+
+
+def test_storage_health_uses_actual_filesystem_state_for_root(monkeypatch, tmp_path):
+    from backend.storage import storage_bridge as sb
+
+    original_engine = sb._engine
+    original_lifecycle = sb._lifecycle
+    original_dm = sb._disk_monitor
+    try:
+        missing_root = tmp_path / "missing-root"
+        sb._engine = type("Engine", (), {"root": missing_root})()
+        sb._lifecycle = MagicMock()
+        sb._disk_monitor = MagicMock()
+        monkeypatch.setattr(
+            sb,
+            "get_storage_topology",
+            lambda: {
+                "primary_root": str(missing_root),
+                "fallback_root": str(tmp_path / "fallback"),
+                "active_root": str(missing_root),
+                "primary_available": True,
+                "fallback_available": True,
+                "fallback_active": False,
+                "mode": "PRIMARY",
+                "reason": "primary root active",
+            },
+        )
+
+        result = sb.get_storage_health()
+
+        assert result["storage_active"] is False
+        assert result["db_active"] is False
+        assert result["status"] == "INACTIVE"
+        assert "Storage root missing or inaccessible" in result["reason"]
+    finally:
+        sb._engine = original_engine
+        sb._lifecycle = original_lifecycle
+        sb._disk_monitor = original_dm
+
+
 def test_stop_enforcement_loop_stops_running_thread(monkeypatch):
     from backend.storage import tiered_storage as ts
 
@@ -126,7 +239,7 @@ def test_stop_enforcement_loop_stops_running_thread(monkeypatch):
         ts._enforcement_stop_event = original_stop_event
 
 
-def test_storage_health_degrades_when_disk_monitor_missing(monkeypatch):
+def test_storage_health_degrades_when_disk_monitor_missing(monkeypatch, tmp_path):
     from backend.storage import storage_bridge as sb
 
     original_engine = sb._engine
@@ -134,8 +247,8 @@ def test_storage_health_degrades_when_disk_monitor_missing(monkeypatch):
     original_dm = sb._disk_monitor
     try:
         mock_engine = MagicMock()
-        mock_root = MagicMock()
-        mock_root.exists.return_value = True
+        mock_root = tmp_path / "primary-root"
+        mock_root.mkdir(parents=True, exist_ok=True)
         mock_engine.root = mock_root
 
         sb._engine = mock_engine

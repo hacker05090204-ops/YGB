@@ -305,6 +305,10 @@ class EWCRegularizer:
     def has_fisher(self) -> bool:
         return bool(self._fisher and self._reference_params and self._sample_count > 0)
 
+    @property
+    def sample_count(self) -> int:
+        return int(self._sample_count)
+
     def compute_fisher(
         self,
         model: torch.nn.Module,
@@ -547,6 +551,14 @@ class AdaptiveLearner:
             if self._model is None:
                 return torch.tensor(0.0, dtype=torch.float32)
             return self.regularizer.ewc_loss(self._model)
+
+    def has_ewc_state(self) -> bool:
+        with self._lock:
+            return self.regularizer.has_fisher()
+
+    def get_ewc_sample_count(self) -> int:
+        with self._lock:
+            return self.regularizer.sample_count
 
     def get_events(self) -> list[AdaptationEvent]:
         with self._lock:

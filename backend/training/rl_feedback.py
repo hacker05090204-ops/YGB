@@ -10,7 +10,7 @@ import threading
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 from backend.ingestion.models import normalize_severity
 
@@ -18,6 +18,7 @@ logger = logging.getLogger("ygb.training.rl_feedback")
 DEFAULT_REWARD_BUFFER_PATH = Path(
     os.environ.get("YGB_RL_REWARD_BUFFER_PATH", "data/rl_reward_buffer.json")
 )
+_DEFAULT_GRPO_GROUP_SIZE = 8
 _SEVERITY_RANKS = {
     "UNKNOWN": 0,
     "INFO": 1,
@@ -25,6 +26,19 @@ _SEVERITY_RANKS = {
     "MEDIUM": 3,
     "HIGH": 4,
     "CRITICAL": 5,
+}
+_SOURCE_REWARD_FACTORS = {
+    "cisa": 1.25,
+    "cisa_kev": 1.25,
+    "nvd": 1.0,
+    "github": 0.9,
+    "ghsa": 0.9,
+    "msrc": 0.95,
+    "osv": 0.9,
+    "redhat": 0.95,
+    "snyk": 0.9,
+    "vendor": 1.1,
+    "vulnrichment": 0.9,
 }
 
 
@@ -37,6 +51,55 @@ def _parse_timestamp(value: str) -> datetime:
     if parsed.tzinfo is None:
         return parsed.replace(tzinfo=timezone.utc)
     return parsed.astimezone(timezone.utc)
+
+
+def _normalize_reward_values(
+    rewards: Iterable[float],
+    *,
+    group_size: int = _DEFAULT_GRPO_GROUP_SIZE,
+    epsilon: float = 1e-8,
+) -> list[float]:
+    reward_values = [float(reward) for reward in rewards]
+    if len(reward_values) < max(int(group_size), 1):
+        return list(reward_values)
+    mean_reward = float(sum(reward_values) / len(reward_values))
+    variance = float(
+        sum((reward - mean_reward) ** 2 for reward in reward_values)
+        / len(reward_values)
+    )
+    std_reward = math.sqrt(max(variance, 0.0))
+    if std_reward <= float(epsilon):
+        return [0.0 for _ in reward_values]
+    return [
+        float((reward - mean_reward) / (std_reward + float(epsilon)))
+        for reward in reward_values
+    ]
+
+
+def normalize_rewards(
+    rewards: Mapping[str, float] | Iterable[float],
+    *,
+    group_size: int = _DEFAULT_GRPO_GROUP_SIZE,
+    epsilon: float = 1e-8,
+) -> dict[str, float] | list[float]:
+    """Apply GRPO-style group normalization while preserving small buffers as raw rewards."""
+
+    if isinstance(rewards, Mapping):
+        reward_items = [(str(key), float(value)) for key, value in rewards.items()]
+        normalized_values = _normalize_reward_values(
+            [value for _, value in reward_items],
+            group_size=group_size,
+            epsilon=epsilon,
+        )
+        return {
+            key: normalized_values[index]
+            for index, (key, _) in enumerate(reward_items)
+        }
+    return _normalize_reward_values(
+        rewards,
+        group_size=group_size,
+        epsilon=epsilon,
+    )
 
 
 @dataclass(frozen=True)
@@ -114,10 +177,16 @@ class RewardBuffer:
         now: datetime | None = None,
         max_age_days: float = 30.0,
         half_life_days: float = 7.0,
+        key: str = "sample_id",
+        normalize: bool = False,
+        group_size: int = _DEFAULT_GRPO_GROUP_SIZE,
     ) -> dict[str, float]:
         current_time = now.astimezone(timezone.utc) if now is not None else datetime.now(timezone.utc)
         max_age_seconds = max(float(max_age_days), 0.0) * 86400.0
         half_life_seconds = max(float(half_life_days), 1e-6) * 86400.0
+        key_name = str(key or "sample_id").strip().lower()
+        if key_name not in {"sample_id", "cve_id"}:
+            raise ValueError("RewardBuffer.get_weighted_signals() key must be 'sample_id' or 'cve_id'")
         weighted_rewards: dict[str, float] = {}
         for signal in self.snapshot():
             observed_at = _parse_timestamp(signal.observed_at)
@@ -128,8 +197,18 @@ class RewardBuffer:
             if age_seconds > max_age_seconds:
                 continue
             decay = math.pow(0.5, age_seconds / half_life_seconds)
-            weighted_rewards[signal.sample_id] = weighted_rewards.get(signal.sample_id, 0.0) + (
+            reward_key = signal.sample_id if key_name == "sample_id" else signal.cve_id
+            if not reward_key:
+                continue
+            weighted_rewards[reward_key] = weighted_rewards.get(reward_key, 0.0) + (
                 float(signal.reward) * decay
+            )
+        if normalize:
+            return dict(
+                normalize_rewards(
+                    weighted_rewards,
+                    group_size=group_size,
+                )
             )
         return weighted_rewards
 
@@ -187,6 +266,8 @@ class _RecordedPrediction:
     cve_id: str
     predicted_severity: str
     recorded_at: str
+    source: str = ""
+    metadata: dict[str, str] = field(default_factory=dict)
 
 
 class RLFeedbackCollector:
@@ -207,6 +288,33 @@ class RLFeedbackCollector:
         if normalized_source.endswith("_severity_update"):
             normalized_source = normalized_source[: -len("_severity_update")]
         return normalized_source
+
+    @staticmethod
+    def _normalize_prediction_metadata(
+        metadata: Mapping[str, object] | None,
+    ) -> dict[str, str]:
+        if metadata is None:
+            return {}
+        if not isinstance(metadata, Mapping):
+            raise TypeError("record_prediction() metadata must be a mapping")
+        return {
+            str(key): str(value)
+            for key, value in metadata.items()
+            if str(key or "").strip()
+        }
+
+    @staticmethod
+    def normalize_rewards(
+        rewards: Mapping[str, float] | Iterable[float],
+        *,
+        group_size: int = _DEFAULT_GRPO_GROUP_SIZE,
+        epsilon: float = 1e-8,
+    ) -> dict[str, float] | list[float]:
+        return normalize_rewards(
+            rewards,
+            group_size=group_size,
+            epsilon=epsilon,
+        )
 
     @staticmethod
     def _kev_event_key(cve_id: str, sample_id: str) -> str:
@@ -255,22 +363,42 @@ class RLFeedbackCollector:
 
     def record_prediction(
         self,
-        *,
-        sample_id: str,
-        cve_id: str,
-        predicted_severity: str,
+        *args,
+        sample_id: str | None = None,
+        cve_id: str | None = None,
+        predicted_severity: str | None = None,
+        source: str | None = None,
+        metadata: Mapping[str, object] | None = None,
     ) -> None:
+        if args:
+            if len(args) == 2 and sample_id is None and cve_id is None and predicted_severity is None:
+                cve_id = str(args[0])
+                predicted_severity = str(args[1])
+                sample_id = cve_id
+            elif len(args) == 3 and sample_id is None and cve_id is None and predicted_severity is None:
+                sample_id = str(args[0])
+                cve_id = str(args[1])
+                predicted_severity = str(args[2])
+            else:
+                raise TypeError(
+                    "record_prediction() accepts either (cve_id, predicted_severity), "
+                    "(sample_id, cve_id, predicted_severity), or keyword arguments"
+                )
         normalized_sample_id = str(sample_id or "").strip()
         normalized_cve_id = str(cve_id or "").strip().upper()
         if not normalized_sample_id:
             raise ValueError("record_prediction() requires a non-empty sample_id")
         if not normalized_cve_id:
             raise ValueError("record_prediction() requires a non-empty cve_id")
+        normalized_metadata = self._normalize_prediction_metadata(metadata)
+        normalized_source = self._normalize_signal_source(source or normalized_metadata.get("prediction_source", ""))
         prediction = _RecordedPrediction(
             sample_id=normalized_sample_id,
             cve_id=normalized_cve_id,
             predicted_severity=normalize_severity(predicted_severity),
             recorded_at=_utc_now(),
+            source=normalized_source,
+            metadata=normalized_metadata,
         )
         with self._lock:
             self._predictions_by_cve.setdefault(normalized_cve_id, {})[
@@ -287,21 +415,53 @@ class RLFeedbackCollector:
         now: datetime | None = None,
         max_age_days: float = 30.0,
         half_life_days: float = 7.0,
+        key: str = "sample_id",
+        normalize: bool = False,
+        group_size: int = _DEFAULT_GRPO_GROUP_SIZE,
     ) -> dict[str, float]:
         return self._reward_buffer.get_weighted_signals(
             now=now,
             max_age_days=max_age_days,
             half_life_days=half_life_days,
+            key=key,
+            normalize=normalize,
+            group_size=group_size,
         )
 
-    @staticmethod
-    def _kev_reward(predicted_severity: str) -> float:
-        severity = normalize_severity(predicted_severity)
-        if severity in {"CRITICAL", "HIGH"}:
+    @classmethod
+    def _kev_reward(cls, predicted_severity: str) -> float:
+        predicted_rank = cls._severity_rank(predicted_severity)
+        critical_rank = cls._severity_rank("CRITICAL")
+        if predicted_rank >= critical_rank:
             return 1.0
-        if severity == "MEDIUM":
-            return 0.5
-        return -0.5
+        miss_distance = max(critical_rank - predicted_rank, 1)
+        return float(-min(1.0, 0.25 * miss_distance))
+
+    @staticmethod
+    def _prediction_signal_metadata(
+        prediction: _RecordedPrediction,
+        *,
+        extra_metadata: Mapping[str, object] | None = None,
+    ) -> dict[str, str]:
+        metadata = {
+            "prediction_recorded_at": prediction.recorded_at,
+        }
+        if prediction.source:
+            metadata["prediction_source"] = prediction.source
+        metadata.update({
+            str(key): str(value)
+            for key, value in prediction.metadata.items()
+            if str(key or "").strip()
+        })
+        if extra_metadata is not None:
+            metadata.update(
+                {
+                    str(key): str(value)
+                    for key, value in extra_metadata.items()
+                    if str(key or "").strip()
+                }
+            )
+        return metadata
 
     def process_new_cisa_kev_batch(self, cve_ids: Iterable[str]) -> int:
         added_signals = 0
@@ -327,6 +487,18 @@ class RLFeedbackCollector:
                         outcome="kev_exploit_confirmed",
                         reward=self._kev_reward(prediction.predicted_severity),
                         source="cisa_kev",
+                        metadata=self._prediction_signal_metadata(
+                            prediction,
+                            extra_metadata={
+                                "confirmed_severity": "CRITICAL",
+                                "signal_source": "cisa_kev",
+                                "reward_kind": (
+                                    "kev_exact_critical_hit"
+                                    if normalize_severity(prediction.predicted_severity) == "CRITICAL"
+                                    else "kev_missed_critical"
+                                ),
+                            },
+                        ),
                     )
                 )
                 added_signals += 1
@@ -340,18 +512,29 @@ class RLFeedbackCollector:
         predicted_severity: str,
         previous_severity: str,
         new_severity: str,
+        source: str,
     ) -> float:
         predicted_rank = self._severity_rank(predicted_severity)
         previous_rank = self._severity_rank(previous_severity)
         new_rank = self._severity_rank(new_severity)
+        delta_rank = new_rank - previous_rank
+        if delta_rank == 0:
+            return 0.0
+        normalized_source = self._normalize_signal_source(source)
+        source_factor = _SOURCE_REWARD_FACTORS.get(normalized_source, 0.85)
+        delta_factor = 1.0 + (0.25 * max(abs(delta_rank) - 1, 0))
         if predicted_rank == new_rank:
-            return 0.5
+            return float(0.5 * delta_factor * source_factor)
         previous_distance = abs(predicted_rank - previous_rank)
         new_distance = abs(predicted_rank - new_rank)
         if new_distance < previous_distance:
-            return 0.25
+            return float(0.25 * delta_factor * source_factor)
         if new_distance > previous_distance:
-            return -0.25
+            return float(-0.25 * delta_factor * source_factor)
+        if (delta_rank > 0 and predicted_rank < new_rank) or (
+            delta_rank < 0 and predicted_rank > new_rank
+        ):
+            return float(-0.1 * delta_factor * source_factor)
         return 0.0
 
     def process_severity_update(
@@ -377,6 +560,7 @@ class RLFeedbackCollector:
                 predicted_severity=prediction.predicted_severity,
                 previous_severity=normalized_previous,
                 new_severity=normalized_new,
+                source=normalized_source,
             )
             if reward == 0.0:
                 continue
@@ -399,11 +583,21 @@ class RLFeedbackCollector:
                     outcome=f"severity_update:{normalized_new}",
                     reward=reward,
                     source=normalized_source,
-                    metadata={
-                        "previous_severity": normalized_previous,
-                        "new_severity": normalized_new,
-                        "signal_source": normalized_source,
-                    },
+                    metadata=self._prediction_signal_metadata(
+                        prediction,
+                        extra_metadata={
+                            "previous_severity": normalized_previous,
+                            "new_severity": normalized_new,
+                            "signal_source": normalized_source,
+                            "severity_delta": str(
+                                self._severity_rank(normalized_new)
+                                - self._severity_rank(normalized_previous)
+                            ),
+                            "source_factor": str(
+                                _SOURCE_REWARD_FACTORS.get(normalized_source, 0.85)
+                            ),
+                        },
+                    ),
                 )
             )
             added_signals += 1

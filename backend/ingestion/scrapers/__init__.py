@@ -1,7 +1,9 @@
 """Synchronous public-source scrapers used by the autograbber."""
 
+from backend.ingestion.scrapers.alpine_scraper import AlpineSecDBScraper
 from backend.ingestion.scrapers.base_scraper import BaseScraper, ScrapedSample
 from backend.ingestion.scrapers.cisa_scraper import CISAScraper
+from backend.ingestion.scrapers.debian_scraper import DebianTrackerScraper
 from backend.ingestion.scrapers.exploitdb_scraper import ExploitDBScraper
 from backend.ingestion.scrapers.github_advisory_scraper import GitHubAdvisoryScraper
 from backend.ingestion.scrapers.msrc_scraper import MSRCScraper
@@ -12,8 +14,10 @@ from backend.ingestion.scrapers.snyk_scraper import SnykScraper
 from backend.ingestion.scrapers.vulnrichment_scraper import VulnrichmentScraper
 
 __all__ = [
+    "AlpineSecDBScraper",
     "BaseScraper",
     "CISAScraper",
+    "DebianTrackerScraper",
     "ExploitDBScraper",
     "GitHubAdvisoryScraper",
     "MSRCScraper",

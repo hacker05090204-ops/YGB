@@ -39,6 +39,7 @@ class IntegrityReport:
 
 
 last_integrity_report: Optional[IntegrityReport] = None
+_env_fallback_warning_emitted = False
 
 
 class LedgerKeyMode(str, Enum):
@@ -47,8 +48,19 @@ class LedgerKeyMode(str, Enum):
     MISSING = "MISSING"
 
 
+def _env_flag_enabled(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _runtime_is_production() -> bool:
-    return os.environ.get("YGB_ENV", "").strip().lower() == "production"
+    return (
+        os.environ.get("YGB_ENV", "").strip().lower() == "production"
+        or _env_flag_enabled("YGB_PRODUCTION")
+    )
+
+
+def _has_env_approval_secret() -> bool:
+    return bool(os.environ.get("YGB_APPROVAL_SECRET", "").strip())
 
 
 def _integrity_timestamp() -> str:
@@ -148,9 +160,7 @@ class KeyManager:
         self._key_dir: str = ""
         # Default to strict=True in production environments
         if strict is None:
-            env = os.environ.get("YGB_ENV", "").lower()
-            prod_flag = os.environ.get("YGB_PRODUCTION", "0")
-            strict = (env == "production" or prod_flag == "1")
+            strict = _runtime_is_production()
         self._strict: bool = strict
         self._load_keys()
 
@@ -189,6 +199,7 @@ class KeyManager:
         """Load keys from filesystem or environment with security checks."""
         key_dir = os.environ.get("YGB_KEY_DIR", "")
         self._key_dir = key_dir
+        production_mode = _runtime_is_production()
 
         if key_dir and os.path.isdir(key_dir):
             self._source = "key_dir"
@@ -230,28 +241,44 @@ class KeyManager:
                         for kid in self._revoked:
                             self._log_audit("KEY_REVOKED_ON_LOAD", kid)
 
-            if loaded == 0 and self._strict:
+            if loaded == 0:
+                if production_mode or self._strict:
+                    raise ValueError(
+                        "KEY_STORAGE_ERROR: no valid keys in YGB_KEY_DIR"
+                    )
+                env_secret = os.environ.get("YGB_APPROVAL_SECRET", "").strip()
+                if env_secret:
+                    self._keys[self.DEFAULT_KEY_ID] = env_secret.encode()
+                    self._source = "env"
+                    self._log_audit(
+                        "KEY_FALLBACK",
+                        self.DEFAULT_KEY_ID,
+                        "using env var because key_dir has no valid keys — NOT FOR PRODUCTION",
+                    )
+                    return
                 raise ValueError(
-                    "KEY_STORAGE_ERROR: no valid keys in YGB_KEY_DIR"
+                    "APPROVAL_SECRET_MISSING: YGB_APPROVAL_SECRET env var is required when YGB_KEY_DIR has no valid keys. "
+                    "For production, use YGB_KEY_DIR with valid key files instead."
                 )
-        else:
-            if self._strict:
-                raise ValueError(
-                    "KEY_STORAGE_ERROR: YGB_KEY_DIR not set or not a directory "
-                    "(strict mode rejects fallback keys)"
-                )
-            # Fallback: env var (dev mode only — no hardcoded default)
-            secret_str = os.environ.get("YGB_APPROVAL_SECRET", "")
-            if not secret_str:
-                raise ValueError(
-                    "APPROVAL_SECRET_MISSING: YGB_APPROVAL_SECRET env var is required. "
-                    "Set it to a strong random secret (e.g. python -c \"import secrets; print(secrets.token_hex(32))\"). "
-                    "For production, use YGB_KEY_DIR with key files instead."
-                )
-            self._keys[self.DEFAULT_KEY_ID] = secret_str.encode()
-            self._source = "env"
-            self._log_audit("KEY_FALLBACK", self.DEFAULT_KEY_ID,
-                            "using env var — NOT FOR PRODUCTION")
+            return
+
+        if production_mode or self._strict:
+            raise ValueError(
+                "KEY_STORAGE_ERROR: YGB_KEY_DIR not set or not a directory "
+                "(production/strict mode rejects fallback keys)"
+            )
+        # Fallback: env var (dev mode only — no hardcoded default)
+        secret_str = os.environ.get("YGB_APPROVAL_SECRET", "")
+        if not secret_str:
+            raise ValueError(
+                "APPROVAL_SECRET_MISSING: YGB_APPROVAL_SECRET env var is required. "
+                "Set it to a strong random secret (e.g. python -c \"import secrets; print(secrets.token_hex(32))\"). "
+                "For production, use YGB_KEY_DIR with key files instead."
+            )
+        self._keys[self.DEFAULT_KEY_ID] = secret_str.encode()
+        self._source = "env"
+        self._log_audit("KEY_FALLBACK", self.DEFAULT_KEY_ID,
+                        "using env var — NOT FOR PRODUCTION")
 
     @property
     def active_key_id(self) -> str:
@@ -342,9 +369,11 @@ def get_ledger_key_mode() -> LedgerKeyMode:
                     os.path.basename(path),
                     exc,
                 )
+        if _has_env_approval_secret() and not _runtime_is_production():
+            return LedgerKeyMode.ENV_KEY
         return LedgerKeyMode.MISSING
 
-    if os.environ.get("YGB_APPROVAL_SECRET", "").strip():
+    if _has_env_approval_secret() and not _runtime_is_production():
         return LedgerKeyMode.ENV_KEY
 
     return LedgerKeyMode.MISSING
@@ -359,6 +388,8 @@ def _sanitize_key_audit_event(entry: dict) -> dict:
 
 
 def _log_ledger_key_mode_startup_status() -> None:
+    global _env_fallback_warning_emitted
+
     key_mode = get_ledger_key_mode()
     if key_mode is LedgerKeyMode.FILE_KEY:
         logger.info("Approval ledger key mode FILE_KEY is active.")
@@ -368,9 +399,21 @@ def _log_ledger_key_mode_startup_status() -> None:
         message = "Approval ledger key mode ENV_KEY is active via environment fallback."
         if _runtime_is_production():
             logger.critical(message)
-        else:
+            raise RuntimeError(
+                "APPROVAL_LEDGER_INSECURE_FALLBACK: production requires YGB_KEY_DIR-backed approval keys"
+            )
+        if not _env_fallback_warning_emitted:
             logger.warning(message)
+            _env_fallback_warning_emitted = True
         return
+
+    if _runtime_is_production() and _has_env_approval_secret():
+        logger.critical(
+            "Approval ledger environment fallback is configured but rejected in production."
+        )
+        raise RuntimeError(
+            "APPROVAL_LEDGER_INSECURE_FALLBACK: production requires YGB_KEY_DIR-backed approval keys"
+        )
 
     logger.critical("Approval ledger key mode MISSING: no usable approval signing key is configured.")
 

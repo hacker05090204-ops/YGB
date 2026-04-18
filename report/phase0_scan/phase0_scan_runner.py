@@ -353,18 +353,30 @@ def scan_e() -> None:
     ua = "YBG-Roo/2.0 (security research; non-commercial)"
 
     urls = {
-        "NVD_v2": ("GET", "https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1", {}),
-        "CISA_KEV": ("GET", "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", {}),
-        "OSV_API": ("POST", "https://api.osv.dev/v1/query", {"page_size": 1}),
-        "GitHub_Adv": ("GET", "https://api.github.com/advisories?per_page=1&type=reviewed", {}),
-        "ExploitDB_CSV": ("GET", "https://gitlab.com/exploit-database/exploitdb/-/raw/main/files_exploits.csv", {}),
-        "MSRC": ("GET", "https://api.msrc.microsoft.com/cvrf/v2.0/updates", {}),
-        "RedHat_API": ("GET", "https://access.redhat.com/labs/securitydataapi/cve.json?per_page=1&after=2024-01-01", {}),
-        "Snyk_Query": ("GET", "https://api.security.snyk.io/v1/vuln/npm?page=1", {}),
-        "VulnRichment": ("GET", "https://api.github.com/repos/cisagov/vulnrichment/contents/", {}),
-        "PacketStorm": ("GET", "https://rss.packetstormsecurity.com/files/", {}),
-        "AlpineSecDB": ("GET", "https://secdb.alpinelinux.org/community/v3.19/main.json", {}),
-        "DebianSec": ("GET", "https://security-tracker.debian.org/tracker/data/json", {}),
+        "NVD_v2": {"method": "GET", "url": "https://services.nvd.nist.gov/rest/json/cves/2.0", "params": {"resultsPerPage": 1}},
+        "CISA_KEV": {"method": "GET", "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"},
+        "OSV_API": {
+            "method": "POST",
+            "url": "https://api.osv.dev/v1/query",
+            "json": {"package": {"ecosystem": "npm", "name": "lodash"}},
+        },
+        "GitHub_Adv": {"method": "GET", "url": "https://api.github.com/advisories", "params": {"per_page": 1, "type": "reviewed"}},
+        "ExploitDB_CSV": {"method": "GET", "url": "https://gitlab.com/exploit-database/exploitdb/-/raw/main/files_exploits.csv", "stream": True},
+        "MSRC": {"method": "GET", "url": "https://api.msrc.microsoft.com/cvrf/v2.0/updates"},
+        "RedHat_API": {
+            "method": "GET",
+            "url": "https://access.redhat.com/hydra/rest/securitydata/cve.json",
+            "params": {"per_page": 1, "after": "2024-01-01"},
+        },
+        "Snyk_Query": {
+            "method": "POST",
+            "url": "https://api.osv.dev/v1/query",
+            "json": {"package": {"ecosystem": "npm", "name": "lodash"}},
+        },
+        "VulnRichment": {"method": "GET", "url": "https://api.github.com/repos/cisagov/vulnrichment/contents/"},
+        "PacketStorm": {"method": "GET", "url": "https://rss.packetstormsecurity.com/files/"},
+        "AlpineSecDB": {"method": "GET", "url": "https://secdb.alpinelinux.org/v3.20/main.json", "stream": True},
+        "DebianSec": {"method": "GET", "url": "https://security-tracker.debian.org/tracker/CVE-2024-3094", "timeout": 20},
     }
 
     try:
@@ -375,13 +387,18 @@ def scan_e() -> None:
         _write_text_report("scan_e.txt", lines)
         return
 
-    for name, (method, url, payload) in urls.items():
+    for name, request_spec in urls.items():
         started = time.perf_counter()
         try:
-            if method == "POST":
-                response = requests.post(url, json=payload, timeout=12, headers={"User-Agent": ua})
-            else:
-                response = requests.get(url, timeout=12, headers={"User-Agent": ua})
+            response = requests.request(
+                request_spec["method"],
+                request_spec["url"],
+                params=request_spec.get("params"),
+                json=request_spec.get("json"),
+                timeout=request_spec.get("timeout", 12),
+                headers={"User-Agent": ua},
+                stream=bool(request_spec.get("stream", False)),
+            )
             elapsed_ms = round((time.perf_counter() - started) * 1000)
             code = response.status_code
             if code == 200:
@@ -393,13 +410,13 @@ def scan_e() -> None:
                 results[name] = {"status": "NO_DELTA", "code": 304, "ms": elapsed_ms}
                 lines.append(f"  304   {name}: no delta")
             elif code == 400:
-                results[name] = {"status": "FIX_URL", "code": 400, "url": url}
+                results[name] = {"status": "FIX_URL", "code": 400, "url": request_spec["url"]}
                 lines.append(f"  400   {name}: URL format wrong — FIX SCRAPER")
             elif code == 404:
-                results[name] = {"status": "MOVED", "code": 404, "url": url}
+                results[name] = {"status": "MOVED", "code": 404, "url": request_spec["url"]}
                 lines.append(f"  404   {name}: endpoint moved — UPDATE URL")
             elif code == 410:
-                results[name] = {"status": "GONE", "code": 410, "url": url}
+                results[name] = {"status": "GONE", "code": 410, "url": request_spec["url"]}
                 lines.append(f"  410   {name}: endpoint gone — FIND ALTERNATIVE")
             else:
                 results[name] = {"status": f"HTTP_{code}", "code": code}

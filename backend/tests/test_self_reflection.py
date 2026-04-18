@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import json
 
-from backend.agent.self_reflection import MethodLibrary, SelfReflectionEngine
+import backend.agent.self_reflection as self_reflection_mod
+from backend.agent.self_reflection import IDLE_THRESHOLD, MethodLibrary, SelfReflectionEngine
+
+
+def test_idle_threshold_constant_is_300():
+    assert IDLE_THRESHOLD == 300
 
 
 def test_self_reflection_invents_and_persists_method_after_repeated_failures(tmp_path):
@@ -56,3 +61,43 @@ def test_self_reflection_invents_and_persists_method_after_repeated_failures(tmp
         (root / "method_library.json").read_text(encoding="utf-8")
     )
     assert persisted_library_payload["methods"][0]["invented_by"] == "self_reflection"
+
+
+def test_idle_reflection_rate_limits_and_expands_queue_fields(tmp_path, monkeypatch):
+    root = tmp_path / "self-reflection"
+    library = MethodLibrary(root=root)
+    engine = SelfReflectionEngine(method_library=library, invention_threshold=1)
+
+    engine.observe_failure(
+        "csrf_basic",
+        "csrf",
+        "token required with same-site cookies",
+        reason="idle_seed",
+    )
+
+    clock = iter(
+        [
+            1_000.0,
+            1_000.0 + IDLE_THRESHOLD - 1,
+            1_000.0 + IDLE_THRESHOLD + 1,
+        ]
+    )
+    monkeypatch.setattr(self_reflection_mod.time, "time", lambda: next(clock))
+
+    first = engine.idle_reflection(["web_vulns"], idle_seconds=IDLE_THRESHOLD)
+    second = engine.idle_reflection(["web_vulns"], idle_seconds=IDLE_THRESHOLD)
+    third = engine.idle_reflection(["web_vulns"], idle_seconds=IDLE_THRESHOLD + 1)
+
+    invented_methods = library.list_methods(invented_by="self_reflection", field="csrf")
+
+    assert first["triggered"] is True
+    assert first["rate_limited"] is False
+    assert "csrf" in first["checked_fields"]
+    assert "csrf" in first["reflected_fields"]
+    assert len(invented_methods) == 1
+
+    assert second["rate_limited"] is True
+    assert second["reason"] == "rate_limited"
+
+    assert third["triggered"] is True
+    assert len(library.list_methods(invented_by="self_reflection", field="csrf")) == 1

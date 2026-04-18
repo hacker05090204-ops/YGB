@@ -6,12 +6,14 @@ import html
 import json
 import re
 from typing import Any
+from urllib.parse import quote
 
 from backend.ingestion.scrapers.base_scraper import BaseScraper, ScrapedSample
+from backend.ingestion.scrapers.osv_scraper import OSVScraper
 
 
 class SnykScraper(BaseScraper):
-    """Scrape public Snyk advisories that carry CVE identifiers."""
+    """Scrape npm vulnerability data using OSV as the maintained Snyk replacement path."""
 
     SOURCE = "snyk"
     MAX_RETRIES = 0
@@ -20,6 +22,9 @@ class SnykScraper(BaseScraper):
     LISTING_ID_MULTIPLIER = 2
     MIN_LISTING_IDS = 5
     ECOSYSTEMS = ("npm", "pip", "maven", "nuget")
+    QUERY_URL = "https://api.osv.dev/v1/query"
+    OSV_DETAIL_URL_TEMPLATE = "https://api.osv.dev/v1/vulns/{advisory_id}"
+    DEFAULT_QUERY_PACKAGES = ("lodash", "minimist", "ws", "axios", "serialize-javascript")
     LIST_URL_TEMPLATE = "https://security.snyk.io/vuln/{ecosystem}"
     DETAIL_URL_TEMPLATE = "https://security.snyk.io/vuln/{advisory_id}"
     ADVISORY_ID_PATTERN = re.compile(r"/vuln/(SNYK-[A-Z0-9-]+)", re.IGNORECASE)
@@ -103,6 +108,137 @@ class SnykScraper(BaseScraper):
                 urls.append(url)
         return tuple(urls)
 
+    @staticmethod
+    def _extract_osv_aliases(payload: dict[str, Any]) -> tuple[str, ...]:
+        aliases_payload = payload.get("aliases", [])
+        if not isinstance(aliases_payload, list):
+            return ()
+        aliases: list[str] = []
+        for alias in aliases_payload:
+            alias_text = str(alias or "").strip()
+            if alias_text and alias_text not in aliases:
+                aliases.append(alias_text)
+        return tuple(aliases)
+
+    @staticmethod
+    def _extract_osv_package_names(payload: dict[str, Any]) -> tuple[str, ...]:
+        package_names: list[str] = []
+        affected = payload.get("affected", [])
+        if not isinstance(affected, list):
+            return ()
+        for item in affected:
+            if not isinstance(item, dict):
+                continue
+            package = item.get("package", {})
+            if not isinstance(package, dict):
+                continue
+            package_name = str(package.get("name", "")).strip()
+            if package_name and package_name not in package_names:
+                package_names.append(package_name)
+        return tuple(package_names)
+
+    def parse_osv_vulnerability(
+        self,
+        payload: dict[str, Any],
+        *,
+        ecosystem: str,
+        package_name: str = "",
+    ) -> ScrapedSample | None:
+        advisory_payload = self._ensure_json_object(payload, source=self.SOURCE)
+        advisory_id = str(advisory_payload.get("id", "")).strip()
+        summary = self._clean_html_text(advisory_payload.get("summary"))
+        description = self._clean_html_text(advisory_payload.get("details"))
+        full_description = " ".join(part for part in (summary, description) if part).strip()
+        if not advisory_id or not full_description:
+            self._log_partial_failure(
+                reason="missing_osv_required_fields",
+                advisory_id=advisory_id or "<missing-advisory-id>",
+            )
+            return None
+
+        aliases = self._extract_osv_aliases(advisory_payload)
+        cve_aliases = tuple(alias for alias in aliases if alias.upper().startswith("CVE-"))
+        resolved_identifier = cve_aliases[0] if cve_aliases else advisory_id
+        package_names = self._extract_osv_package_names(advisory_payload)
+        effective_package = package_name or (package_names[0] if package_names else "")
+        tags = list(
+            dict.fromkeys(
+                tag
+                for tag in (ecosystem, effective_package, *OSVScraper._extract_tags(advisory_payload))
+                if str(tag or "").strip()
+            )
+        )
+        return ScrapedSample(
+            source=self.SOURCE,
+            advisory_id=advisory_id,
+            url=f"https://osv.dev/vulnerability/{advisory_id}",
+            title=summary or advisory_id,
+            description=full_description,
+            severity=OSVScraper._extract_severity(advisory_payload),
+            cve_id=resolved_identifier,
+            cvss_score=OSVScraper._extract_cvss_score(advisory_payload),
+            tags=tuple(tags),
+            aliases=aliases,
+            references=OSVScraper._extract_references(advisory_payload),
+            published_at=str(advisory_payload.get("published", "") or "") or None,
+            modified_at=str(advisory_payload.get("modified", "") or "") or None,
+            product=effective_package,
+        )
+
+    def _fetch_recent_from_osv(self, max_items: int) -> list[ScrapedSample]:
+        samples: list[ScrapedSample] = []
+        seen_advisory_ids: set[str] = set()
+        for package_name in self.DEFAULT_QUERY_PACKAGES:
+            if len(samples) >= max_items:
+                break
+            try:
+                payload = self._post_json(
+                    self.QUERY_URL,
+                    {"package": {"ecosystem": "npm", "name": package_name}},
+                )
+                query_payload = self._ensure_json_object(payload, source=self.SOURCE)
+            except Exception as exc:
+                self._log_partial_failure(
+                    reason="osv_query_failed",
+                    package_name=package_name,
+                    error_type=type(exc).__name__,
+                )
+                continue
+
+            vuln_payloads = query_payload.get("vulns", [])
+            if not isinstance(vuln_payloads, list):
+                continue
+            for vuln_payload in vuln_payloads:
+                if len(samples) >= max_items or not isinstance(vuln_payload, dict):
+                    break
+                advisory_id = str(vuln_payload.get("id", "")).strip()
+                if not advisory_id or advisory_id in seen_advisory_ids:
+                    continue
+                seen_advisory_ids.add(advisory_id)
+                detail_payload = vuln_payload
+                if not str(vuln_payload.get("summary") or vuln_payload.get("details") or "").strip():
+                    try:
+                        detail_payload = self._get_json(
+                            self.OSV_DETAIL_URL_TEMPLATE.format(
+                                advisory_id=quote(advisory_id, safe="")
+                            )
+                        )
+                    except Exception as exc:
+                        self._log_partial_failure(
+                            reason="osv_detail_fetch_failed",
+                            advisory_id=advisory_id,
+                            error_type=type(exc).__name__,
+                        )
+                        continue
+                sample = self.parse_osv_vulnerability(
+                    detail_payload,
+                    ecosystem="npm",
+                    package_name=package_name,
+                )
+                if sample is not None:
+                    samples.append(sample)
+        return samples[:max_items]
+
     def parse_detail_html(
         self,
         advisory_id: str,
@@ -174,6 +310,10 @@ class SnykScraper(BaseScraper):
         )
 
     def _fetch_impl(self, max_items: int) -> list[ScrapedSample]:
+        osv_samples = self._fetch_recent_from_osv(max_items)
+        if osv_samples:
+            return osv_samples[:max_items]
+
         samples: list[ScrapedSample] = []
         seen_advisory_ids: set[str] = set()
         max_detail_attempts = max(max_items * self.LISTING_ID_MULTIPLIER, self.MIN_LISTING_IDS)

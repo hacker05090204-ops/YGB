@@ -17,8 +17,9 @@ import os
 import shutil
 import tempfile
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Callable, Literal
 
 logger = logging.getLogger("ygb.compression_engine")
 
@@ -34,6 +35,8 @@ DEFAULT_COMPRESSION_LEVEL = {
     "gzip": 6,  # Standard
     "none": 0,
 }
+
+DELTA_SCHEMA_VERSION = 1
 
 
 @dataclass
@@ -85,12 +88,78 @@ def _metadata_sidecar_paths(payload_path: Path) -> tuple[Path, ...]:
     return (preferred, legacy)
 
 
+def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = Path(f"{path}.tmp")
+    with open(temp_path, "w", encoding="utf-8", newline="\n") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(str(temp_path), str(path))
+
+
+def _measure_output_bytes(payload_path: Path) -> int:
+    total_bytes = payload_path.stat().st_size if payload_path.exists() else 0
+    for sidecar_path in _metadata_sidecar_paths(payload_path):
+        if sidecar_path.exists():
+            total_bytes += sidecar_path.stat().st_size
+    return int(total_bytes)
+
+
+def _compression_ratio_from_bytes(original_bytes: int, output_bytes: int) -> float:
+    if output_bytes <= 0:
+        return float("inf")
+    return float(original_bytes) / float(output_bytes)
+
+
+def _stabilize_metadata_sidecars(
+    payload_path: Path,
+    metadata: dict[str, Any],
+    *,
+    updater: Callable[[dict[str, Any], int], None],
+) -> tuple[dict[str, Any], int]:
+    normalized = dict(metadata)
+    for _ in range(8):
+        _write_metadata_sidecars(payload_path, normalized)
+        measured_bytes = _measure_output_bytes(payload_path)
+        updated = dict(normalized)
+        updater(updated, measured_bytes)
+        if updated == normalized:
+            return normalized, measured_bytes
+        normalized = updated
+    _write_metadata_sidecars(payload_path, normalized)
+    return normalized, _measure_output_bytes(payload_path)
+
+
+def _compute_tensor_payload_hash(tensors: dict[str, Any]) -> str:
+    hasher = hashlib.sha256()
+    for key in sorted(tensors):
+        value = tensors[key]
+        hasher.update(str(key).encode("utf-8"))
+        if hasattr(value, "detach") and hasattr(value, "cpu"):
+            normalized = value.detach().cpu().contiguous().numpy()
+            hasher.update(str(normalized.dtype).encode("utf-8"))
+            hasher.update(str(tuple(normalized.shape)).encode("utf-8"))
+            hasher.update(normalized.tobytes())
+            continue
+        if hasattr(value, "dtype") and hasattr(value, "shape") and hasattr(value, "tobytes"):
+            hasher.update(str(value.dtype).encode("utf-8"))
+            hasher.update(str(tuple(value.shape)).encode("utf-8"))
+            hasher.update(value.tobytes())
+            continue
+        if hasattr(value, "tobytes"):
+            hasher.update(value.tobytes())
+            continue
+        hasher.update(repr(value).encode("utf-8"))
+    return hasher.hexdigest()
+
+
 def _write_metadata_sidecars(payload_path: Path, metadata: dict[str, Any]) -> Path:
     """Write metadata to the preferred sidecar path and a legacy compatibility path."""
     sidecars = _metadata_sidecar_paths(payload_path)
     for sidecar_path in sidecars:
-        with open(sidecar_path, "w", encoding="utf-8") as handle:
-            json.dump(metadata, handle, indent=2)
+        _atomic_write_json(sidecar_path, metadata)
     return sidecars[0]
 
 
@@ -195,16 +264,9 @@ def compress_file(
     else:
         raise ValueError(f"Unsupported algorithm: {actual_algorithm}")
     
-    compressed_size = output_path.stat().st_size
+    compressed_payload_size = output_path.stat().st_size
     compressed_hash = _compute_file_hash(output_path)
-    compression_ratio = original_size / compressed_size if compressed_size > 0 else 1.0
-    
-    logger.info(
-        f"Compressed {input_path.name}: "
-        f"{original_size:,} → {compressed_size:,} bytes "
-        f"({compression_ratio:.2f}x ratio)"
-    )
-    
+
     # Store metadata
     meta = dict(metadata or {})
     meta.update({
@@ -212,7 +274,7 @@ def compress_file(
         "requested_algorithm": algorithm,  # Store what was requested
         "level": level,
         "original_size": original_size,
-        "compressed_size": compressed_size,
+        "compressed_payload_bytes": compressed_payload_size,
         "original_hash": original_hash,
         "compressed_hash": compressed_hash,
     })
@@ -220,11 +282,27 @@ def compress_file(
     meta.setdefault("original_path", str(input_path))
     meta.setdefault("original_bytes", original_size)
     meta.setdefault("original_sha256", original_hash)
-    meta["compressed_bytes"] = compressed_size
+    meta["compressed_payload_bytes"] = compressed_payload_size
     meta["compressed_sha256"] = compressed_hash
     meta["compression"] = actual_algorithm
 
-    _write_metadata_sidecars(output_path, meta)
+    meta, compressed_size = _stabilize_metadata_sidecars(
+        output_path,
+        meta,
+        updater=lambda current, measured: current.update(
+            {
+                "compressed_bytes": measured,
+                "compression_ratio": _compression_ratio_from_bytes(original_size, measured),
+            }
+        ),
+    )
+    compression_ratio = float(meta.get("compression_ratio") or 0.0)
+
+    logger.info(
+        f"Compressed {input_path.name}: "
+        f"{original_size:,} → {compressed_size:,} bytes "
+        f"({compression_ratio:.2f}x ratio)"
+    )
     
     result = CompressionResult(
         algorithm=actual_algorithm,  # Use actual algorithm
@@ -437,6 +515,222 @@ def decompress_checkpoint(
             tar.extractall(output_dir)
     
     return result
+
+
+def compute_delta(
+    base_path: Path | str,
+    new_path: Path | str,
+    delta_path: Path | str,
+) -> dict[str, Any]:
+    """Compute a delta checkpoint between two checkpoints."""
+    base_path = Path(base_path)
+    new_path = Path(new_path)
+    delta_path = Path(delta_path)
+
+    if not base_path.exists():
+        raise FileNotFoundError(f"Base checkpoint not found: {base_path}")
+    if not new_path.exists():
+        raise FileNotFoundError(f"New checkpoint not found: {new_path}")
+
+    base_size = base_path.stat().st_size
+    new_size = new_path.stat().st_size
+
+    try:
+        from safetensors.torch import load_file, save_file
+        import torch
+
+        base_state = load_file(str(base_path))
+        new_state = load_file(str(new_path))
+
+        added_keys = sorted(set(new_state) - set(base_state))
+        removed_keys = sorted(set(base_state) - set(new_state))
+        changed_tensors: dict[str, Any] = {}
+        changed_keys: list[str] = []
+        unchanged_count = 0
+
+        for key in sorted(new_state):
+            if key not in base_state:
+                changed_tensors[key] = new_state[key]
+                changed_keys.append(key)
+                continue
+            if torch.equal(base_state[key], new_state[key]):
+                unchanged_count += 1
+                continue
+            changed_tensors[key] = new_state[key]
+            changed_keys.append(key)
+
+        delta_path.parent.mkdir(parents=True, exist_ok=True)
+        if changed_tensors:
+            save_file(changed_tensors, str(delta_path))
+        else:
+            delta_path.write_bytes(b"")
+
+        metadata = {
+            "delta_format": "safetensors_delta_v1",
+            "delta_schema_version": DELTA_SCHEMA_VERSION,
+            "base_path": str(base_path),
+            "new_path": str(new_path),
+            "base_bytes": base_size,
+            "new_bytes": new_size,
+            "delta_payload_bytes": delta_path.stat().st_size,
+            "changed_keys": changed_keys,
+            "added_keys": added_keys,
+            "removed_keys": removed_keys,
+            "changed_tensors": len(changed_tensors),
+            "added_tensors": len(added_keys),
+            "removed_tensors": len(removed_keys),
+            "unchanged_tensors": unchanged_count,
+            "base_tensor_hash": _compute_tensor_payload_hash(base_state),
+            "new_tensor_hash": _compute_tensor_payload_hash(new_state),
+            "delta_tensor_hash": (
+                _compute_tensor_payload_hash(changed_tensors) if changed_tensors else ""
+            ),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        metadata, delta_size = _stabilize_metadata_sidecars(
+            delta_path,
+            metadata,
+            updater=lambda current, measured: current.update(
+                {
+                    "delta_bytes": measured,
+                    "ratio": _compression_ratio_from_bytes(new_size, measured),
+                }
+            ),
+        )
+        ratio = float(metadata.get("ratio") or 0.0)
+
+        return {
+            "base_bytes": base_size,
+            "new_bytes": new_size,
+            "delta_bytes": delta_size,
+            "base_size_mb": base_size / (1024 * 1024),
+            "new_size_mb": new_size / (1024 * 1024),
+            "delta_size_mb": delta_size / (1024 * 1024),
+            "ratio": ratio,
+            "changed_tensors": len(changed_tensors),
+            "unchanged_tensors": unchanged_count,
+            "added_tensors": len(added_keys),
+            "removed_tensors": len(removed_keys),
+            "changed_keys": changed_keys,
+            "added_keys": added_keys,
+            "removed_keys": removed_keys,
+        }
+
+    except ImportError:
+        logger.warning("safetensors not available, using full compression")
+        result = compress_file(
+            new_path,
+            delta_path,
+            algorithm="zstd",
+            metadata={
+                "delta_format": "compressed_full_checkpoint_v1",
+                "delta_schema_version": DELTA_SCHEMA_VERSION,
+                "base_path": str(base_path),
+                "new_path": str(new_path),
+                "base_bytes": base_size,
+                "new_bytes": new_size,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
+        )
+        return {
+            "base_bytes": base_size,
+            "new_bytes": new_size,
+            "delta_bytes": result.compressed_size,
+            "base_size_mb": base_size / (1024 * 1024),
+            "new_size_mb": new_size / (1024 * 1024),
+            "delta_size_mb": result.compressed_size / (1024 * 1024),
+            "ratio": _compression_ratio_from_bytes(new_size, result.compressed_size),
+            "changed_tensors": -1,
+            "unchanged_tensors": -1,
+            "added_tensors": -1,
+            "removed_tensors": -1,
+            "changed_keys": [],
+            "added_keys": [],
+            "removed_keys": [],
+        }
+
+
+def apply_delta(
+    base_path: Path | str,
+    delta_path: Path | str,
+    output_path: Path | str,
+) -> dict[str, Any]:
+    """Apply a delta checkpoint to a base checkpoint."""
+    base_path = Path(base_path)
+    delta_path = Path(delta_path)
+    output_path = Path(output_path)
+
+    if not base_path.exists():
+        raise FileNotFoundError(f"Base checkpoint not found: {base_path}")
+    if not delta_path.exists():
+        raise FileNotFoundError(f"Delta checkpoint not found: {delta_path}")
+
+    metadata, _ = _load_metadata_sidecar(delta_path)
+    delta_format = str(metadata.get("delta_format", "") or "").strip().lower()
+
+    if delta_format == "compressed_full_checkpoint_v1":
+        result = decompress_file(delta_path, output_path)
+        return {
+            "base_tensors": -1,
+            "delta_tensors": -1,
+            "output_tensors": -1,
+            "output_bytes": output_path.stat().st_size,
+            "removed_tensors": -1,
+            "verified": bool(result.hash_verified),
+        }
+
+    try:
+        from safetensors.torch import load_file, save_file
+
+        base_state = load_file(str(base_path))
+        expected_base_hash = str(metadata.get("base_tensor_hash", "") or "").strip()
+        if expected_base_hash and _compute_tensor_payload_hash(base_state) != expected_base_hash:
+            raise RuntimeError(f"Base checkpoint does not match delta metadata: {base_path}")
+
+        if delta_path.stat().st_size == 0:
+            delta_state: dict[str, Any] = {}
+        else:
+            delta_state = load_file(str(delta_path))
+
+        removed_keys = [str(key) for key in metadata.get("removed_keys", [])]
+
+        merged_state = dict(base_state)
+        for key in removed_keys:
+            merged_state.pop(key, None)
+        merged_state.update(delta_state)
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        save_file(merged_state, str(output_path))
+
+        expected_new_hash = str(metadata.get("new_tensor_hash", "") or "").strip()
+        verified = True
+        if expected_new_hash:
+            verified = _compute_tensor_payload_hash(merged_state) == expected_new_hash
+            if not verified:
+                raise RuntimeError(
+                    f"Delta application produced unexpected tensor hash for {output_path}"
+                )
+
+        return {
+            "base_tensors": len(base_state),
+            "delta_tensors": len(delta_state),
+            "output_tensors": len(merged_state),
+            "output_bytes": output_path.stat().st_size,
+            "removed_tensors": len(removed_keys),
+            "verified": verified,
+        }
+
+    except ImportError:
+        logger.warning("safetensors not available, using decompression")
+        result = decompress_file(delta_path, output_path)
+        return {
+            "base_tensors": -1,
+            "delta_tensors": -1,
+            "output_tensors": -1,
+            "output_bytes": result.decompressed_size,
+            "removed_tensors": -1,
+            "verified": bool(result.hash_verified),
+        }
 
 
 class ZeroLossCompressor:
@@ -738,76 +1032,15 @@ class DeltaCompressor:
         new_path: Path | str,
         delta_path: Path | str,
     ) -> dict[str, Any]:
-        """
-        Create a delta between two checkpoints.
-        
-        For safetensors files, this compares tensors and only stores changed ones.
-        """
-        base_path = Path(base_path)
-        new_path = Path(new_path)
-        delta_path = Path(delta_path)
-        
-        try:
-            from safetensors.torch import load_file, save_file
-            
-            # Load both checkpoints
-            base_state = load_file(base_path)
-            new_state = load_file(new_path)
-            
-            # Find changed tensors
-            import torch
-            changed_tensors = {}
-            unchanged_count = 0
-            
-            for key, new_tensor in new_state.items():
-                if key not in base_state:
-                    changed_tensors[key] = new_tensor
-                elif not torch.equal(base_state[key], new_tensor):
-                    changed_tensors[key] = new_tensor
-                else:
-                    unchanged_count += 1
-            
-            # Save delta
-            if changed_tensors:
-                save_file(changed_tensors, delta_path)
-            else:
-                # No changes, create empty file
-                delta_path.write_bytes(b"")
-            
-            # Compute sizes
-            base_size = base_path.stat().st_size
-            new_size = new_path.stat().st_size
-            delta_size = delta_path.stat().st_size
-            
-            ratio = new_size / delta_size if delta_size > 0 else float("inf")
-            
-            return {
-                "base_bytes": base_size,
-                "new_bytes": new_size,
-                "delta_bytes": delta_size,
-                "base_size_mb": base_size / (1024 * 1024),
-                "new_size_mb": new_size / (1024 * 1024),
-                "delta_size_mb": delta_size / (1024 * 1024),
-                "ratio": ratio,
-                "changed_tensors": len(changed_tensors),
-                "unchanged_tensors": unchanged_count,
-            }
-            
-        except ImportError:
-            # Fallback: just compress the new file
-            logger.warning("safetensors not available, using full compression")
-            result = compress_file(new_path, delta_path, algorithm="zstd")
-            return {
-                "base_bytes": base_path.stat().st_size,
-                "new_bytes": result.original_size,
-                "delta_bytes": result.compressed_size,
-                "base_size_mb": base_path.stat().st_size / (1024 * 1024),
-                "new_size_mb": result.original_size / (1024 * 1024),
-                "delta_size_mb": result.compressed_size / (1024 * 1024),
-                "ratio": result.compression_ratio,
-                "changed_tensors": -1,
-                "unchanged_tensors": -1,
-            }
+        return compute_delta(base_path, new_path, delta_path)
+
+    @staticmethod
+    def compute_delta(
+        base_path: Path | str,
+        new_path: Path | str,
+        delta_path: Path | str,
+    ) -> dict[str, Any]:
+        return compute_delta(base_path, new_path, delta_path)
     
     @staticmethod
     def apply_delta(
@@ -815,45 +1048,7 @@ class DeltaCompressor:
         delta_path: Path | str,
         output_path: Path | str,
     ) -> dict[str, Any]:
-        """Apply a delta to a base checkpoint to reconstruct the new checkpoint."""
-        base_path = Path(base_path)
-        delta_path = Path(delta_path)
-        output_path = Path(output_path)
-        
-        try:
-            from safetensors.torch import load_file, save_file
-            
-            # Load base and delta
-            base_state = load_file(base_path)
-            
-            if delta_path.stat().st_size == 0:
-                # Empty delta means no changes
-                delta_state = {}
-            else:
-                delta_state = load_file(delta_path)
-            
-            # Merge: base + delta
-            merged_state = {**base_state, **delta_state}
-            
-            # Save merged
-            save_file(merged_state, output_path)
-            
-            return {
-                "base_tensors": len(base_state),
-                "delta_tensors": len(delta_state),
-                "output_tensors": len(merged_state),
-                "output_bytes": output_path.stat().st_size,
-            }
-            
-        except ImportError:
-            logger.warning("safetensors not available, using decompression")
-            result = decompress_file(delta_path, output_path)
-            return {
-                "base_tensors": -1,
-                "delta_tensors": -1,
-                "output_tensors": -1,
-                "output_bytes": result.decompressed_size,
-            }
+        return apply_delta(base_path, delta_path, output_path)
 
 
 if __name__ == "__main__":

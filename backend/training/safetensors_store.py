@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -15,6 +16,7 @@ import numpy as np
 from safetensors import safe_open
 from safetensors.numpy import load_file as load_safetensors_file
 from safetensors.numpy import save_file as save_safetensors_file
+from training.safetensors_io import CheckpointIntegrityError
 
 
 FEATURE_TENSOR_KEY = "features"
@@ -30,6 +32,10 @@ DEFAULT_TOP_K_CHECKPOINTS = 3
 
 logger = logging.getLogger(__name__)
 DESCRIPTION_SIDECAR_SUFFIX = ".descriptions.jsonl"
+
+
+class SecurityError(CheckpointIntegrityError):
+    """Raised when checkpoint integrity verification fails."""
 
 
 def _atomic_write_json_file(path: Path, payload: dict[str, Any]) -> None:
@@ -60,6 +66,34 @@ def _write_sha256_sidecar(path: Path, sha256: str) -> Path:
     sidecar_path = Path(f"{path}.sha256")
     _atomic_write_text_file(sidecar_path, f"{checksum}\n")
     return sidecar_path
+
+
+def _read_sha256_sidecar(path: Path) -> str:
+    candidate_strings: list[str] = []
+    for candidate in (
+        Path(f"{path}.sha256"),
+        path.with_suffix(path.suffix + ".sha256") if path.suffix else Path(f"{path}.sha256"),
+        path.with_suffix(".sha256"),
+    ):
+        candidate_text = str(candidate)
+        if candidate_text not in candidate_strings:
+            candidate_strings.append(candidate_text)
+    for candidate_text in candidate_strings:
+        candidate = Path(candidate_text)
+        if not candidate.exists():
+            continue
+        raw_value = candidate.read_text(encoding="utf-8").strip()
+        if raw_value:
+            return raw_value.split()[0].strip().lower()
+    return ""
+
+
+def _compute_file_sha256(path: Path) -> str:
+    sha256 = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            sha256.update(chunk)
+    return sha256.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -449,6 +483,21 @@ class CheckpointManager:
             device=device,
         )
 
+    def load_expert_checkpoint(
+        self,
+        *,
+        expert_id: int,
+        field_name: str,
+        checkpoint_path: str | Path | None = None,
+        device: str = "cpu",
+    ) -> dict[str, Any]:
+        return self.load(
+            expert_id=expert_id,
+            field_name=field_name,
+            checkpoint_path=checkpoint_path,
+            device=device,
+        )
+
     def save(
         self,
         *,
@@ -607,26 +656,29 @@ class CheckpointManager:
             field_name,
         )
         if checkpoint_path is None:
-            status = self.status(expert_id_value, field_name_value)
-            resolved_path_text = str(status.get("best_checkpoint_path", "") or "")
-            if not resolved_path_text:
+            resolved_path = self._resolve_checkpoint_path_for_load(
+                expert_id_value,
+                field_name_value,
+            )
+            if resolved_path is None:
                 raise FileNotFoundError(
                     f"No retained checkpoint for expert_id={expert_id_value} field_name={field_name_value}"
                 )
-            resolved_path = Path(resolved_path_text)
         else:
             resolved_path = Path(checkpoint_path)
 
         if not resolved_path.exists():
             raise FileNotFoundError(f"Checkpoint not found: {resolved_path}")
 
-        from impl_v1.training.checkpoints.checkpoint_hardening import (
-            HardenedCheckpointManager,
-        )
         from training.safetensors_io import load_safetensors
 
-        HardenedCheckpointManager._require_verified_file_hash(resolved_path)
-        return load_safetensors(str(resolved_path), device=device)
+        try:
+            self._require_verified_checkpoint(resolved_path)
+            return load_safetensors(str(resolved_path), device=device)
+        except CheckpointIntegrityError as exc:
+            if isinstance(exc, SecurityError):
+                raise
+            raise SecurityError(str(exc)) from exc
 
     def status(self, expert_id: int, field_name: str) -> dict[str, Any]:
         expert_id_value, field_name_value = self._validate_expert_identity(
@@ -859,6 +911,16 @@ class CheckpointManager:
         if not checkpoint_path.exists():
             return None
 
+        try:
+            self._require_verified_checkpoint(checkpoint_path)
+        except SecurityError as exc:
+            logger.warning(
+                "Skipping checkpoint with failed integrity verification: %s (%s)",
+                checkpoint_path.as_posix(),
+                exc,
+            )
+            return None
+
         raw_val_f1 = record.get("val_f1")
         if raw_val_f1 in (None, ""):
             raw_val_f1 = self._extract_f1(checkpoint_path.name)
@@ -922,6 +984,37 @@ class CheckpointManager:
                 records.append(normalized)
 
         return self._sort_checkpoint_records(records)
+
+    def _resolve_checkpoint_path_for_load(
+        self,
+        expert_id: int,
+        field_name: str,
+    ) -> Path | None:
+        registry = self._load_registry()
+        registry_key = self._registry_key(expert_id, field_name)
+        existing_entry = registry["experts"].get(registry_key)
+        candidate_paths: list[Path] = []
+
+        if isinstance(existing_entry, dict):
+            best_path_text = str(existing_entry.get("best_checkpoint_path", "") or "").strip()
+            if best_path_text:
+                candidate_paths.append(Path(best_path_text))
+            for record in existing_entry.get("checkpoints", []):
+                checkpoint_path_text = str(record.get("checkpoint_path", "") or "").strip()
+                if checkpoint_path_text:
+                    candidate_paths.append(Path(checkpoint_path_text))
+
+        candidate_paths.extend(self._discover_checkpoint_paths(expert_id, field_name))
+
+        seen: set[str] = set()
+        for candidate in candidate_paths:
+            serialized = self._serialize_path(candidate)
+            if serialized in seen:
+                continue
+            seen.add(serialized)
+            if candidate.exists():
+                return candidate
+        return None
 
     def _discover_checkpoint_paths(
         self,
@@ -1058,6 +1151,21 @@ class CheckpointManager:
         )
         _write_sha256_sidecar(checkpoint_path, checkpoint_file_hash)
         return checkpoint_file_hash, tensor_hash
+
+    @staticmethod
+    def _require_verified_checkpoint(path: Path) -> str:
+        expected = _read_sha256_sidecar(path)
+        if not expected:
+            raise SecurityError(f"Checkpoint SHA-256 sidecar missing for {path}")
+        if len(expected) != 64 or any(ch not in "0123456789abcdef" for ch in expected):
+            raise SecurityError(f"Checkpoint SHA-256 sidecar invalid for {path}")
+
+        actual = _compute_file_sha256(path)
+        if actual != expected:
+            raise SecurityError(
+                f"Checkpoint SHA-256 mismatch for {path}: expected={expected[:16]}..., got={actual[:16]}..."
+            )
+        return actual
 
     def _prune_records(
         self,

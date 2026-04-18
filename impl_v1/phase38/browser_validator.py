@@ -6,7 +6,8 @@
 Phase-38 Browser Intent Validator
 
 Validates browser execution intents WITHOUT executing anything.
-All validation returns simulated results (boolean outcomes).
+Validation returns deterministic pass/fail outcomes only.
+It does not execute or simulate browser actions.
 
 ALL FORBIDDEN ACTIONS → DENY
 ALL INVALID URLs → DENY

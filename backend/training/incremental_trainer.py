@@ -20,8 +20,10 @@ import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from torch.optim import AdamW
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 
+from backend.governance.kill_switch import check_or_raise as check_kill_switch
+from backend.governance.training_gate import check_or_raise as check_training_gate
 from backend.ingestion._integrity import log_module_sha256
 from backend.bridge.bridge_state import get_bridge_state
 from backend.ingestion.normalizer import SampleQualityScorer
@@ -1552,6 +1554,7 @@ class IncrementalTrainer:
         samples: list[IngestedSample],
         *,
         include_train_dataset_indices: bool = False,
+        sample_weights: dict[str, float] | list[float] | np.ndarray | None = None,
     ) -> tuple[DataLoader, DataLoader]:
         if self.num_workers > 0 and can_ai_execute()[0]:
             raise RuntimeError("GUARD")
@@ -1610,15 +1613,42 @@ class IncrementalTrainer:
             return_dataset_index=include_train_dataset_indices,
         )
         eval_dataset = _StreamingFeatureDataset(self, samples, eval_indices)
+        aligned_train_sample_weights = self._resolve_sample_weights_for_indices(
+            samples,
+            balanced_train_indices,
+            sample_weights,
+        )
         train_generator = torch.Generator().manual_seed(self.model_config.seed)
+        train_sampler = None
+        if aligned_train_sample_weights is not None:
+            sampler_weights = torch.as_tensor(
+                aligned_train_sample_weights,
+                dtype=torch.double,
+            )
+            train_sampler = WeightedRandomSampler(
+                sampler_weights,
+                num_samples=len(train_dataset),
+                replacement=True,
+            )
+            weight_mean, weight_min, weight_max = self._weight_statistics(
+                np.asarray(aligned_train_sample_weights, dtype=np.float32)
+            )
+            logger.info(
+                "incremental_weighted_sampler enabled rows=%d weight_mean=%.6f weight_min=%.6f weight_max=%.6f",
+                len(train_dataset),
+                weight_mean,
+                weight_min,
+                weight_max,
+            )
         train_loader = DataLoader(
             train_dataset,
             batch_size=int(self.model_config.batch_size),
-            shuffle=True,
+            shuffle=train_sampler is None,
+            sampler=train_sampler,
             num_workers=self.num_workers,
             pin_memory=self.device.type == "cuda",
             persistent_workers=self.num_workers > 0,
-            generator=train_generator,
+            generator=train_generator if train_sampler is None else None,
         )
         eval_loader = DataLoader(
             eval_dataset,
@@ -1817,6 +1847,7 @@ class IncrementalTrainer:
         if hard_negative_miner is not None:
             hard_negative_miner.reset()
         for step_count, batch in enumerate(train_loader, start=1):
+            check_kill_switch()
             features, labels, dataset_indices = self._unpack_batch(batch)
             features = features.to(self.device)
             labels = labels.to(self.device)
@@ -1997,17 +2028,28 @@ class IncrementalTrainer:
         samples: list[IngestedSample],
     ) -> dict[str, float] | None:
         weighted_rewards = self._reward_buffer.get_weighted_signals()
+        weighted_rewards_by_cve = self._reward_buffer.get_weighted_signals(key="cve_id")
         total_signals = len(weighted_rewards)
-        if not weighted_rewards:
+        if not weighted_rewards and not weighted_rewards_by_cve:
             logger.info(
-                "incremental_rl_reward_weights matched_samples=0 total_signals=0 reason=no_reward_signals"
+                "incremental_rl_reward_weights matched_samples=0 matched_by_sample_id=0 matched_cve_fallback=0 total_signals=0 reason=no_reward_signals"
             )
             return None
 
         matched_sample_weights: dict[str, float] = {}
         matched_reward_values: list[float] = []
-        for sample_id in sorted({sample.sha256_hash for sample in samples}):
+        matched_by_sample_id = 0
+        matched_by_cve_id = 0
+        for sample in samples:
+            sample_id = str(sample.sha256_hash or "").strip()
+            normalized_cve_id = str(sample.cve_id or "").strip().upper()
             reward_value = weighted_rewards.get(sample_id)
+            if reward_value is not None:
+                matched_by_sample_id += 1
+            elif normalized_cve_id:
+                reward_value = weighted_rewards_by_cve.get(normalized_cve_id)
+                if reward_value is not None:
+                    matched_by_cve_id += 1
             if reward_value is None:
                 continue
             reward_float = float(reward_value)
@@ -2016,7 +2058,7 @@ class IncrementalTrainer:
 
         if not matched_sample_weights:
             logger.info(
-                "incremental_rl_reward_weights matched_samples=0 total_signals=%d reason=no_matching_samples",
+                "incremental_rl_reward_weights matched_samples=0 matched_by_sample_id=0 matched_cve_fallback=0 total_signals=%d reason=no_matching_samples",
                 total_signals,
             )
             return None
@@ -2030,8 +2072,10 @@ class IncrementalTrainer:
             sample_weight_values
         )
         logger.info(
-            "incremental_rl_reward_weights matched_samples=%d total_signals=%d reward_mean=%.6f reward_min=%.6f reward_max=%.6f weight_mean=%.6f weight_min=%.6f weight_max=%.6f",
+            "incremental_rl_reward_weights matched_samples=%d matched_by_sample_id=%d matched_cve_fallback=%d total_signals=%d reward_mean=%.6f reward_min=%.6f reward_max=%.6f weight_mean=%.6f weight_min=%.6f weight_max=%.6f",
             len(matched_sample_weights),
+            matched_by_sample_id,
+            matched_by_cve_id,
             total_signals,
             reward_mean,
             reward_min,
@@ -2041,6 +2085,37 @@ class IncrementalTrainer:
             weight_max,
         )
         return matched_sample_weights
+
+    def _resolve_sample_weights_for_indices(
+        self,
+        samples: list[IngestedSample],
+        sample_indices: list[int] | tuple[int, ...],
+        sample_weights: dict[str, float] | list[float] | np.ndarray | None,
+    ) -> np.ndarray | None:
+        if sample_weights is None:
+            return None
+        expected_length = len(sample_indices)
+        if isinstance(sample_weights, dict):
+            aligned_weights: list[float] = []
+            for sample_index in sample_indices:
+                sample = samples[int(sample_index)]
+                weight_value = None
+                sample_id = str(sample.sha256_hash or "").strip()
+                cve_id = str(sample.cve_id or "").strip().upper()
+                for lookup_key in (sample_id, cve_id):
+                    if lookup_key and lookup_key in sample_weights:
+                        weight_value = float(sample_weights[lookup_key])
+                        break
+                aligned_weights.append(1.0 if weight_value is None else weight_value)
+            return self._coerce_sample_weights(aligned_weights, expected_length)
+        try:
+            raw_length = len(sample_weights)
+        except TypeError as exc:
+            raise ValueError("sample_weights must be a dict or 1D sequence") from exc
+        if raw_length == len(samples):
+            aligned_weights = [float(sample_weights[index]) for index in sample_indices]
+            return self._coerce_sample_weights(aligned_weights, expected_length)
+        return self._coerce_sample_weights(sample_weights, expected_length)
 
     def _merge_incremental_sample_weight_sources(
         self,
@@ -2154,19 +2229,68 @@ class IncrementalTrainer:
                 raise ValueError(
                     "sample_weights dict requires the streaming training dataset for sample-id alignment"
                 )
-            aligned_weights = [
-                float(sample_weights.get(samples[index].sha256_hash, 1.0))
-                for index in dataset.sample_indices
-            ]
-            return self._coerce_sample_weights(aligned_weights, expected_length)
+            return self._resolve_sample_weights_for_indices(
+                samples,
+                dataset.sample_indices,
+                sample_weights,
+            )
         try:
             raw_length = len(sample_weights)
         except TypeError as exc:
             raise ValueError("sample_weights must be a dict or 1D sequence") from exc
         if isinstance(dataset, _StreamingFeatureDataset) and raw_length == len(samples):
-            aligned_weights = [float(sample_weights[index]) for index in dataset.sample_indices]
-            return self._coerce_sample_weights(aligned_weights, expected_length)
+            return self._resolve_sample_weights_for_indices(
+                samples,
+                dataset.sample_indices,
+                sample_weights,
+            )
         return self._coerce_sample_weights(sample_weights, expected_length)
+
+    def _build_governance_gate_arrays(
+        self,
+        samples: list[IngestedSample],
+    ) -> tuple[np.ndarray, np.ndarray]:
+        feature_rows: list[np.ndarray] = []
+        labels: list[int] = []
+
+        for sample in samples:
+            feature = self._load_or_compute_feature(sample)
+            feature_row = (
+                feature.detach().cpu().to(dtype=torch.float32).reshape(-1).numpy().copy()
+            )
+            is_valid, reason = self._validate_feature_tensor(torch.from_numpy(feature_row))
+            if not is_valid:
+                self._record_invalid_sample(sample, reason)
+                raise RuntimeError(
+                    "REAL_DATA_REQUIRED: invalid governance gate feature tensor "
+                    f"for {sample.sha256_hash} ({reason})"
+                )
+            feature_rows.append(feature_row)
+            labels.append(self._label_for_sample(sample))
+
+        if not feature_rows:
+            raise RuntimeError("REAL_DATA_REQUIRED: no features available for governance gate")
+
+        return (
+            np.asarray(feature_rows, dtype=np.float32),
+            np.asarray(labels, dtype=np.int64),
+        )
+
+    def _run_governance_training_gate(self, samples: list[IngestedSample]) -> None:
+        check_kill_switch()
+        features, labels = self._build_governance_gate_arrays(samples)
+        gate_result = check_training_gate(
+            features,
+            labels,
+            int(self.model_config.output_dim),
+            source_id="ingestion_pipeline",
+        )
+        logger.info(
+            "incremental training governance gate passed checks=%d/%d duration_ms=%.0f",
+            gate_result.checks_passed,
+            gate_result.checks_run,
+            gate_result.duration_ms,
+        )
 
     def train(
         self,
@@ -2461,19 +2585,20 @@ class IncrementalTrainer:
                 0.0, 0.0, 0.0, 0.0, 0.0, len(samples), epoch_number, False, False
             )
 
+        self._run_governance_training_gate(samples)
+
         build_dataset_signature = inspect.signature(self.build_dataset)
-        if "include_train_dataset_indices" in build_dataset_signature.parameters:
-            train_loader, eval_loader = self.build_dataset(
-                samples,
-                include_train_dataset_indices=True,
-            )
-        else:
-            train_loader, eval_loader = self.build_dataset(samples)
         native_reward_weights = self._resolve_native_reward_weight_lookup(samples)
         merged_sample_weights = self._merge_incremental_sample_weight_sources(
             native_reward_weights,
             sample_weights,
         )
+        build_dataset_kwargs: dict[str, object] = {}
+        if "include_train_dataset_indices" in build_dataset_signature.parameters:
+            build_dataset_kwargs["include_train_dataset_indices"] = True
+        if "sample_weights" in build_dataset_signature.parameters:
+            build_dataset_kwargs["sample_weights"] = merged_sample_weights
+        train_loader, eval_loader = self.build_dataset(samples, **build_dataset_kwargs)
         resolved_train_sample_weights = self._resolve_train_sample_weights(
             samples,
             train_loader,
@@ -2533,6 +2658,18 @@ class IncrementalTrainer:
         )
         eval_criterion = torch.nn.CrossEntropyLoss()
         previous_state = self._clone_model_state(self.model.state_dict())
+        self.adaptive_learner.attach_model(self.model)
+        initial_ewc_loss = self.adaptive_learner.get_ewc_loss()
+        if torch.is_tensor(initial_ewc_loss):
+            initial_ewc_value = float(initial_ewc_loss.detach().cpu().item())
+        else:
+            initial_ewc_value = float(initial_ewc_loss)
+        if initial_ewc_value > 0.0:
+            logger.info(
+                "incremental_ewc_loaded sample_count=%d initial_ewc_loss=%.8f",
+                int(getattr(self.adaptive_learner, "get_ewc_sample_count", lambda: 0)()),
+                initial_ewc_value,
+            )
 
         start_time = time.perf_counter()
         training_loop_result = self.train(

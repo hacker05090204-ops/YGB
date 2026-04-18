@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import deque
 import os
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -10,6 +11,73 @@ import backend.api.runtime_api as runtime_api
 from backend.auth import auth_guard
 import backend.auth.revocation_store as revocation_store
 from backend.governance import approval_ledger
+
+
+def test_env_fallback_warns_once_in_development(monkeypatch, caplog):
+    monkeypatch.delenv("YGB_KEY_DIR", raising=False)
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "dev-secret-" + "a" * 64)
+    monkeypatch.setenv("YGB_ENV", "development")
+    monkeypatch.setattr(approval_ledger, "_env_fallback_warning_emitted", False)
+
+    with caplog.at_level("WARNING"):
+        approval_ledger._log_ledger_key_mode_startup_status()
+        approval_ledger._log_ledger_key_mode_startup_status()
+
+    warnings = [
+        record.message
+        for record in caplog.records
+        if "ENV_KEY is active via environment fallback" in record.message
+    ]
+    assert len(warnings) == 1
+
+
+
+def test_env_fallback_raises_in_production(monkeypatch):
+    monkeypatch.delenv("YGB_KEY_DIR", raising=False)
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "prod-secret-" + "b" * 64)
+    monkeypatch.setenv("YGB_ENV", "production")
+    monkeypatch.setattr(approval_ledger, "_env_fallback_warning_emitted", False)
+
+    with pytest.raises(RuntimeError, match="APPROVAL_LEDGER_INSECURE_FALLBACK"):
+        approval_ledger._log_ledger_key_mode_startup_status()
+
+
+def test_env_fallback_raises_when_production_flag_enabled(monkeypatch):
+    monkeypatch.delenv("YGB_KEY_DIR", raising=False)
+    monkeypatch.delenv("YGB_ENV", raising=False)
+    monkeypatch.setenv("YGB_PRODUCTION", "1")
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "prod-secret-" + "c" * 64)
+    monkeypatch.setattr(approval_ledger, "_env_fallback_warning_emitted", False)
+
+    with pytest.raises(RuntimeError, match="APPROVAL_LEDGER_INSECURE_FALLBACK"):
+        approval_ledger._log_ledger_key_mode_startup_status()
+
+
+def test_env_fallback_warns_once_when_key_dir_has_no_valid_keys_in_development(
+    monkeypatch,
+    caplog,
+    tmp_path,
+):
+    empty_key_dir = tmp_path / "empty-keys"
+    empty_key_dir.mkdir()
+
+    monkeypatch.setenv("YGB_KEY_DIR", str(empty_key_dir))
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "dev-secret-" + "d" * 64)
+    monkeypatch.setenv("YGB_ENV", "development")
+    monkeypatch.delenv("YGB_PRODUCTION", raising=False)
+    monkeypatch.setattr(approval_ledger, "_env_fallback_warning_emitted", False)
+
+    with caplog.at_level("WARNING"):
+        approval_ledger._log_ledger_key_mode_startup_status()
+        approval_ledger._log_ledger_key_mode_startup_status()
+
+    warnings = [
+        record.message
+        for record in caplog.records
+        if "ENV_KEY is active via environment fallback" in record.message
+    ]
+    assert len(warnings) == 1
+
 
 
 def test_key_manager_status_reports_fallback_and_authority_state(monkeypatch):

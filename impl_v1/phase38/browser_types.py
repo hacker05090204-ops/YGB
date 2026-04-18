@@ -155,7 +155,7 @@ class BrowserResponse:
     decision: BrowserDecision
     reason_code: str
     reason_description: str
-    simulated_result: bool  # Would have succeeded (NO ACTUAL EXECUTION)
+    simulated_result: bool  # Legacy field name; True only after a real execution probe succeeds.
     requires_human: bool
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from backend.ingestion.industrial_autograbber import IndustrialAutoGrabber
 from backend.ingestion.parallel_autograbber import (
     FieldRouter,
     ParallelAutoGrabber,
@@ -276,6 +277,23 @@ class TestParallelAutoGrabber:
         assert isinstance(scraper_types, dict)
         assert len(scraper_types) > 0, "Should have at least one scraper"
         assert "nvd" in scraper_types, "Should include NVD scraper"
+
+    def test_industrial_available_scraper_types_include_group_d_sources(self):
+        """Industrial registry must expose Alpine and Debian sources."""
+        scraper_types = IndustrialAutoGrabber._available_scraper_types()
+        assert "alpine" in scraper_types
+        assert "debian" in scraper_types
+
+    def test_industrial_grabber_accepts_alpine_and_debian_sources(self):
+        """IndustrialAutoGrabber must resolve new Group D sources."""
+        config = ParallelAutoGrabberConfig(
+            sources=["alpine", "debian"],
+            max_per_cycle=4,
+            max_workers=2,
+        )
+        grabber = IndustrialAutoGrabber(config)
+        assert isinstance(grabber, IndustrialAutoGrabber)
+        assert list(grabber.config.sources) == ["alpine", "debian"]
 
     def test_config_validation_max_workers_positive(self):
         """Test config validation rejects non-positive max_workers."""

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import logging
+from types import SimpleNamespace
 
 import pytest
 import torch
@@ -94,6 +95,21 @@ def _passing_training_loop_result() -> TrainingLoopResult:
         epochs_completed=1,
         early_stopped=False,
         metrics_report=None,
+    )
+
+
+def _allow_governance_gate(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.check_kill_switch",
+        lambda: None,
+    )
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.check_training_gate",
+        lambda features, labels, n_classes, source_id="ingestion_pipeline": SimpleNamespace(
+            checks_passed=9,
+            checks_run=9,
+            duration_ms=0.0,
+        ),
     )
 
 
@@ -194,6 +210,7 @@ def test_incremental_trainer_run_epoch_uses_native_reward_buffer_weights(
     tmp_path,
     caplog,
 ):
+    _allow_governance_gate(monkeypatch)
     reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
     monkeypatch.setattr(
         "backend.training.incremental_trainer.get_training_state_manager",
@@ -265,11 +282,86 @@ def test_incremental_trainer_run_epoch_uses_native_reward_buffer_weights(
     assert "matched_rows=" in caplog.text
 
 
+def test_incremental_trainer_run_epoch_uses_cve_fallback_reward_weights(
+    monkeypatch,
+    tmp_path,
+    caplog,
+):
+    _allow_governance_gate(monkeypatch)
+    reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: _FakeStateManager(),
+    )
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_reward_buffer",
+        lambda: reward_buffer,
+    )
+    monkeypatch.setattr(
+        "backend.training.runtime_status_validator.validate_promotion_readiness",
+        lambda snapshot: True,
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.device = torch.device("cpu")
+    trainer.model = trainer.model.to(trainer.device)
+    trainer.feature_engineer.extract = _stable_feature_vector
+    trainer._save_model_state = lambda *args, **kwargs: None
+    trainer._save_named_checkpoint = lambda *args, **kwargs: tmp_path / "noop.pt"
+    trainer._persist_checkpoint_metrics = lambda **kwargs: None
+
+    samples = _quality_gate_samples(100)
+    for sample in samples[:10]:
+        reward_buffer.add(
+            OutcomeSignal(
+                sample_id=f"external::{sample.cve_id}",
+                cve_id=sample.cve_id,
+                predicted_severity=sample.severity,
+                outcome="kev_exploit_confirmed",
+                reward=1.0,
+                source="cisa_kev",
+            )
+        )
+
+    captured: dict[str, object] = {}
+
+    def _fake_train(
+        train_loader,
+        optimizer,
+        scheduler,
+        criterion,
+        scaler,
+        *,
+        sample_weights=None,
+        **kwargs,
+    ):
+        captured["sample_weights"] = (
+            sample_weights.copy() if sample_weights is not None else None
+        )
+        return _passing_training_loop_result()
+
+    trainer.train = _fake_train
+    trainer.load_new_samples = lambda: samples
+
+    with caplog.at_level(logging.INFO, logger="ygb.training.incremental_trainer"):
+        trainer.run_incremental_epoch()
+
+    assert captured["sample_weights"] is not None
+    assert float(captured["sample_weights"].max()) > 1.0
+    assert "matched_cve_fallback=" in caplog.text
+
+
 def test_incremental_trainer_native_reward_weights_do_not_double_count_external_dict(
     monkeypatch,
     tmp_path,
     caplog,
 ):
+    _allow_governance_gate(monkeypatch)
     reward_buffer = RewardBuffer(path=tmp_path / "rl_reward_buffer.json")
     monkeypatch.setattr(
         "backend.training.incremental_trainer.get_training_state_manager",
@@ -340,11 +432,43 @@ def test_incremental_trainer_native_reward_weights_do_not_double_count_external_
     assert "merge_strategy=external_dict_overrides" in caplog.text
 
 
+def test_incremental_trainer_build_dataset_uses_weighted_random_sampler_when_weights_exist(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: _FakeStateManager(),
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.device = torch.device("cpu")
+    trainer.model = trainer.model.to(trainer.device)
+    trainer.feature_engineer.extract = _stable_feature_vector
+
+    samples = _quality_gate_samples(100)
+    weighted_sample = samples[0]
+    train_loader, _ = trainer.build_dataset(
+        samples,
+        include_train_dataset_indices=True,
+        sample_weights={weighted_sample.cve_id: 3.0},
+    )
+
+    assert isinstance(train_loader.sampler, torch.utils.data.WeightedRandomSampler)
+    assert float(torch.as_tensor(train_loader.sampler.weights).max().item()) == pytest.approx(3.0)
+
+
 def test_incremental_trainer_run_epoch_logs_effective_label_smoothing(
     monkeypatch,
     tmp_path,
     caplog,
 ):
+    _allow_governance_gate(monkeypatch)
     monkeypatch.setattr(
         "backend.training.incremental_trainer.get_training_state_manager",
         lambda: _FakeStateManager(),
@@ -396,3 +520,124 @@ def test_incremental_trainer_run_epoch_logs_effective_label_smoothing(
     assert captured["label_smoothing"] == pytest.approx(0.2)
     assert "incremental_label_smoothing_configured" in caplog.text
     assert "label_smoothing=0.200000" in caplog.text
+
+
+def test_incremental_trainer_run_epoch_invokes_hard_training_gate(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: _FakeStateManager(),
+    )
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_reward_buffer",
+        lambda: RewardBuffer(path=tmp_path / "empty_rl_reward_buffer.json"),
+    )
+    monkeypatch.setattr(
+        "backend.training.runtime_status_validator.validate_promotion_readiness",
+        lambda snapshot: True,
+    )
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.check_kill_switch",
+        lambda: None,
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.device = torch.device("cpu")
+    trainer.model = trainer.model.to(trainer.device)
+    trainer.feature_engineer.extract = _stable_feature_vector
+    trainer._save_model_state = lambda *args, **kwargs: None
+    trainer._save_named_checkpoint = lambda *args, **kwargs: tmp_path / "noop.pt"
+    trainer._persist_checkpoint_metrics = lambda **kwargs: None
+
+    samples = _quality_gate_samples(100)
+    captured: dict[str, object] = {}
+
+    def _fake_gate(features, labels, n_classes, source_id="ingestion_pipeline"):
+        captured["feature_shape"] = tuple(features.shape)
+        captured["label_count"] = int(labels.shape[0])
+        captured["n_classes"] = int(n_classes)
+        captured["source_id"] = str(source_id)
+        return SimpleNamespace(checks_passed=9, checks_run=9, duration_ms=1.0)
+
+    def _fake_train(*args, **kwargs):
+        return _passing_training_loop_result()
+
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.check_training_gate",
+        _fake_gate,
+    )
+    trainer.train = _fake_train
+    trainer.load_new_samples = lambda: samples
+
+    result = trainer.run_incremental_epoch()
+
+    assert result.rollback is False
+    assert captured["feature_shape"] == (100, 512)
+    assert captured["label_count"] == 100
+    assert captured["n_classes"] == 2
+    assert captured["source_id"] == "ingestion_pipeline"
+
+
+def test_incremental_trainer_checks_kill_switch_each_training_batch(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_training_state_manager",
+        lambda: _FakeStateManager(),
+    )
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.device = torch.device("cpu")
+    trainer.model = trainer.model.to(trainer.device)
+    trainer.adaptive_learner = _ZeroEwcAdaptiveLearner()
+
+    features = torch.randn(4, 512, dtype=torch.float32)
+    labels = torch.tensor([0, 1, 0, 1], dtype=torch.long)
+    train_loader = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(features, labels),
+        batch_size=2,
+        shuffle=False,
+    )
+    optimizer = torch.optim.SGD(trainer.model.parameters(), lr=0.01)
+    scheduler = WarmupCosineScheduler(
+        optimizer,
+        total_steps=len(train_loader),
+        warmup_steps=0,
+        min_lr=0.0,
+    )
+    criterion = torch.nn.CrossEntropyLoss(reduction="none")
+    kill_checks = {"count": 0}
+
+    def _record_kill_switch() -> None:
+        kill_checks["count"] += 1
+
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.check_kill_switch",
+        _record_kill_switch,
+    )
+
+    trainer._train_single_epoch(
+        train_loader,
+        optimizer,
+        scheduler,
+        criterion,
+        None,
+        accumulation_steps=1,
+        gradient_clip_norm=1.0,
+        amp_enabled=False,
+    )
+
+    assert kill_checks["count"] == len(train_loader)

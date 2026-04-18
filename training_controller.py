@@ -43,6 +43,13 @@ YGB_USE_MOE = os.getenv(
     str(YGB_USE_MOE_DEFAULT).lower(),
 ).lower() == "true"
 USE_MOE = YGB_USE_MOE
+YGB_USE_PRO_MOE_ENV_VAR = "YGB_USE_PRO_MOE"
+YGB_USE_PRO_MOE_DEFAULT = False
+YGB_USE_PRO_MOE = os.getenv(
+    YGB_USE_PRO_MOE_ENV_VAR,
+    str(YGB_USE_PRO_MOE_DEFAULT).lower(),
+).lower() == "true"
+USE_PRO_MOE = YGB_USE_PRO_MOE
 N_EXPERTS = 23
 REAL_SAFETENSORS_FEATURE_STORE_ROOT = FEATURES_DIR
 MOE_GLOBAL_REGISTRY_PATH = os.path.join("checkpoints", "moe_global_registry.json")
@@ -86,6 +93,16 @@ def _refresh_use_moe() -> bool:
     ).lower() == "true"
     USE_MOE = YGB_USE_MOE
     return USE_MOE
+
+
+def _refresh_use_pro_moe() -> bool:
+    global USE_PRO_MOE, YGB_USE_PRO_MOE
+    YGB_USE_PRO_MOE = os.getenv(
+        YGB_USE_PRO_MOE_ENV_VAR,
+        str(YGB_USE_PRO_MOE_DEFAULT).lower(),
+    ).lower() == "true"
+    USE_PRO_MOE = YGB_USE_PRO_MOE
+    return USE_PRO_MOE
 
 
 def _compute_dataset_hash(features: np.ndarray, labels: np.ndarray) -> str:
@@ -158,6 +175,13 @@ def _compute_phase1_moe_expert_hidden_dim(
     return max(base_hidden_dim, int(required_hidden_dim))
 
 
+def _scale_moe_dimension_for_device(base_dim: int, scale_factor: float) -> int:
+    resolved_base_dim = max(1, int(base_dim))
+    bounded_scale = min(1.0, max(0.25, float(scale_factor or 1.0)))
+    scaled_dim = int(round(resolved_base_dim * bounded_scale / 32.0) * 32)
+    return max(64, min(resolved_base_dim, scaled_dim if scaled_dim > 0 else resolved_base_dim))
+
+
 def _write_safetensors_checkpoint(
     checkpoint_path: str,
     state_dict: Dict[str, Any],
@@ -224,7 +248,10 @@ def _build_configured_model(
         if nn_module is None:
             nn_module = resolved_nn
 
-    if _refresh_use_moe():
+    use_moe = _refresh_use_moe()
+    use_pro_moe = bool(use_moe and _refresh_use_pro_moe())
+
+    if use_moe:
         from impl_v1.phase49.moe import EXPERT_FIELDS, MoEClassifier, MoEConfig
         resolved_expert_id = getattr(config, "active_expert_id", expert_id)
 
@@ -240,31 +267,96 @@ def _build_configured_model(
             else baseline_moe_dim
         )
         phase1_required_total_params = 100_000_001
-        expert_hidden_dim = _compute_phase1_moe_expert_hidden_dim(
-            moe_dim,
-            n_experts=N_EXPERTS,
-            expert_hidden_mult=2,
-            required_total_params=phase1_required_total_params,
-        )
-        moe_config = MoEConfig(
-            d_model=moe_dim,
-            n_experts=N_EXPERTS,
-            top_k=min(2, N_EXPERTS),
-            expert_hidden_mult=2,
-            dropout=0.3,
-            gate_noise=1.0,
-            aux_loss_coeff=0.01,
-        )
-        setattr(moe_config, "expert_hidden_dim", expert_hidden_dim)
-        model = MoEClassifier(
-            moe_config,
-            input_dim=config.input_dim,
-            output_dim=config.num_classes,
-        )
-        target_dtype = getattr(model, "_preferred_dtype", getattr(model, "_dtype", torch.float32))
-        if getattr(device, "type", str(device)) != "cuda":
-            target_dtype = torch.float32
-        model = model.to(device=device, dtype=target_dtype)
+        runtime_profile = None
+        if use_pro_moe:
+            from backend.training.small_device import (
+                prepare_model_for_small_device,
+                profile_device,
+            )
+            from impl_v1.phase49.moe.pro_moe import ProMoEClassifier, ProMoEConfig
+
+            runtime_profile = profile_device(
+                torch_module=torch,
+                requested_device=getattr(device, "type", device),
+            )
+            moe_dim = _scale_moe_dimension_for_device(
+                moe_dim,
+                float(getattr(runtime_profile, "scale_factor", 1.0) or 1.0),
+            )
+            expert_hidden_dim = _compute_phase1_moe_expert_hidden_dim(
+                moe_dim,
+                n_experts=N_EXPERTS,
+                expert_hidden_mult=2,
+                required_total_params=phase1_required_total_params,
+            )
+            moe_config = ProMoEConfig(
+                d_model=moe_dim,
+                n_experts=N_EXPERTS,
+                top_k=min(2, N_EXPERTS),
+                expert_hidden_mult=2,
+                dropout=0.3,
+                gate_noise=1.0,
+                aux_loss_coeff=0.01,
+                enable_cpu_offload=bool(
+                    getattr(runtime_profile, "prefer_cpu_offload", True)
+                ),
+                enable_dynamic_int8=bool(
+                    getattr(runtime_profile, "prefer_dynamic_int8", False)
+                ),
+                max_experts_in_memory=int(
+                    getattr(runtime_profile, "max_experts_in_memory", 0) or 0
+                ),
+                device_scale_factor=float(
+                    getattr(runtime_profile, "scale_factor", 1.0) or 1.0
+                ),
+                preferred_dtype=str(
+                    getattr(runtime_profile, "preferred_dtype", "float32") or "float32"
+                ),
+            )
+            setattr(moe_config, "expert_hidden_dim", expert_hidden_dim)
+            model = ProMoEClassifier(
+                moe_config,
+                input_dim=config.input_dim,
+                output_dim=config.num_classes,
+                device_profile=runtime_profile,
+            )
+            model = prepare_model_for_small_device(
+                model,
+                profile=runtime_profile,
+                device=device,
+                for_training=True,
+            )
+        else:
+            expert_hidden_dim = _compute_phase1_moe_expert_hidden_dim(
+                moe_dim,
+                n_experts=N_EXPERTS,
+                expert_hidden_mult=2,
+                required_total_params=phase1_required_total_params,
+            )
+            moe_config = MoEConfig(
+                d_model=moe_dim,
+                n_experts=N_EXPERTS,
+                top_k=min(2, N_EXPERTS),
+                expert_hidden_mult=2,
+                dropout=0.3,
+                gate_noise=1.0,
+                aux_loss_coeff=0.01,
+            )
+            setattr(moe_config, "expert_hidden_dim", expert_hidden_dim)
+            model = MoEClassifier(
+                moe_config,
+                input_dim=config.input_dim,
+                output_dim=config.num_classes,
+            )
+            target_dtype = getattr(
+                model,
+                "_preferred_dtype",
+                getattr(model, "_dtype", torch.float32),
+            )
+            if getattr(device, "type", str(device)) != "cuda":
+                target_dtype = torch.float32
+            model = model.to(device=device, dtype=target_dtype)
+
         if resolved_expert_id is not None:
             model.set_active_expert(int(resolved_expert_id))
         if getattr(model, "_use_grad_checkpoint", False):
@@ -282,18 +374,35 @@ def _build_configured_model(
             )
         model.requires_unused_parameter_detection = True
         model.total_parameter_count = int(model_parameter_count)
-        logger.info(
-            "  MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s | device=%s | dtype=%s | active_expert=%s",
-            moe_config.n_experts,
-            moe_config.top_k,
-            moe_config.d_model,
-            expert_hidden_dim,
-            f"{model_parameter_count:,}",
-            enforced_dropout_experts,
-            getattr(model, "_device", device),
-            getattr(model, "_dtype", torch.float32),
-            resolved_expert_id,
-        )
+        if use_pro_moe:
+            logger.info(
+                "  Pro-MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s | device=%s | dtype=%s | active_expert=%s | cpu_offload=%s | dynamic_int8=%s | scale_factor=%.2f",
+                moe_config.n_experts,
+                moe_config.top_k,
+                moe_config.d_model,
+                expert_hidden_dim,
+                f"{model_parameter_count:,}",
+                enforced_dropout_experts,
+                getattr(model, "_device", device),
+                getattr(model, "_dtype", torch.float32),
+                resolved_expert_id,
+                getattr(moe_config, "enable_cpu_offload", False),
+                getattr(moe_config, "enable_dynamic_int8", False),
+                float(getattr(moe_config, "device_scale_factor", 1.0) or 1.0),
+            )
+        else:
+            logger.info(
+                "  MoE activated: experts=%s | top_k=%s | d_model=%s | expert_hidden_dim=%s | total_params=%s | hidden_dropout_enforced=%s | device=%s | dtype=%s | active_expert=%s",
+                moe_config.n_experts,
+                moe_config.top_k,
+                moe_config.d_model,
+                expert_hidden_dim,
+                f"{model_parameter_count:,}",
+                enforced_dropout_experts,
+                getattr(model, "_device", device),
+                getattr(model, "_dtype", torch.float32),
+                resolved_expert_id,
+            )
         return model if convenience_mode else (model, moe_config.d_model)
 
     from impl_v1.phase49.governors.g37_pytorch_backend import (

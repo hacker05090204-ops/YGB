@@ -20,7 +20,346 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger("ygb.self_reflection")
 
 FAILURE_THRESHOLD = 3
+IDLE_THRESHOLD = 300
 REFLECTION_INTERVAL = 300
+
+FIELD_ALIASES: dict[str, str] = {
+    "api_broken_auth": "auth",
+    "auth_bypass": "auth",
+    "web_auth_bypass": "auth",
+    "web_csrf": "csrf",
+    "web_idor": "idor",
+    "web_sqli": "sqli",
+    "web_ssrf": "ssrf",
+    "web_xss": "xss",
+}
+
+FIELD_EXPANSIONS: dict[str, tuple[str, ...]] = {
+    "api_testing": (
+        "graphql_abuse",
+        "rest_attacks",
+        "idor",
+        "auth",
+        "sqli",
+        "ssrf",
+        "csrf",
+    ),
+    "web_vulns": (
+        "xss",
+        "sqli",
+        "ssrf",
+        "idor",
+        "auth",
+        "csrf",
+        "xxe",
+        "rce",
+        "file_upload",
+        "deserialization",
+    ),
+}
+
+ESCALATION_RULES: dict[str, list[tuple[str, str, str, str]]] = {
+    "auth": [
+        (
+            "jwt validated",
+            "auth_jwt_kid",
+            "JWT Key ID Injection",
+            "Test JWT kid parameter for path traversal or SQL injection",
+        ),
+        (
+            "session strong",
+            "auth_timing",
+            "Timing Attack on Auth",
+            "Use timing differences to enumerate valid usernames",
+        ),
+        (
+            "mfa enforced",
+            "auth_device_flow",
+            "Device Flow Auth Abuse",
+            "Target alternate OAuth and device-code paths that bypass interactive MFA",
+        ),
+    ],
+    "csrf": [
+        (
+            "token required",
+            "csrf_login",
+            "Login CSRF",
+            "Target login, OAuth linking, and state-changing endpoints that still accept ambient credentials",
+        ),
+        (
+            "same-site enforced",
+            "csrf_client_side",
+            "Client-Side CSRF",
+            "Use client-side request forgery via trusted JavaScript gadgets and reflected state",
+        ),
+        (
+            "origin checked",
+            "csrf_content_type",
+            "Content-Type Confusion CSRF",
+            "Bypass origin checks with simple requests, method override, or content-type downgrades",
+        ),
+    ],
+    "deserialization": [
+        (
+            "gadget unavailable",
+            "deser_alt_gadget",
+            "Alternate Gadget Chain Discovery",
+            "Probe alternate gadget chains, library versions, and secondary sinks for deserialization abuse",
+        ),
+        (
+            "pickle blocked",
+            "deser_yaml_polyglot",
+            "YAML Polyglot Deserialization",
+            "Swap pickle payloads for YAML, XMLDecoder, or polyglot object formats",
+        ),
+        (
+            "java serialization filtered",
+            "deser_jndi",
+            "JNDI-Assisted Deserialization",
+            "Pivot from blocked serialized blobs to JNDI lookups, gadget autoloading, or alternate marshallers",
+        ),
+    ],
+    "file_upload": [
+        (
+            "extension blocked",
+            "upload_polyglot",
+            "Polyglot File Upload",
+            "Use image/script polyglots, parser differentials, and double-extension payloads",
+        ),
+        (
+            "mime checked",
+            "upload_magic_bypass",
+            "Magic-Byte Upload Bypass",
+            "Match expected magic bytes while preserving a secondary executable parser path",
+        ),
+        (
+            "storage isolated",
+            "upload_processing_chain",
+            "Processing-Chain Upload Abuse",
+            "Target downstream image, archive, and antivirus processing for secondary execution",
+        ),
+    ],
+    "graphql_abuse": [
+        (
+            "introspection disabled",
+            "graphql_suggestion_oracle",
+            "GraphQL Suggestion Oracle",
+            "Use field suggestion leakage, error oracles, and persisted query diffs to map the schema",
+        ),
+        (
+            "depth limited",
+            "graphql_batching",
+            "GraphQL Query Batching",
+            "Chain aliases, batching, and fragments to bypass depth and rate controls",
+        ),
+        (
+            "auth enforced",
+            "graphql_idor",
+            "GraphQL Object Authorization Bypass",
+            "Probe node, edge, and nested resolver authorization inconsistencies",
+        ),
+    ],
+    "idor": [
+        (
+            "sequential blocked",
+            "idor_uuid",
+            "UUID IDOR",
+            "Test UUID/GUID predictability or enumeration",
+        ),
+        (
+            "authz check present",
+            "idor_race",
+            "Race Condition IDOR",
+            "Use concurrent requests to bypass authorization checks",
+        ),
+        (
+            "object scoped",
+            "idor_indirect_ref",
+            "Indirect Reference IDOR",
+            "Pivot through exports, shares, logs, and secondary object references that leak cross-tenant identifiers",
+        ),
+    ],
+    "privilege_escalation": [
+        (
+            "role check present",
+            "privesc_confused_deputy",
+            "Confused Deputy Privilege Escalation",
+            "Target helper services and cross-role workflows that execute with elevated authority",
+        ),
+        (
+            "sudo blocked",
+            "privesc_service_misconfig",
+            "Service Misconfiguration Privilege Escalation",
+            "Pivot to writable services, scheduled tasks, and install paths that grant elevated execution",
+        ),
+        (
+            "container isolated",
+            "privesc_escape_surface",
+            "Container Escape Surface Mapping",
+            "Probe kernel interfaces, mounted sockets, and runtime escapes instead of direct sudo paths",
+        ),
+    ],
+    "race_condition": [
+        (
+            "duplicate blocked",
+            "race_multi_endpoint",
+            "Multi-Endpoint Race",
+            "Race logically-linked endpoints that share state but enforce checks independently",
+        ),
+        (
+            "locking enabled",
+            "race_cross_region",
+            "Cross-Region Race",
+            "Exploit replication lag, cache delay, or asynchronous workers rather than local locks",
+        ),
+        (
+            "idempotency present",
+            "race_state_confusion",
+            "State Confusion Race",
+            "Target partial state transitions and asynchronous confirmation windows",
+        ),
+    ],
+    "rce": [
+        (
+            "command not found",
+            "rce_env",
+            "RCE via Environment Variables",
+            "Manipulate PATH or LD_PRELOAD for execution",
+        ),
+        (
+            "filtered",
+            "rce_template",
+            "Template Injection RCE",
+            "Test SSTI payloads for server-side template engines",
+        ),
+        (
+            "shell blocked",
+            "rce_deserialization",
+            "Deserialization RCE",
+            "Test unsafe deserialization in pickle, yaml, java",
+        ),
+    ],
+    "rest_attacks": [
+        (
+            "verb blocked",
+            "rest_method_override",
+            "REST Method Override Abuse",
+            "Use method override headers, proxy rewrites, and alternate verbs to reach blocked handlers",
+        ),
+        (
+            "schema validated",
+            "rest_mass_assignment",
+            "REST Mass Assignment",
+            "Probe hidden fields, sparse updates, and partial object merges for unauthorized property control",
+        ),
+        (
+            "auth enforced",
+            "rest_bola",
+            "REST BOLA Pivot",
+            "Target object-level authorization mismatches across list, detail, and export endpoints",
+        ),
+    ],
+    "sqli": [
+        (
+            "filtered",
+            "sqli_blind_time",
+            "Blind Time-Based SQLi",
+            "Use SLEEP() or pg_sleep() with binary search on data",
+        ),
+        (
+            "waf detected",
+            "sqli_chunked",
+            "WAF Evasion SQLi",
+            "Use comment splitting, case variation, hex encoding",
+        ),
+        (
+            "error suppressed",
+            "sqli_boolean",
+            "Boolean-Based Blind SQLi",
+            "Use conditional responses to extract data bit by bit",
+        ),
+    ],
+    "ssrf": [
+        (
+            "blocked",
+            "ssrf_dns_rebind",
+            "DNS Rebinding SSRF",
+            "Use DNS rebinding or CNAME chains to bypass IP filters",
+        ),
+        (
+            "redirect followed",
+            "ssrf_redirect_chain",
+            "SSRF via Redirect Chain",
+            "Use HTTP 301/302 to internal targets",
+        ),
+        (
+            "localhost blocked",
+            "ssrf_ipv6",
+            "IPv6 SSRF",
+            "Use IPv6 localhost variants like ::1 or IPv6-mapped IPv4",
+        ),
+    ],
+    "subdomain_takeover": [
+        (
+            "cname validated",
+            "subdomain_ns_drift",
+            "Dangling NS Takeover",
+            "Target dangling NS delegations and partially-retired zones instead of direct CNAMEs",
+        ),
+        (
+            "dns active",
+            "subdomain_service_rebind",
+            "Service Rebind Takeover",
+            "Probe third-party service unclaim flows, zone transfers, and stale SaaS bindings",
+        ),
+        (
+            "cdn configured",
+            "subdomain_cache_poison",
+            "CDN Cache-Poison Pivot",
+            "Abuse CDN host routing and cache poisoning to recover control over delegated origins",
+        ),
+    ],
+    "xss": [
+        (
+            "basic payload filtered",
+            "xss_encode",
+            "XSS with encoding bypass",
+            "Try HTML entity, URL, unicode encodings of XSS payload",
+        ),
+        (
+            "csp present",
+            "xss_csp_bypass",
+            "CSP Bypass XSS",
+            "Use CSP nonce prediction, DOM-based sinks, or JSONP callbacks",
+        ),
+        (
+            "waf detected",
+            "xss_polyglot",
+            "Polyglot XSS",
+            "Use polyglot payloads that work in multiple contexts",
+        ),
+    ],
+    "xxe": [
+        (
+            "doctype blocked",
+            "xxe_xinclude",
+            "XInclude XXE",
+            "Shift from DOCTYPE entities to XInclude, schema imports, and parser-side includes",
+        ),
+        (
+            "external entity blocked",
+            "xxe_oob",
+            "Out-of-Band XXE",
+            "Use external DTD retrieval and blind OOB callbacks to exfiltrate parser-controlled content",
+        ),
+        (
+            "parser hardened",
+            "xxe_svg",
+            "SVG/Office XXE",
+            "Target secondary XML parsers in SVG, DOCX, XLSX, or SOAP processing flows",
+        ),
+    ],
+}
 
 
 @dataclass
@@ -188,7 +527,7 @@ class MethodLibrary:
 
         if not self._methods:
             for method in self.SEED_METHODS:
-                self._methods[method.method_id] = method
+                self._methods[method.method_id] = VulnMethod(**method.to_dict())
             self._save()
 
     def _save(self) -> None:
@@ -278,13 +617,40 @@ class SelfReflectionEngine:
     def build_failure_key(self, attack_family: str, failure_pattern: str) -> str:
         return f"{str(attack_family).strip().lower()}::{str(failure_pattern).strip().lower()}"
 
+    def _normalize_field_name(self, field_name: str) -> str:
+        return str(field_name or "").strip().lower().replace("-", "_").replace(" ", "_")
+
+    def _expand_field_names(self, field_name: str) -> List[str]:
+        root = self._normalize_field_name(field_name)
+        if not root:
+            return []
+
+        expanded: List[str] = []
+        seen: set[str] = set()
+        pending = [root]
+        while pending:
+            current = self._normalize_field_name(pending.pop(0))
+            if not current or current in seen:
+                continue
+            seen.add(current)
+            expanded.append(current)
+
+            alias = FIELD_ALIASES.get(current)
+            if alias is not None:
+                pending.append(alias)
+            pending.extend(FIELD_EXPANSIONS.get(current, ()))
+        return expanded
+
     def _infer_field(self, attack_family: str, explicit_field: str | None = None) -> str:
         if explicit_field:
-            return str(explicit_field).strip().lower()
+            normalized_field = self._normalize_field_name(str(explicit_field))
+            return FIELD_ALIASES.get(normalized_field, normalized_field)
         method = self._library.get_method(attack_family)
         if method is not None:
-            return method.field
-        return str(attack_family).strip().lower()
+            normalized_field = self._normalize_field_name(method.field)
+            return FIELD_ALIASES.get(normalized_field, normalized_field)
+        normalized_field = self._normalize_field_name(str(attack_family))
+        return FIELD_ALIASES.get(normalized_field, normalized_field)
 
     def _append_event(self, event: ReflectionEvent) -> None:
         self._events.append(event)
@@ -363,15 +729,88 @@ class SelfReflectionEngine:
         del field
         self._library.record_outcome(method_id, success=True)
 
-    def idle_reflection(self, fields: List[str]) -> None:
+    def idle_reflection(self, fields: List[str], *, idle_seconds: float | None = None) -> Dict[str, Any]:
+        requested_fields = [
+            str(field).strip()
+            for field in fields
+            if str(field).strip()
+        ]
+        if not requested_fields:
+            requested_fields = sorted(
+                {
+                    method.field
+                    for method in self._library.get_all_methods()
+                    if str(method.field).strip()
+                }
+            )
+
+        if idle_seconds is not None and float(idle_seconds) < IDLE_THRESHOLD:
+            return {
+                "triggered": False,
+                "rate_limited": False,
+                "reason": "idle_threshold_not_met",
+                "requested_fields": requested_fields,
+                "checked_fields": [],
+                "reflected_fields": [],
+                "invented_method_ids": [],
+                "idle_seconds": float(idle_seconds),
+                "idle_threshold": float(IDLE_THRESHOLD),
+                "seconds_until_next": 0.0,
+            }
+
         now = time.time()
-        if now - self._last_reflection < REFLECTION_INTERVAL:
-            return
+        seconds_until_next = max(0.0, float(REFLECTION_INTERVAL) - (now - self._last_reflection))
+        if seconds_until_next > 0.0:
+            return {
+                "triggered": False,
+                "rate_limited": True,
+                "reason": "rate_limited",
+                "requested_fields": requested_fields,
+                "checked_fields": [],
+                "reflected_fields": [],
+                "invented_method_ids": [],
+                "idle_seconds": None if idle_seconds is None else float(idle_seconds),
+                "idle_threshold": float(IDLE_THRESHOLD),
+                "seconds_until_next": round(seconds_until_next, 3),
+            }
+
         self._last_reflection = now
-        for field in fields:
-            failing_methods = self._library.get_failing_methods(field, threshold=self._invention_threshold)
-            if failing_methods:
-                self._reflect(field, failing_methods, trigger="idle")
+        checked_fields: List[str] = []
+        reflected_fields: List[str] = []
+        invented_method_ids: List[str] = []
+        seen_fields: set[str] = set()
+
+        for field in requested_fields:
+            for candidate_field in self._expand_field_names(field):
+                if candidate_field in seen_fields:
+                    continue
+                seen_fields.add(candidate_field)
+                checked_fields.append(candidate_field)
+
+                failing_methods = self._library.get_failing_methods(
+                    candidate_field,
+                    threshold=self._invention_threshold,
+                )
+                if not failing_methods:
+                    continue
+
+                invented_method = self._reflect(candidate_field, failing_methods, trigger="idle")
+                reflected_fields.append(candidate_field)
+                if invented_method is not None:
+                    invented_method_ids.append(invented_method.method_id)
+
+        return {
+            "triggered": bool(reflected_fields),
+            "rate_limited": False,
+            "reason": "reflected" if reflected_fields else "no_failing_methods",
+            "requested_fields": requested_fields,
+            "checked_fields": checked_fields,
+            "reflected_fields": reflected_fields,
+            "invented_method_ids": invented_method_ids,
+            "idle_seconds": None if idle_seconds is None else float(idle_seconds),
+            "idle_threshold": float(IDLE_THRESHOLD),
+            "seconds_until_next": float(REFLECTION_INTERVAL),
+        }
 
     def _reflect(
         self,
@@ -443,55 +882,38 @@ class SelfReflectionEngine:
         failure_pattern: str,
         source_failure_count: int,
     ) -> Optional[VulnMethod]:
-        pattern_text = " ".join(patterns[-5:]).lower()
-        escalation_map = {
-            "xss": [
-                ("basic payload filtered", "xss_encode", "XSS with encoding bypass", "Try HTML entity, URL, unicode encodings of XSS payload"),
-                ("csp present", "xss_csp_bypass", "CSP Bypass XSS", "Use CSP nonce prediction, DOM-based sinks, or JSONP callbacks"),
-                ("waf detected", "xss_polyglot", "Polyglot XSS", "Use polyglot payloads that work in multiple contexts"),
-            ],
-            "sqli": [
-                ("filtered", "sqli_blind_time", "Blind Time-Based SQLi", "Use SLEEP() or pg_sleep() with binary search on data"),
-                ("waf detected", "sqli_chunked", "WAF Evasion SQLi", "Use comment splitting, case variation, hex encoding"),
-                ("error suppressed", "sqli_boolean", "Boolean-Based Blind SQLi", "Use conditional responses to extract data bit by bit"),
-            ],
-            "ssrf": [
-                ("blocked", "ssrf_dns_rebind", "DNS Rebinding SSRF", "Use DNS rebinding or CNAME chains to bypass IP filters"),
-                ("redirect followed", "ssrf_redirect_chain", "SSRF via Redirect Chain", "Use HTTP 301/302 to internal targets"),
-                ("localhost blocked", "ssrf_ipv6", "IPv6 SSRF", "Use IPv6 localhost variants like ::1 or IPv6-mapped IPv4"),
-            ],
-            "rce": [
-                ("command not found", "rce_env", "RCE via Environment Variables", "Manipulate PATH or LD_PRELOAD for execution"),
-                ("filtered", "rce_template", "Template Injection RCE", "Test SSTI payloads for server-side template engines"),
-                ("shell blocked", "rce_deserialization", "Deserialization RCE", "Test unsafe deserialization in pickle, yaml, java"),
-            ],
-            "idor": [
-                ("sequential blocked", "idor_uuid", "UUID IDOR", "Test UUID/GUID predictability or enumeration"),
-                ("authz check present", "idor_race", "Race Condition IDOR", "Use concurrent requests to bypass authorization checks"),
-            ],
-            "auth": [
-                ("jwt validated", "auth_jwt_kid", "JWT Key ID Injection", "Test JWT kid parameter for path traversal or SQL injection"),
-                ("session strong", "auth_timing", "Timing Attack on Auth", "Use timing differences to enumerate valid usernames"),
-            ],
-        }
+        normalized_field = self._infer_field(str(field), explicit_field=str(field))
+        pattern_text = " ".join([*patterns[-5:], str(failure_pattern)]).lower()
 
-        for trigger_text, method_prefix, name, description in escalation_map.get(field, []):
-            if trigger_text not in pattern_text:
-                continue
-            method_id = f"{method_prefix}_{uuid.uuid4().hex[:4]}"
-            if any(existing.method_id == method_id for existing in failing_methods):
-                continue
-            return VulnMethod(
-                method_id=method_id,
-                name=name,
-                description=description,
-                field=field,
-                invented_at=datetime.now(UTC).isoformat(),
-                invented_by="self_reflection",
-                attack_family=str(attack_family),
-                failure_pattern=str(failure_pattern),
-                source_failure_count=int(source_failure_count),
-            )
+        candidate_fields: List[str] = []
+        for candidate_field in [normalized_field, *self._expand_field_names(normalized_field)]:
+            if candidate_field not in candidate_fields:
+                candidate_fields.append(candidate_field)
+
+        for candidate_field in candidate_fields:
+            field_rules = ESCALATION_RULES.get(candidate_field, [])
+            field_for_method = normalized_field if normalized_field in ESCALATION_RULES else candidate_field
+            existing_methods = self._library.list_methods(field=field_for_method)
+            for trigger_text, method_prefix, name, description in field_rules:
+                if trigger_text not in pattern_text:
+                    continue
+                if any(
+                    existing.method_id.startswith(f"{method_prefix}_") or existing.name == name
+                    for existing in existing_methods
+                ):
+                    continue
+                method_id = f"{method_prefix}_{uuid.uuid4().hex[:4]}"
+                return VulnMethod(
+                    method_id=method_id,
+                    name=name,
+                    description=description,
+                    field=field_for_method,
+                    invented_at=datetime.now(UTC).isoformat(),
+                    invented_by="self_reflection",
+                    attack_family=str(attack_family),
+                    failure_pattern=str(failure_pattern),
+                    source_failure_count=int(source_failure_count),
+                )
         return None
 
     def _generate_reasoning(self, field: str, failing_methods: List[VulnMethod], patterns: List[str]) -> str:
@@ -543,6 +965,7 @@ if __name__ == "__main__":
 
 __all__ = [
     "FailureObservation",
+    "IDLE_THRESHOLD",
     "MethodLibrary",
     "ReflectionEvent",
     "SelfReflectionEngine",

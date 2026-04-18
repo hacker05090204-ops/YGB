@@ -75,9 +75,9 @@ def _run_real_observation(intent: BrowserIntent) -> tuple[bool, str]:
             )
 
         if "not in whitelist" in str(fetch_result.error).lower():
-            return True, (
-                "REAL_FETCH_SKIPPED_WHITELIST "
-                "validated_public_navigation"
+            return False, (
+                "REAL_FETCH_BLOCKED_WHITELIST "
+                "browser isolation denied the requested target"
             )
 
         # Real fallback path: direct HTTPS fetch when Edge binary is unavailable.
@@ -112,6 +112,41 @@ def _run_real_observation(intent: BrowserIntent) -> tuple[bool, str]:
     except Exception as e:  # pragma: no cover - defensive
         logger.exception("Phase-38 real observation failed")
         return False, f"REAL_FETCH_EXCEPTION: {e}"
+
+
+def _build_real_execution_response(
+    intent: BrowserIntent,
+    *,
+    executed: bool,
+    exec_msg: str,
+    human_approved: bool,
+) -> BrowserResponse:
+    if executed:
+        return BrowserResponse(
+            intent_id=intent.intent_id,
+            decision=BrowserDecision.ALLOW,
+            reason_code="HUMAN_APPROVED" if human_approved else "VALIDATED",
+            reason_description=(
+                f"Human approved. {exec_msg}"
+                if human_approved
+                else f"Browser intent validated. {exec_msg}"
+            ),
+            simulated_result=True,
+            requires_human=False,
+        )
+
+    return BrowserResponse(
+        intent_id=intent.intent_id,
+        decision=BrowserDecision.DENY,
+        reason_code="REAL_EXECUTION_FAILED",
+        reason_description=(
+            f"Human approval present but real browser observation failed. {exec_msg}"
+            if human_approved
+            else f"Browser intent validated but real browser observation failed. {exec_msg}"
+        ),
+        simulated_result=False,
+        requires_human=False,
+    )
 
 
 # =============================================================================
@@ -174,13 +209,11 @@ def make_browser_decision(
     if human_approved is not None:
         if human_approved:
             executed, exec_msg = _run_real_observation(intent)
-            return BrowserResponse(
-                intent_id=intent.intent_id,
-                decision=BrowserDecision.ALLOW,
-                reason_code="HUMAN_APPROVED",
-                reason_description=f"Human approved. {exec_msg}",
-                simulated_result=executed,
-                requires_human=False,
+            return _build_real_execution_response(
+                intent,
+                executed=executed,
+                exec_msg=exec_msg,
+                human_approved=True,
             )
 
         return BrowserResponse(
@@ -205,13 +238,11 @@ def make_browser_decision(
 
     # Step 6: Allow and execute real read-only observation
     executed, exec_msg = _run_real_observation(intent)
-    return BrowserResponse(
-        intent_id=intent.intent_id,
-        decision=BrowserDecision.ALLOW,
-        reason_code="VALIDATED",
-        reason_description=f"Browser intent validated. {exec_msg}",
-        simulated_result=executed,
-        requires_human=False,
+    return _build_real_execution_response(
+        intent,
+        executed=executed,
+        exec_msg=exec_msg,
+        human_approved=False,
     )
 
 

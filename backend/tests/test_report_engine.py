@@ -174,3 +174,93 @@ def test_report_contains_no_fabricated_content(tmp_path):
     assert "placeholder" not in serialized
     assert "fabricated" not in serialized
     assert "no description provided" not in serialized
+
+
+def test_build_report_attaches_detected_per_expert_metrics(tmp_path):
+    engine = ReportEngine(output_dir=tmp_path)
+    report = engine.build_report(
+        report_id="rpt-expert-metrics",
+        title="Per expert metrics report",
+        description="Per expert metric attachment coverage",
+        report_type="security",
+        findings=[_finding("FND-EXPERT")],
+        per_expert_metrics=[
+            {
+                "expert_id": 11,
+                "field_name": "sqli",
+                "val_f1": 0.9123,
+                "val_precision": 0.8844,
+                "val_recall": 0.9456,
+            }
+        ],
+    )
+
+    finding = report.findings[0]
+
+    assert finding.expert_field == "sqli"
+    assert finding.expert_id == 11
+    assert finding.expert_val_f1 == pytest.approx(0.9123)
+    assert finding.expert_val_precision == pytest.approx(0.8844)
+    assert finding.expert_val_recall == pytest.approx(0.9456)
+
+
+def test_build_report_falls_back_to_general_vuln_metrics_alias(tmp_path):
+    engine = ReportEngine(output_dir=tmp_path)
+    report = engine.build_report(
+        report_id="rpt-general-fallback",
+        title="General fallback report",
+        description="General fallback metric coverage",
+        report_type="security",
+        findings=[
+            _finding(
+                "FND-GENERAL",
+                title="Opaque workflow defect",
+                description="A proprietary workflow exposes an undocumented weakness across internal processing stages and error handling paths with unclear root cause or exploit family.",
+            )
+        ],
+        per_expert_metrics={
+            "general_triage": {
+                "expert_id": 15,
+                "val_f1": 0.5500,
+                "val_precision": 0.5000,
+                "val_recall": 0.6100,
+            }
+        },
+    )
+
+    finding = report.findings[0]
+
+    assert finding.expert_field == "general_vuln"
+    assert finding.expert_id == 15
+    assert finding.expert_val_f1 == pytest.approx(0.55)
+    assert finding.expert_val_precision == pytest.approx(0.50)
+    assert finding.expert_val_recall == pytest.approx(0.61)
+
+
+def test_export_markdown_backfills_expert_metadata_from_saved_mapping(tmp_path):
+    engine = ReportEngine(output_dir=tmp_path)
+    report = engine.build_report(
+        report_id="rpt-backfill",
+        title="Backfill report",
+        description="Markdown expert metadata backfill coverage",
+        report_type="security",
+        findings=[
+            _finding(
+                "FND-BACKFILL",
+                title="Cross-site scripting in comments",
+                description="Stored cross-site scripting in the comment renderer allows attacker-supplied JavaScript to execute for administrative users who review content.",
+            )
+        ],
+    )
+
+    payload = report.to_dict()
+    payload["content"] = dict(payload["content"])
+    payload["content"]["findings"] = [dict(payload["content"]["findings"][0])]
+    payload["content"]["findings"][0].pop("expert_id", None)
+    payload["content"]["findings"][0].pop("expert_field", None)
+
+    markdown = engine.export_markdown(payload)
+
+    assert "- Expert ID: 10" in markdown
+    assert "- Expert Field: xss" in markdown
+    assert "- Expert Validation F1: 0.0000" in markdown

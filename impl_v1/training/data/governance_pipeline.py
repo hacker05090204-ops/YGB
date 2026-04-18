@@ -105,6 +105,24 @@ class PostEpochResult:
     warnings: List[str] = field(default_factory=list)
 
 
+def _to_pre_training_result(gate_result) -> PreTrainingResult:
+    return PreTrainingResult(
+        passed=bool(getattr(gate_result, "passed", False)),
+        checks_run=int(getattr(gate_result, "checks_run", 0)),
+        checks_passed=int(getattr(gate_result, "checks_passed", 0)),
+        checks_failed=int(getattr(gate_result, "checks_failed", 0)),
+        failures=list(getattr(gate_result, "failures", []) or []),
+        warnings=list(getattr(gate_result, "warnings", []) or []),
+        duration_ms=float(getattr(gate_result, "duration_ms", 0.0)),
+    )
+
+
+def _re_raise_post_audit_failure(epoch: int, component: str, exc: Exception) -> NoReturn:
+    logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(exc), exc_info=True)
+    _record_audit_failure(epoch, f"{component}: {exc}")
+    raise exc
+
+
 # ═══════════════════════════════════════════════════════════════════
 #  C++ DLL LOADING
 # ═══════════════════════════════════════════════════════════════════
@@ -152,157 +170,15 @@ def pre_training_gate(
     Returns:
         PreTrainingResult
     """
-    t0 = time.perf_counter()
-    result = PreTrainingResult()
+    from backend.governance.training_gate import run_training_gate
 
-    def _check(name: str, fn):
-        """Run a single check and record result."""
-        result.checks_run += 1
-        try:
-            passed, msg = fn()
-            if passed:
-                result.checks_passed += 1
-                logger.info(f"  ✓ {name}: {msg}")
-            else:
-                result.checks_failed += 1
-                result.failures.append(f"{name}: {msg}")
-                logger.error(f"  ✗ {name}: {msg}")
-        except Exception as e:
-            result.checks_failed += 1
-            result.failures.append(f"{name}: exception — {e}")
-            logger.error(f"  ✗ {name}: {e}")
-
-    logger.info("[GOVERNANCE] ═══ PRE-TRAINING GATE ═══")
-
-    # ── Check 1: Mock data scanner ──
-    def _mock_scan():
-        try:
-            from impl_v1.training.safety.mock_data_scanner import scan_production_code
-            scan = scan_production_code(str(_PROJECT_ROOT / "impl_v1" / "training"))
-            if scan.violations_found > 0:
-                return False, f"{scan.violations_found} mock data violations"
-            return True, f"0 violations in {scan.files_scanned} files"
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.mock_data_scanner")
-    _check("Mock Data Scanner", _mock_scan)
-
-    # ── Check 2: Dataset quality gate ──
-    def _quality_gate():
-        try:
-            from impl_v1.training.safety.dataset_quality_gate import validate_dataset
-            report = validate_dataset(features, labels)
-            if report.passed:
-                return True, f"entropy={report.entropy:.2f}"
-            return False, report.rejection_reason
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.dataset_quality_gate")
-    _check("Dataset Quality Gate", _quality_gate)
-
-    # ── Check 3: Label consistency validator ──
-    def _label_check():
-        try:
-            from impl_v1.training.data.label_consistency_validator import validate_labels
-            valid = validate_labels(labels, n_classes)
-            if valid.passed:
-                return True, f"KL={valid.kl_divergence:.4f}"
-            return False, valid.rejection_reason
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.data.label_consistency_validator")
-    _check("Label Consistency", _label_check)
-
-    # ── Check 4: Dataset balance controller ──
-    def _balance_check():
-        try:
-            from impl_v1.training.data.dataset_balance_controller import DatasetBalanceController
-            ctrl = DatasetBalanceController()
-            analysis = ctrl.analyze(labels, n_classes)
-            if analysis.balanced:
-                return True, f"ratio={analysis.max_ratio:.2f}"
-            return False, f"imbalanced: ratio={analysis.max_ratio:.2f}"
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.data.dataset_balance_controller")
-    _check("Dataset Balance", _balance_check)
-
-    # ── Check 5: Semantic quality gate (3-epoch sanity) ──
-    def _sanity_check():
-        try:
-            from impl_v1.training.data.semantic_quality_gate import run_sanity_test
-            sanity = run_sanity_test(features, labels, n_classes)
-            if sanity.passed:
-                return True, f"loss {sanity.epoch_losses[0]:.3f}→{sanity.epoch_losses[-1]:.3f}"
-            return False, sanity.rejection_reason
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.data.semantic_quality_gate")
-    _check("Semantic Quality (3-epoch)", _sanity_check)
-
-    # ── Check 6: Ingestion policy ──
-    def _ingestion_check():
-        try:
-            from impl_v1.training.data.ingestion_policy import IngestionPolicy
-            policy = IngestionPolicy()
-            decision = policy.evaluate(features, labels, source_id)
-            if decision.allowed:
-                return True, "all 3 gates passed"
-            return False, decision.rejection_reason
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.data.ingestion_policy")
-    _check("Ingestion Policy", _ingestion_check)
-
-    # ── Check 7: C++ signal strength validator ──
-    def _signal_check():
-        dll = _load_dll("signal_strength_validator")
-        if dll is None:
-            return True, "DLL not available (skip)"
-        try:
-            n_samples, n_features = features.shape
-            flat = features.astype(np.float64).flatten()
-            arr = (ctypes.c_double * len(flat))(*flat)
-            dll.validate_signal_strength.restype = ctypes.c_int
-            passed = dll.validate_signal_strength(
-                arr, ctypes.c_int(n_samples), ctypes.c_int(n_features)
-            )
-            if passed:
-                return True, "entropy + overlap + fingerprint OK"
-            return False, "signal strength validation failed"
-        except Exception as e:
-            return True, f"signal check error: {e} (skip)"
-    _check("C++ Signal Strength", _signal_check)
-
-    # ── Check 8: Data source audit ──
-    def _audit_check():
-        try:
-            from impl_v1.training.data.data_source_audit import audit_data_source
-            audit = audit_data_source(source_id, features.shape[0])
-            if audit.passed:
-                return True, f"source={source_id} verified"
-            return False, audit.rejection_reason
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.data.data_source_audit")
-    _check("Data Source Audit", _audit_check)
-
-    # ── Check 9: Overfit guard (baseline) ──
-    def _overfit_check():
-        try:
-            from impl_v1.training.safety.overfit_guard import check_overfitting_risk
-            risk = check_overfitting_risk(features.shape[0], features.shape[1], n_classes)
-            if not risk.high_risk:
-                return True, f"risk={risk.risk_score:.2f}"
-            return False, f"overfitting risk: {risk.reason}"
-        except ImportError as exc:
-            _raise_missing_governance_dependency(exc, "impl_v1.training.safety.overfit_guard")
-    _check("Overfit Guard", _overfit_check)
-
-    # ── Verdict ──
-    result.passed = result.checks_failed == 0
-    result.duration_ms = (time.perf_counter() - t0) * 1000
-
-    icon = "✓" if result.passed else "✗"
-    logger.info(
-        f"[GOVERNANCE] {icon} Pre-training: {result.checks_passed}/{result.checks_run} passed "
-        f"({result.duration_ms:.0f}ms)"
+    gate_result = run_training_gate(
+        features=features,
+        labels=labels,
+        n_classes=n_classes,
+        source_id=source_id,
     )
-
-    return result
+    return _to_pre_training_result(gate_result)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -384,9 +260,7 @@ def post_epoch_audit(
         append_truth_entry(entry)
         result.truth_logged = True
     except Exception as e:
-        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
-        _record_audit_failure(epoch, f"truth_ledger: {e}")
-        raise
+        _re_raise_post_audit_failure(epoch, "truth_ledger", e)
 
     # ── 2: Overfitting detection ──
     gap = train_accuracy - holdout_accuracy
@@ -404,9 +278,7 @@ def post_epoch_audit(
             dll.update_throughput(ctypes.c_double(total_samples / max(1.0, 1.0)))
             result.performance_adjusted = True
     except Exception as e:
-        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
-        _record_audit_failure(epoch, f"performance_optimizer: {e}")
-        raise
+        _re_raise_post_audit_failure(epoch, "performance_optimizer", e)
 
     # ── 4: C++ auto_ingest_scheduler stats ──
     try:
@@ -417,9 +289,7 @@ def post_epoch_audit(
             if dupes > 0:
                 logger.info(f"[GOVERNANCE] Ingestion: {unique} unique, {dupes} dupes rejected")
     except Exception as e:
-        logger.critical("[GOVERNANCE] Audit FAILED: %s", repr(e), exc_info=True)
-        _record_audit_failure(epoch, f"auto_ingest_scheduler: {e}")
-        raise
+        _re_raise_post_audit_failure(epoch, "auto_ingest_scheduler", e)
 
     return result
 

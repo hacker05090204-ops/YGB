@@ -637,11 +637,26 @@ class AutoGrabber:
         if not callable(record_prediction):
             return
         try:
-            record_prediction(
-                sample_id=sample.sha256_hash,
-                cve_id=sample.cve_id,
-                predicted_severity=sample.severity,
-            )
+            try:
+                record_prediction(
+                    sample_id=sample.sha256_hash,
+                    cve_id=sample.cve_id,
+                    predicted_severity=sample.severity,
+                    source=sample.source,
+                    metadata={
+                        "sample_cve_id": sample.cve_id,
+                        "sample_source": sample.source,
+                        "sample_url": sample.url,
+                        "sample_token_count": str(sample.token_count),
+                        "sample_ingested_at": sample.ingested_at.isoformat(),
+                    },
+                )
+            except TypeError:
+                record_prediction(
+                    sample_id=sample.sha256_hash,
+                    cve_id=sample.cve_id,
+                    predicted_severity=sample.severity,
+                )
         except (OSError, RuntimeError, TypeError, ValueError) as exc:
             error_message = (
                 f"rl prediction recording failed for {sample.cve_id or sample.sha256_hash}: "
